@@ -12,11 +12,44 @@ And, if you are tired and just want to see some images of the website, [scroll t
 ___
 
 ### Table of Contents
+- [Recent Updates](#recent-updates)
 - [Monday Description](#monday-description)
 - [Application Features](#application-features)
 - [Technologies](#technologies)
 - [Getting started](#getting-started)
 - [Showcase](#showcase)
+
+## Recent Updates
+
+### 🔧 Task Menu Modal Fixes (Latest)
+**Status:** ✅ **Fully Fixed** - All task menu options now working correctly
+
+Fixed critical issues with the task context menu functionality:
+
+- **✅ Delete Task** - Fixed immutable state updates to properly remove tasks from groups
+- **✅ Duplicate Task** - Enhanced state management for reliable task duplication  
+- **✅ Create New Item Below** - Fixed array copying to properly insert new tasks
+- **✅ Open Task Modal** - Navigation to task detail view working correctly
+
+**Technical Improvements:**
+- Implemented proper React immutable state patterns
+- Fixed direct object mutations that were causing UI inconsistencies
+- Added comprehensive Playwright test coverage for all menu functions
+- Enhanced error handling and state synchronization
+
+### 🎯 Table Component Restoration
+**Status:** ✅ **Completed** - Table functionality fully operational
+
+Resolved major rendering issues in the main table view:
+
+- **✅ Component Picker Fix** - Resolved "UNKNOWN StatusPicker/MemberPicker/DatePicker" errors
+- **✅ Dynamic Component Rendering** - Fixed component name normalization from PascalCase to kebab-case
+- **✅ React Beautiful DND** - Fixed drag-and-drop functionality and missing draggableId errors
+- **✅ Task ID Generation** - Implemented proper unique ID generation for all tasks
+
+**Magic Link Authentication System** also implemented with email-based login functionality.
+
+---
 
 ## Monday Description
 Monday is an app in which you can manage projects and tasks using a table board. A board contains groups, lists and tasks. Usually each project is a board, and the groups and the tasks and titles to do in the project. Users can modify the board and change group and task locations using Drag and Drop.
@@ -43,7 +76,12 @@ The app uses webSockets to update the board in real-time.
 The API calls to the backend are done with the REST API method.
 
 We have used many thirs side libraries for many goals like google-login, lodash, D&D and more.
-The layout and pixel-perfect were made with Sass (functions, mixins, variables). 
+The layout and pixel-perfect were made with Sass (functions, mixins, variables).
+
+**Testing & Quality Assurance:**
+- **Playwright** - End-to-end testing framework for comprehensive UI testing
+- **ESLint** - Code linting and quality enforcement
+- Automated testing coverage for critical user workflows 
 
 ## Getting started
 
