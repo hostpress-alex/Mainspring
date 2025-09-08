@@ -15,8 +15,8 @@ export function TaskMenuModal({ dynamicModalObj }) {
     function onRemoveTask() {
         try {
             const tasksToSave = dynamicModalObj.group.tasks.filter(task => task.id !== dynamicModalObj.task.id)
-            dynamicModalObj.group.tasks = tasksToSave
-            updateGroupAction(board, dynamicModalObj.group)
+            const updatedGroup = { ...dynamicModalObj.group, tasks: tasksToSave }
+            updateGroupAction(board, updatedGroup)
             dynamicModalObj.isOpen = false
             setDynamicModalObj(dynamicModalObj)
         } catch (err) {
@@ -40,8 +40,10 @@ export function TaskMenuModal({ dynamicModalObj }) {
             newTask.id = utilService.makeId()
             newTask.title = 'New Task'
             const idx = dynamicModalObj.group.tasks.indexOf(dynamicModalObj.task)
-            dynamicModalObj.group.tasks.splice(idx + 1, 0, newTask)
-            updateGroupAction(board, dynamicModalObj.group)
+            const updatedTasks = [...dynamicModalObj.group.tasks]
+            updatedTasks.splice(idx + 1, 0, newTask)
+            const updatedGroup = { ...dynamicModalObj.group, tasks: updatedTasks }
+            updateGroupAction(board, updatedGroup)
             dynamicModalObj.isOpen = false
             setDynamicModalObj(dynamicModalObj)
         } catch (err) {
