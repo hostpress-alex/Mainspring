@@ -190,15 +190,18 @@ export function GroupPreview ({ group, board, idx }) {
                         <Droppable droppableId={group.id} type='task'>
                             {(droppableProvided) => (
                                 <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps} >
-                                    {group.tasks.map((task, idx) => (
-                                        <Draggable key={task.id} draggableId={task.id} index={idx}>
-                                            {(provided) => (
-                                                <li ref={provided.innerRef}{...provided.draggableProps} {...provided.dragHandleProps} key={idx}>
-                                                    <TaskPreview task={task} group={group} board={board} handleCheckboxChange={handleCheckboxChange} isMainCheckbox={isMainCheckbox} />
-                                                </li>
-                                            )}
-                                        </Draggable>
-                                    ))}
+                                    {group.tasks.map((task, idx) => {
+                                        const taskId = task.id || `task-${idx}-${Date.now()}`
+                                        return (
+                                            <Draggable key={taskId} draggableId={taskId} index={idx}>
+                                                {(provided) => (
+                                                    <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                        <TaskPreview task={{...task, id: taskId}} group={group} board={board} handleCheckboxChange={handleCheckboxChange} isMainCheckbox={isMainCheckbox} />
+                                                    </li>
+                                                )}
+                                            </Draggable>
+                                        )
+                                    })}
                                     {droppableProvided.placeholder}
                                     <div className="add-task flex">
                                         <div className="sticky-div" style={{ borderColor: group.color }}>

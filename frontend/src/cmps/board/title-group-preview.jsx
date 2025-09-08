@@ -10,22 +10,32 @@ export function TitleGroupPreview({ title, group, isKanban }) {
     const elRemoveColumn = useRef()
 
     function getTitleName(cmpOrder) {
-        switch (cmpOrder) {
+        // Normalize the component name to handle both formats
+        const normalizedCmp = cmpOrder.toLowerCase().replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+        
+        switch (normalizedCmp) {
             case 'member-picker':
+            case 'memberpicker':
                 return 'Person'
             case 'status-picker':
+            case 'statuspicker':
                 return 'Status'
             case 'date-picker':
+            case 'datepicker':
                 return 'Date'
             case 'priority-picker':
+            case 'prioritypicker':
                 return 'Priority'
             case 'number-picker':
+            case 'numberpicker':
                 return 'Number'
             case 'file-picker':
+            case 'filepicker':
                 return 'Files'
             case 'updated-picker':
+            case 'updatedpicker':
                 return 'Last Updated'
-            default: return ''
+            default: return cmpOrder
         }
     }
 

@@ -116,7 +116,10 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
 }
 
 function DynamicCmp({ cmp, info, onUpdate }) {
-    switch (cmp) {
+    // Normalize component name: convert PascalCase to kebab-case
+    const normalizedCmp = cmp.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+    
+    switch (normalizedCmp) {
         case "status-picker":
             return <StatusPicker info={info} onUpdate={onUpdate} />
         case "member-picker":

@@ -163,6 +163,7 @@ export async function addTaskOnFirstGroup(filteredBoard) {
         const { board } = store.getState().boardModule
         if (!filteredBoard.groups.length) await addGroup(filteredBoard)
         const taskToAdd = boardService.getEmptyTask()
+        taskToAdd.id = utilService.makeId()
         taskToAdd.title = 'New Task'
         board.groups[0].tasks.push(taskToAdd)
         await boardService.save(board)
