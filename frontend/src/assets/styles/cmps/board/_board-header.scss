@@ -1,5 +1,10 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .board-header {
-    padding: $spacing-medium 30px 0 38px;
+    padding: variables.$spacing-medium 30px 0 38px;
     position: sticky;
     left: 0;
     top: 0;
@@ -7,29 +12,29 @@
     z-index: 30;
 
     .board-title {
-        color: $workspace-icon-color ;
+        color: variables.$workspace-icon-color ;
 
         >* {
             display: flex;
             align-items: center;
-            padding-top: $spacing-xs;
-            height: rem(32px);
+            padding-top: variables.$spacing-xs;
+            height: functions.rem(32px);
             border-radius: 4px;
         }
 
         .board-info {
             width: 100%;
-            gap: $spacing-small;
+            gap: variables.$spacing-small;
 
             h1 {
                 cursor: text;
-                padding: $spacing-xs $spacing-xs $spacing-xs 0;
+                padding: variables.$spacing-xs variables.$spacing-xs variables.$spacing-xs 0;
                 border: 1px solid transparent;
-                color: $primary-text-color;
+                color: variables.$primary-text-color;
                 letter-spacing: 0.5px;
 
                 &:hover {
-                    border: 1px solid darken($border-color , 20%);
+                    border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
                 }
             }
 
@@ -37,13 +42,13 @@
                 cursor: pointer;
 
                 &:hover:not(:first-child) {
-                    background-color: $workspace-hover;
+                    background-color: variables.$workspace-hover;
                 }
             }
 
             .icon {
-                font-size: rem(20px);
-                @include center-flex();
+                font-size: functions.rem(20px);
+                @include mixins.center-flex();
                 border-radius: 4px;
                 padding: 2px;
                 
@@ -53,55 +58,55 @@
             }
 
             .star-full {
-                color: $color-egg_yolk;
+                color: variables.$color-egg_yolk;
             }
         }
 
         .board-tools {
-            gap: $spacing-medium;
+            gap: variables.$spacing-medium;
             height: fit-content;
 
             >* {
-                padding: $spacing-xs;
-                @include center-flex();
+                padding: variables.$spacing-xs;
+                @include mixins.center-flex();
                 border-radius: 6px;
                 cursor: pointer;
             }
 
             .activity {
                 &:hover {
-                    background-color: $workspace-hover;
+                    background-color: variables.$workspace-hover;
                 }
             }
 
             .members-last-seen {
                 width: max-content;
-                gap: $spacing-xs;
-                height: rem(32px);
+                gap: variables.$spacing-xs;
+                height: functions.rem(32px);
 
                 &:hover {
-                    background-color: $workspace-hover;
+                    background-color: variables.$workspace-hover;
                 }
 
                 .last-seen-title {
                     display: none;
-                    @include for-normal-layout() {
+                    @include mixins.for-normal-layout() {
                         display: block;
                     }
                 }
             }
 
             .invite {
-                height: rem(32px);
+                height: functions.rem(32px);
                 width: max-content;
 
                 &:hover {
-                    background-color: $workspace-hover;
+                    background-color: variables.$workspace-hover;
                 }
 
                 &-title{
                     display: none;
-                    @include for-normal-layout() {
+                    @include mixins.for-normal-layout() {
                         display: block;
                     }
                 }
@@ -112,7 +117,7 @@
             }
 
             .members-imgs {
-                @include member-img(white, #323338, 24px, 26px);
+                @include mixins.member-img(white, #323338, 24px, 26px);
 
             }
         }
@@ -121,17 +126,17 @@
     .board-description {
         border: 1px solid transparent;
         align-items: flex-start;
-        padding: $spacing-xs $spacing-small $spacing-xs 0;
+        padding: variables.$spacing-xs variables.$spacing-small variables.$spacing-xs 0;
         cursor: pointer;
-        color: $workspace-icon-color;
+        color: variables.$workspace-icon-color;
 
         &-link {
             font-weight: 400;
-            font-size: rem(14px);
+            font-size: functions.rem(14px);
         }
 
         span {
-            color: $link-color;
+            color: variables.$link-color;
 
             &:hover {
                 text-decoration: underline;
@@ -140,29 +145,29 @@
     }
 
     .board-display-btns {
-        margin-top: $spacing-small;
+        margin-top: variables.$spacing-small;
 
         .type-btn {
-            color: $primary-text-color;
+            color: variables.$primary-text-color;
             position: relative;
-            @include center-flex();
-            padding: 0px $spacing-small 0px $spacing-small;
-            font-size: rem(14px);
+            @include mixins.center-flex();
+            padding: 0px variables.$spacing-small 0px variables.$spacing-small;
+            font-size: functions.rem(14px);
             height: 32px;
             white-space: nowrap;
             cursor: pointer;
 
             &.active {
-                border-bottom: 2px solid $board-btn;
+                border-bottom: 2px solid variables.$board-btn;
             }
 
             svg {
-                font-size: rem(12px);
+                font-size: functions.rem(12px);
             }
 
             span {
                 font-weight: 500;
-                padding: 0 $spacing-xs;
+                padding: 0 variables.$spacing-xs;
 
                 &.wide {
                     display: none;
@@ -173,9 +178,9 @@
                 }
             }
             
-            @include for-narrow-layout() {
+            @include mixins.for-narrow-layout() {
                 &:hover {
-                    background-color: $workspace-hover;
+                    background-color: variables.$workspace-hover;
                     border-top-left-radius: 4px;
                     border-top-right-radius: 4px;
                 }
@@ -196,15 +201,15 @@
     .board-border {
         height: 1px;
         width: 100%;
-        background-color: darken($border-color , 20%);
+        background-color: color.adjust(variables.$border-color , $lightness: -20%);
     }
 
-    @include for-mobile-layout() {
+    @include mixins.for-mobile-layout() {
         & {
-            padding: $spacing-medium 10px 0 10px;
+            padding: variables.$spacing-medium 10px 0 10px;
 
             .board-info h1 {
-                font-size: rem(15px);
+                font-size: functions.rem(15px);
                 white-space: nowrap;
             }
 
@@ -227,10 +232,10 @@
         }
     }
 
-    @include for-narrow-layout() {
+    @include mixins.for-narrow-layout() {
         & {
             .board-info h1 {
-                font-size: rem(24px);
+                font-size: functions.rem(24px);
                 line-height: 42px;
             }
         }

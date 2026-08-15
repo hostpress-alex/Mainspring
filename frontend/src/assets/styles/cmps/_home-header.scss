@@ -1,8 +1,12 @@
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .home-header {
-    @include center-flex();
+    @include mixins.center-flex();
     justify-content: space-between;
-    padding: 0 $spacing-large;
-    height: rem(72px);
+    padding: 0 variables.$spacing-large;
+    height: functions.rem(72px);
     position: sticky;
     top: 0;
     background: #ffffff;
@@ -12,15 +16,15 @@
     }
 
     .header-btns {
-        @include center-flex();
+        @include mixins.center-flex();
 
         .btn-start {
-            @include center-flex();
-            background-color: $home-btn-bg;
+            @include mixins.center-flex();
+            background-color: variables.$home-btn-bg;
             height: 40px;
             width: 130px;
-            font-size: rem(13px);
-            padding: $spacing-small $spacing-medium;
+            font-size: functions.rem(13px);
+            padding: variables.$spacing-small variables.$spacing-medium;
             border-radius: 40px;
 
             &:hover {
@@ -33,11 +37,11 @@
             }
 
             .arrow {
-                @include center-flex();
+                @include mixins.center-flex();
                 display: none;
-                padding-left: $spacing-medium;
+                padding-left: variables.$spacing-medium;
 
-                @include for-normal-layout() {
+                @include mixins.for-normal-layout() {
                     & {
                         display: flex;
                     }
@@ -46,13 +50,13 @@
         }
 
         .btn-login {
-            background-color: $app-bg;
+            background-color: variables.$app-bg;
             color: #535768;
-            padding: $spacing-small $spacing-medium;
-            font-size: rem(14px);
+            padding: variables.$spacing-small variables.$spacing-medium;
+            font-size: functions.rem(14px);
             border-radius: 8px;
             font-weight: 300;
-            margin-right: $spacing-medium;
+            margin-right: variables.$spacing-medium;
 
             &:hover {
                 color: #5034FF;

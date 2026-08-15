@@ -1,32 +1,36 @@
+@use "sass:color";
+@use "functions";
+@use "variables";
+
 /* Breakpoint mixins */
 
 @mixin for-mobile-layout {
-  @media (max-width: calc($mobile-breakpoint + 40px)) {
+  @media (max-width: calc(variables.$mobile-breakpoint + 40px)) {
     @content;
   }
 }
 
 @mixin for-narrow-layout {
-  @media (min-width: calc($mobile-breakpoint + 40px)) {
+  @media (min-width: calc(variables.$mobile-breakpoint + 40px)) {
     @content;
   }
 }
 
 @mixin for-normal-layout {
-  @media (min-width: calc($narrow-breakpoint + 40px)) {
+  @media (min-width: calc(variables.$narrow-breakpoint + 40px)) {
     @content;
   }
 }
 
 @mixin for-wide-layout {
-  @media (min-width: calc($normal-breakpoint + 40px)) {
+  @media (min-width: calc(variables.$normal-breakpoint + 40px)) {
     @content;
   }
 }
 
 @mixin members() {
-  height: rem(26px);
-  width: rem(26px);
+  height: functions.rem(26px);
+  width: functions.rem(26px);
   border-radius: 50%;
 }
 
@@ -57,11 +61,11 @@
 
   .show-more-members {
     @include center-flex();
-    font-size: rem(14px);
+    font-size: functions.rem(14px);
     background-color: $bgColor;
     margin-left: -5px;
-    border: 1px solid $border-color;
-    padding: em(4px);
+    border: 1px solid variables.$border-color;
+    padding: functions.em(4px);
     text-align: center;
     width: $countSize;
     height: $countSize;
@@ -105,36 +109,36 @@
 }
 
 @mixin menu-modal() {
-  background-color: $app-bg;
-  border-radius: $spacing-small;
+  background-color: variables.$app-bg;
+  border-radius: variables.$spacing-small;
   display: flex;
   flex-direction: column;
   position: absolute;
   top: 40px;
-  color: $primary-text-color;
-  font-size: rem(14px);
+  color: variables.$primary-text-color;
+  font-size: functions.rem(14px);
   z-index: 10;
-  padding: $spacing-small;
+  padding: variables.$spacing-small;
   box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-  border: 1px solid darken($border-color , 20%);
+  border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
 
   >* {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: $spacing-xs $spacing-small;
+    padding: variables.$spacing-xs variables.$spacing-small;
 
     &:hover:not(.color-palette) {
-      background-color: $workspace-hover;
-      border-radius: $spacing-small;
+      background-color: variables.$workspace-hover;
+      border-radius: variables.$spacing-small;
     }
   }
 }
 
 @mixin empty-div() {
     width: 100%;
-    border-bottom: 2px solid darken($border-color , 20%);
+    border-bottom: 2px solid color.adjust(variables.$border-color , $lightness: -20%);
     &:first-child {
-        border-top: 2px solid darken($border-color , 20%);
+        border-top: 2px solid color.adjust(variables.$border-color , $lightness: -20%);
   }
 }

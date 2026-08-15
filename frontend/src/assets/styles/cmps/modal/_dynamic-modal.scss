@@ -1,10 +1,22 @@
+@use "sass:color";
+@use "../../setup/variables";
+
 .dynamic-modal{
     position: absolute;
-    background-color: $app-bg;
-    border-radius: $spacing-small;
-    padding: $spacing-small;
+    background-color: variables.$app-bg;
+    border-radius: variables.$spacing-small;
+    padding: variables.$spacing-small;
     box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-    border: 1px solid darken($border-color , 20%);
+    border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
     border-radius: 8px;
     z-index: 1000;
+
+    // Was in einem Popup anklickbar ist, soll auch so aussehen. Bisher hing
+    // der Zeigerwechsel an jeder Popup-Datei einzeln — und fehlte prompt.
+    li,
+    button,
+    [role='button'],
+    .folder, .duplicate, .delete, .edit, .pin, .open {
+        cursor: pointer;
+    }
 }

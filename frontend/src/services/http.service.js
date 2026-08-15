@@ -1,8 +1,8 @@
 import Axios from 'axios'
 
-const BASE_URL = process.env.NODE_ENV === 'production'
-    ? '/api/'
-    : '//localhost:3030/api/'
+// Immer relativ: in Dev leitet der Vite-Proxy nach :3030 weiter,
+// in Produktion liefert derselbe Express-Prozess Frontend und API aus.
+const BASE_URL = '/api/'
 
 
 var axios = Axios.create({
@@ -18,6 +18,9 @@ export const httpService = {
     },
     put (endpoint, data) {
         return ajax(endpoint, 'PUT', data)
+    },
+    patch (endpoint, data) {
+        return ajax(endpoint, 'PATCH', data)
     },
     delete (endpoint, data) {
         return ajax(endpoint, 'DELETE', data)
@@ -38,9 +41,11 @@ async function ajax (endpoint, method = 'GET', data = null) {
         console.dir(err)
         if (err.response && err.response.status === 401) {
             sessionStorage.clear()
-        }
-        if (err.response && err.response.status === 500) {
-            window.location.assign('/')
+            // Nicht umleiten, wenn wir ohnehin schon auf der Login-Seite sind —
+            // sonst verschluckt der Reload die Fehlermeldung des Login-Versuchs.
+            if (!window.location.pathname.startsWith('/auth/')) {
+                window.location.assign('/auth/login')
+            }
         }
         throw err
     }

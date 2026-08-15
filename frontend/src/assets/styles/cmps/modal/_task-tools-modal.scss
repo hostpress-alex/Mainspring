@@ -1,3 +1,8 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .task-tools-modal {
     position: fixed;
     bottom: 35px;
@@ -9,10 +14,10 @@
     z-index: 100;
     border-radius: 5px;
     pointer-events: auto;
-    background-color: $app-bg;
+    background-color: variables.$app-bg;
     box-shadow: 0px 15px 50px rgba(0, 0, 0, 0.3);
 
-    @include for-mobile-layout() {
+    @include mixins.for-mobile-layout() {
         & {
             inset: 72% auto auto 11%;
             width: 78%;
@@ -38,7 +43,7 @@
     }
 
     .task-tools {
-        color: $primary-text-color;
+        color: variables.$primary-text-color;
         width: 100%;
 
         >* {
@@ -47,22 +52,22 @@
             gap: 5px;
         }
 
-        @include for-mobile-layout() {
+        @include mixins.for-mobile-layout() {
             & >*{
                 align-items: flex-start;
             }
           
         }
         .task-count {
-            @include center-flex();
+            @include mixins.center-flex();
             border-top-left-radius: 5px;
             border-bottom-left-radius: 5px;
             width: 36px;
             height: 100%;
             color: white;
             width: 63px;
-            font-size: rem(24px);
-            background-color: $board-btn;
+            font-size: functions.rem(24px);
+            background-color: variables.$board-btn;
         }
 
         .tasks-container {
@@ -71,18 +76,18 @@
 
         .task-info {
             padding-left: 20px;
-            font-size: rem(20px);
+            font-size: functions.rem(20px);
             flex-direction: column;
             align-items: flex-start;
-            margin-bottom: $spacing-xs;
+            margin-bottom: variables.$spacing-xs;
 
             .group-color {
                 justify-content: flex-start;
-                font-size: rem(10px);
-                padding-left: $spacing-xs;
-                gap: $spacing-xs;
+                font-size: functions.rem(10px);
+                padding-left: variables.$spacing-xs;
+                gap: variables.$spacing-xs;
             }
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 &{
                     flex-direction: column;
                 }
@@ -101,18 +106,18 @@
 
                 &:hover {
                     .icon {
-                        color: $board-btn;
+                        color: variables.$board-btn;
                     }
                 }
 
                 .icon {
-                    font-size: rem(18px);
+                    font-size: functions.rem(18px);
                     margin: 0 auto;
-                    color: darken($workspace-icon-color , 20%);
+                    color: color.adjust(variables.$workspace-icon-color , $lightness: -20%);
                 }
             }
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & {
                     margin-left: 10px;
                 }
@@ -120,23 +125,23 @@
         }
 
         .close-btn {
-            @include center-flex();
+            @include mixins.center-flex();
             width: 63px;
             height: 100%;
-            border-left: 2px solid $task-box-shadow-color;
+            border-left: 2px solid variables.$task-box-shadow-color;
 
             &:hover {
                 .icon {
-                    color: $board-btn;
+                    color: variables.$board-btn;
                 }
             }
 
             .icon {
-                font-size: rem(26px);
+                font-size: functions.rem(26px);
                 color: black;
             }
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & {
                     position: absolute;
                     right: -11px;

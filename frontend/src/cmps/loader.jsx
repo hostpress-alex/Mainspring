@@ -1,5 +1,4 @@
-const loader = require('../assets/img/loader.gif')
-
+import loader from '../assets/img/loader.gif'
 export function Loader() {
 
 

@@ -61,7 +61,7 @@ export function MemberChart ({ board, dynamicModalObj }) {
         <section className='member-chart'>
             <div className='chart-header'>
               <div className='header-content'>
-                <h2>Chart member</h2>
+                <h2>Diagramm: Personen</h2>
                 <span className='icon-container' ref={elModalBtn} onClick={onToggleTypeModal}>
                   <BiDotsHorizontalRounded />
                 </span>

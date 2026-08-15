@@ -1,5 +1,10 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .group-preview {
-    margin-bottom: $spacing-xxxl;
+    margin-bottom: variables.$spacing-xxxl;
     position: relative;
 
     .hidden {
@@ -9,7 +14,7 @@
         height: 40px;
         background-color: white;
 
-        @include for-mobile-layout() {
+        @include mixins.for-mobile-layout() {
             & {
                 display: none;
             }
@@ -27,7 +32,7 @@
         
         &:hover {
             .open-modal-icon {
-                @include center-flex();
+                @include mixins.center-flex();
                 opacity: 1;
                 z-index: 20;
                 cursor: pointer;
@@ -40,24 +45,24 @@
         top: 211px;
         left: 40px;
         z-index: 2;
-        background-color: $app-bg;
+        background-color: variables.$app-bg;
         width: 100%;
 
-        @include for-narrow-layout() {
+        @include mixins.for-narrow-layout() {
             &.not-des {
                 top: 186px;
             }
         }
 
-        @include for-mobile-layout {
+        @include mixins.for-mobile-layout {
             & {
                 top: 179px;
             }
         }
 
         .add-picker-task {
-            border-top: 1px solid darken($border-color , 20%);
-            border-bottom: 1px solid darken($border-color , 20%);
+            border-top: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+            border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
             width: 100%;
             transition: transform .2s, color .1s ease;
             padding-right: 150px;
@@ -65,16 +70,16 @@
             .add-btn {
                 display: flex;
                 align-items: center;
-                padding: 3px $spacing-xs;
-                margin-left: $spacing-xs;
-                border-radius: $spacing-xs;
+                padding: 3px variables.$spacing-xs;
+                margin-left: variables.$spacing-xs;
+                border-radius: variables.$spacing-xs;
                 cursor: pointer;
                 position: relative;
 
                 .plus {
                     transition: transform .2s ease, color .1s ease;
                     transform: rotate(45deg);
-                    color: $primary-hover-color;
+                    color: variables.$primary-hover-color;
                 }
                 
                 .close{
@@ -83,27 +88,27 @@
                 }
                 
                 &:hover {
-                    background-color: $layout-border-color;
+                    background-color: variables.$layout-border-color;
                 }
                 
                 &.active {
-                    background-color: $layout-border-color;
+                    background-color: variables.$layout-border-color;
                 }
             }
         }
     }
 
     .title {
-        @include center-flex();
-        min-width: $cell-width;
-        height: $cell-height;
-        border: 1px solid darken($border-color , 20%);
-        font-size: rem(14px);
+        @include mixins.center-flex();
+        min-width: variables.$cell-width;
+        height: variables.$cell-height;
+        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        font-size: functions.rem(14px);
 
         &.task {
-            min-width: $cell-width-task;
+            min-width: variables.$cell-width-task;
 
-            @include for-mobile-layout {
+            @include mixins.for-mobile-layout {
                 & {
                     min-width: 202px;
                 }
@@ -111,7 +116,7 @@
         }
 
         &.member-picker {
-            min-width: $cell-width-person;
+            min-width: variables.$cell-width-person;
         }
     }
 
@@ -124,20 +129,20 @@
         width: 100%;
         line-height: 24px;
 
-        @include for-narrow-layout() {
+        @include mixins.for-narrow-layout() {
             &.not-des {
                 top: 158px;
             }
         }
 
-        @include for-mobile-layout {
+        @include mixins.for-mobile-layout {
             & {
                 top: 149px;
             }
         }
 
         .group-title-info {
-            margin-bottom: $spacing-small;
+            margin-bottom: variables.$spacing-small;
 
             &:hover {
                 .task-count {
@@ -146,23 +151,23 @@
             }
 
             .task-count {
-                color: $workspace-icon-color;
+                color: variables.$workspace-icon-color;
                 white-space: nowrap;
-                font-size: rem(14px);
+                font-size: functions.rem(14px);
                 line-height: 19px;
-                margin-left: $spacing-small;
+                margin-left: variables.$spacing-small;
                 transition: .2s;
                 opacity: 0;
             }
 
             &.showBorder {
-                border: 1px solid $board-btn;
+                border: 1px solid variables.$board-btn;
                 border-radius: 4px;
             }
 
             .group-title:focus-visible {
                 outline: none;
-                margin-left: $spacing-xs;
+                margin-left: variables.$spacing-xs;
             }
 
             blockquote {
@@ -178,7 +183,7 @@
             left: 40px;
             z-index: 2;
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & {
                     left: 0;
                 }
@@ -198,7 +203,7 @@
         }
 
         .arrow-icon {
-            font-size: rem(16px);
+            font-size: functions.rem(16px);
             margin-left: 13px;
             cursor: pointer;
         }
@@ -206,30 +211,30 @@
         h4 {
             cursor: text;
             font-weight: 600;
-            font-size: rem(18px);
-            padding: $spacing-xs;
+            font-size: functions.rem(18px);
+            padding: variables.$spacing-xs;
         }
 
         .group-menu {
-            @include center-flex();
+            @include mixins.center-flex();
             position: absolute;
             width: 40px;
             left: -38px;
             height: 40px;
-            color: $primary-text-color;
+            color: variables.$primary-text-color;
 
             .icon {
                 display: none;
                 cursor: pointer;
                 border-radius: 4px;
-                font-size: rem(20px);
+                font-size: functions.rem(20px);
             }
 
             .icon:hover {
-                background-color: $layout-border-color;
+                background-color: variables.$layout-border-color;
             }
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & {
                     display: none;
                 }
@@ -239,8 +244,8 @@
 
     .check-box {
         min-width: 33px;
-        @include center-flex();
-        border: 1px solid darken($border-color , 20%);
+        @include mixins.center-flex();
+        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
 
         input {
             width: 15px;
@@ -253,7 +258,7 @@
 
         .empty-div {
             width: 100%;
-            border-bottom: 1px solid darken($border-color , 20%);
+            border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
         }
 
         .add-task-form {
@@ -273,22 +278,22 @@
             border: none;
 
             &:focus-visible {
-                outline: 1px solid darken($border-color , 20%);
+                outline: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
             }
 
             &:hover {
-                border: .5px solid darken($border-color , 20%);
+                border: .5px solid color.adjust(variables.$border-color , $lightness: -20%);
             }
         }
 
         .check-box.add-task {
             width: 33px;
             height: 36px;
-            border-left: $color-bright-blue-selected;
+            border-left: variables.$color-bright-blue-selected;
 
             input {
                 margin: 3px 3px 3px 4px;
-                padding: $spacing-small;
+                padding: variables.$spacing-small;
             }
         }
     }
@@ -301,7 +306,7 @@
         z-index: 1;
         left: 40px;
 
-        @include for-mobile-layout {
+        @include mixins.for-mobile-layout {
             & {
                 min-width: 240px;
                 left: 0;

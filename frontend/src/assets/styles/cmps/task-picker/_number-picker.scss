@@ -1,8 +1,12 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .number-picker {
     max-width: 140px;
-    @include center-flex();
+    @include mixins.center-flex();
     position: relative;
-    font-size: rem(14px);
+    font-size: functions.rem(14px);
 
     &:hover {
         .clear-input,
@@ -20,16 +24,16 @@
         margin: auto;
 
         &:hover {
-            border: .2px solid $workspace-hover;
+            border: .2px solid variables.$workspace-hover;
         }
 
         &:focus-visible {
-            border: .2px solid $board-btn;
+            border: .2px solid variables.$board-btn;
         }
     }
 
     .clear-input {
-        @include center-flex();
+        @include mixins.center-flex();
         opacity: 0;
         margin: 0;
         padding: 2px;
@@ -37,19 +41,19 @@
         right: 13px;
         border-radius: 3px;
         cursor: pointer;
-        background-color: $workspace-hover;
-        color: $primary-text-color;
+        background-color: variables.$workspace-hover;
+        color: variables.$primary-text-color;
     }
 
     .add-number-icons {
         opacity: 0;
-        @include center-flex();
-        gap: $spacing-xs;
+        @include mixins.center-flex();
+        gap: variables.$spacing-xs;
         width: 100%;
         cursor: pointer;
 
         .plus-icon {
-            color: $board-btn;
+            color: variables.$board-btn;
         }
     }
 }

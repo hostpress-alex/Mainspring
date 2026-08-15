@@ -1,3 +1,7 @@
+@use "sass:color";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .dashboard {
     display: flex;
     flex-wrap: wrap;
@@ -8,7 +12,7 @@
     >* {
         width: 40%;
         border-radius: 8px;
-        border: 2px solid darken($border-color , 20%);
+        border: 2px solid color.adjust(variables.$border-color , $lightness: -20%);
         height: 100%;
         
         &:hover {
@@ -16,8 +20,8 @@
         }
         
         .chart-header {
-            border-bottom: 1px solid darken($border-color , 20%);
-            color: $primary-text-color;
+            border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+            color: variables.$primary-text-color;
 
             h2 {
                 overflow-x: hidden;
@@ -30,15 +34,15 @@
         }
 
         .header-content, .chart-content {
-            @include center-flex();
-            padding: $spacing-small $spacing-medium;
+            @include mixins.center-flex();
+            padding: variables.$spacing-small variables.$spacing-medium;
         }
         
         .header-content {
             justify-content: space-between;
 
             .icon-container {
-                @include center-flex();
+                @include mixins.center-flex();
                 width: 20px;
                 height: 20px;
                 cursor: pointer;
@@ -52,7 +56,7 @@
 
     }
 
-    @include for-mobile-layout() {
+    @include mixins.for-mobile-layout() {
         & {
             padding: 16px 0;
             justify-content: center;

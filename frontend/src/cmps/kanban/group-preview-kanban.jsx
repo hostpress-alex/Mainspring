@@ -1,5 +1,6 @@
 import { Tooltip } from '@mui/material'
 import { updateGroupAction } from '../../store/board.actions'
+import { singleLineEditable } from '../../services/editable'
 import { TaskListKanban } from './task-list-kanban'
 
 export function GroupPreviewKanban ({ group, board, index }) {
@@ -10,14 +11,15 @@ export function GroupPreviewKanban ({ group, board, index }) {
         try {
             await updateGroupAction(board, group)
         } catch (err) {
-            console.log('Failed to save')
+            console.log('Speichern fehlgeschlagen')
         }
     }
     return (
         <section className="group-preview-kanban" >
             <div className={`group-header ${!board.description ? ' not-des' : ''}`}>
                 <div className='group-title-container' style={{ backgroundColor: group.color }}>
-                    <blockquote className="group-title" contentEditable onBlur={(ev) => onSave(ev)} suppressContentEditableWarning={true}>
+                    <blockquote className="group-title" contentEditable onBlur={(ev) => onSave(ev)} suppressContentEditableWarning={true}
+                        {...singleLineEditable()}>
                         <Tooltip title={group.title} arrow>
                             <span>{group.title}</span>
                         </Tooltip>

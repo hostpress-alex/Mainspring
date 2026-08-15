@@ -1,18 +1,21 @@
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .upload-preview {
     .img-picker{
-        @include center-flex();
+        @include mixins.center-flex();
         flex-direction: column;
-        gap: $spacing-medium;
+        gap: variables.$spacing-medium;
     }
 
     label {
-        margin-bottom: $spacing-medium;
-        color: $primary-text-color;
+        margin-bottom: variables.$spacing-medium;
+        color: variables.$primary-text-color;
         transition: color 200ms ease;
         width: fit-content;
 
         .guest-img {
-            margin-bottom: $spacing-small;
+            margin-bottom: variables.$spacing-small;
             border-radius: 50%;
             opacity: 0.3;
             cursor: pointer;

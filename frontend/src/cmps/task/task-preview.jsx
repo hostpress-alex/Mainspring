@@ -7,15 +7,21 @@ import { MemberPicker } from "./member-picker"
 import { PriorityPicker } from "./priority-picker"
 import { StatusPicker } from "./status-picker"
 import { setDynamicModalObj, toggleModal, updateTaskAction } from "../../store/board.actions"
+import { boardService } from "../../services/board.service"
+import { singleLineEditable } from "../../services/editable"
 import { UpdatedPicker } from "./updated-picker"
 import { NumberPicker } from "./number-picker"
 import { FilePicker } from "./file-picker"
+import { TextPicker, LongTextPicker, CheckboxPicker, LinkPicker, DropdownPicker } from "./simple-pickers"
 
 import { TbArrowsDiagonal } from 'react-icons/tb'
 import { BiDotsHorizontalRounded, BiMessageRoundedAdd } from 'react-icons/bi'
 import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
+import { GUEST_IMG } from '../../services/avatar'
+import { widthOf, widthStyle } from '../board/column-width'
+import '../board/board-columns.css'
 
-export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCheckbox }) {
+export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCheckbox, widths = {} }) {
     const [isClick, setIsClick] = useState(false)
     const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
     const user = useSelector(storeState => storeState.userModule.user)
@@ -23,9 +29,9 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
     const elTaskPreview = useRef(null)
     const elMenuTask = useRef()
     const navigate = useNavigate()
-
-    const guest = "https://res.cloudinary.com/du63kkxhl/image/upload/v1675013009/guest_f8d60j.png"
-
+    // Nur eigenstaendige Updates zaehlen — Antworten haengen daran und wuerden
+    // die Zahl in der Zeile sonst aufblaehen.
+    const updateCount = (task.comments || []).filter(c => c && !c.parentId).length
     useEffect(() => {
         setIsClick(isMainCheckbox.isActive)
     }, [isMainCheckbox])
@@ -34,7 +40,7 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
         const taskToUpdate = structuredClone(task)
         taskToUpdate[cmpType] = data
         taskToUpdate.updatedBy.date = Date.now()
-        taskToUpdate.updatedBy.imgUrl = (user && user.imgUrl) || guest
+        taskToUpdate.updatedBy.imgUrl = (user && user.imgUrl) || GUEST_IMG
         try {
             await updateTaskAction(board, group.id, taskToUpdate, activity)
         } catch (err) {
@@ -44,17 +50,22 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
 
     async function onUpdateTaskTitle(ev) {
         const value = ev.target.innerText
-        task.title = value
+        if (value === task.title) return
+        const activity = boardService.getEmptyActivity()
+        activity.action = 'title'
+        activity.task = { id: task.id, title: value }
+        activity.from = task.title
+        activity.to = value
         try {
             toggleOnTyping()
-            await updateTaskAction(board, group.id, task)
+            await updateTaskAction(board, group.id, { ...task, title: value }, activity)
         } catch (err) {
-            console.log('Failed to save')
+            console.log('Speichern fehlgeschlagen')
         }
     }
 
     function onOpenModal() {
-        toggleModal(isOpen)
+        // Die URL steuert den Dialog — kein zusaetzliches Umschalten noetig.
         navigate(`/board/${board._id}/${group.id}/${task.id}`)
     }
 
@@ -84,57 +95,62 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
                     <input type="checkbox" checked={isClick} onChange={onCheckBoxChange} />
                 </div>
                 <div className="task-title picker flex align-center space-between">
-                    <blockquote contentEditable onFocus={toggleOnTyping}
-                        onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}>
+                    <blockquote contentEditable
+                        onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
+                        {...singleLineEditable({ onFocus: toggleOnTyping })}>
                         <span>{task.title}</span>
                     </blockquote>
                     <div className="open-task-details " onClick={onOpenModal}>
                         <TbArrowsDiagonal />
-                        <span className="open-btn">Open</span>
+                        <span className="open-btn">Öffnen</span>
                     </div>
                     <div onClick={onOpenModal} className="chat-icon">
-                        {task.comments.length > 0 && <div>
+                        {updateCount > 0 && <div>
                             <HiOutlineChatBubbleOvalLeft className="comment-chat" />
-                            <div className="count-comment">{task.comments.length}</div>
+                            <div className="count-comment">{updateCount}</div>
                         </div>}
-                        {task.comments.length === 0 && <BiMessageRoundedAdd className="icon" />}
+                        {updateCount === 0 && <BiMessageRoundedAdd className="icon" />}
                     </div>
                 </div>
             </div>
-            {board.cmpsOrder.map((cmp, idx) => {
-                return (
-                    <DynamicCmp
-                        cmp={cmp}
-                        key={cmp + idx}
-                        info={task}
-                        onUpdate={updateTask}
-                    />)
-            })}
+            {(board.columns || []).map(column => (
+                <DynamicCmp
+                    key={column.id}
+                    column={column}
+                    board={board}
+                    info={task}
+                    width={widthOf(widths, column)}
+                    onUpdate={updateTask}
+                />
+            ))}
             <div className="empty-div"></div>
         </section>
     )
 }
 
-function DynamicCmp({ cmp, info, onUpdate }) {
-    // Normalize component name: convert PascalCase to kebab-case
-    const normalizedCmp = cmp.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-    
-    switch (normalizedCmp) {
-        case "status-picker":
-            return <StatusPicker info={info} onUpdate={onUpdate} />
-        case "member-picker":
-            return <MemberPicker info={info} onUpdate={onUpdate} />
-        case "date-picker":
-            return <DueDate info={info} onUpdate={onUpdate} />
-        case "priority-picker":
-            return <PriorityPicker info={info} onUpdate={onUpdate} />
-        case "number-picker":
-            return <NumberPicker info={info} onUpdate={onUpdate} />
-        case "file-picker": 
-            return <FilePicker info={info} onUpdate={onUpdate} />
-        case "updated-picker":
-            return <UpdatedPicker info={info} onUpdate={onUpdate} />
-        default:
-            return <p>UNKNOWN {cmp}</p>
+/** Rendert eine Spalte anhand ihres Typs. `field` sagt, wo der Wert liegt. */
+export function DynamicCmp({ column, info, onUpdate, board, width }) {
+    const field = column.field || column.id
+    const props = { info, onUpdate, field, column }
+
+    const inner = renderPicker()
+    return <div className='col-cell' style={width ? widthStyle(width) : undefined}>{inner}</div>
+
+    function renderPicker () {
+    switch (column.type) {
+        case 'status':   return <StatusPicker {...props} />
+        case 'person':   return <MemberPicker {...props} />
+        case 'date':     return <DueDate {...props} />
+        case 'priority': return <PriorityPicker {...props} />
+        case 'number':   return <NumberPicker {...props} />
+        case 'file':     return <FilePicker {...props} />
+        case 'updated':  return <UpdatedPicker {...props} />
+        case 'text':     return <TextPicker {...props} />
+        case 'longtext': return <LongTextPicker {...props} />
+        case 'checkbox': return <CheckboxPicker {...props} />
+        case 'link':     return <LinkPicker {...props} />
+        case 'dropdown': return <DropdownPicker {...props} board={board} />
+        default:         return <section className='picker'>—</section>
+    }
     }
 }

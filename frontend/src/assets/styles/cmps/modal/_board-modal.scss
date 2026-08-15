@@ -1,19 +1,33 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .board-modal {
     position: fixed;
     top: 0;
     right: 0;
     flex-direction: column;
     height: 100vh;
-    background-color: $app-bg;
+    background-color: variables.$app-bg;
     border-inline-start: 1px solid #ccc;
-    min-width: 570px;
+    // Die Breite kommt als Inline-Stil aus BoardModal (pro Benutzer gemerkt).
+    // Hier steht nur noch die Untergrenze, damit nichts zusammenfaellt.
+    min-width: 420px;
+    box-sizing: border-box;
+    // Eigener Scrollbereich: sonst wandert das Rad durch auf das Board dahinter.
+    overflow-y: auto;
+    overscroll-behavior: contain;
     transform: translateX(100%);
     z-index: 100;
     transition: transform .6s, box-shadow .6s;
 
-    @include for-mobile-layout() {
+    @include mixins.for-mobile-layout() {
         & {
             min-width: 100vw;
+            // Auf dem Handy nimmt das Panel die ganze Breite — die gezogene
+            // Breite waere dort nur im Weg.
+            width: 100vw !important;
         }
     }
 
@@ -27,31 +41,49 @@
         cursor: pointer;
     }
 
+    // Titel steht neben dem Schliessen-Kreuz, nicht darunter.
     .task-modal-header {
         justify-content: flex-start;
-        margin: 20px 20px 6px 24px;
-        height: 53px;
-        font-size: rem(18px);
+        align-items: center;
+        gap: variables.$spacing-small;
+        margin: 18px 20px 6px 24px;
+        min-height: 34px;
+        height: auto;
+        font-size: functions.rem(18px);
+
+        .close-btn {
+            flex: 0 0 auto;
+            font-size: functions.rem(22px);
+        }
+
+        .title {
+            min-width: 0;
+            flex: 1 1 auto;
+
+            blockquote {
+                margin: 0;
+            }
+        }
     }
 
     .task-modal-type {
-        padding: 0 $spacing-large;
-        border-bottom: 1px solid $border-color;
+        padding: 0 variables.$spacing-large;
+        border-bottom: 1px solid variables.$border-color;
 
         >* {
-            @include center-flex();
-            gap: $spacing-small;
-            border-right: 1px solid $border-color;
+            @include mixins.center-flex();
+            gap: variables.$spacing-small;
+            border-right: 1px solid variables.$border-color;
             width: fit-content;
-            padding: $spacing-small;
+            padding: variables.$spacing-small;
             font-weight: 500;
-            font-size: rem(14px);
+            font-size: functions.rem(14px);
             cursor: pointer;
 
             &:hover {
-                border-top-left-radius: $spacing-xs;
-                border-top-right-radius: $spacing-xs;
-                background-color: $workspace-hover;
+                border-top-left-radius: variables.$spacing-xs;
+                border-top-right-radius: variables.$spacing-xs;
+                background-color: variables.$workspace-hover;
             }
         }
 
@@ -61,7 +93,7 @@
     }
 
     .update {
-        padding: 20px 20px 6px $spacing-large;
+        padding: 20px 20px 6px variables.$spacing-large;
         height: 85vh;
         overflow: auto;
 
@@ -71,39 +103,63 @@
 
         .close-input-container {
             padding-left: 20px;
-            outline: 1px solid $board-btn;
+            outline: 1px solid variables.$board-btn;
             min-height: 40px;
             border-radius: 4px;
-            color: $workspace-icon-color;
+            color: variables.$workspace-icon-color;
 
             &:hover {
-                background-color: $workspace-hover;
+                background-color: variables.$workspace-hover;
             }
         }
 
         .button-container {
             display: flex;
             flex-direction: row-reverse;
-            gap: $spacing-small;
+            gap: variables.$spacing-small;
 
             .save {
-                @include center-flex();
-                background-color: $board-btn;
+                @include mixins.center-flex();
+                background-color: variables.$board-btn;
                 color: white;
                 margin: 0;
                 height: 32px;
                 border-radius: 4px;
-                padding: $spacing-xs $spacing-small;
+                padding: variables.$spacing-xs variables.$spacing-small;
 
                 &:hover {
-                    background-color: $primary-hover-color;
+                    background-color: variables.$primary-hover-color;
+                }
+
+                &:disabled {
+                    background-color: #c3c6d4;
+                    cursor: default;
+                }
+            }
+
+            // Hatte vorher gar keine eigene Regel und war dadurch hellgrau
+            // auf hellgrau — praktisch unlesbar.
+            .cancel {
+                @include mixins.center-flex();
+                background-color: transparent;
+                color: #323338;
+                border: 1px solid #c3c6d4;
+                margin: 0;
+                height: 32px;
+                border-radius: 4px;
+                padding: variables.$spacing-xs variables.$spacing-small;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: variables.$workspace-hover;
+                    border-color: #676879;
                 }
             }
         }
 
         .input-container {
-            margin-bottom: $spacing-small;
-            outline: 1px solid $board-btn;
+            margin-bottom: variables.$spacing-small;
+            outline: 1px solid variables.$board-btn;
             border-radius: 4px;
             width: 100%;
             height: 145px;
@@ -111,19 +167,19 @@
             .style-txt {
                 width: 100%;
                 display: flex;
-                border-bottom: 1px solid darken($border-color, 20%);
+                border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
                 >* {
-                    @include center-flex();
-                    padding: $spacing-xs $spacing-small;
+                    @include mixins.center-flex();
+                    padding: variables.$spacing-xs variables.$spacing-small;
                     cursor: pointer;
                     border-radius: 4px;
-                    font-size: rem(14px);
+                    font-size: functions.rem(14px);
                     text-align: center;
-                    margin: $spacing-xs 2px $spacing-xs $spacing-xs;
+                    margin: variables.$spacing-xs 2px variables.$spacing-xs variables.$spacing-xs;
 
                     &:hover {
-                        background-color: $workspace-hover;
+                        background-color: variables.$workspace-hover;
                     }
                 }
             }
@@ -148,16 +204,16 @@
             }
 
             .txt {
-                padding: $spacing-medium;
+                padding: variables.$spacing-medium;
             }
 
             h2 {
                 font-weight: 500;
-                font-size: rem(24px);
+                font-size: functions.rem(24px);
             }
 
             p {
-                margin-top: $spacing-medium;
+                margin-top: variables.$spacing-medium;
                 text-align: center;
             }
         }
@@ -166,5 +222,33 @@
     .activities {
         height: 85vh;
         overflow: auto;
+    }
+}
+/**
+ * Ziehgriff fuer die Breite des rechten Task-Fensters.
+ *
+ * Bewusst ein eigenes Element neben dem Panel und nicht darin: das Panel
+ * scrollt, ein Griff darin wuerde mitwandern.
+ */
+.board-modal-resizer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 9px;
+    margin-right: -4px;
+    z-index: 101;
+    cursor: col-resize;
+    background: transparent;
+    transition: background-color .15s;
+
+    &:hover,
+    &.is-active {
+        background-color: rgba(0, 115, 234, .35);
+    }
+
+    @include mixins.for-mobile-layout() {
+        & {
+            display: none;
+        }
     }
 }

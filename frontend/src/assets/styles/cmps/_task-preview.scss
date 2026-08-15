@@ -1,9 +1,14 @@
+@use "sass:color";
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .task-preview {
     position: relative;
-    font-size: rem(14px);
+    font-size: functions.rem(14px);
 
     .empty-div {
-        @include empty-div()
+        @include mixins.empty-div()
     }
 
     &:hover {
@@ -13,18 +18,18 @@
     }
 
     .sticky-div.on-typing{
-        background-color: $workspace-board-active;
+        background-color: variables.$workspace-board-active;
     }
     .task-menu {
-        @include center-flex();
+        @include mixins.center-flex();
         position: absolute;
         width: 41px;
         left: -47px;
         height: 40px;
-        color: $primary-text-color;
+        color: variables.$primary-text-color;
         background-color: white;
 
-        @include for-mobile-layout() {
+        @include mixins.for-mobile-layout() {
             & {
                 display: none;
             }
@@ -33,12 +38,12 @@
         .icon {
             display: none;
             border-radius: 4px;
-            font-size: rem(20px);
+            font-size: functions.rem(20px);
             cursor: pointer;
         }
 
         .icon:hover {
-            background-color: $layout-border-color;
+            background-color: variables.$layout-border-color;
         }
     }
 
@@ -49,17 +54,17 @@
     // }
 
     .task-tools-modal {
-        @include menu-modal();
+        @include mixins.menu-modal();
     }
 
     .picker {
-        min-width: $cell-width;
-        height: $cell-height;
-        border: 1px solid darken($border-color , 20%);
+        min-width: variables.$cell-width;
+        height: variables.$cell-height;
+        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
     }
 
     .task-title {
-        width: $cell-width-task;
+        width: variables.$cell-width-task;
         cursor: pointer;
 
         &:hover {
@@ -73,12 +78,12 @@
         }
 
         .open-task-details {
-            @include center-flex();
+            @include mixins.center-flex();
             opacity: 0;
-            margin: 0 $spacing-small;
-            color: $workspace-icon-color;
+            margin: 0 variables.$spacing-small;
+            color: variables.$workspace-icon-color;
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & .open-btn {
                     display: none;
                 }
@@ -86,16 +91,16 @@
         }
 
         .chat-icon {
-            font-size: rem(24px);
-            padding: 0 $spacing-medium;
+            font-size: functions.rem(24px);
+            padding: 0 variables.$spacing-medium;
             height: 100%;
-            border-left: 1px solid darken($border-color , 20%);
-            color: $chat-icon-color;
-            @include center-flex();
+            border-left: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+            color: variables.$chat-icon-color;
+            @include mixins.center-flex();
             position: relative;
 
             .icon:hover {
-                color: $board-btn;
+                color: variables.$board-btn;
                 cursor: pointer;
             }
 
@@ -105,13 +110,13 @@
             }
 
             .count-comment {
-                @include center-flex();
+                @include mixins.center-flex();
                 position: absolute;
                 top: 15px;
                 right: 15px;
-                background-color: $board-btn;
+                background-color: variables.$board-btn;
                 color: white;
-                font-size: rem(10px);
+                font-size: functions.rem(10px);
                 border-radius: 50%;
                 width: 14px;
                 height: 13px;
@@ -120,13 +125,13 @@
             }
 
             .comment-chat {
-                color: $board-btn;
+                color: variables.$board-btn;
             }
         }
     }
 
     &.on-typing {
-        background-color: $workspace-board-active;
+        background-color: variables.$workspace-board-active;
     }
 
     blockquote {
@@ -138,23 +143,23 @@
         margin-left: 36px;
         cursor: text;
 
-        @include for-mobile-layout() {
+        @include mixins.for-mobile-layout() {
             & {
                 margin-left: 5px;
             }
         }
 
         &:focus-visible {
-            outline: 1px solid $board-btn;
+            outline: 1px solid variables.$board-btn;
         }
 
         &:hover {
-            outline: 1px solid darken($border-color, 20%);
+            outline: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         }
     }
 
     .empty-div {
-        border-bottom: 1px solid darken($border-color , 20%);
+        border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
         flex-grow: 100%;
         padding-right: 188px;
     }

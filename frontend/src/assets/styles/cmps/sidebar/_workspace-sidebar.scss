@@ -1,8 +1,13 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .workspace-sidebar {
     position: relative;
-    background-color: $sidebar-workspace-bg ;
-    border-right: 1px solid darken($border-color , 30%);
-    color: $workspace-icon-color;
+    background-color: variables.$sidebar-workspace-bg ;
+    border-right: 1px solid color.adjust(variables.$border-color , $lightness: -30%);
+    color: variables.$workspace-icon-color;
     transition: .4s;
 
     &.open {
@@ -15,7 +20,7 @@
     
     &.close {
         width: 0;
-        @include for-narrow-layout() {
+        @include mixins.for-narrow-layout() {
             width: 30px;
         }
         .workspace-sidebar-header{
@@ -26,32 +31,32 @@
     
 
     .workspace-sidebar-items {
-        margin: $spacing-medium $spacing-medium 18px $spacing-medium;
-        border-bottom: 1px solid darken($border-color , 30%);
+        margin: variables.$spacing-medium variables.$spacing-medium 18px variables.$spacing-medium;
+        border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -30%);
         gap: 10px;
     }
 
     .workspace-title-container {
-        color: $primary-text-color;
+        color: variables.$primary-text-color;
 
         .workspace-title {
             font-weight: 400;
-            font-size: rem(14px);
-            padding: 0 0 $spacing-xs 0;
+            font-size: functions.rem(14px);
+            padding: 0 0 variables.$spacing-xs 0;
         }
 
         .icon {
-            font-size: rem(28px);
+            font-size: functions.rem(28px);
         }
 
         .favorites-title {
-            font-size: rem(16px);
+            font-size: functions.rem(16px);
             font-weight: 600;
-            color: $primary-text-color;
+            color: variables.$primary-text-color;
 
             .star-icon {
-                margin-right: $spacing-small;
-                color: $color-egg_yolk;
+                margin-right: variables.$spacing-small;
+                color: variables.$color-egg_yolk;
             }
         }
     }
@@ -65,11 +70,11 @@
 
         .favorites-empty-text {
             flex-direction: column;
-            @include center-flex();
+            @include mixins.center-flex();
             text-align: center;
             padding: 0 12px;
-            font-size: rem(15px);
-            color: $primary-text-color;
+            font-size: functions.rem(15px);
+            color: variables.$primary-text-color;
 
             b {
                 font-weight: bold;
@@ -78,25 +83,25 @@
     }
 
     .workspace-select {
-        padding: $spacing-small;
-        border: 1px solid $workspace-icon-color;
+        padding: variables.$spacing-small;
+        border: 1px solid variables.$workspace-icon-color;
         border-radius: 4px;
 
         .workspace-logo {
             position: relative;
 
             .lightning-container {
-                @include center-flex();
-                width: rem(30px);
-                height: rem(30px);
-                background-color: $color-done-green;
+                @include mixins.center-flex();
+                width: functions.rem(30px);
+                height: functions.rem(30px);
+                background-color: variables.$color-done-green;
                 color: #fff;
                 border-radius: 8px;
             }
 
             .home {
                 position: absolute;
-                font-size: rem(18px);
+                font-size: functions.rem(18px);
                 z-index: 2;
                 color: black;
                 bottom: -1px;
@@ -104,8 +109,8 @@
             }
 
             .workspace-title {
-                font-size: rem(16px);
-                color: $primary-text-color;
+                font-size: functions.rem(16px);
+                color: variables.$primary-text-color;
                 margin-left: 12px;
                 font-weight: bold;
             }
@@ -114,18 +119,18 @@
 
     .workspace-btns,
     .board-list {
-        padding: $spacing-medium 0 $spacing-medium 2px;
+        padding: variables.$spacing-medium 0 variables.$spacing-medium 2px;
         width: 100%;
 
         .icon {
             width: 18px;
             height: 19px;
-            color: $primary-text-color;
+            color: variables.$primary-text-color;
             font-weight: 400;
         }
 
         span {
-            color: $primary-text-color ;
+            color: variables.$primary-text-color ;
             font-weight: 400;
         }
 
@@ -134,23 +139,23 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: $spacing-xs;
+            padding: variables.$spacing-xs;
             cursor: pointer;
-            font-size: rem(14px);
+            font-size: functions.rem(14px);
         }
 
         >*:hover {
-            background-color: $workspace-hover;
+            background-color: variables.$workspace-hover;
             border-radius: 4px;
         }
 
         .search-board {
             border-radius: 4px;
-            color: $primary-text-color;
+            color: variables.$primary-text-color;
             height: 31px;
 
             &:has(:focus-visible) {
-                border: .5px solid $board-btn;
+                border: .5px solid variables.$board-btn;
                 background-color: white;
                 outline: none;
             }
@@ -161,7 +166,7 @@
                 margin-left: 2px;
 
                 &::-webkit-input-placeholder {
-                    color: $primary-text-color ;
+                    color: variables.$primary-text-color ;
                     font-weight: 400;
                 }
 
@@ -173,25 +178,25 @@
     }
 
     .board-list-container {
-        margin-top: $spacing-large;
+        margin-top: variables.$spacing-large;
         gap: 5px;
 
         .board-list {
-            padding: 0 $spacing-medium;
+            padding: 0 variables.$spacing-medium;
 
             & .active {
                 border-radius: 4px;
-                background-color: $workspace-board-active;
+                background-color: variables.$workspace-board-active;
             }
         }
     }
 
     .toggle-workspace {
-        @include center-flex();
+        @include mixins.center-flex();
         position: absolute;
         top: 13px;
         left: calc(100% - 14px);
-        padding: $spacing-xs;
+        padding: variables.$spacing-xs;
         border-radius: 20px;
         border: 1px solid #c3c6d4;
         background-color: #fff;
@@ -201,13 +206,13 @@
 
         &:hover {
             color: white;
-            background-color: $board-btn;
-            padding-left: $spacing-medium;
-            padding-right: $spacing-xs;
+            background-color: variables.$board-btn;
+            padding-left: variables.$spacing-medium;
+            padding-right: variables.$spacing-xs;
         }
     }
 
-    @include for-mobile-layout() {
+    @include mixins.for-mobile-layout() {
         &.close {
             min-width: 0;
         }
@@ -226,8 +231,8 @@
     &.open {
         .toggle-workspace {
             &:hover {
-                padding: $spacing-xs;
-                padding-right: $spacing-medium;
+                padding: variables.$spacing-xs;
+                padding-right: variables.$spacing-medium;
                 left: auto;
                 right: -12px;
             }

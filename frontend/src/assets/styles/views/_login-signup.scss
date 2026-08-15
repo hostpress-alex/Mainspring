@@ -1,7 +1,11 @@
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .login-page-header {
     border-bottom: 1px solid #e0e0e0;
     height: 65px;
-    background: $login-bg;
+    background: variables.$login-bg;
 
     .logo {
         height: 65px;
@@ -10,16 +14,16 @@
 }
 
 .form-container {
-    @include center-flex();
+    @include mixins.center-flex();
     flex-direction: column;
     margin-top: 40px;
-    margin-bottom: $spacing-medium;
+    margin-bottom: variables.$spacing-medium;
     text-align: center;
 
     h1 {
-        font-size: rem(40px);
+        font-size: functions.rem(40px);
         font-weight: 100;
-        margin-bottom: $spacing-small;
+        margin-bottom: variables.$spacing-small;
         color: #333;
     }
 
@@ -34,9 +38,9 @@
         border-radius: 4px;
         border: 1px solid #ccc;
         padding: 6px 12px;
-        font-size: rem(16px);
+        font-size: functions.rem(16px);
         outline: none;
-        margin-bottom: $spacing-medium;
+        margin-bottom: variables.$spacing-medium;
     }
 
     .btn-next {
@@ -45,32 +49,32 @@
         padding: 6px 0;
         border: none;
         border-radius: 4px;
-        font-size: rem(18px);
-        background-color: $board-btn;
+        font-size: functions.rem(18px);
+        background-color: variables.$board-btn;
         color: #fff;
     }
 
     .split-line {
-        margin-bottom: $spacing-medium;
+        margin-bottom: variables.$spacing-medium;
         margin-top: 30px;
         width: 100%;
         
         .separator-line {
             border: .5px solid #c5c7d0;
             width: 200px;
-            margin: $spacing-medium;
+            margin: variables.$spacing-medium;
         }
     }
 
     .btn-login-google {
-        @include center-flex();
+        @include mixins.center-flex();
         font-family: roboto-light;
-        padding: 12px $spacing-medium;
+        padding: 12px variables.$spacing-medium;
         border: 1px solid #c5c7d0;
         border-radius: 4px;
         gap: 8px;
         margin-bottom: 32px;
-        background-color: $app-bg ;
+        background-color: variables.$app-bg ;
 
         .img-google-login {
             width: 16px;
@@ -78,23 +82,23 @@
 
         span {
             font-family: tahoma;
-            font-size: rem(14px);
+            font-size: functions.rem(14px);
             color: #000000;
         }
     }
 
     .suggest-signup {
         .suggest-signup-prefix {
-            padding-right: $spacing-xs;
-            font-size: rem(16px);
+            padding-right: variables.$spacing-xs;
+            font-size: functions.rem(16px);
         }
 
         .btn-signup {
             color: #0fa2e2;
-            background-color: $app-bg;
+            background-color: variables.$app-bg;
             margin: 0;
             padding: 0;
-            font-size: rem(16px);
+            font-size: functions.rem(16px);
         }
     }
 }

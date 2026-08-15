@@ -3,6 +3,7 @@ import { useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 
 import { removeBoard, saveBoard, loadBoard, setDynamicModalObj } from "../../store/board.actions"
+import { confirmDelete } from "../confirm-dialog"
 import { boardService } from "../../services/board.service"
 
 import { BiDotsHorizontalRounded } from "react-icons/bi"
@@ -20,6 +21,13 @@ export function BoardPreview({ board }) {
     }
 
     async function onRemove(boardId) {
+        const b = boards.find(x => x._id === boardId)
+        const ok = await confirmDelete({
+            was: b?.title ? `Das Board „${b.title}"` : 'Dieses Board',
+            hinweis: 'Alle Gruppen, Tasks, Updates und Kalendereinträge dieses Boards gehen mit.',
+            knopf: 'Board löschen',
+        })
+        if (!ok) return
         try {
             await removeBoard(boardId)
             if(!boards.length) await saveBoard(boardService.getEmptyBoard())
@@ -40,9 +48,9 @@ export function BoardPreview({ board }) {
     }
 
     function onToggleMemberFilterModal() {
-        const isOpen = dynamicModalObj?.type === 'board-menu' ? !dynamicModalObj.isOpen : true
+        const isOpen = dynamicModalObj?.type === 'board-menu' && dynamicModalObj?.board?._id === board._id ? !dynamicModalObj.isOpen : true
         const { x, y } = elBoardPreview.current.getClientRects()[0]
-        setDynamicModalObj({ isOpen, pos: { x: (x + 190), y: (y + 35) }, type: 'board-menu', onRemove: onRemove, onDuplicate: onDuplicate})
+        setDynamicModalObj({ isOpen, pos: { x: (x + 190), y: (y + 35) }, type: 'board-menu', board, onRemove, onDuplicate })
     }
 
     return (

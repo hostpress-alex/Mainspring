@@ -1,26 +1,29 @@
+@use "../../setup/functions";
+@use "../../setup/variables";
+
 .add-group-modal {
     display: flex;
     flex-direction: column;
     width: 220px;
-    font-size: rem(14px);
+    font-size: functions.rem(14px);
     gap: 5px;
 
     >* {
         display: flex;
         align-items: center;
-        padding: $spacing-xs $spacing-small;
-        color: $primary-text-color;
+        padding: variables.$spacing-xs variables.$spacing-small;
+        color: variables.$primary-text-color;
         gap: 12px;
         cursor: pointer;
         transition: .2s;
 
         &:hover {
             border-radius: 4px;
-            background-color: $workspace-hover;
+            background-color: variables.$workspace-hover;
         }
     }
 
     .icon {
-        font-size: rem(16px);
+        font-size: functions.rem(16px);
     }
 }

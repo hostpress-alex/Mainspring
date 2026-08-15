@@ -1,5 +1,7 @@
+@use "../../setup/mixins";
+
 .color-palette {
-    @include center-flex();
+    @include mixins.center-flex();
     width: 142px;
     flex-wrap: wrap;
     >* {

@@ -1,6 +1,9 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+
 .file-picker {
     max-width: 140px;
-    @include center-flex();
+    @include mixins.center-flex();
     position: relative;
     width: 100%;
 
@@ -16,12 +19,12 @@
 
     label {
         width: 100%;
-        @include center-flex();
+        @include mixins.center-flex();
     }
 
     .icon {
         margin: auto;
-        font-size: rem(19px);
+        font-size: functions.rem(19px);
         opacity: 0;
         cursor: pointer;
     }

@@ -1,3 +1,7 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .statistic {
     .statistic-container {
         height: 36px;
@@ -11,7 +15,7 @@
     .title.status-picker,
     .title.priority-picker {
         border-top: 0;
-        padding: 0 $spacing-small;
+        padding: 0 variables.$spacing-small;
 
         >* {
             height: 80%;
@@ -34,7 +38,7 @@
             top: -3px;
         }
 
-        @include for-mobile-layout {
+        @include mixins.for-mobile-layout {
             & {
                 min-width: 240px;
                 left: 0;
@@ -43,15 +47,15 @@
     }
 
     .statistic-number {
-        font-size: rem(14px);
+        font-size: functions.rem(14px);
         position: relative;
         .number{
             position: absolute;
             top: -15px;
         }
         .sum {
-            color: $board-btn;
-            font-size: rem(12px);
+            color: variables.$board-btn;
+            font-size: functions.rem(12px);
             position: absolute;
         }
     }

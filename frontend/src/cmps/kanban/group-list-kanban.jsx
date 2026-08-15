@@ -1,4 +1,4 @@
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 
 import { handleOnDragEnd } from "../../store/board.actions"
 import { GroupPreviewKanban } from "./group-preview-kanban"

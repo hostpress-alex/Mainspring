@@ -10,8 +10,7 @@ export function AddGroupModal({ dynamicModalObj }) {
     function onAddGroup() {
         try {
             addGroup(board)
-            dynamicModalObj.isOpen = false
-            setDynamicModalObj(dynamicModalObj)
+            setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
         } catch (err) {
             console.log('cant add group:', err)
         }
@@ -24,7 +23,7 @@ export function AddGroupModal({ dynamicModalObj }) {
             </div>
             <div className='import-tasks'>
                 <BsArrowDownCircle className='icon' />
-                <span>Import tasks</span>
+                <span>Tasks importieren</span>
             </div>
         </div>
     )

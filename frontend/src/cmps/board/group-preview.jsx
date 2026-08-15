@@ -1,19 +1,24 @@
-import { useState, useRef} from "react"
+import { useState, useRef, useEffect } from "react"
 import { useSelector } from "react-redux"
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd"
 
 import { TaskPreview } from "../task/task-preview"
-import { addTask, updateGroupAction, updatePickerCmpsOrder, addActivity, setDynamicModalObj } from "../../store/board.actions"
+import { addTask, updateGroupAction, updatePickerCmpsOrder, setDynamicModalObj, updateBoardColumns, loadBoard } from "../../store/board.actions"
 import { boardService } from "../../services/board.service"
 
 import { TaskToolsModal } from "../modal/task-tools-modal"
 import { TitleGroupPreview } from "./title-group-preview"
+import { AddColumnDialog } from "../modal/add-column-dialog"
+import { singleLineEditable } from "../../services/editable"
+import { loadWidths, saveWidths, widthOf, widthStyle, MIN_WIDTH, MAX_WIDTH } from "./column-width"
+import "./board-columns.css"
 import { StatisticGroup } from "./statistics-group"
 
 import { MdKeyboardArrowDown } from 'react-icons/md'
 import { BsFillCircleFill } from 'react-icons/bs'
 import { BiDotsHorizontalRounded } from 'react-icons/bi'
 import { AiOutlinePlus } from 'react-icons/ai'
+import { GUEST_IMG } from '../../services/avatar'
 
 export function GroupPreview ({ group, board, idx }) {
     const [taskToEdit, setTaskToEdit] = useState(boardService.getEmptyTask())
@@ -21,19 +26,69 @@ export function GroupPreview ({ group, board, idx }) {
     const [isShowColorPicker, setIsShowColorPicker] = useState(false)
     const [selectedTasks, setSelectedTasks] = useState([])
     const [isMainCheckbox, setIsMainCheckbox] = useState({ isActive: false })
+    const [isAddColumnOpen, setIsAddColumnOpen] = useState(false)
+    const [widths, setWidths] = useState(() => loadWidths(board._id))
+    const [resizing, setResizing] = useState(null)
+
+    useEffect(() => { setWidths(loadWidths(board._id)) }, [board._id])
+
+
+    /** Breite ziehen: waehrend der Bewegung live, beim Loslassen gespeichert. */
+    function onStartResize (ev, column) {
+        ev.preventDefault()
+        ev.stopPropagation()
+        setResizing({ id: column.id, startX: ev.clientX, startWidth: widthOf(widths, column) })
+    }
+
+    useEffect(() => {
+        if (!resizing) return
+        document.body.classList.add('is-col-resizing')
+
+        function onMove (ev) {
+            const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, resizing.startWidth + (ev.clientX - resizing.startX)))
+            setWidths(prev => ({ ...prev, [resizing.id]: next }))
+        }
+        function onUp () {
+            setWidths(prev => { saveWidths(board._id, prev); return prev })
+            setResizing(null)
+        }
+
+        window.addEventListener('mousemove', onMove)
+        window.addEventListener('mouseup', onUp)
+        return () => {
+            document.body.classList.remove('is-col-resizing')
+            window.removeEventListener('mousemove', onMove)
+            window.removeEventListener('mouseup', onUp)
+        }
+    }, [resizing, board._id])
 
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const user = useSelector(storeState => storeState.userModule.user)
 
-    const guest = "https://res.cloudinary.com/du63kkxhl/image/upload/v1675013009/guest_f8d60j.png"
+    // Nur Owner und Admins duerfen die Spaltenreihenfolge aendern.
+    const canReorderColumns = boardService.canManageMembers(board, user)
     const elMainGroup = useRef()
     const elAddColumn = useRef()
 
-    function loadColumns () {
-        const columns = board.cmpsOption.filter(cmpOption => {
-            return !board.cmpsOrder.includes(cmpOption)
-        })
-        return columns
+    const columns = board.columns || []
+
+    async function onAddColumn (column) {
+        setIsAddColumnOpen(false)
+        try {
+            await updateBoardColumns(board, [...columns, column])
+            loadBoard(board._id)
+        } catch (err) {
+            console.log('Spalte konnte nicht angelegt werden', err)
+        }
+    }
+
+    async function onRenameColumn (column, title) {
+        try {
+            await updateBoardColumns(board, columns.map(c => c.id === column.id ? { ...c, title } : c))
+            loadBoard(board._id)
+        } catch (err) {
+            console.log('Spalte konnte nicht umbenannt werden', err)
+        }
     }
 
 
@@ -50,10 +105,7 @@ export function GroupPreview ({ group, board, idx }) {
     }
 
     function toggleColumnModal () {
-        const columns = loadColumns()
-        const isOpen = dynamicModalObj?.group?.id === group.id && dynamicModalObj?.type === 'add-column' ? !dynamicModalObj.isOpen : true
-        const { x, y, height } = elAddColumn.current.getClientRects()[0]
-        setDynamicModalObj({ isOpen, pos: { x: (x - 225), y: (y + height) }, type: 'add-column', group, columns })
+        setIsAddColumnOpen(open => !open)
     }
 
     async function onSave (ev) {
@@ -64,7 +116,7 @@ export function GroupPreview ({ group, board, idx }) {
             setIsTyping(false)
             setIsShowColorPicker(false)
         } catch (err) {
-            console.log('Failed to save')
+            console.log('Speichern fehlgeschlagen')
         }
     }
 
@@ -80,26 +132,28 @@ export function GroupPreview ({ group, board, idx }) {
         activity.from = { color: group.color, title: group.title }
         activity.action = 'create'
         taskToEdit.updatedBy.date = Date.now()
-        taskToEdit.updatedBy.imgUrl = user?.imgUrl || guest
+        taskToEdit.updatedBy.imgUrl = user?.imgUrl || GUEST_IMG
         addTask(taskToEdit, group, board, activity)
         setTaskToEdit(boardService.getEmptyTask())
     }
 
     function handleHorizontalDrag (ev) {
-        const updatedTitles = [...board.cmpsOrder]
-        const [draggedItem] = updatedTitles.splice(ev.source.index, 1)
-        updatedTitles.splice(ev.destination.index, 0, draggedItem)
-        updatePickerCmpsOrder(board, updatedTitles)
+        if (!ev.destination) return
+        if (!canReorderColumns) return
+        const next = [...columns]
+        const [dragged] = next.splice(ev.source.index, 1)
+        next.splice(ev.destination.index, 0, dragged)
+        updateBoardColumns(board, next).then(() => loadBoard(board._id))
     }
 
     async function handleCheckboxChange (task) {
         try {
+            // Bewusst ohne Verlaufseintrag: das Haekchen markiert einen Task
+            // nur fuer die Mehrfachauswahl und aendert am Task selbst nichts.
             if (selectedTasks.includes(task)) {
                 selectedTasks.splice(selectedTasks.indexOf(task), 1)
                 setSelectedTasks((selectedTasks) => ([...selectedTasks]))
-                addCheckActivity(true, task)
             } else {
-                addCheckActivity(false, task)
                 setSelectedTasks((prevTasks) => ([...prevTasks, task]))
             }
         } catch (err) {
@@ -111,15 +165,6 @@ export function GroupPreview ({ group, board, idx }) {
         if (isMainCheckbox.isActive) setSelectedTasks([])
         else setSelectedTasks(group.tasks)
         setIsMainCheckbox({ isActive: !isMainCheckbox.isActive })
-    }
-
-    function addCheckActivity (isCheckBoxDown, task) {
-        const activity = boardService.getEmptyActivity()
-        activity.task = { id: task.id, title: task.title }
-        activity.action = 'check'
-        activity.from = isCheckBoxDown
-        activity.to = !isCheckBoxDown
-        addActivity(board, activity)
     }
 
     function getSumOfTasks () {
@@ -146,7 +191,8 @@ export function GroupPreview ({ group, board, idx }) {
                             </div>
                             <div className={`group-title-info flex align-center ${isShowColorPicker ? 'showBorder' : ''} `} onFocus={() => setIsShowColorPicker(true)}>
                                 {isShowColorPicker && <BsFillCircleFill onClick={onTogglePalette} />}
-                                <blockquote className="group-title" onFocus={() => setIsTyping(true)} contentEditable onBlur={(ev) => onSave(ev)} suppressContentEditableWarning={true}>
+                                <blockquote className="group-title" contentEditable onBlur={(ev) => onSave(ev)} suppressContentEditableWarning={true}
+                                    {...singleLineEditable({ onFocus: () => setIsTyping(true) })}>
                                     <h4>{group.title}</h4>
                                 </blockquote>
                                 {!isTyping && <span className="task-count flex align-center">{getSumOfTasks()}</span>}
@@ -165,17 +211,26 @@ export function GroupPreview ({ group, board, idx }) {
                                             </div>
                                             <div className="task title">Task</div>
                                         </div>
-                                        {board.cmpsOrder.map((title, idx) =>
-                                            <Draggable key={title} draggableId={title} index={idx}>
-                                                {(provided, snapshot) => {
-                                                    return (
-                                                        <li ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps} className={title + ' cmp-order-title title'} key={idx}>
-                                                            <TitleGroupPreview title={title} group={group} board={board} />
-                                                        </li>
-                                                    )
-                                                }}
+                                        {columns.map((column, idx) =>
+                                            <Draggable key={column.id} draggableId={column.id} index={idx}
+                                                isDragDisabled={!canReorderColumns}>
+                                                {(provided) => (
+                                                    <li ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        style={{ ...provided.draggableProps.style, ...widthStyle(widthOf(widths, column)) }}
+                                                        className={`${column.type}-picker cmp-order-title title`}>
+                                                        {/* Nur der Titel ist der Griff zum Umsortieren — sonst wuerde
+                                                            der Breiten-Greifer gleichzeitig einen Spaltenzug ausloesen. */}
+                                                        <span className='col-drag' {...provided.dragHandleProps}>
+                                                            <TitleGroupPreview column={column} group={group} board={board}
+                                                                onRename={onRenameColumn} />
+                                                        </span>
+                                                        <span
+                                                            className={`col-resizer${resizing?.id === column.id ? ' is-active' : ''}`}
+                                                            title='Breite ziehen'
+                                                            onMouseDown={ev => onStartResize(ev, column)} />
+                                                    </li>
+                                                )}
                                             </Draggable>
                                         )}
                                         <div ref={elAddColumn} className="add-picker-task flex align-items" onClick={toggleColumnModal}>
@@ -196,7 +251,7 @@ export function GroupPreview ({ group, board, idx }) {
                                             <Draggable key={taskId} draggableId={taskId} index={idx}>
                                                 {(provided) => (
                                                     <li ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                        <TaskPreview task={{...task, id: taskId}} group={group} board={board} handleCheckboxChange={handleCheckboxChange} isMainCheckbox={isMainCheckbox} />
+                                                        <TaskPreview task={{...task, id: taskId}} group={group} board={board} widths={widths} handleCheckboxChange={handleCheckboxChange} isMainCheckbox={isMainCheckbox} />
                                                     </li>
                                                 )}
                                             </Draggable>
@@ -212,7 +267,7 @@ export function GroupPreview ({ group, board, idx }) {
                                                 <input type="text"
                                                     name="title"
                                                     value={taskToEdit.title}
-                                                    placeholder="+ Add Task"
+                                                    placeholder="+ Task hinzufügen"
                                                     onChange={handleChange}
                                                     onBlur={onAddTask} />
                                             </form>
@@ -227,13 +282,12 @@ export function GroupPreview ({ group, board, idx }) {
                                 <div className="hidden"></div>
                             </div>
                             <div className="statistic-container flex">
-                                {board.cmpsOrder.map((cmpType, idx) => {
-                                    return (
-                                        <div key={idx} className={`title ${idx === 0 ? ' first ' : ''}${cmpType}`}>
-                                            <StatisticGroup cmpType={cmpType} board={board} group={group} />
-                                        </div>
-                                    )
-                                })}
+                                {columns.map((column, idx) => (
+                                    <div key={column.id} style={widthStyle(widthOf(widths, column))}
+                                        className={`title ${idx === 0 ? ' first ' : ''}${column.type}-picker`}>
+                                        <StatisticGroup column={column} board={board} group={group} />
+                                    </div>
+                                ))}
                             </div>
                             <div className="empty-div"></div>
                         </div>
@@ -241,6 +295,12 @@ export function GroupPreview ({ group, board, idx }) {
                 </div>
             }}
         </Draggable>
+        {isAddColumnOpen && (
+            <AddColumnDialog
+                existingTitles={(board.columns || []).map(c => c.title)}
+                onAdd={onAddColumn}
+                onClose={() => setIsAddColumnOpen(false)} />
+        )}
         {selectedTasks.length > 0 && <TaskToolsModal board={board} tasks={selectedTasks} group={group} setSelectedTasks={setSelectedTasks} setIsMainCheckbox={setIsMainCheckbox} />}
     </ul >
 }

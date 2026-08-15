@@ -1,22 +1,26 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .teaser {
       padding-top: 10vh;
       padding-right: 20px;
       padding-left: 20px;
-      background: $home-secondary-bg;
+      background: variables.$home-secondary-bg;
       color: white;
 
       &-header {
             padding: 4rem 0;
             text-align: center;
-            $font-family: $title-font-family;
+            $font-family: variables.$title-font-family;
 
             &-title {
-                  font-size: rem(34px);
+                  font-size: functions.rem(34px);
             }
 
             &-paragraph {
-                  font-size: rem(16px);
-                  margin-top: $spacing-small;
+                  font-size: functions.rem(16px);
+                  margin-top: variables.$spacing-small;
                   color: lightgrey;
             }
       }
@@ -24,16 +28,16 @@
       .teaser-content {
             display: flex;
             align-items: center;
-            margin-bottom: $spacing-medium;
-            gap: $spacing-small;
-            color: $home-active-color;
-            font-family: $title-font-family;
+            margin-bottom: variables.$spacing-medium;
+            gap: variables.$spacing-small;
+            color: variables.$home-active-color;
+            font-family: variables.$title-font-family;
             -webkit-transition: opacity 50ms ease, transform 50ms ease;
             transition: opacity 50ms ease, transform 50ms ease;
           
 
-            @include for-normal-layout {
-                  font-size: rem(28px);
+            @include mixins.for-normal-layout {
+                  font-size: functions.rem(28px);
             }
       }
 
@@ -72,7 +76,7 @@
             cursor: pointer;
 
             &.active {
-                  color: $home-active-color;
+                  color: variables.$home-active-color;
             }
 
             &:hover {
@@ -85,7 +89,7 @@
             bottom: 0;
             position: absolute;
             height: 4px;
-            background-color: $home-active-color;
+            background-color: variables.$home-active-color;
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
             -webkit-transition: background-color 0.3s ease-in-out;

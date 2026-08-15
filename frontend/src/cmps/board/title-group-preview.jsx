@@ -1,54 +1,61 @@
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 
 import { setDynamicModalObj } from "../../store/board.actions"
 
 import { BiDotsHorizontalRounded } from 'react-icons/bi'
 
-export function TitleGroupPreview({ title, group, isKanban }) {
+/**
+ * Spaltenkopf. Doppelklick benennt die Spalte um — Titel und Typ sind seit dem
+ * Spaltenumbau getrennt, ein Board kann also mehrere "Text"-Spalten mit
+ * eigenen Namen haben.
+ */
+export function TitleGroupPreview({ column, group, isKanban, onRename }) {
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const elRemoveColumn = useRef()
+    const [isEditing, setIsEditing] = useState(false)
+    const [draft, setDraft] = useState(column?.title || '')
 
-    function getTitleName(cmpOrder) {
-        // Normalize the component name to handle both formats
-        const normalizedCmp = cmpOrder.toLowerCase().replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-        
-        switch (normalizedCmp) {
-            case 'member-picker':
-            case 'memberpicker':
-                return 'Person'
-            case 'status-picker':
-            case 'statuspicker':
-                return 'Status'
-            case 'date-picker':
-            case 'datepicker':
-                return 'Date'
-            case 'priority-picker':
-            case 'prioritypicker':
-                return 'Priority'
-            case 'number-picker':
-            case 'numberpicker':
-                return 'Number'
-            case 'file-picker':
-            case 'filepicker':
-                return 'Files'
-            case 'updated-picker':
-            case 'updatedpicker':
-                return 'Last Updated'
-            default: return cmpOrder
-        }
-    }
+    useEffect(() => { if (!isEditing) setDraft(column?.title || '') }, [column?.title, isEditing])
 
     function onToggleMenuModal() {
-        console.log(elRemoveColumn)
-        const isOpen = dynamicModalObj?.group?.id === group.id && dynamicModalObj?.cmpOrder === title && dynamicModalObj?.type === 'remove-column' ? !dynamicModalObj.isOpen : true
+        const isOpen = dynamicModalObj?.group?.id === group.id
+            && dynamicModalObj?.columnId === column.id
+            && dynamicModalObj?.type === 'remove-column' ? !dynamicModalObj.isOpen : true
         const { x, y } = elRemoveColumn.current.getClientRects()[0]
-        setDynamicModalObj({ isOpen, pos: { x: (x - 75), y: (y + 28) }, type: 'remove-column', group: group, cmpOrder: title })
+        setDynamicModalObj({
+            isOpen, pos: { x: (x - 75), y: (y + 28) },
+            type: 'remove-column', group, columnId: column.id, column,
+        })
+    }
+
+    function commit() {
+        setIsEditing(false)
+        const clean = draft.trim()
+        if (clean && clean !== column.title && onRename) onRename(column, clean)
+    }
+
+    if (isEditing) {
+        return (
+            <input autoFocus value={draft}
+                onChange={e => setDraft(e.target.value)}
+                onBlur={commit}
+                onKeyDown={e => {
+                    if (e.key === 'Enter') e.currentTarget.blur()
+                    if (e.key === 'Escape') { setDraft(column.title); setIsEditing(false) }
+                }}
+                onClick={e => e.stopPropagation()}
+                style={{ width: '90%', border: '1px solid #0073ea', borderRadius: 4, padding: '2px 6px',
+                    font: 'inherit', textAlign: 'center' }} />
+        )
     }
 
     return (
         <>
-            {getTitleName(title)}
+            <span onDoubleClick={() => !isKanban && setIsEditing(true)}
+                title={isKanban ? column.title : 'Doppelklick zum Umbenennen'}>
+                {column.title}
+            </span>
             <span ref={elRemoveColumn} className="open-modal-icon">
                 {!isKanban && <BiDotsHorizontalRounded onClick={onToggleMenuModal} />}
             </span>

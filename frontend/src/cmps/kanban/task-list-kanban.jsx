@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Draggable, Droppable } from 'react-beautiful-dnd'
+import { Draggable, Droppable } from '@hello-pangea/dnd'
 
 import { TaskPreviewKanban } from './task-preview-kanban'
+import { loadWidths, widthOf, widthStyle } from '../board/column-width'
 import { TitleGroupPreview } from '../board/title-group-preview'
 import { TaskTitleKanban } from './task-title-kanban'
 
@@ -23,15 +24,16 @@ export function TaskListKanban({ board, group }) {
                                             <div className="flex" style={{ backgroundColor: 'white' }}>
                                                 <div className="task-content">
                                                     <ul className="title-container">
-                                                        {board.cmpsOrder.map((title, idx) =>
-                                                            <li className={title + ' cmp-order-title title'} key={idx}>
-                                                                <TitleGroupPreview title={title} board={board} isKanban={true} />
+                                                        {(board.columns || []).map(column =>
+                                                            <li className={`${column.type}-picker cmp-order-title title`} key={column.id}
+                                                                style={widthStyle(widthOf(loadWidths(board._id), column))}>
+                                                                <TitleGroupPreview column={column} board={board} isKanban={true} />
                                                             </li>
                                                         )}
                                                     </ul>
                                                 </div>
                                                 <div key={task.id} >
-                                                    <TaskPreviewKanban task={task} group={group} board={board} isTaskModalOpen={isTaskModalOpen} setIsTaskModalOpen={setIsTaskModalOpen} />
+                                                    <TaskPreviewKanban task={task} group={group} board={board} widths={loadWidths(board._id)} isTaskModalOpen={isTaskModalOpen} setIsTaskModalOpen={setIsTaskModalOpen} />
                                                 </div>
                                             </div>
                                         </div>

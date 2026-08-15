@@ -30,7 +30,6 @@ export function BoardDetails () {
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
     const [isStarredOpen, setIsStarredOpen] = useState(false)
-    const [isMouseOver, setIsMouseOver] = useState(false)
     const [boardType, setBoardType] = useState('table')
 
     const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false)
@@ -81,11 +80,13 @@ export function BoardDetails () {
                 {boardType === 'kanban' &&
                     <GroupListKanban board={board} />
                 }
-                <BoardModal setIsMouseOver={setIsMouseOver} />
+                <BoardModal />
                 {boardType === 'dashboard' && <Dashboard />}
             </main>
             {isCreateModalOpen && <CreateBoard setIsModalOpen={setIsCreateModalOpen} />}
-            {(isInviteModalOpen || isCreateModalOpen || (isBoardModalOpen && isMouseOver)) && <div className='dark-screen'></div>}
+            {/* Bewusst ohne den Task-Dialog: das Board bleibt bedienbar und scrollbar,
+                waehrend rechts ein Task offen ist. */}
+            {(isInviteModalOpen || isCreateModalOpen) && <div className='dark-screen'></div>}
             {isShowDescription &&
                 <>
                     <BoardDescription setIsShowDescription={setIsShowDescription} board={board} />

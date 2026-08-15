@@ -1,12 +1,11 @@
 import { IoTimeOutline } from 'react-icons/io5'
-const guest = "https://res.cloudinary.com/du63kkxhl/image/upload/v1675013009/guest_f8d60j.png"
-
+import { GUEST_IMG } from '../services/avatar'
 export function LastViewed({ member }) {
 
     return (
         <div className="last-viewed-main flex space-between">
             <div className="member-info flex align-center">
-                <img src={member.imgUrl || guest} alt="" />
+                <img src={member.imgUrl || GUEST_IMG} alt="" />
                 <span>{member.fullname}</span>
             </div>
             {/* Demo */}

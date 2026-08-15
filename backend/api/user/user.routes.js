@@ -1,16 +1,15 @@
 const express = require('express')
 const {requireAuth, requireAdmin} = require('../../middlewares/requireAuth.middleware')
-const {getUser, getUsers, deleteUser, updateUser} = require('./user.controller')
+const {getUser, getUsers, deleteUser, updateUser, addUser} = require('./user.controller')
 const router = express.Router()
 
-// middleware that is specific to this router
-// router.use(requireAuth)
+// Auch die Benutzerliste ist nicht oeffentlich.
+router.use(requireAuth)
 
 router.get('/', getUsers)
 router.get('/:id', getUser)
-router.put('/:id', requireAuth,  updateUser)
-
-// router.put('/:id',  requireAuth, updateUser)
-router.delete('/:id',  requireAuth, requireAdmin, deleteUser)
+router.post('/', requireAdmin, addUser)
+router.put('/:id', updateUser)          // Selbst oder Admin — geprueft im Service
+router.delete('/:id', requireAdmin, deleteUser)
 
 module.exports = router

@@ -5,23 +5,22 @@ export function ChartTypeModal({ dynamicModalObj }) {
 
     function onSetChartType(chartType) {
         dynamicModalObj.setChartType(chartType)
-        dynamicModalObj.isOpen = false
-        setDynamicModalObj({...dynamicModalObj})
+        setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
     }
 
     return (
         <section className="chart-type-modal">
             <div onClick={() => onSetChartType('pie')}>
                 <FcPieChart />
-                <span>Pie</span>
+                <span>Kreis</span>
             </div>
             <div onClick={() => onSetChartType('doughnut')}>
                 <FcDoughnutChart />
-                <span>Doughnut</span>
+                <span>Ring</span>
             </div>
             <div onClick={() => onSetChartType('bar')}>
                 <FcBarChart />
-                <span>Bar</span>
+                <span>Balken</span>
             </div>
         </section>
     )

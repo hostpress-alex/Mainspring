@@ -1,39 +1,44 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .modal-status-priority {
     .modal-status-priority-content {
 
         ul {
             display: flex;
             flex-direction: column;
-            padding: $spacing-small;
-            font-size: rem(14px);
-            gap: $spacing-small;
+            padding: variables.$spacing-small;
+            font-size: functions.rem(14px);
+            gap: variables.$spacing-small;
             color: white;
             margin: 0;
 
             li {
                 min-width: 152px;
                 height: 32px;
-                @include center-flex();
+                @include mixins.center-flex();
                 cursor: pointer;
             }
         }
 
         .edit-labels-btn {
-            padding: 0 $spacing-medium $spacing-small $spacing-medium;
-            @include center-flex();
-            border-top: 1px solid darken($border-color , 20%);
+            padding: 0 variables.$spacing-medium variables.$spacing-small variables.$spacing-medium;
+            @include mixins.center-flex();
+            border-top: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
 
             button {
                 width: 152px;
-                background-color: $app-bg;
-                color: $primary-text-color;
-                padding: $spacing-xs $spacing-small;
-                @include center-flex();
-                margin: $spacing-medium $spacing-xs $spacing-xs $spacing-xs;
+                background-color: variables.$app-bg;
+                color: variables.$primary-text-color;
+                padding: variables.$spacing-xs variables.$spacing-small;
+                @include mixins.center-flex();
+                margin: variables.$spacing-medium variables.$spacing-xs variables.$spacing-xs variables.$spacing-xs;
 
                 .icon {
-                    font-size: rem(20px);
-                    margin-right: $spacing-small;
+                    font-size: functions.rem(20px);
+                    margin-right: variables.$spacing-small;
                 }
             }
         }

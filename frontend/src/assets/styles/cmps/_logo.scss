@@ -1,3 +1,6 @@
+@use "../setup/functions";
+@use "../setup/mixins";
+
 .logo {
       display: flex;
       align-items: center;
@@ -5,22 +8,22 @@
       gap: 7px;
 
       &-title {
-          font-size: rem(20px);
+          font-size: functions.rem(20px);
           font-weight:700;
           color: black;
       }
 
       &-img {
-          height: rem(18px);
+          height: functions.rem(18px);
       }
 
-      @include for-normal-layout() {
+      @include mixins.for-normal-layout() {
           &-title {
-              font-size: rem(24px);
+              font-size: functions.rem(24px);
           }
 
           &-img {
-              height: rem(20px);
+              height: functions.rem(20px);
           }
       }            
   }

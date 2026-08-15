@@ -1,19 +1,23 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .task-list-content-kanban {
-    padding: $spacing-small;
+    padding: variables.$spacing-small;
     min-height: 110px;
     margin: 0;
 
     .task-container {
         border-radius: 4px;
         box-shadow: 0px 4px 8px rgb(0 0 0 / 20%);
-        font-size: rem(13px);
+        font-size: functions.rem(13px);
         font-weight: 400;
         cursor: pointer;
-        margin-bottom: $spacing-small;
+        margin-bottom: variables.$spacing-small;
 
         .flex {
-            padding: $spacing-small;
-            gap: $spacing-small;
+            padding: variables.$spacing-small;
+            gap: variables.$spacing-small;
         }
     }
 
@@ -24,24 +28,24 @@
     }
 
     .task-title {
-        @include center-flex();
-        margin-bottom: $spacing-small;
+        @include mixins.center-flex();
+        margin-bottom: variables.$spacing-small;
         height: 36px;
-        padding: $spacing-small;
+        padding: variables.$spacing-small;
         position: relative;
-        gap: $spacing-xs;
+        gap: variables.$spacing-xs;
 
         .chat-icon {
-            @include center-flex();
-            font-size: rem(24px);
-            padding: 0 $spacing-small;
+            @include mixins.center-flex();
+            font-size: functions.rem(24px);
+            padding: 0 variables.$spacing-small;
             height: 100%;
             margin-left: auto;
-            color: $chat-icon-color;
+            color: variables.$chat-icon-color;
             position: relative;
 
             &:hover {
-                color: $board-btn;
+                color: variables.$board-btn;
                 cursor: pointer;
             }
 
@@ -51,13 +55,13 @@
             }
 
             .count-comment {
-                @include center-flex();
+                @include mixins.center-flex();
                 position: absolute;
                 top: 11px;
                 right: 7px;
-                background-color: $board-btn;
+                background-color: variables.$board-btn;
                 color: white;
-                font-size: rem(10px);
+                font-size: functions.rem(10px);
                 border-radius: 50%;
                 width: 14px;
                 height: 13px;
@@ -66,22 +70,22 @@
             }
 
             .comment-chat {
-                color: $board-btn;
+                color: variables.$board-btn;
             }
         }
 
         .task-menu {
-            @include center-flex();
+            @include mixins.center-flex();
             border-radius: 8px;
 
             .icon {
                 cursor: pointer;
-                font-size: rem(22px);
-                color: $workspace-icon-color;
+                font-size: functions.rem(22px);
+                color: variables.$workspace-icon-color;
             }
 
             &:hover {
-                background-color: $workspace-hover;
+                background-color: variables.$workspace-hover;
             }
         }
     }
@@ -98,7 +102,7 @@
     .title-container {
         >* {
             height: 36px;
-            margin-bottom: $spacing-small;
+            margin-bottom: variables.$spacing-small;
             display: flex;
             align-items: center;
         }

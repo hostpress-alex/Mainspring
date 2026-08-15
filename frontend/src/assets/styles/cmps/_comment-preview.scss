@@ -1,48 +1,56 @@
+@use "sass:color";
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .comments-list {
     li {
         border-radius: 4px;
-        border: 1px solid darken($border-color , 20%);
-        margin-bottom: $spacing-medium;
-        padding: $spacing-medium;
+        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        margin-bottom: variables.$spacing-medium;
+        padding: variables.$spacing-medium;
         .header-comment {
-            padding-bottom: $spacing-small;
-            font-size: rem(14px);
-            color: $workspace-icon-color;
+            padding-bottom: variables.$spacing-small;
+            font-size: functions.rem(14px);
+            color: variables.$workspace-icon-color;
 
             .left {
-                gap: $spacing-small;
+                gap: variables.$spacing-small;
                 font-size: 16px;
-                color: $primary-text-color;
+                color: variables.$primary-text-color;
 
                 img {
-                    @include members();
+                    @include mixins.members();
                 }
             }
 
             .right {
-                gap: $spacing-small;
+                gap: variables.$spacing-small;
 
                 .time {
                     gap: 2px;
                 }
 
                 .menu-icon-container {
-                    @include center-flex();
+                    @include mixins.center-flex();
                     position: relative;
                     width: 24px;
                     height: 24px;
                     border-radius: 4px;
 
                     &:hover {
-                        background-color: $workspace-hover;
+                        background-color: variables.$workspace-hover;
                     }
 
                     &.active {
-                        background-color: $workspace-board-active;
+                        background-color: variables.$workspace-board-active;
                     }
 
                     .comment-modal {
-                        @include menu-modal();
+                        @include mixins.menu-modal();
+                        // Ohne das sieht das Menue klickbar aus, verhaelt sich
+                        // aber wie Text.
+                        > * { cursor: pointer; }
                         right: 0;
                         width: 265px;
                     }
@@ -51,8 +59,8 @@
         }
 
         p {
-            margin-top: $spacing-small;
-            padding: 0 $spacing-medium $spacing-medium $spacing-medium;
+            margin-top: variables.$spacing-small;
+            padding: 0 variables.$spacing-medium variables.$spacing-medium variables.$spacing-medium;
             max-width: 540px;
             overflow-wrap: break-word;
         }
@@ -63,11 +71,11 @@
             margin: 0;
             height: 32px;
             border-radius: 4px;
-            padding: $spacing-xs $spacing-small;
-            @include center-flex();
+            padding: variables.$spacing-xs variables.$spacing-small;
+            @include mixins.center-flex();
 
             &:hover {
-                background-color: $workspace-hover;
+                background-color: variables.$workspace-hover;
             }
         }
     }

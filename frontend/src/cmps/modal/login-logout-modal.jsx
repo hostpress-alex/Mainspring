@@ -15,7 +15,8 @@ export function LoginLogoutModal({ setIsLoginModalOpen }) {
     }
 
     return <section className="login-logout-modal">
-        {user && <span onClick={onLogout} ><TbLogout className="logout-icon" />Log out</span>}
-        {!user && <Link to={'/auth/login'} ><span onClick={closeDynamicModal}>Log in<BiLogIn className="login-icon" /></span></Link>}
+        {user && <Link to={'/profil'}><span onClick={closeDynamicModal}>Mein Profil</span></Link>}
+        {user && <span onClick={onLogout} ><TbLogout className="logout-icon" />Abmelden</span>}
+        {!user && <Link to={'/auth/login'} ><span onClick={closeDynamicModal}>Anmelden<BiLogIn className="login-icon" /></span></Link>}
     </section>
 }

@@ -1,25 +1,30 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .create-board-modal {
-    @include center-absolute();
-    padding: $spacing-medium $spacing-xl $spacing-xl $spacing-xl;
+    @include mixins.center-absolute();
+    padding: variables.$spacing-medium variables.$spacing-xl variables.$spacing-xl variables.$spacing-xl;
     width: 500px;
-    color: $primary-text-color;
-    background-color: $app-bg;
-    border-radius: $spacing-small;
+    color: variables.$primary-text-color;
+    background-color: variables.$app-bg;
+    border-radius: variables.$spacing-small;
     box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-    font-size: rem(14px);
+    font-size: functions.rem(14px);
     z-index: 51;
-    border: 1px solid darken($border-color , 20%);
+    border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
 
     h1 {
-        font-size: rem(32px);
+        font-size: functions.rem(32px);
         font-weight: 500;
-        margin-bottom: $spacing-medium;
+        margin-bottom: variables.$spacing-medium;
     }
 
     h3 {
-        font-size: rem(14px);
+        font-size: functions.rem(14px);
         font-weight: 400;
-        margin-bottom: $spacing-small;
+        margin-bottom: variables.$spacing-small;
     }
 
     form { 
@@ -29,15 +34,15 @@
         input {
             width: 100%;
             border-radius: 4px;
-            border: 1px solid $border-color;
-            font-size: rem(16px);
-            padding: $spacing-small $spacing-medium;
+            border: 1px solid variables.$border-color;
+            font-size: functions.rem(16px);
+            padding: variables.$spacing-small variables.$spacing-medium;
             height: 40px;
             margin: 0;
             font-family: inherit;
 
             &:focus-visible {
-                outline: 1px solid $border-color;
+                outline: 1px solid variables.$border-color;
             }
         }
 
@@ -51,13 +56,13 @@
         flex-direction: row-reverse;
         align-items: center;
         .icon {
-            padding: $spacing-xs $spacing-small;
+            padding: variables.$spacing-xs variables.$spacing-small;
             width: 32px;
             height: 28px;
             cursor: pointer;
             &:hover {
-                background-color: $workspace-hover;
-                border-radius: $spacing-small;
+                background-color: variables.$workspace-hover;
+                border-radius: variables.$spacing-small;
               }
         }
     }

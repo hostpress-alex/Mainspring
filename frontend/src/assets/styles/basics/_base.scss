@@ -1,3 +1,8 @@
+@use "sass:color";
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 * {
     box-sizing: border-box;
     scrollbar-width: thin;
@@ -22,7 +27,7 @@
 .dark-screen {
     position: fixed;
     z-index: 50;
-    background-color: $react-modal-background;
+    background-color: variables.$react-modal-background;
     width: 100vw;
     height: 100vh;
 }
@@ -43,14 +48,14 @@ h5,
 h6 {
     margin: 0;
     padding: 0;
-    font-family: $title-font-family;
+    font-family: variables.$title-font-family;
 }
 
 body {
-    font-size: rem(18px);
+    font-size: functions.rem(18px);
     margin: 0;
     padding: 0;
-    font-family: $font-family;
+    font-family: variables.$font-family;
 }
 
 img {
@@ -89,7 +94,7 @@ button {
     width: 100%;
     overflow: auto;
 
-    @include for-mobile-layout {
+    @include mixins.for-mobile-layout {
         & {
             height: 92vh;
         }
@@ -104,6 +109,6 @@ blockquote {
     cursor: text;
 
     &:focus-visible {
-        outline: 1px solid darken($border-color , 20%);
+        outline: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
     }
 }

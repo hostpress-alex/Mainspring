@@ -15,6 +15,8 @@ export const userService = {
     getById,
     remove,
     update,
+    create,
+    setAdmin,
 }
 
 window.userService = userService
@@ -34,6 +36,16 @@ function remove(userId) {
 async function update({user}) {
     if (user._id) return httpService.put(BASE_URL + user._id, user)
     return httpService.post(BASE_URL, user)
+}
+
+/** Nur fuer Admins: neuen Benutzer anlegen. */
+function create(user) {
+    return httpService.post(BASE_URL, user)
+}
+
+/** Nur fuer Admins: Admin-Flag setzen oder entziehen. */
+function setAdmin(userId, isAdmin) {
+    return httpService.put(BASE_URL + userId, { isAdmin })
 }
 
 async function login(userCred) {
@@ -57,7 +69,7 @@ async function logout() {
 }
 
 function saveLocalUser(user) {
-    user = {_id: user._id, fullname: user.fullname, imgUrl: user.imgUrl}
+    user = { _id: user._id, username: user.username, fullname: user.fullname, imgUrl: user.imgUrl, isAdmin: user.isAdmin === true }
     sessionStorage.setItem(STORAGE_KEY_LOGGEDIN_USER, JSON.stringify(user))
     return user
 }

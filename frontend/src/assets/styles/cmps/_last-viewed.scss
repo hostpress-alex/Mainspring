@@ -1,17 +1,20 @@
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .last-viewed {
-    padding: $spacing-xl $spacing-medium;
+    padding: variables.$spacing-xl variables.$spacing-medium;
 
     .title {
-        margin-bottom: $spacing-small;
+        margin-bottom: variables.$spacing-small;
     }
 
     .last-viewed-main {
         .member-info {
-            gap: $spacing-small;
-            margin-bottom: $spacing-small;
+            gap: variables.$spacing-small;
+            margin-bottom: variables.$spacing-small;
 
             img {
-                @include members();
+                @include mixins.members();
             }
         }
     }

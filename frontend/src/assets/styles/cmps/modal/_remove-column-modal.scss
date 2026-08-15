@@ -1,15 +1,38 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
+// Das Markup benutzt .remove-column-modal — die alte Klasse .delete-modal
+// stand nur im SCSS und hat nie gegriffen. Deshalb war die Box so gross und
+// ohne Zeigerwechsel.
+.remove-column-modal,
 .delete-modal {
-    color: $primary-text-color;
-    font-size: rem(14px);
+    color: variables.$primary-text-color;
+    font-size: functions.rem(14px);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
 
     >* {
-        @include center-flex();
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         gap: 8px;
-        padding: $spacing-xs $spacing-small;
+        white-space: nowrap;
+        padding: 6px 10px;
+        border-radius: 4px;
         cursor: pointer;
+        min-width: 0;
+        height: auto;
+
         &:hover {
-            background-color: $workspace-hover;
-            border-radius: $spacing-xs;
+            background-color: variables.$workspace-hover;
+        }
+
+        .icon {
+            font-size: functions.rem(16px);
+            flex-shrink: 0;
         }
     }
 }

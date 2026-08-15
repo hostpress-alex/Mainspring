@@ -1,19 +1,17 @@
-import { DragDropContext, Droppable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 
 import { GroupPreview } from './group-preview'
 import { handleOnDragEnd } from "../../store/board.actions"
 
 import { useRef } from 'react'
+import { loadWidths, widthOf } from './column-width'
 
 export function GroupList({ board }) {
     const containerRef = useRef()
 
     function getCellWidth() {
-        return board.cmpsOrder.reduce((acc, cmpOrder) => {
-            if (cmpOrder === 'person') acc += 87
-            else acc += 139
-            return acc
-        }, 600)
+        const widths = loadWidths(board._id)
+        return (board.columns || []).reduce((acc, column) => acc + widthOf(widths, column), 600)
     }
 
     if (!board.groups) return <div></div>

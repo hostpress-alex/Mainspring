@@ -7,28 +7,29 @@ import { useNavigate } from "react-router-dom";
 import { boardService } from "../../services/board.service";
 import { utilService } from "../../services/util.service";
 import { duplicateTask, setDynamicModalObj, toggleModal, updateGroupAction } from "../../store/board.actions";
+import { confirmDelete } from "../confirm-dialog";
 
 export function TaskMenuModal({ dynamicModalObj }) {
     const board = useSelector(storeState => storeState.boardModule.filteredBoard)
     const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
     const navigate = useNavigate()
-    function onRemoveTask() {
+    async function onRemoveTask() {
+        const titel = dynamicModalObj.task?.title
+        if (!await confirmDelete({ was: titel ? `Der Task „${titel}"` : 'Dieser Task' })) return
         try {
             const tasksToSave = dynamicModalObj.group.tasks.filter(task => task.id !== dynamicModalObj.task.id)
             const updatedGroup = { ...dynamicModalObj.group, tasks: tasksToSave }
             updateGroupAction(board, updatedGroup)
-            dynamicModalObj.isOpen = false
-            setDynamicModalObj(dynamicModalObj)
+            setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
         } catch (err) {
-            console.log('Failed to remove task', err)
+            console.log('Task konnte nicht gelöscht werden', err)
         }
     }
 
     function onDuplicateTask() {
         try {
             duplicateTask(board, dynamicModalObj.group, dynamicModalObj.task)
-            dynamicModalObj.isOpen = false
-            setDynamicModalObj(dynamicModalObj)
+            setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
         } catch (err) {
             console.log(err)
         }
@@ -44,36 +45,33 @@ export function TaskMenuModal({ dynamicModalObj }) {
             updatedTasks.splice(idx + 1, 0, newTask)
             const updatedGroup = { ...dynamicModalObj.group, tasks: updatedTasks }
             updateGroupAction(board, updatedGroup)
-            dynamicModalObj.isOpen = false
-            setDynamicModalObj(dynamicModalObj)
+            setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
         } catch (err) {
             console.log(err)
         }
     }
     
     function onOpenModal() {
-        toggleModal(isOpen)
         navigate(`/board/${board._id}/${dynamicModalObj.group.id}/${dynamicModalObj.task.id}`)
-        dynamicModalObj.isOpen = false
-        setDynamicModalObj(dynamicModalObj)
+        setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
     }
     return (
         <section className="task-menu-modal">
             <div onClick={onOpenModal}>
                 <TbArrowsDiagonal />
-                <span>Open</span>
+                <span>Öffnen</span>
             </div>
             <div onClick={onDuplicateTask}>
                 <HiOutlineDocumentDuplicate />
-                <span>Duplicate</span>
+                <span>Duplizieren</span>
             </div>
             <div onClick={() => onRemoveTask()}>
                 <FiTrash />
-                <span>Delete</span>
+                <span>Löschen</span>
             </div>
             <div onClick={onCreateNewTaskBelow}>
                 <AiOutlinePlus />
-                <span>Create new item below</span>
+                <span>Neuen Task darunter</span>
             </div>
         </section>
     )

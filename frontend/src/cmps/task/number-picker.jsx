@@ -4,13 +4,13 @@ import { BsFillPlusCircleFill } from "react-icons/bs"
 import { TbNumbers } from "react-icons/tb"
 import { boardService } from "../../services/board.service"
 
-export function NumberPicker({ info, onUpdate }) {
-    const [number, setNumber] = useState(info.number || '')
+export function NumberPicker({ info, onUpdate, field = 'number' }) {
+    const [number, setNumber] = useState(info[field] || '')
     const [isShowInput, setIsShowInput] = useState(false)
     const activity = boardService.getEmptyActivity()
 
     activity.action = 'number'
-    activity.from = info.number || '-'
+    activity.from = info[field] || '-'
     activity.task = { id: info.id, title: info.title }
 
     function handleNumberChange({ target }) {

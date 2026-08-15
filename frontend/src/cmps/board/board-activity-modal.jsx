@@ -18,7 +18,6 @@ export function BoardActivityModal({ board, activityLog }) {
     
     function onCloseModal() {
         navigate(`/board/${board._id}`)
-        toggleModal(true)
     }
 
     function loadTasks() {
@@ -59,10 +58,10 @@ export function BoardActivityModal({ board, activityLog }) {
         <section className="board-activity-modal">
             <div className="board-activity-header">
                     <CgClose className="close-btn" onClick={onCloseModal} />
-                    <h3 className="board-title">{board.title} <span>Log</span></h3>
+                    <h3 className="board-title">{board.title} <span>Verlauf</span></h3>
                     <div className="views flex">
-                    <span className={view === 'activity' ? 'active' : ''} onClick={() => setView('activity')}>Activity</span>
-                        <span className={view === 'last-viewed' ? 'active' : ''} onClick={() => setView('last-viewed')}>Last Viewed</span>
+                    <span className={view === 'activity' ? 'active' : ''} onClick={() => setView('activity')}>Verlauf</span>
+                        <span className={view === 'last-viewed' ? 'active' : ''} onClick={() => setView('last-viewed')}>Zuletzt geöffnet</span>
                         <span className={view === 'updates' ? 'active' : ''} onClick={() => setView('updates')}>Updates</span>
                     </div>
             </div>
@@ -76,7 +75,7 @@ export function BoardActivityModal({ board, activityLog }) {
                     <section className="last-viewed">
                         <div className="title flex space-between">
                             <span>Name</span>
-                            <span>Last viewed</span>
+                            <span>Zuletzt geöffnet</span>
                         </div>
 
                         {board.members.map(member => {

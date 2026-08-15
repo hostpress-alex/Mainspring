@@ -1,10 +1,13 @@
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .group-preview-kanban {
     width: 260px;
-    background-color: $sidebar-workspace-bg;
+    background-color: variables.$sidebar-workspace-bg;
     .group-title-container {
         height: 44px;
-        color: $app-bg;
-        @include center-flex();
+        color: variables.$app-bg;
+        @include mixins.center-flex();
         font-weight: 400;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;

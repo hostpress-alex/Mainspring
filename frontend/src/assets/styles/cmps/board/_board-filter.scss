@@ -1,31 +1,35 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .board-filter {
-    padding: $spacing-medium 0;
+    padding: variables.$spacing-medium 0;
     gap: 5px;
 
     >* {
-        @include center-flex();
-        font-size: rem(14px);
+        @include mixins.center-flex();
+        font-size: functions.rem(14px);
         height: 32px;
         gap: 5px;
     }
 
     .board-tools {
         >* {
-            @include center-flex();
-            gap: $spacing-xs;
+            @include mixins.center-flex();
+            gap: variables.$spacing-xs;
             padding: 0 8px;
-            color: $workspace-icon-color;
+            color: variables.$workspace-icon-color;
             height: 100%;
             cursor: pointer;
 
             &:hover {
                 border-radius: 4px;
-                background-color: $workspace-hover;
+                background-color: variables.$workspace-hover;
             }
 
             .icon {
                 font-size: 18px;
-                color: $workspace-icon-color;
+                color: variables.$workspace-icon-color;
 
             }
         }
@@ -33,58 +37,58 @@
 
     .add-btn {
         position: relative;
-        background-color: $board-btn;
+        background-color: variables.$board-btn;
         color: white;
         border-radius: 5px;
         height: 32px;
 
         .new-task-btn {
             cursor: pointer;
-            padding: $spacing-xs $spacing-small;
+            padding: variables.$spacing-xs variables.$spacing-small;
             transition: .4s;
             white-space: nowrap;
 
             &:hover {
-                background-color: $primary-hover-color;
+                background-color: variables.$primary-hover-color;
                 border-top-left-radius: 5px;
                 border-bottom-left-radius: 5px;
             }
         }
 
         .drop-down-btn {
-            @include center-flex();
+            @include mixins.center-flex();
             height: 100%;
-            padding: 0 $spacing-small;
-            border-left: 1px solid $primary-hover-color;
+            padding: 0 variables.$spacing-small;
+            border-left: 1px solid variables.$primary-hover-color;
             cursor: pointer;
             transition: .4s;
 
             &:hover {
-                background-color: $primary-hover-color;
+                background-color: variables.$primary-hover-color;
                 border-top-right-radius: 5px;
                 border-bottom-right-radius: 5px;
             }
 
             .icon {
-                font-size: rem(15px);
+                font-size: functions.rem(15px);
             }
         }
     }
 
     .search-task {
         border-radius: 4px;
-        color: $primary-text-color;
-        background-color: $app-bg;
+        color: variables.$primary-text-color;
+        background-color: variables.$app-bg;
         white-space: nowrap;
         padding: unset;
         margin-left: 3px;
 
         &:hover {
-            background-color: $workspace-hover;
+            background-color: variables.$workspace-hover;
         }
 
         &:has(:focus-visible) {
-            border: .5px solid $board-btn;
+            border: .5px solid variables.$board-btn;
             background-color: white;
             outline: none;
         }
@@ -102,7 +106,7 @@
                 outline: none;
                 width: 140px;
 
-                @include for-mobile-layout() {
+                @include mixins.for-mobile-layout() {
                     & {
                         width: 120px;
                     }
@@ -120,11 +124,11 @@
         border-radius: 4px;
 
         &.active {
-            background-color: $primary-selected-color;
+            background-color: variables.$primary-selected-color;
         }
 
         .member-img {
-            @include members();
+            @include mixins.members();
         }
     }
 }

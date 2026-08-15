@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toLocalInput, fromLocalInput, fmtDuration, MS_MIN } from '../../services/date.util'
+import { confirmDelete } from '../confirm-dialog'
 
 const PRESETS = [30, 60, 90, 120, 240, 480]
 
@@ -178,7 +179,9 @@ export function EntryDialog ({ draft, tasks, onSave, onDelete, onClose, busy }) 
                     <div>
                         {isEdit && (
                             <button type='button' className='cal-btn cal-btn-danger' disabled={busy}
-                                onClick={() => onDelete(draft._id)}>Loeschen</button>
+                                onClick={async () => {
+                                    if (await confirmDelete({ was: 'Dieser Kalendereintrag' })) onDelete(draft._id)
+                                }}>Löschen</button>
                         )}
                     </div>
                     <div style={{ display: 'flex', gap: 10 }}>

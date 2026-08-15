@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import { BiDotsHorizontalRounded, BiMessageRoundedAdd } from 'react-icons/bi'
 import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
 import { setDynamicModalObj, toggleModal, updateTaskAction } from '../../store/board.actions'
+import { boardService } from '../../services/board.service'
+import { singleLineEditable } from '../../services/editable'
 
 export function TaskTitleKanban({task , group , board}) {
     const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
@@ -13,7 +15,6 @@ export function TaskTitleKanban({task , group , board}) {
     const elTaskModalBtn = useRef()
 
     function onOpenModal(task) {
-        toggleModal(isOpen)
         navigate(`/board/${board._id}/${group.id}/${task.id}`)
     }
 
@@ -25,17 +26,23 @@ export function TaskTitleKanban({task , group , board}) {
 
     async function onUpdateTaskTitle(ev, task) {
         const value = ev.target.innerText
-        task.title = value
+        if (value === task.title) return
+        const activity = boardService.getEmptyActivity()
+        activity.action = 'title'
+        activity.task = { id: task.id, title: value }
+        activity.from = task.title
+        activity.to = value
         try {
-            await updateTaskAction(board, group.id, task)
+            await updateTaskAction(board, group.id, { ...task, title: value }, activity)
         } catch (err) {
-            console.log('Failed to save')
+            console.log('Speichern fehlgeschlagen')
         }
     }
 
     return (
         <section className="task-title" >
-            <blockquote contentEditable onBlur={(ev) => onUpdateTaskTitle(ev, task)} suppressContentEditableWarning={true}>
+            <blockquote contentEditable onBlur={(ev) => onUpdateTaskTitle(ev, task)} suppressContentEditableWarning={true}
+                {...singleLineEditable()}>
                 <span>{task.title}</span>
             </blockquote>
             <div onClick={() => onOpenModal(task)} className="chat-icon">

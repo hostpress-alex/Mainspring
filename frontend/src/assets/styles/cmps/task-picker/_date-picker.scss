@@ -1,3 +1,5 @@
+@use "../../setup/variables";
+
 .date-picker {
     outline: 0;
     max-width: 140px;
@@ -21,16 +23,16 @@
         outline: none;
         border: none;
         text-align: center;
-        padding: $spacing-xs;
+        padding: variables.$spacing-xs;
         background-color: inherit;
 
         &:hover {
-            color: $board-btn;
-            border: .2px solid $workspace-hover;
+            color: variables.$board-btn;
+            border: .2px solid variables.$workspace-hover;
         }
 
         &:focus-visible {
-            border: .2px solid $board-btn;
+            border: .2px solid variables.$board-btn;
         }
     }
 }

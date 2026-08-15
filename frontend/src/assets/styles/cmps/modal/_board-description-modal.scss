@@ -1,8 +1,12 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .board-description-modal {
-    @include center-absolute();
+    @include mixins.center-absolute();
     flex-direction: column;
     border: 1px solid rgb(204, 204, 204);
-    background: $app-bg;
+    background: variables.$app-bg;
     overflow: hidden;
     border-radius: 8px;
     outline: none;
@@ -12,48 +16,48 @@
     max-width: 95vw;
     transition: all 0.4s ease 0s;
     box-shadow: rgb(0 0 0) 1px 0px 20px 0px;
-    color: $primary-text-color;
+    color: variables.$primary-text-color;
     z-index: 51;
 
     .close-btn {
-        @include center-flex();
+        @include mixins.center-flex();
         position: fixed;
         right: 15px;
         top: 15px;
         border-radius: 6px;
-        color: $primary-text-color;
-        padding: $spacing-small;
+        color: variables.$primary-text-color;
+        padding: variables.$spacing-small;
         cursor: pointer;
 
         &:hover {
-            background-color: $workspace-hover;
+            background-color: variables.$workspace-hover;
         }
 
         svg {
-            font-size: rem(22px);
+            font-size: functions.rem(22px);
         }
     }
 
     .board-edit {
-        padding: $spacing-medium $spacing-xl $spacing-xl $spacing-xl;
+        padding: variables.$spacing-medium variables.$spacing-xl variables.$spacing-xl variables.$spacing-xl;
         width: 62%;
         height: 100%;
-        gap: $spacing-small;
+        gap: variables.$spacing-small;
 
         .board-edit-title {
             margin-top: 12px;
-            font-size: rem(24px);
+            font-size: functions.rem(24px);
 
             blockquote {
                 border-radius: 4px;
                 white-space: wrap;
 
                 &:hover {
-                    outline: 1px solid $task-box-shadow-color;
+                    outline: 1px solid variables.$task-box-shadow-color;
                 }
 
                 &:focus-visible {
-                    outline: 1px solid $board-btn;
+                    outline: 1px solid variables.$board-btn;
                 }
             }
         }
@@ -64,7 +68,7 @@
             overflow-y: auto;
             top: 78px;
             left: auto;
-            font-size: rem(14px);
+            font-size: functions.rem(14px);
             font-weight: 400;
             overflow: hidden;
             max-width: 800px;
@@ -73,7 +77,7 @@
             cursor: default;
 
             &:hover {
-                border: 1px dashed $task-box-shadow-color;
+                border: 1px dashed variables.$task-box-shadow-color;
                 cursor: text;
             }
 
@@ -90,10 +94,10 @@
     }
 
     .board-info {
-        padding: $spacing-medium;
+        padding: variables.$spacing-medium;
         height: 100%;
         width: 100%;
-        background-color: $board-description-bg;
+        background-color: variables.$board-description-bg;
 
         >* {
             margin-bottom: 24px;
@@ -101,30 +105,30 @@
             >* {
                 display: flex;
                 align-items: center;
-                gap: $spacing-small;
+                gap: variables.$spacing-small;
 
                 span {
-                    font-size: rem(14px);
+                    font-size: functions.rem(14px);
                 }
             }
         }
 
         .title {
-            font-size: rem(16px);
+            font-size: functions.rem(16px);
             font-weight: bold;
-            margin-bottom: $spacing-large;
+            margin-bottom: variables.$spacing-large;
         }
 
         .header {
-            font-size: rem(14px);
-            color: $workspace-icon-color;
+            font-size: functions.rem(14px);
+            color: variables.$workspace-icon-color;
         }
 
         .lightning-container {
-            @include center-flex();
+            @include mixins.center-flex();
             width: 24px;
             height: 24px;
-            background-color: $color-done-green;
+            background-color: variables.$color-done-green;
             color: #fff;
             border-radius: 8px;
         }
@@ -132,7 +136,7 @@
         .created-by,
         .owners {
             img {
-                @include members();
+                @include mixins.members();
             }
         }
 
@@ -143,12 +147,12 @@
     }
 
 
-    @include for-narrow-layout() {
+    @include mixins.for-narrow-layout() {
         & {
             flex-direction: row;
 
             .board-info {
-                padding: $spacing-xl;
+                padding: variables.$spacing-xl;
                 width: 38%;
             }
         }

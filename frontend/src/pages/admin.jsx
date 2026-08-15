@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { userService } from '../services/user.service'
 import { boardService } from '../services/board.service'
+import { confirmDelete } from '../cmps/confirm-dialog'
 
 const S = {
     page: { padding: '32px 40px', maxWidth: 1100, margin: '0 auto', fontFamily: 'inherit' },
@@ -77,6 +78,12 @@ export function AdminPage () {
     }
 
     async function onDeleteUser (user) {
+        const ok = await confirmDelete({
+            was: `Der Benutzer „${user.fullname || user.username}"`,
+            hinweis: 'Die Anmeldung wird sofort ungültig. Bereits geschriebene Updates bleiben erhalten.',
+            knopf: 'Benutzer löschen',
+        })
+        if (!ok) return
         setErr(null)
         try {
             await userService.remove(user._id)
@@ -180,7 +187,7 @@ export function AdminPage () {
                                         <button style={S.btnGhost} onClick={() => onToggleAdmin(u)}>
                                             {u.isAdmin ? 'Admin entziehen' : 'Zum Admin machen'}
                                         </button>
-                                        <button style={S.btnDanger} onClick={() => onDeleteUser(u)}>Loeschen</button>
+                                        <button style={S.btnDanger} onClick={() => onDeleteUser(u)}>Löschen</button>
                                     </>}
                                     {String(u._id) === String(me?._id) && <span style={{ color: '#9699a6', fontSize: 13 }}>das bist du</span>}
                                 </td>
@@ -197,7 +204,7 @@ export function AdminPage () {
                         <tr>
                             <th style={S.th}>Board</th>
                             <th style={S.th}>Mitglieder — ★ = Owner</th>
-                            <th style={S.th}>Hinzufuegen</th>
+                            <th style={S.th}>Hinzufügen</th>
                         </tr>
                     </thead>
                     <tbody>

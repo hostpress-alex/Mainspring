@@ -9,6 +9,7 @@ import { BsPersonCircle } from 'react-icons/bs'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { useSelector } from 'react-redux'
 import { Tooltip } from '@mui/material'
+import { GUEST_IMG } from '../../services/avatar'
 
 export function BoardFilter ({ board, onSetFilter }) {
     const filter = useSelector(storeState => storeState.boardModule.filter)
@@ -59,29 +60,29 @@ export function BoardFilter ({ board, onSetFilter }) {
 
     return (
         <section ref={elBoardFilter} className="board-filter flex align-center">
-            <Tooltip title="Add new task" arrow>
+            <Tooltip title="Neuen Task anlegen" arrow>
                 <div className="add-btn">
-                    <span className='new-task-btn' onClick={() => addTaskOnFirstGroup(board)}>New Task</span>
+                    <span className='new-task-btn' onClick={() => addTaskOnFirstGroup(board)}>Neuer Task</span>
                     <div className='drop-down-btn' onClick={onToggleMenuModal}>
                         <FaAngleDown className="icon" />
                     </div>
                 </div>
             </Tooltip>
             <div className='board-tools flex align-center'>
-                <Tooltip title="Search" arrow>
+                <Tooltip title="Suchen" arrow>
                     <div className='search-task'>
                         <TfiSearch className='icon' />
                         <input type="text"
                             name='title'
                             value={filterBy.title}
-                            placeholder="Search"
+                            placeholder="Suchen"
                             onChange={handleChange} />
                     </div>
                 </Tooltip>
-                <Tooltip title="Filter by member" arrow>
+                <Tooltip title="Nach Person filtern" arrow>
                     <div ref={elMemberFilter} onClick={onToggleMemberFilterModal} className={`person-filter ${(isMemberModalOpen() || filterBy.memberId) ? ' active' : ''}`}>
                         {!memberFilter && <BsPersonCircle className='icon' />}
-                        {memberFilter && <img className='member-img' src={memberFilter.imgUrl} alt="" />}
+                        {memberFilter && <img className='member-img' src={memberFilter.imgUrl || GUEST_IMG} alt="" />}
                         <span>Person</span>
                         {filterBy.memberId && <AiFillCloseCircle onClick={onRemovePersonFilter} />}
                     </div>

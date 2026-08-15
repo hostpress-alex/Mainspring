@@ -1,16 +1,20 @@
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .activity-preview {
     display: flex;
-    padding: $spacing-small 0 $spacing-small 0;
-    border-bottom: 1px solid $task-box-shadow-color;
+    padding: variables.$spacing-small 0 variables.$spacing-small 0;
+    border-bottom: 1px solid variables.$task-box-shadow-color;
     margin: 0 25px 0 25px;
     gap: 5%;
-    font-size: rem(16px);
+    font-size: functions.rem(16px);
     height: 60px;
-    color: $primary-text-color;
+    color: variables.$primary-text-color;
 
-    @include for-mobile-layout() {
+    @include mixins.for-mobile-layout() {
         & {
-            font-size: rem(12px);
+            font-size: functions.rem(12px);
         }
     }
 
@@ -22,7 +26,7 @@
     .time-title {
         width: 200px;
 
-        @include for-mobile-layout() {
+        @include mixins.for-mobile-layout() {
             & {
                 width: 100px;
                 gap: unset;
@@ -32,7 +36,7 @@
         .time {
             width: 60px;
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & {
                     width: 50px;
                 }
@@ -42,9 +46,9 @@
 
         .title {
             height: 100%;
-            gap: $spacing-xs;
+            gap: variables.$spacing-xs;
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & {
                     width: 50px;
                     gap: unset;
@@ -55,7 +59,7 @@
             img {
                 border-radius: 50px;
 
-                @include for-mobile-layout() {
+                @include mixins.for-mobile-layout() {
                     & {
                         display: none;
                     }
@@ -63,17 +67,17 @@
             }
 
             span {
-                font-size: rem(14px);
+                font-size: functions.rem(14px);
                 font-weight: 500;
             }
         }
     }
 
     .action {
-        gap: $spacing-small;
+        gap: variables.$spacing-small;
         width: 80px;
 
-        @include for-mobile-layout() {
+        @include mixins.for-mobile-layout() {
             & {
                 width: 60px;
             }
@@ -87,7 +91,7 @@
         }
 
         .icon {
-            font-size: rem(20px);
+            font-size: functions.rem(20px);
         }
     }
 
@@ -98,7 +102,7 @@
         margin-left: auto;
         width: 200px;
 
-        @include for-mobile-layout() {
+        @include mixins.for-mobile-layout() {
             & {
                 width: 100px;
             }
@@ -106,16 +110,16 @@
 
         span {
             height: 100%;
-            @include center-flex();
+            @include mixins.center-flex();
             width: 90px;
 
-            @include for-mobile-layout() {
+            @include mixins.for-mobile-layout() {
                 & {
                     width: 40px;
                 }
             }
 
-            @include for-narrow-layout() {
+            @include mixins.for-narrow-layout() {
                 & {
                     min-width: 80px;
                 }
@@ -123,24 +127,24 @@
         }
 
         .icon {
-            font-size: rem(35px);
-            color: $color-explosive;
-            margin: 0 $spacing-xs;
+            font-size: functions.rem(35px);
+            color: variables.$color-explosive;
+            margin: 0 variables.$spacing-xs;
         }
 
         &.label-container {
             span {
                 &.label {
                     width: 100%;
-                    padding: 0 $spacing-small;
+                    padding: 0 variables.$spacing-small;
                     color: white;
                     border-radius: 4px;
 
-                    @include for-mobile-layout() {
+                    @include mixins.for-mobile-layout() {
                         &.label {
                             width: 40px;
                             height: 30px;
-                            font-size: rem(10px);
+                            font-size: functions.rem(10px);
                         }
                     }
                 }
@@ -148,7 +152,7 @@
         }
 
         &.person-container {
-            gap: $spacing-xl;
+            gap: variables.$spacing-xl;
             margin-left: unset;
 
             img {

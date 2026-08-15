@@ -14,7 +14,7 @@ async function getBoards(req, res) {
     res.json(boards)
   } catch (err) {
     logger.error('Failed to get boards', err)
-    res.status(500).send({ err: 'Failed to get boards' })
+    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to get boards' })
   }
 }
 
@@ -25,7 +25,7 @@ async function getBoardById(req, res) {
     res.json(board)
   } catch (err) {
     logger.error('Failed to get board', err)
-    res.status(500).send({ err: 'Failed to get board' })
+    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to get board' })
   }
 }
 
@@ -36,7 +36,7 @@ async function addBoard(req, res) {
     res.json(addedBoard)
   } catch (err) {
     logger.error('Failed to add board', err)
-    res.status(500).send({ err: 'Failed to add board' })
+    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to add board' })
   }
 }
 
@@ -48,7 +48,7 @@ async function updateBoard(req, res) {
     res.json(updatedBoard)
   } catch (err) {
     logger.error('Failed to update board', err)
-    res.status(500).send({ err: 'Failed to update board' })
+    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update board' })
 
   }
 }
@@ -60,7 +60,7 @@ async function removeBoard(req, res) {
     res.send(removedId)
   } catch (err) {
     logger.error('Failed to remove board', err)
-    res.status(500).send({ err: 'Failed to remove board' })
+    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to remove board' })
   }
 }
 
@@ -72,7 +72,7 @@ async function updateTask(req, res) {
     res.send(taskToSend)
   } catch (err) {
     logger.error('Failed to update task', err)
-    res.status(500).send({ err: 'Failed to update task' })
+    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update task' })
   }
 }
 
@@ -84,7 +84,7 @@ async function updateGroup(req, res) {
     res.send(groupToSend)
   } catch (err) {
     logger.error('Failed to update group', err)
-    res.status(500).send({ err: 'Failed to update group' })
+    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update group' })
   }
 }
 
@@ -100,7 +100,7 @@ async function updateGroup(req, res) {
 //     res.json(savedMsg)
 //   } catch (err) {
 //     logger.error('Failed to update car', err)
-//     res.status(500).send({ err: 'Failed to update car' })
+//     res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update car' })
 
 //   }
 // }
@@ -115,7 +115,7 @@ async function updateGroup(req, res) {
 //     res.send(removedId)
 //   } catch (err) {
 //     logger.error('Failed to remove car msg', err)
-//     res.status(500).send({ err: 'Failed to remove car msg' })
+//     res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to remove car msg' })
 
 //   }
 // }

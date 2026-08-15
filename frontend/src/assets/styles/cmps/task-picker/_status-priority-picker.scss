@@ -1,6 +1,8 @@
+@use "../../setup/mixins";
+
 .status-priority-picker {
     position: relative;
-    @include center-flex();
+    @include mixins.center-flex();
     color: white;
 
     &:hover .fold {

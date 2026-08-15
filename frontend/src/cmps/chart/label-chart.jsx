@@ -22,23 +22,49 @@ export function LabelChart ({ board, dynamicModalObj }) {
         ],
       }
 
+      /**
+       * Labels haengen seit der Umstellung an der Spalte, nicht mehr am Board.
+       * Fuer die Auswertung werden die Listen aller Status- und
+       * Prioritaets-Spalten zusammengefasst; gleiche Titel zaehlen zusammen.
+       */
+      function getLabelColumns() {
+        return (board.columns || []).filter(c => c.type === 'status' || c.type === 'priority')
+      }
+
+      function getLabels() {
+        const seen = new Map()
+        for (const column of getLabelColumns()) {
+          for (const label of (column.labels || [])) {
+            if (!label || seen.has(label.title)) continue
+            seen.set(label.title, label)
+          }
+        }
+        // Rueckfall fuer Boards, die noch keine spaltenweisen Listen haben.
+        if (!seen.size) {
+          for (const label of (board.labels || [])) {
+            if (label && !seen.has(label.title)) seen.set(label.title, label)
+          }
+        }
+        return [...seen.values()]
+      }
+
       function getLabelTitles() {
-        return board.labels.map(label => {
-            if(label.title) return label.title
-            return 'empty'
-        })
+        return getLabels().map(label => label.title || 'empty')
       }
 
       function getLabelColors() {
-        return board.labels.map(label => label.color)
+        return getLabels().map(label => label.color)
       }
 
       function getData() {
-        const labelTitles =board.labels.map(label => label.title)
+        const labelTitles = getLabels().map(label => label.title)
+        const fields = getLabelColumns().map(c => c.field || c.id)
         const data = new Array(labelTitles.length).fill(0)
         board.groups.forEach(group => group.tasks.forEach(task => {
-            data[labelTitles.indexOf(task.status)]++
-            data[labelTitles.indexOf(task.priority)]++
+            fields.forEach(field => {
+                const idx = labelTitles.indexOf(task[field])
+                if (idx >= 0) data[idx]++
+            })
         }))
 
         return data
@@ -66,7 +92,7 @@ export function LabelChart ({ board, dynamicModalObj }) {
         <section className='label-chart'>
           <div className='chart-header'>
             <div className='header-content'>
-              <h2>Chart label</h2>
+              <h2>Diagramm: Labels</h2>
               <span className='icon-container' ref={elModalBtn} onClick={onToggleTypeModal}>
                 <BiDotsHorizontalRounded />
               </span>

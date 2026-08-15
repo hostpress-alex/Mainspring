@@ -1,6 +1,10 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .screenshot-section {
-      background: $home-tertiary-bg;
-      font-family: $title-font-family;
+      background: variables.$home-tertiary-bg;
+      font-family: variables.$title-font-family;
       padding: 10vh 0;
 
       .header {
@@ -15,27 +19,27 @@
                   padding: 18px;
                   text-align: center;
                   margin-bottom: 16px;
-                  font-size: rem(28px);
-                  line-height: rem(36px);
+                  font-size: functions.rem(28px);
+                  line-height: functions.rem(36px);
             }
 
             .info {
-                  color: $workspace-icon-color;
-                  font-size: rem(15px);
+                  color: variables.$workspace-icon-color;
+                  font-size: functions.rem(15px);
                   font-weight: 500;
                   line-height: 28px;
                   margin-bottom: 26px;
             }
 
-            @include for-normal-layout() {
+            @include mixins.for-normal-layout() {
                   .title {
-                        font-size: rem(46px);
-                        line-height: rem(65px);
+                        font-size: functions.rem(46px);
+                        line-height: functions.rem(65px);
                   }
 
                   .info {
-                        font-size: rem(20px);
-                        line-height: rem(28px);
+                        font-size: functions.rem(20px);
+                        line-height: functions.rem(28px);
                   }
             }
       }

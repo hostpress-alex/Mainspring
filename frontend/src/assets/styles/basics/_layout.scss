@@ -1,17 +1,19 @@
+@use "../setup/variables";
+
 .layout {
-    max-width: $mobile-breakpoint;
+    max-width: variables.$mobile-breakpoint;
     margin-left: auto;
     margin-right: auto;
   }
   
   @media (min-width: 720px) {
     .layout {
-      max-width: $narrow-breakpoint;
+      max-width: variables.$narrow-breakpoint;
     }
   }
   
   @media (min-width: 960px) {
     .layout {
-      max-width: $normal-breakpoint;
+      max-width: variables.$normal-breakpoint;
     }
   }

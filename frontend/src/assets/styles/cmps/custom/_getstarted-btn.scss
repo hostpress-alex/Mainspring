@@ -1,15 +1,19 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .get-started-btn {
       display: flex;
-      background-image: $home-btn-bg-gradient;
+      background-image: variables.$home-btn-bg-gradient;
       border-radius: 2em;
       color: #fff;
       letter-spacing: 1px;
       width: 100%;
       align-items: center;
       justify-content: center;
-      padding: $spacing-medium 0;
+      padding: variables.$spacing-medium 0;
       line-height: 18px;
-      font-size: rem(16px);
+      font-size: functions.rem(16px);
       transition: opacity .3s ease-in-out, box-shadow .2s ease-in-out;
 
       &:hover {
@@ -22,15 +26,15 @@
       }
 
       .arrow {
-            margin-left: $spacing-small;
+            margin-left: variables.$spacing-small;
             transition: transform .3s ease-in-out;
-            font-size: rem(20px);
+            font-size: functions.rem(20px);
       }
 
-      @include for-normal-layout() {
+      @include mixins.for-normal-layout() {
             & {
                   width: max-content;
-                  padding: $spacing-medium $spacing-xl;
+                  padding: variables.$spacing-medium variables.$spacing-xl;
             }
       }
 }

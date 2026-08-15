@@ -27,8 +27,8 @@ export function CreateBoard({ setIsModalOpen }) {
             <div className="close" onClick={() => setIsModalOpen(false)}>
                 <AiOutlineClose className="icon" />
             </div>
-            <h1>Create board</h1>
-            <h3>Board name</h3>
+            <h1>Board anlegen</h1>
+            <h3>Board-Name</h3>
             <form onSubmit={onAddBoard}>
                 <input  type="text"
                         name="title"

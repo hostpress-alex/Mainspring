@@ -1,15 +1,20 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .updated-picker {
-    @include center-flex();
+    @include mixins.center-flex();
     &-content{
         width: 60px;
     }
 
     img {
-        @include members;
+        @include mixins.members;
     }
 
     .icon-person {
-        font-size: rem(26px);
-        color: darken($border-color, 20%);
+        font-size: functions.rem(26px);
+        color: color.adjust(variables.$border-color, $lightness: -20%);
     }
 }

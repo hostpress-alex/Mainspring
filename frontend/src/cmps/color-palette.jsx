@@ -13,8 +13,7 @@ export function ColorPalette({ dynamicModalObj }) {
         try {
             dynamicModalObj.group.color = color
             updateGroups(dynamicModalObj.group, board)
-            dynamicModalObj.isOpen = false
-            setDynamicModalObj(dynamicModalObj)
+            setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
         } catch (err) {
             console.log(err)
         }

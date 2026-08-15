@@ -1,21 +1,25 @@
+@use "sass:color";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .task-preview , .task-preview-kanban{
     .task-person {
         cursor: pointer;
         height: 36px;
-        min-width: $cell-width-person;
+        min-width: variables.$cell-width-person;
         position: relative;
-        border: 1px solid darken($border-color , 20%);
-        @include center-flex();
+        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        @include mixins.center-flex();
 
         .members-imgs {
-            width: $cell-width-person;
+            width: variables.$cell-width-person;
             height: 100%;
-            @include member-img(#323338, white, 30px, 30px);
-            @include center-flex();
+            @include mixins.member-img(#323338, white, 30px, 30px);
+            @include mixins.center-flex();
         }
 
         .icon-person {
-            color: darken($border-color, 20%);
+            color: color.adjust(variables.$border-color, $lightness: -20%);
         }
     }
 }

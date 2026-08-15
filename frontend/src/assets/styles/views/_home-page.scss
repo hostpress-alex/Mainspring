@@ -1,21 +1,25 @@
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
 .home-page {
-  background-image: $home-bg;
+  background-image: variables.$home-bg;
   margin: 0;
-  padding-top: rem(72px);
-  color: $app-bg;
-  font-family: $title-font-family;
+  padding-top: functions.rem(72px);
+  color: variables.$app-bg;
+  font-family: variables.$title-font-family;
 
   .home-content {
-    padding-top: $spacing-xxl;
-    @include center-flex();
+    padding-top: variables.$spacing-xxl;
+    @include mixins.center-flex();
     flex-direction: column;
-    margin-bottom: $spacing-medium;
+    margin-bottom: variables.$spacing-medium;
 
     .home-paragraph {
-      color: $app-bg;
+      color: variables.$app-bg;
       text-align: center;
-      font-size: rem(14px);
-      color: $workspace-icon-color;
+      font-size: functions.rem(14px);
+      color: variables.$workspace-icon-color;
     }
 
     .headers-container {
@@ -28,16 +32,16 @@
         background: linear-gradient(360deg, #adadad 53.95%, #8080e0 121.37%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: $spacing-large;
-        font-size: rem(30px);
-        margin-bottom: $spacing-medium;
+        margin-bottom: variables.$spacing-large;
+        font-size: functions.rem(30px);
+        margin-bottom: variables.$spacing-medium;
         line-height: 40px;
         letter-spacing: 2px;
 
-        @include for-normal-layout() {
+        @include mixins.for-normal-layout() {
           & {
-            font-size: rem(46px);
-            margin-bottom: $spacing-medium;
+            font-size: functions.rem(46px);
+            margin-bottom: variables.$spacing-medium;
             line-height: 65px;
           }
         }
@@ -45,13 +49,13 @@
 
       .secondary-title {
         font-weight: 300;
-        font-size: rem(16px);
+        font-size: functions.rem(16px);
         letter-spacing: 1px;
-        padding: 0 $spacing-large;
+        padding: 0 variables.$spacing-large;
 
-        @include for-normal-layout() {
+        @include mixins.for-normal-layout() {
           & {
-            font-size: rem(20px);
+            font-size: functions.rem(20px);
             padding: 0;
           }
         }

@@ -45,7 +45,7 @@ export function MonthGrid ({ date, entries, onCreate, onOpen, onPickDay }) {
                                     onMouseDown={ev => onCellMouseDown(ev, day)}>
                                     <span className='cal-month-num'
                                         onMouseDown={ev => { ev.stopPropagation(); onPickDay(day) }}
-                                        title='Tagesansicht oeffnen'>
+                                        title='Tagesansicht öffnen'>
                                         {day.getDate()}
                                     </span>
                                     {list.slice(0, MAX_CHIPS).map(e => (

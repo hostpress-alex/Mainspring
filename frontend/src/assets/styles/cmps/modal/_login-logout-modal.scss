@@ -1,29 +1,34 @@
+@use "sass:color";
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .login-logout-modal {
     position: absolute;
-    background-color: $app-bg;
-    border-radius: $spacing-small;
-    color: $primary-text-color;
+    background-color: variables.$app-bg;
+    border-radius: variables.$spacing-small;
+    color: variables.$primary-text-color;
     box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-    padding: $spacing-small;
-    font-size: rem(14px);
+    padding: variables.$spacing-small;
+    font-size: functions.rem(14px);
     z-index: 10;
-    border: 1px solid darken($border-color , 20%);
+    border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
     left: 74%;
     bottom: 70px;    
     
     span, a {
-        @include center-flex();
+        @include mixins.center-flex();
         cursor: pointer;
-        padding: 0 $spacing-xs;
+        padding: 0 variables.$spacing-xs;
         border-radius: 4px;
-        gap: $spacing-xs;
-        color: $primary-text-color;
+        gap: variables.$spacing-xs;
+        color: variables.$primary-text-color;
         &:hover {
-            background-color: $workspace-hover;
+            background-color: variables.$workspace-hover;
         }
     }
     
-    @include for-narrow-layout() {
+    @include mixins.for-narrow-layout() {
         &{
             left: 60px;
             bottom: 15px;

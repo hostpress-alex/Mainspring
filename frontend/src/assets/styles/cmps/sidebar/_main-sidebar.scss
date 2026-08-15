@@ -1,24 +1,28 @@
+@use "../../setup/functions";
+@use "../../setup/mixins";
+@use "../../setup/variables";
+
 .main-sidebar {
     flex-direction: column;
     justify-content: space-between;
-    background-color: $sidebar-main-bg;
+    background-color: variables.$sidebar-main-bg;
     min-width: 66px;
     height: 100vh;
     position: sticky;
     top: 0;
 
     .icon-link {
-        @include center-flex();
-        margin: $spacing-small;
+        @include mixins.center-flex();
+        margin: variables.$spacing-small;
         transition: background-color .3s;
 
         &:hover {
-            @include hover-sidebar();
+            @include mixins.hover-sidebar();
         }
 
         .home-img {
             height: 22px;
-            margin: $spacing-small 0;
+            margin: variables.$spacing-small 0;
         }
     }
 
@@ -26,15 +30,15 @@
         display: none;
     }
 
-    @include for-mobile-layout() {
+    @include mixins.for-mobile-layout() {
         .open-workspace-btn {
-            @include center-flex();
+            @include mixins.center-flex();
             color: white;
-            font-size: rem(24px);
-            padding: $spacing-xs;
+            font-size: functions.rem(24px);
+            padding: variables.$spacing-xs;
             cursor: pointer;
             &:hover {
-                @include hover-sidebar();
+                @include mixins.hover-sidebar();
             }
         }
     }
@@ -53,25 +57,25 @@
     }
 
     .tools-container {
-        border-bottom: 1px solid $border-color;
-        border-top: 1px solid $border-color;
+        border-bottom: 1px solid variables.$border-color;
+        border-top: 1px solid variables.$border-color;
         height: 100%;
         color: white;
-        gap: $spacing-medium;
-        font-size: rem(23px);
-        padding: $spacing-medium 0;
+        gap: variables.$spacing-medium;
+        font-size: functions.rem(23px);
+        padding: variables.$spacing-medium 0;
 
         .icon-container {
-            width: rem(56px);
-            height: rem(36px);
-            @include center-flex();
+            width: functions.rem(56px);
+            height: functions.rem(36px);
+            @include mixins.center-flex();
             position: relative;
 
             .triangle-icon {
                 position: absolute;
-                color: $sidebar-workspace-bg;
+                color: variables.$sidebar-workspace-bg;
 
-                @include for-narrow-layout {
+                @include mixins.for-narrow-layout {
                     & {
                         left: 46px;
                     }
@@ -80,29 +84,29 @@
         }
 
         >*:hover {
-            @include hover-sidebar()
+            @include mixins.hover-sidebar()
         }
     }
 
     .bottom {
-        @include center-flex();
-        gap: $spacing-medium;
-        padding: $spacing-medium 0;
+        @include mixins.center-flex();
+        gap: variables.$spacing-medium;
+        padding: variables.$spacing-medium 0;
     }
 
     .menu-icon {
-        width: rem(42px);
-        height: rem(42px);
-        color: $menu-icon-color;
+        width: functions.rem(42px);
+        height: functions.rem(42px);
+        color: variables.$menu-icon-color;
 
         &:hover {
-            @include hover-sidebar()
+            @include mixins.hover-sidebar()
         }
     }
 
-    @include for-mobile-layout {
+    @include mixins.for-mobile-layout {
         & {
-            @include center-flex();
+            @include mixins.center-flex();
             flex-direction: row;
             position: fixed;
             width: 100vw;

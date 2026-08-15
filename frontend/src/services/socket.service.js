@@ -12,7 +12,8 @@ const SOCKET_EMIT_LOGIN = 'set-user-socket'
 const SOCKET_EMIT_LOGOUT = 'unset-user-socket'
 
 
-const baseUrl = (process.env.NODE_ENV === 'production') ? '' : '//localhost:3030'
+// Gleiche Origin — in Dev uebernimmt der Vite-Proxy (ws: true).
+const baseUrl = ''
 export const socketService = createSocketService()
 
 // for debugging from console
