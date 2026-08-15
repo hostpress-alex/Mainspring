@@ -1,13 +1,14 @@
+import { t } from '../i18n'
 /**
- * Uploads gehen an das eigene Backend (POST /api/upload) und landen dort als
- * Datei unter backend/uploads/. Zurueck kommt ein Pfad wie /api/upload/<id>,
- * der ueberall als src verwendet werden kann.
+ * Uploads go to our own backend (POST /api/upload) and end up there as a file
+ * under backend/uploads/. What comes back is a path like /api/upload/<id> that
+ * can be used as a src anywhere.
  *
- * Frueher ging hier jedes Bild an einen fremden Cloudinary-Account.
+ * Every image used to go to a stranger's Cloudinary account.
  */
 const UPLOAD_URL = '/api/upload'
 
-/** Avatare werden vor dem Upload verkleinert — Fotos aus dem Handy sind sonst riesig. */
+/** Avatars are scaled down before upload — photos from a phone are huge otherwise. */
 const AVATAR_SIDE = 256
 const AVATAR_QUALITY = 0.85
 
@@ -19,22 +20,22 @@ export const uploadService = {
 }
 
 /**
- * Laedt eine Datei oder einen Blob hoch. Funktioniert mit File-Objekten aus
- * einem <input type="file">, mit Drag&Drop und mit Blobs aus der Zwischenablage.
- * Gibt { _id, url, mime, size } zurueck.
+ * Uploads a file or a blob. Works with File objects from an
+ * <input type="file">, with drag & drop and with blobs from the clipboard.
+ * Returns { _id, url, mime, size }.
  */
 /**
  * opts.scope: 'profile' -> uploads/profile/
  *             'task' + opts.taskId -> uploads/task/<taskId>/
- * ohne Angabe landet die Datei unter uploads/misc/<jahr>/<monat>/
+ * without one, the file ends up under uploads/misc/<year>/<month>/
  */
 export async function uploadFile (fileOrBlob, opts = {}) {
-    if (!fileOrBlob) throw new Error('Keine Datei ausgewaehlt')
+    if (!fileOrBlob) throw new Error(t('file.noneSelected'))
     const params = new URLSearchParams()
     if (opts.scope) params.set('scope', opts.scope)
     if (opts.taskId) params.set('taskId', opts.taskId)
-    // Der Server braucht den Namen fuer zwei Dinge: den Download-Namen und —
-    // wenn der Browser keinen brauchbaren Typ meldet — die Typerkennung.
+    // The server needs the name for two things: the download name and —
+    // when the browser reports no usable type — working out the type.
     const name = opts.name || fileOrBlob.name
     if (name) params.set('name', name)
     const url = params.toString() ? `${UPLOAD_URL}?${params}` : UPLOAD_URL
@@ -49,16 +50,16 @@ export async function uploadFile (fileOrBlob, opts = {}) {
     return data
 }
 
-/** Verkleinert auf einen quadratischen Mittelausschnitt und laedt hoch. */
+/** Scales down to a square centre crop and uploads it. */
 export async function uploadAvatar (file) {
-    if (!file) throw new Error('Keine Datei ausgewaehlt')
-    if (!file.type.startsWith('image/')) throw new Error('Das ist kein Bild')
+    if (!file) throw new Error(t('file.noneSelected'))
+    if (!file.type.startsWith('image/')) throw new Error(t('file.notAnImage'))
     const blob = await resizeToSquare(file, AVATAR_SIDE, AVATAR_QUALITY)
     return uploadFile(blob, { scope: 'profile' })
 }
 
 /**
- * Bilder aus einem Paste-Event ziehen. Fuer spaetere Verwendung in Task-Updates:
+ * Pull images out of a paste event. For later use in task updates:
  *   onPaste={async ev => { for (const b of imagesFromClipboard(ev)) await uploadFile(b) }}
  */
 export function imagesFromClipboard (ev) {
@@ -76,10 +77,10 @@ export function imagesFromClipboard (ev) {
 function resizeToSquare (file, side, quality) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader()
-        reader.onerror = () => reject(new Error('Datei konnte nicht gelesen werden'))
+        reader.onerror = () => reject(new Error(t('file.readFailed')))
         reader.onload = () => {
             const img = new Image()
-            img.onerror = () => reject(new Error('Bild konnte nicht gelesen werden'))
+            img.onerror = () => reject(new Error(t('file.imageReadFailed')))
             img.onload = () => {
                 const src = Math.min(img.width, img.height)
                 const sx = (img.width - src) / 2
@@ -91,7 +92,7 @@ function resizeToSquare (file, side, quality) {
                 ctx.imageSmoothingQuality = 'high'
                 ctx.drawImage(img, sx, sy, src, src, 0, 0, side, side)
                 canvas.toBlob(
-                    blob => blob ? resolve(blob) : reject(new Error('Bild konnte nicht verarbeitet werden')),
+                    blob => blob ? resolve(blob) : reject(new Error(t('file.imageFailed'))),
                     'image/jpeg',
                     quality
                 )
@@ -102,7 +103,7 @@ function resizeToSquare (file, side, quality) {
     })
 }
 
-/** Kompatibel zur alten Signatur (Change-Event vom File-Input). */
+/** Compatible with the old signature (change event from the file input). */
 async function uploadImg (ev) {
     const file = ev?.target?.files?.[0]
     const { url } = await uploadAvatar(file)

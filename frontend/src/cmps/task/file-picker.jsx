@@ -1,17 +1,18 @@
 import { useRef, useState } from 'react'
 import { AiOutlineFileAdd } from 'react-icons/ai'
 import { uploadFile } from '../../services/upload.service'
+import { t } from '../../i18n'
 
 /**
- * Datei-Spalte.
+ * File column.
  *
- * Frueher lief hier alles ueber uploadImg(), das jede Datei als Bild behandelt
- * und verkleinert hat — PDFs und Word-Dateien wurden schlicht abgewiesen.
- * Jetzt wird die Datei unveraendert hochgeladen; Bilder bekommen ein
- * Vorschaubild, alles andere ein Symbol mit Namen.
+ * Everything used to go through uploadImg(), which treated every file as an
+ * image and scaled it down — PDFs and Word files were simply turned away. Now
+ * the file is uploaded unchanged; images get a thumbnail, everything else an
+ * icon with its name.
  *
- * Der gespeicherte Wert ist ein Objekt { url, name, mime, size }. Altbestand
- * ist eine blanke URL und wird weiter verstanden.
+ * The stored value is an object { url, name, mime, size }. Older data is a
+ * bare URL and is still understood.
  */
 
 const ACCEPT = [
@@ -21,7 +22,7 @@ const ACCEPT = [
     '.txt', '.md', '.json', '.xml', '.zip', '.7z',
 ].join(',')
 
-/** Wert normalisieren: frueher stand hier nur eine URL. */
+/** Normalise the value: this used to be nothing but a URL. */
 function asFile(value) {
     if (!value) return null
     if (typeof value === 'string') return { url: value, name: '', mime: '', size: 0 }
@@ -59,7 +60,7 @@ export function FilePicker({ info, onUpdate, field = 'file' }) {
                 size: saved.size || picked.size || 0,
             })
         } catch (e) {
-            setErr(e.message || 'Upload fehlgeschlagen')
+            setErr(e.message || t('file.uploadFailed'))
         } finally {
             setIsBusy(false)
         }
@@ -72,7 +73,7 @@ export function FilePicker({ info, onUpdate, field = 'file' }) {
     }
 
     return (
-        <section className="file-picker picker" title={err || (file ? (file.name || 'Datei') : 'Datei anhängen')}>
+        <section className="file-picker picker" title={err || (file ? (file.name || t('file.file')) : t('file.attach'))}>
             {!file && (
                 <label htmlFor={'file-upload' + info.id} style={{ cursor: 'pointer' }}>
                     {isBusy ? <span style={{ fontSize: 11, color: '#676879' }}>…</span> : <AiOutlineFileAdd className="icon" />}
@@ -93,7 +94,7 @@ export function FilePicker({ info, onUpdate, field = 'file' }) {
                             </span>
                         )}
                     </a>
-                    <button type="button" title="Datei entfernen" onClick={onClear}
+                    <button type="button" title={t('file.remove')} onClick={onClear}
                         style={{ border: 'none', background: 'transparent', color: '#676879', cursor: 'pointer', padding: 0, lineHeight: 1, fontSize: 13 }}>
                         ×
                     </button>

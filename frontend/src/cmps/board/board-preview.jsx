@@ -7,6 +7,7 @@ import { confirmDelete } from "../confirm-dialog"
 import { boardService } from "../../services/board.service"
 
 import { BiDotsHorizontalRounded } from "react-icons/bi"
+import { t } from '../../i18n'
 
 export function BoardPreview({ board }) {
     const boards = useSelector(storeState => storeState.boardModule.boards)
@@ -23,9 +24,9 @@ export function BoardPreview({ board }) {
     async function onRemove(boardId) {
         const b = boards.find(x => x._id === boardId)
         const ok = await confirmDelete({
-            was: b?.title ? `Das Board „${b.title}"` : 'Dieses Board',
-            hinweis: 'Alle Gruppen, Tasks, Updates und Kalendereinträge dieses Boards gehen mit.',
-            knopf: 'Board löschen',
+            what: b?.title ? t('board.deleteName', { title: b.title }) : t('board.thisBoard'),
+            note: t('board.deleteNote'),
+            button: t('board.delete'),
         })
         if (!ok) return
         try {

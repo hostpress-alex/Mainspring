@@ -1,37 +1,40 @@
+import { t } from '../i18n'
 /**
- * Spaltenmodell eines Boards.
+ * Column model of a board.
  *
- * Frueher: board.cmpsOrder = ['status-picker', 'date-picker', …]
- *   -> jeder Typ war genau einmal moeglich, weil jeder Picker ein festes Feld
- *      am Task las (task.status, task.dueDate, …). Zwei Status-Spalten oder
- *      eine umbenannte Spalte waren damit unmoeglich.
+ * Before: board.cmpsOrder = ['status-picker', 'date-picker', …]
+ *   -> every type was possible exactly once, because each picker read a fixed
+ *      field on the task (task.status, task.dueDate, …). Two status columns or
+ *      a renamed column were impossible that way.
  *
- * Jetzt: board.columns = [{ id, type, title, field }]
- *   - `field` sagt, in welcher Task-Eigenschaft der Wert liegt.
- *   - Migrierte Altspalten behalten ihr angestammtes Feld (status, dueDate, …),
- *     damit Statistik, Kanban und Filter unveraendert weiterlaufen.
- *   - Neue Spalten bekommen `field = id`. Dadurch sind beliebig viele Spalten
- *     desselben Typs moeglich, ohne dass sich zwei denselben Wert teilen.
+ * Now: board.columns = [{ id, type, title, field }]
+ *   - `field` says which task property the value sits in.
+ *   - Migrated old columns keep the field they always had (status, dueDate, …),
+ *     so that statistics, kanban and filters carry on unchanged.
+ *   - New columns get `field = id`. That allows any number of columns of the
+ *     same type without two of them sharing the same value.
  */
 
+const OVERVIEW = t('column.category.overview')
+const USEFUL = t('column.category.useful')
+
 export const COLUMN_CATALOG = [
-    // Ueberblick
-    { type: 'status',   label: 'Status',              category: 'Überblick',   icon: 'status',   emptyValue: '' },
-    { type: 'dropdown', label: 'Drop-down',           category: 'Überblick',   icon: 'dropdown', emptyValue: '' },
-    { type: 'text',     label: 'Text',                category: 'Überblick',   icon: 'text',     emptyValue: '' },
-    { type: 'date',     label: 'Datum',               category: 'Überblick',   icon: 'date',     emptyValue: '' },
-    { type: 'person',   label: 'Personen',            category: 'Überblick',   icon: 'person',   emptyValue: [] },
-    { type: 'number',   label: 'Zahlen',              category: 'Überblick',   icon: 'number',   emptyValue: '' },
-    // Sehr nuetzlich
-    { type: 'file',     label: 'Datei',               category: 'Sehr nützlich', icon: 'file',     emptyValue: '' },
-    { type: 'checkbox', label: 'Checkbox',            category: 'Sehr nützlich', icon: 'checkbox', emptyValue: false },
-    { type: 'link',     label: 'Link',                category: 'Sehr nützlich', icon: 'link',     emptyValue: '' },
-    { type: 'priority', label: 'Priority',            category: 'Sehr nützlich', icon: 'priority', emptyValue: '' },
-    { type: 'longtext', label: 'Langer Text',         category: 'Sehr nützlich', icon: 'longtext', emptyValue: '' },
-    { type: 'updated',  label: 'Zuletzt aktualisiert', category: 'Sehr nützlich', icon: 'updated',  emptyValue: null },
+    { type: 'status',   label: t('column.type.status'),   category: OVERVIEW, icon: 'status',   emptyValue: '' },
+    { type: 'dropdown', label: t('column.type.dropdown'), category: OVERVIEW, icon: 'dropdown', emptyValue: '' },
+    { type: 'text',     label: t('column.type.text'),     category: OVERVIEW, icon: 'text',     emptyValue: '' },
+    { type: 'date',     label: t('column.type.date'),     category: OVERVIEW, icon: 'date',     emptyValue: '' },
+    { type: 'person',   label: t('column.type.person'),   category: OVERVIEW, icon: 'person',   emptyValue: [] },
+    { type: 'number',   label: t('column.type.number'),   category: OVERVIEW, icon: 'number',   emptyValue: '' },
+    { type: 'file',     label: t('column.type.file'),     category: USEFUL,   icon: 'file',     emptyValue: '' },
+    { type: 'checkbox', label: t('column.type.checkbox'), category: USEFUL,   icon: 'checkbox', emptyValue: false },
+    { type: 'link',     label: t('column.type.link'),     category: USEFUL,   icon: 'link',     emptyValue: '' },
+    { type: 'priority', label: t('column.type.priority'), category: USEFUL,   icon: 'priority', emptyValue: '' },
+    { type: 'longtext', label: t('column.type.longtext'), category: USEFUL,   icon: 'longtext', emptyValue: '' },
+    { type: 'updated',  label: t('column.type.updated'),  category: USEFUL,   icon: 'updated',  emptyValue: null },
 ]
 
-export const COLUMN_CATEGORIES = ['Überblick', 'Sehr nützlich']
+// Order of the headings in the add-column dialog.
+export const COLUMN_CATEGORIES = [OVERVIEW, USEFUL]
 
 /** Altes cmpsOrder-Kuerzel -> neue Spaltendefinition. */
 const LEGACY = {
@@ -55,21 +58,21 @@ export function catalogEntry (type) {
     return COLUMN_CATALOG.find(c => c.type === type) || null
 }
 
-/** Neue Spalte. Der Wert landet in task[<id>], nicht in einem festen Feld. */
+/** A new column. The value lands in task[<id>], not in a fixed field. */
 export function makeColumn (type, title) {
     const entry = catalogEntry(type)
     const id = makeColumnId()
     return { id, type, title: title || (entry ? entry.label : type), field: id }
 }
 
-/** Normalisiert `cmpOrder`-Eintraege auf kebab-case (Altbestand war uneinheitlich). */
+/** Normalises `cmpOrder` entries to kebab-case (older data was inconsistent). */
 function normalizeLegacy (value) {
     return String(value).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 }
 
 /**
- * Sorgt dafuer, dass board.columns existiert. Idempotent — laeuft bei jedem
- * Lesen und veraendert bereits migrierte Boards nicht mehr.
+ * Makes sure board.columns exists. Idempotent — runs on every read and leaves
+ * boards that have already been migrated alone.
  */
 export function ensureColumns (board) {
     if (!board) return board
@@ -85,7 +88,7 @@ export function ensureColumns (board) {
     return board
 }
 
-/** Wert einer Spalte an einem Task lesen. */
+/** Read the value of a column on a task. */
 export function valueOf (task, column) {
     const raw = task ? task[column.field] : undefined
     if (raw !== undefined && raw !== null) return raw

@@ -6,6 +6,7 @@ import {
 } from 'react-icons/md'
 import { COLUMN_CATALOG, COLUMN_CATEGORIES, makeColumn } from '../../services/column.service'
 import './add-column-dialog.css'
+import { t } from '../../i18n'
 
 const ICONS = {
     status:   { el: <MdOutlineViewWeek />,        bg: '#00c875' },
@@ -23,9 +24,9 @@ const ICONS = {
 }
 
 /**
- * Spaltenauswahl nach Vorbild von monday: Suche, Kategorien, ein Klick legt an.
- * Optional laesst sich vorher ein eigener Titel setzen — sonst nimmt die Spalte
- * den Namen ihres Typs. Derselbe Typ darf beliebig oft vorkommen.
+ * Column picker modelled on monday: search, categories, one click creates it.
+ * You can optionally set your own title first — otherwise the column takes the
+ * name of its type. The same type may occur as often as you like.
  */
 export function AddColumnDialog ({ onAdd, onClose, existingTitles = [] }) {
     const [filter, setFilter] = useState('')
@@ -61,14 +62,14 @@ export function AddColumnDialog ({ onAdd, onClose, existingTitles = [] }) {
 
     return (
         <div className='acd-backdrop' onMouseDown={ev => { if (ev.target === ev.currentTarget) onClose() }}>
-            <div className='acd' role='dialog' aria-label='Spalte hinzufügen'>
+            <div className='acd' role='dialog' aria-label={t('column.add')}>
                 <div className='acd-head'>
-                    <h2>Spalte hinzufügen</h2>
-                    <button className='acd-close' onClick={onClose} aria-label='Schließen'>×</button>
+                    <h2>{t('column.add')}</h2>
+                    <button className='acd-close' onClick={onClose} aria-label={t('common.close')}>×</button>
                 </div>
 
                 <div className='acd-search'>
-                    <input ref={elSearch} value={filter} placeholder='Spalte suchen…'
+                    <input ref={elSearch} value={filter} placeholder={t('column.search')}
                         onChange={e => setFilter(e.target.value)} />
                 </div>
 
@@ -99,10 +100,10 @@ export function AddColumnDialog ({ onAdd, onClose, existingTitles = [] }) {
 
                 <div className='acd-foot'>
                     <label className='acd-name'>
-                        <span className='acd-hint'>Eigener Name</span>
-                        <input value={title} placeholder='optional' onChange={e => setTitle(e.target.value)} />
+                        <span className='acd-hint'>{t('column.customName')}</span>
+                        <input value={title} placeholder={t('common.optional')} onChange={e => setTitle(e.target.value)} />
                     </label>
-                    <span className='acd-hint'>Titel später per Doppelklick auf den Spaltenkopf änderbar</span>
+                    <span className='acd-hint'>{t('column.titleHint')}</span>
                 </div>
             </div>
         </div>

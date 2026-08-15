@@ -12,13 +12,13 @@ import { utilService } from "../../services/util.service"
 import { GUEST_IMG } from '../../services/avatar'
 import { AttachmentStrip } from './attachment-strip'
 import './comment-replies.css'
+import { t } from '../../i18n'
 
 /**
- * Ein Update mit seinen Antworten.
+ * One update with its replies.
  *
- * Antworten sind normale Kommentare mit `parentId`. Bewusst nur eine Ebene:
- * eine Antwort kann nicht selbst beantwortet werden — verschachtelte Baeume
- * liest hinterher niemand mehr.
+ * Replies are ordinary comments with a `parentId`. Deliberately only one
+ * level: a reply cannot be replied to — nobody reads nested trees later on.
  */
 export function CommentPreview({ onRemoveComment, comment, taskId, onEditComment, replies = [], onReply, isReply = false }) {
     const [isMenuModalOpen, setIsMenuModalOpen] = useState(false)
@@ -115,8 +115,8 @@ export function CommentPreview({ onRemoveComment, comment, taskId, onEditComment
                     onChange={handleChange}></textarea>
             </form>}
             {isEditOpen && <div className="button-container">
-                <button className="save" onMouseDown={onSaveEdit}>Speichern</button>
-                <button className="cancel" onMouseDown={onCancelEdit}>Abbrechen</button>
+                <button className="save" onMouseDown={onSaveEdit}>{t('common.save')}</button>
+                <button className="cancel" onMouseDown={onCancelEdit}>{t('common.cancel')}</button>
             </div>}
 
             {!isReply && !isEditOpen && (
@@ -139,7 +139,7 @@ export function CommentPreview({ onRemoveComment, comment, taskId, onEditComment
                     {!isReplyOpen && (
                         <button type="button" className="reply-btn" onClick={() => setIsReplyOpen(true)}>
                             <BsReply />
-                            <span>{replies.length ? `Antworten (${replies.length})` : 'Antworten'}</span>
+                            <span>{replies.length ? t('update.repliesCount', { n: replies.length }) : t('update.replies')}</span>
                         </button>
                     )}
 
@@ -149,19 +149,19 @@ export function CommentPreview({ onRemoveComment, comment, taskId, onEditComment
                                 autoFocus
                                 rows={2}
                                 value={replyTxt}
-                                placeholder="Antwort schreiben…"
+                                placeholder={t('update.replyPlaceholder')}
                                 onChange={ev => setReplyTxt(ev.target.value)}
                                 onKeyDown={ev => {
-                                    // Enter sendet, Shift+Enter macht eine neue Zeile.
+                                    // Enter sends, Shift+Enter starts a new line.
                                     if (ev.key === 'Enter' && !ev.shiftKey) onSendReply(ev)
                                     if (ev.key === 'Escape') { setIsReplyOpen(false); setReplyTxt('') }
                                 }} />
                             <div className="reply-actions">
                                 <button type="submit" className="save" disabled={!replyTxt.trim() || isSendingReply}>
-                                    {isSendingReply ? 'Sendet…' : 'Antworten'}
+                                    {isSendingReply ? 'Sendet…' : t('update.replies')}
                                 </button>
                                 <button type="button" className="cancel"
-                                    onClick={() => { setIsReplyOpen(false); setReplyTxt('') }}>Abbrechen</button>
+                                    onClick={() => { setIsReplyOpen(false); setReplyTxt('') }}>{t('common.cancel')}</button>
                             </div>
                         </form>
                     )}

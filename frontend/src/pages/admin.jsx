@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { userService } from '../services/user.service'
 import { boardService } from '../services/board.service'
 import { confirmDelete } from '../cmps/confirm-dialog'
+import { t } from '../i18n'
 
 const S = {
     page: { padding: '32px 40px', maxWidth: 1100, margin: '0 auto', fontFamily: 'inherit' },
@@ -49,7 +50,7 @@ export function AdminPage () {
     }
 
     function readErr (e) {
-        return e?.response?.data?.err || e?.message || 'Unbekannter Fehler'
+        return e?.response?.data?.err || e?.message || t('common.unknownError')
     }
 
     function flash (text) {
@@ -63,7 +64,7 @@ export function AdminPage () {
         try {
             await userService.create(form)
             setForm(EMPTY_FORM)
-            flash(`Benutzer "${form.username}" angelegt.`)
+            flash(t('admin.userCreated', { name: form.username }))
             reload()
         } catch (e) { setErr(readErr(e)) }
     }
@@ -72,22 +73,22 @@ export function AdminPage () {
         setErr(null)
         try {
             await userService.setAdmin(user._id, !user.isAdmin)
-            flash(`${user.fullname}: Admin-Recht ${user.isAdmin ? 'entzogen' : 'vergeben'}.`)
+            flash(t(user.isAdmin ? 'admin.adminRevoked' : 'admin.adminGranted', { name: user.fullname }))
             reload()
         } catch (e) { setErr(readErr(e)) }
     }
 
     async function onDeleteUser (user) {
         const ok = await confirmDelete({
-            was: `Der Benutzer „${user.fullname || user.username}"`,
-            hinweis: 'Die Anmeldung wird sofort ungültig. Bereits geschriebene Updates bleiben erhalten.',
-            knopf: 'Benutzer löschen',
+            what: t('admin.deleteUserName', { name: user.fullname || user.username }),
+            note: t('admin.deleteUserNote'),
+            button: t('admin.deleteUser'),
         })
         if (!ok) return
         setErr(null)
         try {
             await userService.remove(user._id)
-            flash(`Benutzer "${user.username}" geloescht.`)
+            flash(t('admin.userDeleted', { name: user.username }))
             reload()
         } catch (e) { setErr(readErr(e)) }
     }
@@ -100,7 +101,7 @@ export function AdminPage () {
         try {
             const members = [...(board.members || []), { _id: user._id, fullname: user.fullname, imgUrl: user.imgUrl || '' }]
             await boardService.setMembers(board._id, members)
-            flash(`${user.fullname} zu "${board.title}" hinzugefuegt.`)
+            flash(t('admin.memberAdded', { name: user.fullname, board: board.title }))
             reload()
         } catch (e) { setErr(readErr(e)) }
     }
@@ -110,7 +111,7 @@ export function AdminPage () {
         try {
             const members = (board.members || []).filter(m => String(m._id) !== String(memberId))
             await boardService.setMembers(board._id, members)
-            flash('Mitglied entfernt.')
+            flash(t('member.removed'))
             reload()
         } catch (e) { setErr(readErr(e)) }
     }
@@ -124,7 +125,7 @@ export function AdminPage () {
         const owners = ownerIdsOf(board)
         const isOwner = owners.includes(String(userId))
         if (isOwner && owners.length === 1) {
-            setErr('Ein Board braucht mindestens einen Owner.')
+            setErr(t('admin.ownerRequired'))
             return
         }
         try {
@@ -133,14 +134,15 @@ export function AdminPage () {
                 : [...owners, String(userId)]
             await boardService.setOwners(board._id, ownerIds)
             const u = users.find(x => String(x._id) === String(userId))
-            flash(`${u ? u.fullname : userId}: Owner-Recht fuer "${board.title}" ${isOwner ? 'entzogen' : 'vergeben'}.`)
+            flash(t(isOwner ? 'admin.ownerRevoked' : 'admin.ownerGranted',
+                { name: u ? u.fullname : userId, board: board.title }))
             reload()
         } catch (e) { setErr(readErr(e)) }
     }
 
     return (
         <section style={S.page}>
-            <h1 style={S.h1}>Administration</h1>
+            <h1 style={S.h1}>{t('nav.administration')}</h1>
             <p style={S.sub}>
                 Angemeldet als {me?.fullname}.
             </p>
@@ -149,19 +151,19 @@ export function AdminPage () {
             {msg && <div style={S.ok}>{msg}</div>}
 
             <div style={S.card}>
-                <h2 style={S.h2}>Benutzer anlegen</h2>
+                <h2 style={S.h2}>{t('admin.createUser')}</h2>
                 <form onSubmit={onCreateUser}>
-                    <input style={S.input} placeholder='Voller Name' value={form.fullname}
+                    <input style={S.input} placeholder={t('profile.fullName')} value={form.fullname}
                         onChange={e => setForm({ ...form, fullname: e.target.value })} required />
-                    <input style={S.input} placeholder='Benutzername' value={form.username}
+                    <input style={S.input} placeholder={t('login.username')} value={form.username}
                         onChange={e => setForm({ ...form, username: e.target.value })} required />
-                    <input style={S.input} type='password' placeholder='Passwort (min. 8)' value={form.password}
+                    <input style={S.input} type='password' placeholder={t('admin.passwordPlaceholder')} value={form.password}
                         onChange={e => setForm({ ...form, password: e.target.value })} required />
                     <label style={{ marginRight: 12, fontSize: 14 }}>
                         <input type='checkbox' checked={form.isAdmin}
-                            onChange={e => setForm({ ...form, isAdmin: e.target.checked })} /> Admin
+                            onChange={e => setForm({ ...form, isAdmin: e.target.checked })} /> {t('admin.admin')}
                     </label>
-                    <button style={S.btn} type='submit'>Anlegen</button>
+                    <button style={S.btn} type='submit'>{t('common.create')}</button>
                 </form>
             </div>
 
@@ -170,9 +172,9 @@ export function AdminPage () {
                 <table style={S.table}>
                     <thead>
                         <tr>
-                            <th style={S.th}>Name</th>
-                            <th style={S.th}>Benutzername</th>
-                            <th style={S.th}>Rolle</th>
+                            <th style={S.th}>{t('common.name')}</th>
+                            <th style={S.th}>{t('login.username')}</th>
+                            <th style={S.th}>{t('common.role')}</th>
                             <th style={S.th}></th>
                         </tr>
                     </thead>
@@ -181,15 +183,15 @@ export function AdminPage () {
                             <tr key={u._id}>
                                 <td style={S.td}>{u.fullname}</td>
                                 <td style={S.td}>{u.username}</td>
-                                <td style={S.td}>{u.isAdmin ? <span style={S.badge}>Admin</span> : 'Benutzer'}</td>
+                                <td style={S.td}>{u.isAdmin ? <span style={S.badge}>{t('admin.admin')}</span> : t('common.user')}</td>
                                 <td style={{ ...S.td, textAlign: 'right' }}>
                                     {String(u._id) !== String(me?._id) && <>
                                         <button style={S.btnGhost} onClick={() => onToggleAdmin(u)}>
-                                            {u.isAdmin ? 'Admin entziehen' : 'Zum Admin machen'}
+                                            {u.isAdmin ? t('admin.revokeAdmin') : t('admin.makeAdmin')}
                                         </button>
-                                        <button style={S.btnDanger} onClick={() => onDeleteUser(u)}>Löschen</button>
+                                        <button style={S.btnDanger} onClick={() => onDeleteUser(u)}>{t('common.delete')}</button>
                                     </>}
-                                    {String(u._id) === String(me?._id) && <span style={{ color: '#9699a6', fontSize: 13 }}>das bist du</span>}
+                                    {String(u._id) === String(me?._id) && <span style={{ color: '#9699a6', fontSize: 13 }}>{t('admin.thatIsYou')}</span>}
                                 </td>
                             </tr>
                         ))}
@@ -202,9 +204,9 @@ export function AdminPage () {
                 <table style={S.table}>
                     <thead>
                         <tr>
-                            <th style={S.th}>Board</th>
-                            <th style={S.th}>Mitglieder — ★ = Owner</th>
-                            <th style={S.th}>Hinzufügen</th>
+                            <th style={S.th}>{t('board.board')}</th>
+                            <th style={S.th}>{t('admin.members')}</th>
+                            <th style={S.th}>{t('common.add')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -216,17 +218,17 @@ export function AdminPage () {
                                 <tr key={b._id}>
                                     <td style={S.td}><Link to={`/board/${b._id}`}>{b.title}</Link></td>
                                     <td style={S.td}>
-                                        {(b.members || []).length === 0 && <span style={{ color: '#9699a6' }}>niemand</span>}
+                                        {(b.members || []).length === 0 && <span style={{ color: '#9699a6' }}>{t('common.nobody')}</span>}
                                         {(b.members || []).map(m => {
                                             const isOwner = owners.includes(String(m._id))
                                             return (
                                                 <span key={m._id} style={{ ...S.chip, background: isOwner ? '#e6f2ff' : '#f0f1f5' }}>
                                                     <span style={{ cursor: 'pointer' }}
-                                                        title={isOwner ? 'Owner-Recht entziehen' : 'Zum Owner machen'}
+                                                        title={isOwner ? t('admin.revokeOwner') : t('admin.makeOwner')}
                                                         onClick={() => onToggleOwner(b, m._id)}>
                                                         {isOwner ? '★ ' : '☆ '}{m.fullname}
                                                     </span>
-                                                    {!isOwner && <span style={S.x} title='Aus Board entfernen'
+                                                    {!isOwner && <span style={S.x} title={t('admin.removeFromBoard')}
                                                         onClick={() => onRemoveMember(b, m._id)}>×</span>}
                                                 </span>
                                             )
@@ -234,7 +236,7 @@ export function AdminPage () {
                                     </td>
                                     <td style={S.td}>
                                         <select style={S.input} value='' onChange={e => onAddMember(b, e.target.value)}>
-                                            <option value=''>Benutzer waehlen…</option>
+                                            <option value=''>{t('admin.chooseUser')}</option>
                                             {candidates.map(u => <option key={u._id} value={u._id}>{u.fullname}</option>)}
                                         </select>
                                     </td>

@@ -12,8 +12,8 @@ export function StatusPicker({ info, onUpdate, field = 'status', column }) {
     let classText = !info[field] ? 'empty-label ' : ''
     classText += 'label-text'
     
-    // Die Auswahl haengt an der Spalte. board.labels ist nur noch der
-    // Rueckfall fuer Boards, die noch keine spaltenweisen Listen haben.
+    // The choice hangs off the column. board.labels is only the fallback
+    // for boards that do not have per-column lists yet.
     const labels = (column && Array.isArray(column.labels)) ? column.labels : (board.labels || [])
     const label = labels.find(label => label.title === info[field])
     const color = label ? label.color : '#c4c4c4'

@@ -13,6 +13,7 @@ import { RiUserAddLine } from 'react-icons/ri'
 import { Tooltip } from '@mui/material'
 import { GUEST_IMG } from '../../services/avatar'
 import { singleLineEditable } from '../../services/editable'
+import { t } from '../../i18n'
 export function BoardHeader ({ board, onSetFilter, isStarredOpen, setIsShowDescription, setIsInviteModalOpen, setBoardType, boardType }) {
     const isOpen = useSelector(storeState => storeState.boardModule.isBoardModalOpen)
     const navigate = useNavigate()
@@ -25,7 +26,7 @@ export function BoardHeader ({ board, onSetFilter, isStarredOpen, setIsShowDescr
             await updateBoardMeta(board._id, { title: value })
             loadBoards()
         } catch (err) {
-            console.log('Speichern fehlgeschlagen')
+            console.log('saving failed')
         }
     }
 
@@ -51,30 +52,30 @@ export function BoardHeader ({ board, onSetFilter, isStarredOpen, setIsShowDescr
         <header className="board-header">
             <section className='board-title flex align-center space-around'>
                 <div className="board-info flex">
-                    <Tooltip title="Zum Bearbeiten klicken" arrow>
+                    <Tooltip title={t('board.clickToEdit')} arrow>
                         <blockquote contentEditable onBlur={onSave} suppressContentEditableWarning={true}
                             {...singleLineEditable()}>
                             <h1>{board.title}</h1>
                         </blockquote>
                     </Tooltip>
-                    <Tooltip title="Board-Beschreibung anzeigen" arrow>
+                    <Tooltip title={t('board.showDescription')} arrow>
                         <div className='info-btn icon' onClick={() => setIsShowDescription(true)}>
                             <RiErrorWarningLine />
                         </div>
                     </Tooltip>
-                    <Tooltip title="Zu den Favoriten" arrow>
+                    <Tooltip title={t('board.addFavorite')} arrow>
                         <div className='star-btn icon ' onClick={onToggleStarred}>
                             {!board.isStarred ? <BsStar className='star' /> : <BsStarFill className="star star-full" />}
                         </div>
                     </Tooltip>
                 </div>
                 <div className='board-tools flex align-center'>
-                    <Tooltip title="Board-Verlauf anzeigen" arrow>
+                    <Tooltip title={t('board.showActivity')} arrow>
                         <div className='activity' onClick={() => toggleIsOpen('activity')}><FiActivity /></div>
                     </Tooltip>
-                    <Tooltip title="Board-Mitglieder anzeigen" arrow>
+                    <Tooltip title={t('board.showMembers')} arrow>
                         <div className='members-last-seen flex' onClick={() => toggleIsOpen('last-viewed')}>
-                            <span className='last-seen-title'>Zuletzt geöffnet</span>
+                            <span className='last-seen-title'>{t('activity.lastSeen')}</span>
                             <div className='flex members-imgs'>
                                 <img className='member-img1' src={board.members[0]?.imgUrl || GUEST_IMG} alt="member" />
                                 <img className='member-img2' src={board.members[1]?.imgUrl || GUEST_IMG} alt="member" />
@@ -84,7 +85,7 @@ export function BoardHeader ({ board, onSetFilter, isStarredOpen, setIsShowDescr
                             </div>
                         </div>
                     </Tooltip>
-                    <Tooltip title="Mitglieder einladen" arrow>
+                    <Tooltip title={t('board.invite')} arrow>
                         <div className="invite" onClick={() => setIsInviteModalOpen(prev => !prev)}>
                             <RiUserAddLine className="invite-icon" />
                             <span className='invite-title'> Invite / 1</span>
@@ -93,28 +94,28 @@ export function BoardHeader ({ board, onSetFilter, isStarredOpen, setIsShowDescr
                 </div>
             </section>
             <div className='board-description flex'>
-                {board.description && <p className='board-description-link'>{board.description} <span onClick={() => setIsShowDescription(true)}>See More</span></p>}
+                {board.description && <p className='board-description-link'>{board.description} <span onClick={() => setIsShowDescription(true)}>{t('board.more')}</span></p>}
             </div>
             <div className='board-display-btns flex' >
-                <Tooltip title="Tabelle" arrow>
+                <Tooltip title={t('board.table')} arrow>
                     <div className={`type-btn ${boardType === 'table' ? ' active' : ''}`} onClick={() => onSetBoardType('table')} >
                         <GrHomeRounded className='icon' />
-                        <span className='wide' onClick={() => onSetBoardType('table')}>Tabelle</span>
-                        <span className='mobile'>Tabelle</span>
+                        <span className='wide' onClick={() => onSetBoardType('table')}>{t('board.table')}</span>
+                        <span className='mobile'>{t('board.table')}</span>
                     </div>
                 </Tooltip>
-                <Tooltip title="Kanban" arrow>
+                <Tooltip title={t('board.kanban')} arrow>
                     <div className={`type-btn ${boardType === 'kanban' ? ' active' : ''}`} onClick={() => onSetBoardType('kanban')}>
                         <BsKanban />
-                        <span className='wide'  >Kanban</span>
-                        <span className='mobile' onClick={() => onSetBoardType('kanban')}>Kanban</span>
+                        <span className='wide'  >{t('board.kanban')}</span>
+                        <span className='mobile' onClick={() => onSetBoardType('kanban')}>{t('board.kanban')}</span>
                     </div>
                 </Tooltip>
-                <Tooltip title="Auswertung" arrow>
+                <Tooltip title={t('board.dashboard')} arrow>
                     <div className={`type-btn ${boardType === 'dashboard' ? ' active' : ''}`} onClick={() => onSetBoardType('dashboard')}>
                         <BsBarChart />
-                        <span className='wide' >Auswertung</span>
-                        <span className='mobile' onClick={() => onSetBoardType('dashboard')}>Auswertung</span>
+                        <span className='wide' >{t('board.dashboard')}</span>
+                        <span className='mobile' onClick={() => onSetBoardType('dashboard')}>{t('board.dashboard')}</span>
                     </div>
                 </Tooltip>
             </div>

@@ -7,6 +7,7 @@ import { boardService } from '../services/board.service'
 import { logout } from '../store/user.actions'
 import { Loader } from '../cmps/loader'
 import { GUEST_IMG } from '../services/avatar'
+import { t } from '../i18n'
 
 const S = {
     page: { minHeight: '100vh', background: '#f6f7fb' },
@@ -47,7 +48,7 @@ export function BoardsOverview () {
 
     useEffect(() => {
         loadBoards()
-            .catch(e => setErr(e?.response?.data?.err || 'Boards konnten nicht geladen werden.'))
+            .catch(e => setErr(e?.response?.data?.err || t('board.loadFailed')))
             .finally(() => setIsLoading(false))
     }, [])
 
@@ -55,12 +56,12 @@ export function BoardsOverview () {
         setErr(null)
         try {
             const board = boardService.getEmptyBoard()
-            board.title = 'Neues Board'
+            board.title = t('board.newTitle')
             const saved = await saveBoard(board)
             if (saved && saved._id) navigate(`/board/${saved._id}`)
             else await loadBoards()
         } catch (e) {
-            setErr(e?.response?.data?.err || 'Board konnte nicht angelegt werden.')
+            setErr(e?.response?.data?.err || t('board.createFailed'))
         }
     }
 
@@ -83,30 +84,30 @@ export function BoardsOverview () {
                         <img src={user?.imgUrl || GUEST_IMG} alt='' style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
                         {user?.fullname}
                     </Link>
-                    <span onClick={onLogout} style={{ ...S.link, cursor: 'pointer' }}>Abmelden</span>
+                    <span onClick={onLogout} style={{ ...S.link, cursor: 'pointer' }}>{t('nav.logout')}</span>
                 </div>
             </div>
 
             <div style={S.main}>
                 <div style={S.head}>
-                    <h1 style={S.h1}>Meine Boards</h1>
+                    <h1 style={S.h1}>{t('nav.myBoards')}</h1>
                     <div style={{ display: 'flex', gap: 10 }}>
-                        <input style={S.search} placeholder='Board suchen…' value={filter}
+                        <input style={S.search} placeholder={t('board.search')} value={filter}
                             onChange={e => setFilter(e.target.value)} />
                         <button style={S.btn} onClick={onCreateBoard}>+ Neues Board</button>
                     </div>
                 </div>
                 <p style={S.sub}>
                     {boards.length === 0
-                        ? 'Du bist noch in keinem Board.'
-                        : `${boards.length} Board${boards.length === 1 ? '' : 's'}, in denen du Mitglied oder Owner bist.`}
+                        ? t('board.noneYet')
+                        : t('board.count', { n: boards.length })}
                 </p>
 
                 {err && <div style={S.err}>{err}</div>}
 
                 {boards.length === 0 && (
                     <div style={S.empty}>
-                        <p style={{ fontSize: 17, marginBottom: 6 }}>Hier ist noch nichts.</p>
+                        <p style={{ fontSize: 17, marginBottom: 6 }}>{t('board.empty')}</p>
                         <p style={{ color: '#676879', marginBottom: 22 }}>
                             Leg dein erstes Board an — oder lass dich von einem Owner zu einem bestehenden einladen.
                         </p>
@@ -128,11 +129,11 @@ export function BoardsOverview () {
                                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 3px 12px rgba(0,0,0,.09)'; e.currentTarget.style.borderColor = '#0073ea' }}
                                     onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#e0e3ee' }}>
                                     <div style={S.cardTitle}>
-                                        {isOwner && <span title='Du bist Owner dieses Boards' style={{ color: '#fdab3d' }}>★</span>}
+                                        {isOwner && <span title={t('board.youAreOwner')} style={{ color: '#fdab3d' }}>★</span>}
                                         {board.title}
                                     </div>
                                     <div style={S.meta}>
-                                        {(board.groups || []).length} Gruppen · {countTasks(board)} Tasks
+                                        {t('board.cardMeta', { groups: (board.groups || []).length, tasks: countTasks(board) })}
                                     </div>
                                     <div style={S.avatars}>
                                         {members.slice(0, 5).map(m => (
@@ -147,7 +148,7 @@ export function BoardsOverview () {
                                                 +{members.length - 5}
                                             </span>
                                         )}
-                                        {members.length === 0 && <span style={{ color: '#9699a6', fontSize: 13 }}>keine Mitglieder</span>}
+                                        {members.length === 0 && <span style={{ color: '#9699a6', fontSize: 13 }}>{t('board.noMembers')}</span>}
                                     </div>
                                 </Link>
                             )

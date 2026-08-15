@@ -47,12 +47,8 @@ async function findById(id) {
     return out(await db()('file').where({ id: String(id) }).first())
 }
 
-async function findAll() {
-    return (await db()('file').orderBy('created_at')).map(out)
-}
-
 async function deleteById(id) {
     await db()('file').where({ id: String(id) }).del()
 }
 
-module.exports = { insert, findById, findAll, deleteById }
+module.exports = { insert, findById, deleteById }

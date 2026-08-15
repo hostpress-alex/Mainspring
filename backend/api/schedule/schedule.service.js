@@ -1,11 +1,11 @@
 /**
- * Persoenliche Zeitplanung: welcher Benutzer arbeitet wann an welchem Task.
+ * Personal scheduling: which user works on which task and when.
  *
- * Bewusst eine eigene Collection statt eines Feldes im Board:
- *  - die Planung gehoert einem Benutzer, das Board gehoert allen
- *  - saveBoard schreibt das komplette Board-Dokument; Planungseintraege dort
- *    abzulegen wuerde bei jedem Task-Klick alles neu schreiben
- *  - Zeitraum-Abfragen brauchen einen Index auf start/end
+ * Deliberately its own collection instead of a field on the board:
+ *  - the schedule belongs to one user, the board belongs to everyone
+ *  - saveBoard writes the complete board document; putting schedule entries
+ *    in there would rewrite everything on every task click
+ *  - date range queries need an index on start/end
  */
 const logger = require('../../services/logger.service')
 const asyncLocalStorage = require('../../services/als.service')
@@ -38,7 +38,7 @@ function parseDate(value, label) {
     return d
 }
 
-/** Nur die Felder, die der Client setzen darf. */
+/** Only the fields the client is allowed to set. */
 async function buildEntry(payload, user) {
     const start = parseDate(payload.start, 'start')
     const end = parseDate(payload.end, 'end')
@@ -49,8 +49,8 @@ async function buildEntry(payload, user) {
 
     if (!payload.boardId || !payload.taskId) throw httpError(400, 'boardId und taskId sind Pflicht')
 
-    // Nur planbar, was der Benutzer auch sehen darf. Dabei fallen Titel und
-    // Farbe gleich mit ab, damit der Kalender ohne Nachladen anzeigen kann.
+    // Only what the user may see can be scheduled. Title and color drop out
+    // of that at the same time, so the calendar can show it without refetching.
     let board
     try {
         board = await boardService.getById(payload.boardId)
@@ -82,7 +82,7 @@ async function buildEntry(payload, user) {
     }
 }
 
-/** Eintraege des angemeldeten Benutzers, die den Zeitraum beruehren. */
+/** Entries of the logged-in user that touch the given period. */
 async function query({ from, to } = {}) {
     const user = requireUser()
     try {

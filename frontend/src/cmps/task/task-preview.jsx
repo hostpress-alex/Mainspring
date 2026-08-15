@@ -20,6 +20,7 @@ import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
 import { GUEST_IMG } from '../../services/avatar'
 import { widthOf, widthStyle } from '../board/column-width'
 import '../board/board-columns.css'
+import { t } from '../../i18n'
 
 export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCheckbox, widths = {} }) {
     const [isClick, setIsClick] = useState(false)
@@ -29,8 +30,8 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
     const elTaskPreview = useRef(null)
     const elMenuTask = useRef()
     const navigate = useNavigate()
-    // Nur eigenstaendige Updates zaehlen — Antworten haengen daran und wuerden
-    // die Zahl in der Zeile sonst aufblaehen.
+    // Only standalone updates count — replies hang off them and would otherwise
+    // inflate the number in the row.
     const updateCount = (task.comments || []).filter(c => c && !c.parentId).length
     useEffect(() => {
         setIsClick(isMainCheckbox.isActive)
@@ -60,12 +61,12 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
             toggleOnTyping()
             await updateTaskAction(board, group.id, { ...task, title: value }, activity)
         } catch (err) {
-            console.log('Speichern fehlgeschlagen')
+            console.log('saving failed')
         }
     }
 
     function onOpenModal() {
-        // Die URL steuert den Dialog — kein zusaetzliches Umschalten noetig.
+        // The URL drives the dialog — no extra toggling needed.
         navigate(`/board/${board._id}/${group.id}/${task.id}`)
     }
 
@@ -102,7 +103,7 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
                     </blockquote>
                     <div className="open-task-details " onClick={onOpenModal}>
                         <TbArrowsDiagonal />
-                        <span className="open-btn">Öffnen</span>
+                        <span className="open-btn">{t('common.open')}</span>
                     </div>
                     <div onClick={onOpenModal} className="chat-icon">
                         {updateCount > 0 && <div>
@@ -128,7 +129,7 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
     )
 }
 
-/** Rendert eine Spalte anhand ihres Typs. `field` sagt, wo der Wert liegt. */
+/** Renders a column by its type. `field` says where the value sits. */
 export function DynamicCmp({ column, info, onUpdate, board, width }) {
     const field = column.field || column.id
     const props = { info, onUpdate, field, column }

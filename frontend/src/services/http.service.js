@@ -1,7 +1,7 @@
 import Axios from 'axios'
 
-// Immer relativ: in Dev leitet der Vite-Proxy nach :3030 weiter,
-// in Produktion liefert derselbe Express-Prozess Frontend und API aus.
+// Always relative: in dev the Vite proxy forwards to :3030,
+// in production the same Express process serves frontend and API.
 const BASE_URL = '/api/'
 
 
@@ -41,8 +41,8 @@ async function ajax (endpoint, method = 'GET', data = null) {
         console.dir(err)
         if (err.response && err.response.status === 401) {
             sessionStorage.clear()
-            // Nicht umleiten, wenn wir ohnehin schon auf der Login-Seite sind —
-            // sonst verschluckt der Reload die Fehlermeldung des Login-Versuchs.
+            // Do not redirect if we are already on the login page —
+            // otherwise the reload swallows the error from the login attempt.
             if (!window.location.pathname.startsWith('/auth/')) {
                 window.location.assign('/auth/login')
             }

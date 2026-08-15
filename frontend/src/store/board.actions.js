@@ -6,26 +6,26 @@ import { utilService } from '../services/util.service.js'
 import { socketService, SOCKET_EMIT_SEND_UPDATE_BOARD } from '../services/socket.service.js'
 
 /* ======================================================================
- * Warum diese Datei so aussieht, wie sie aussieht
+ * Why this file looks the way it does
  *
- * Frueher endete fast jede Aenderung in `saveBoard(board)` — also: das
- * komplette Board wandert zum Server und ueberschreibt dort alles. Arbeiten
- * zwei Leute gleichzeitig am selben Board, gewinnt der letzte Schreibvorgang
- * und die Aenderung des anderen ist weg.
+ * It used to be that almost every change ended in `saveBoard(board)` — the
+ * whole board travels to the server and overwrites everything there. If two
+ * people work on the same board at the same time, the last write wins and the
+ * other person's change is gone.
  *
- * Jetzt schickt jede Aktion nur noch das, was sich wirklich geaendert hat,
- * und bekommt das frische Board vom Server zurueck. `saveBoard` bleibt nur
- * noch fuer das Anlegen und Duplizieren ganzer Boards.
+ * Now every action sends only what actually changed and gets the fresh board
+ * back from the server. `saveBoard` is left for creating and duplicating
+ * whole boards, nothing else.
  * ==================================================================== */
 
 /**
- * Private Tiefkopie des zuletzt vom Server gelesenen Boards.
+ * Private deep copy of the board as last read from the server.
  *
- * Warum nicht einfach der Store: Komponenten reichen Objekte aus dem Store
- * durch und aendern sie stellenweise direkt — der Task-Dialog macht zum
- * Beispiel task.comments.unshift(...). Der Vergleich haette dann das schon
- * geaenderte Objekt mit sich selbst verglichen, keinen Unterschied gefunden
- * und gar nichts gespeichert. Genau das war der Fall bei neuen Kommentaren.
+ * Why not simply the store: components pass objects from the store around and
+ * change them in place here and there — the task dialog does
+ * task.comments.unshift(...), for one. The comparison would then have compared
+ * the already changed object with itself, found no difference and saved
+ * nothing at all. That is exactly what happened with new comments.
  */
 let _serverBoard = null
 
@@ -38,21 +38,21 @@ function _rememberServer(board) {
     }
 }
 
-/** Der Stand, von dem wir wissen, dass der Server ihn hat — sonst null. */
+/** The state we know the server has — null otherwise. */
 function _serverStateOf(boardId) {
     if (!_serverBoard || String(_serverBoard._id) !== String(boardId)) return null
     return _serverBoard
 }
 
-/** Vergleich ueber die serialisierte Form. Ein falsch-negativer Treffer ist
- *  harmlos (dann wandert ein Feld unnoetig mit), ein falsch-positiver waere
- *  es nicht — deshalb bewusst streng. */
+/** Compared through the serialised form. A false negative is harmless (a field
+ *  travels along for nothing), a false positive would not be — hence
+ *  deliberately strict. */
 function _same(a, b) {
     return JSON.stringify(a) === JSON.stringify(b)
 }
 
-/** Board in den Store schreiben, ohne Socket-Meldung (fuer optimistische
- *  Zwischenzustaende beim Ziehen). */
+/** Write a board into the store without a socket message (for optimistic
+ *  intermediate states while dragging). */
 function _applyLocal(board) {
     if (!board) return
     const { filter } = store.getState().boardModule
@@ -61,11 +61,11 @@ function _applyLocal(board) {
 }
 
 /**
- * Das frische Board vom Server im Store verankern.
+ * Anchor the fresh board from the server in the store.
  *
- * Wichtig: wurde ein ANDERES Board geaendert (z.B. der Ordner eines Boards
- * aus der Seitenleiste), darf das gerade geoeffnete Board nicht ueberschrieben
- * werden — dann wird nur die Board-Liste aktualisiert.
+ * Important: if a DIFFERENT board was changed (the folder of a board from the
+ * sidebar, say), the board currently open must not be overwritten — then only
+ * the board list is updated.
  */
 function _applyBoard(fresh) {
     if (!fresh) return fresh
@@ -130,24 +130,24 @@ export async function removeBoard(boardId) {
 }
 
 /**
- * Ganzes Board schreiben.
+ * Write a whole board.
  *
- * NUR noch fuer das Anlegen und Duplizieren eines Boards benutzen. Fuer
- * Aenderungen an einem bestehenden Board gibt es die gezielten Aktionen
- * weiter unten — sonst ueberschreiben sich zwei Leute gegenseitig.
+ * Use this ONLY for creating and duplicating a board. For changes to an
+ * existing board there are the targeted actions further down — otherwise two
+ * people overwrite each other.
  */
 export async function saveBoard(board) {
     const type = (board._id) ? UPDATE_BOARD : ADD_BOARD
     if (board._id) {
-        // Stolperdraht: taucht das im Log auf, schreibt wieder jemand ein
-        // ganzes Board und die Aenderungen anderer gehen dabei verloren.
+        // Tripwire: if this shows up in the log, someone is writing a whole board
+        // again and other people's changes are being lost along the way.
         console.warn('saveBoard mit vorhandener _id — bitte eine der gezielten Aktionen benutzen:', board._id)
     }
     try {
         const newBoard = await boardService.save(board)
         store.dispatch({ type, board: newBoard })
         socketService.emit(SOCKET_EMIT_SEND_UPDATE_BOARD, { filteredBoard: null, board: newBoard })
-        // Beim Anlegen vergibt erst der Server die _id — deshalb newBoard, nicht board.
+        // On create it is the server that hands out the _id — hence newBoard, not board.
         return newBoard
     } catch (err) {
         console.error('cant save board:', err)
@@ -175,11 +175,11 @@ export async function updateBoardMembers(boardId, members) {
 }
 
 /**
- * Mitglied aus einem Board entfernen.
+ * Remove a member from a board.
  *
- * Zuerst wird die Person aus den Tasks ausgetragen, in denen sie zugewiesen
- * ist — und zwar Task fuer Task, nicht ueber das ganze Board. Erst danach
- * wird sie aus der Mitgliederliste genommen.
+ * The person is first taken out of the tasks they are assigned to — task by
+ * task, not across the whole board. Only then are they removed from the member
+ * list.
  */
 export async function removeBoardMember(board, memberId) {
     const boardId = board._id
@@ -210,7 +210,7 @@ export async function updateBoardOwners(boardId, ownerIds) {
     }
 }
 
-/** Spaltenliste des Boards speichern (Reihenfolge, Titel, Hinzufuegen, Entfernen). */
+/** Save the column list of the board (order, titles, adding, removing). */
 export async function updateBoardColumns(filteredBoard, columns) {
     try {
         return _applyBoard(await boardService.setColumns(filteredBoard._id, columns))
@@ -221,18 +221,18 @@ export async function updateBoardColumns(filteredBoard, columns) {
 }
 
 /**
- * Labels einer Spalte speichern.
+ * Save the labels of a column.
  *
- * Tasks speichern beim Status den TITEL des Labels, nicht seine Id. Wird ein
- * Label umbenannt oder entfernt, muessen die betroffenen Tasks deshalb
- * mitziehen — sonst stehen sie auf einem Wert, den es nicht mehr gibt und der
- * in der Oberflaeche als graues Nichts erscheint.
+ * For status, tasks store the label TITLE, not its id. So when a label is
+ * renamed or removed, the affected tasks have to follow — otherwise they sit
+ * on a value that no longer exists and shows up as grey nothing in the
+ * interface.
  *
- * Bewusst Task fuer Task und nur das eine Feld: es sind meist eine Handvoll
- * Tasks, und so ueberschreibt das Umbenennen niemandem seine anderen Spalten.
+ * Deliberately task by task and only that one field: it is usually a handful
+ * of tasks, and this way a rename does not overwrite anyone's other columns.
  *
- *   renames  { "Alter Titel": "Neuer Titel" }
- *   removed  [ "Geloeschter Titel", ... ]  -> betroffene Tasks werden geleert
+ *   renames  { "old title": "new title" }
+ *   removed  [ "deleted title", ... ]  -> the affected tasks are cleared
  */
 export async function saveColumnLabels(board, column, labels, renames = {}, removed = []) {
     const boardId = board._id
@@ -339,8 +339,8 @@ export async function addTaskOnFirstGroup(filteredBoard) {
 }
 
 /**
- * Der Task-Dialog haengt an der URL. `setModalOpen` haelt nur noch das Flag im
- * Store synchron (Abdunkeln des Hintergrunds, Socket-Effekt).
+ * The task dialog hangs off the URL. `setModalOpen` only keeps the flag in the
+ * store in sync (dimming the background, socket effect).
  */
 export function setModalOpen(isOpen) {
     store.dispatch({ type: SET_MODAL, isOpen })
@@ -350,7 +350,7 @@ export function toggleModal(isOpenModal) {
     store.dispatch({ type: SET_MODAL, isOpen: !isOpenModal })
 }
 
-/** Eine Gruppe loeschen. */
+/** Delete a group. */
 export async function updateGroups(groupId, filteredBoard) {
     try {
         _applyBoard(await boardService.deleteGroup(filteredBoard._id, groupId))
@@ -360,12 +360,12 @@ export async function updateGroups(groupId, filteredBoard) {
 }
 
 /**
- * Eine Gruppe speichern.
+ * Save a group.
  *
- * Die Aufrufer uebergeben die fertige Gruppe. Hier wird ermittelt, was sich
- * gegenueber dem Stand im Store tatsaechlich geaendert hat, und nur das an
- * den Server geschickt. Passt keiner der engen Faelle, wird die ganze Gruppe
- * ersetzt — immer noch deutlich besser als das ganze Board.
+ * Callers hand over the finished group. What actually changed against the
+ * state in the store is worked out here, and only that is sent to the server.
+ * If none of the narrow cases fits, the whole group is replaced — still a lot
+ * better than the whole board.
  */
 export async function updateGroupAction(filteredBoard, saveGroup) {
     try {
@@ -386,7 +386,7 @@ async function _saveGroupSmart(boardId, prev, next) {
     const prevIds = prevTasks.map(t => t.id)
     const nextIds = nextTasks.map(t => t.id)
 
-    // 1. Was hat sich am Kopf der Gruppe geaendert (Titel, Farbe ...)?
+    // 1. What changed in the head of the group (title, colour ...)?
     const metaPatch = {}
     for (const key of Object.keys(next)) {
         if (key === 'id' || key === 'tasks') continue
@@ -403,13 +403,13 @@ async function _saveGroupSmart(boardId, prev, next) {
     const removed = prevIds.filter(id => !nextIds.includes(id))
     const added = nextIds.filter(id => !prevIds.includes(id))
 
-    // 2. Genau ein Task entfernt, sonst nichts.
+    // 2. Exactly one task removed, nothing else.
     if (removed.length === 1 && !added.length
         && _same(nextTasks, prevTasks.filter(t => t.id !== removed[0]))) {
         return await boardService.deleteTask(boardId, next.id, removed[0])
     }
 
-    // 3. Genau ein Task dazugekommen, sonst nichts.
+    // 3. Exactly one task added, nothing else.
     if (added.length === 1 && !removed.length) {
         const idx = nextIds.indexOf(added[0])
         if (_same(nextTasks.filter(t => t.id !== added[0]), prevTasks)) {
@@ -417,7 +417,7 @@ async function _saveGroupSmart(boardId, prev, next) {
         }
     }
 
-    // 4. Gleiche Tasks: entweder nur umsortiert oder genau einer geaendert.
+    // 4. Same tasks: either only reordered or exactly one changed.
     if (!added.length && !removed.length) {
         const prevById = new Map(prevTasks.map(t => [t.id, t]))
         const changed = nextTasks.filter(t => !_same(t, prevById.get(t.id)))
@@ -427,16 +427,16 @@ async function _saveGroupSmart(boardId, prev, next) {
         }
     }
 
-    // 5. Alles andere: ganze Gruppe ersetzen.
+    // 5. Anything else: replace the whole group.
     return await boardService.replaceGroup(boardId, next.id, next)
 }
 
 /**
- * Einen Task speichern.
+ * Save a task.
  *
- * Es wandern nur die Felder zum Server, die sich gegenueber dem Stand im
- * Store unterscheiden. Damit koennen zwei Leute gleichzeitig verschiedene
- * Spalten desselben Tasks aendern, ohne sich zu ueberschreiben.
+ * Only the fields that differ from the state in the store travel to the
+ * server. That lets two people change different columns of the same task at
+ * the same time without overwriting each other.
  */
 export async function updateTaskAction(filteredBoard, groupId, saveTask, activity) {
     try {
@@ -466,7 +466,7 @@ function _diffTask(boardId, groupId, saveTask) {
     const group = (server.groups || []).find(g => g.id === groupId)
     const prev = (group?.tasks || []).find(t => t.id === saveTask.id)
     if (!prev) return null
-    // Ein Feld ist weggefallen — das kann ein Patch nicht ausdruecken.
+    // A field has fallen away — a patch cannot express that.
     for (const key of Object.keys(prev)) {
         if (!(key in saveTask)) return null
     }
@@ -478,7 +478,7 @@ function _diffTask(boardId, groupId, saveTask) {
     return patch
 }
 
-/** Markierte Tasks in eine andere Gruppe desselben Boards schieben. */
+/** Move the selected tasks into another group of the same board. */
 export async function moveTasksToGroup(boardId, taskIds, fromGroupId, toGroupId) {
     let fresh = null
     for (const taskId of taskIds) {
@@ -501,7 +501,7 @@ export async function toggleStarred(filteredBoard, isStarred) {
     }
 }
 
-/** Die Laengenbegrenzung der Liste macht der Server (MAX_ACTIVITIES). */
+/** The server caps the length of the list (MAX_ACTIVITIES). */
 export async function addActivity(filteredBoard, activity) {
     try {
         _applyBoard(await boardService.addActivity(filteredBoard._id, activity))
@@ -515,9 +515,9 @@ export function setFilter(filter) {
 }
 
 /**
- * Kennung eines Popups: gleicher Typ am gleichen Objekt = dasselbe Popup.
- * Wird gebraucht, damit ein Klick auf den auslesenden Button das gerade per
- * Aussenklick geschlossene Popup nicht sofort wieder oeffnet.
+ * Identity of a popup: same type on the same object = the same popup.
+ * Needed so that a click on the triggering button does not immediately reopen
+ * the popup that the outside click has just closed.
  */
 function _modalKey(obj) {
     if (!obj) return ''
@@ -530,14 +530,14 @@ export function setDynamicModalObj(dynamicModalObj) {
     if (dynamicModalObj?.isOpen
         && _modalKey(dynamicModalObj) === _lastClosed.key
         && Date.now() - _lastClosed.at < 400) {
-        // Derselbe Klick, der eben ausserhalb geschlossen hat — nicht erneut oeffnen.
+        // The same click that just closed it from outside — do not open it again.
         _lastClosed = { key: '', at: 0 }
         return
     }
     store.dispatch({ type: SET_DYNAMIC_MODAL, dynamicModalObj })
 }
 
-/** Wird vom Aussenklick-Handler benutzt, bevor geschlossen wird. */
+/** Used by the outside-click handler before closing. */
 export function noteDynamicModalClosedByOutsideClick() {
     const { dynamicModalObj } = store.getState().boardModule
     _lastClosed = { key: _modalKey(dynamicModalObj), at: Date.now() }
@@ -545,19 +545,18 @@ export function noteDynamicModalClosedByOutsideClick() {
 
 export function closeDynamicModal() {
     const { dynamicModalObj } = store.getState().boardModule
-    // Neues Objekt: Redux vergleicht per Referenz. Wurde hier frueher nur
-    // isOpen mutiert, blieb die Referenz gleich und React rendert nicht neu —
-    // das Popup blieb sichtbar.
+    // New object: Redux compares by reference. When only isOpen was mutated here,
+    // the reference stayed the same and React did not re-render —
+    // the popup stayed visible.
     store.dispatch({ type: SET_DYNAMIC_MODAL, dynamicModalObj: { ...dynamicModalObj, isOpen: false } })
 }
 
 /* ----------------------------------------------------------------------
- * Ziehen und Ablegen
+ * Drag and drop
  *
- * Gezogen wird auf dem gefilterten Board, gespeichert wird auf dem echten.
- * Deshalb wird die neue Reihenfolge aus der angezeigten Liste gebildet und
- * um die gerade ausgeblendeten Eintraege ergaenzt — so geht beim Ziehen mit
- * aktivem Filter nichts verloren.
+ * Dragging happens on the filtered board, saving on the real one. So the new
+ * order is built from the visible list and topped up with the entries
+ * currently hidden — that way nothing is lost when dragging with a filter on.
  * -------------------------------------------------------------------- */
 function _mergeOrder(visibleIds, allIds) {
     const seen = new Set(visibleIds)
@@ -592,7 +591,7 @@ export async function handleOnDragEnd(result, board) {
         const taskId = shownFrom?.tasks?.[result.source.index]?.id
         if (!taskId) return
 
-        // Innerhalb derselben Gruppe: nur die Reihenfolge.
+        // Within the same group: only the order.
         if (fromGroupId === toGroupId) {
             const visible = (shownFrom.tasks || []).map(t => t.id)
             const [moved] = visible.splice(result.source.index, 1)
@@ -626,8 +625,8 @@ export async function handleOnDragEnd(result, board) {
         _applyBoard(await boardService.moveTask(boardId, taskId, fromGroupId, toGroupId,
             result.destination.index))
     } catch (err) {
-        // Fehlgeschlagen: den Stand von vorher wiederherstellen.
+        // Failed: restore the state from before.
         _applyLocal(prevBoard)
-        console.error('Verschieben fehlgeschlagen', err)
+        console.error('moving a task failed', err)
     }
 }

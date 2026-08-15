@@ -4,11 +4,12 @@ import { useSelector } from "react-redux"
 import { setDynamicModalObj } from "../../store/board.actions"
 
 import { BiDotsHorizontalRounded } from 'react-icons/bi'
+import { t } from '../../i18n'
 
 /**
- * Spaltenkopf. Doppelklick benennt die Spalte um — Titel und Typ sind seit dem
- * Spaltenumbau getrennt, ein Board kann also mehrere "Text"-Spalten mit
- * eigenen Namen haben.
+ * Column header. A double-click renames the column — title and type have been
+ * separate since the column rework, so a board can have several "text" columns
+ * with names of their own.
  */
 export function TitleGroupPreview({ column, group, isKanban, onRename }) {
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
@@ -53,7 +54,7 @@ export function TitleGroupPreview({ column, group, isKanban, onRename }) {
     return (
         <>
             <span onDoubleClick={() => !isKanban && setIsEditing(true)}
-                title={isKanban ? column.title : 'Doppelklick zum Umbenennen'}>
+                title={isKanban ? column.title : t('column.renameHint')}>
                 {column.title}
             </span>
             <span ref={elRemoveColumn} className="open-modal-icon">

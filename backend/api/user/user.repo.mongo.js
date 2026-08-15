@@ -1,6 +1,6 @@
 /**
- * Speicherzugriff auf Benutzer — MongoDB.
- * Gegenstueck: user.repo.sql.js. Ausgewaehlt wird in user.repo.js.
+ * Storage access for users — MongoDB.
+ * Counterpart: user.repo.sql.js. The pick happens in user.repo.js.
  */
 const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
@@ -15,7 +15,7 @@ function toId(id) {
     }
 }
 
-/** Nach aussen ist eine Benutzer-Id immer eine Zeichenkette. */
+/** On the outside a user id is always a string. */
 function out(doc) {
     if (!doc) return null
     const user = { ...doc, _id: String(doc._id) }

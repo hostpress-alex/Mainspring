@@ -1,15 +1,15 @@
 /**
- * Verhalten fuer einzeilige contentEditable-Felder (Task-Titel, Gruppenname,
- * Boardname).
+ * Behaviour for single-line contentEditable fields (task title, group name,
+ * board name).
  *
- * Ohne das hier macht Enter in so einem Feld eine neue Zeile — gespeichert
- * wird erst beim Klick irgendwohin. Das ist bei einem Titel nie gemeint.
+ * Without this, Enter in such a field starts a new line — and nothing is saved
+ * until you click somewhere else. For a title that is never what was meant.
  *
- *   Enter          speichern (loest das vorhandene onBlur aus)
- *   Shift+Enter    trotzdem eine neue Zeile, falls jemand sie braucht
- *   Escape         verwerfen und den urspruenglichen Text zuruecksetzen
+ *   Enter          save (triggers the onBlur that is already there)
+ *   Shift+Enter    a new line anyway, in case someone needs one
+ *   Escape         discard and put the original text back
  *
- * Verwendung:
+ * Usage:
  *   <blockquote contentEditable onBlur={onSave} {...singleLineEditable()} />
  *   <blockquote contentEditable onBlur={onSave} {...singleLineEditable({ onFocus: … })} />
  */

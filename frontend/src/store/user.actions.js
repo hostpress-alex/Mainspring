@@ -57,8 +57,8 @@ export async function signup(credentials) {
 }
 
 /**
- * Aendert das eigene Profil und haelt Store und sessionStorage synchron.
- * changes darf fullname, username, imgUrl, password und currentPassword enthalten.
+ * Changes your own profile and keeps store and sessionStorage in sync.
+ * changes may contain fullname, username, imgUrl, password and currentPassword.
  */
 export async function updateProfile(userId, changes) {
     const saved = await userService.update({ user: { _id: userId, ...changes } })

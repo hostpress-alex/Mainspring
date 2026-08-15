@@ -1,12 +1,13 @@
 import React from 'react'
+import { t } from '../i18n'
 
 /**
- * Faengt Fehler beim Rendern ab.
+ * Catches errors during rendering.
  *
- * Ohne so etwas reisst ein einziger kaputter Datensatz den kompletten
- * React-Baum ab und die Seite wird weiss — ohne jeden Hinweis, was los ist.
- * Mit Boundary bleibt der Rest der Anwendung stehen und man sieht, welcher
- * Bereich betroffen ist.
+ * Without something like this a single broken record tears down the entire
+ * React tree and the page turns white — with no hint at all as to what is
+ * going on. With a boundary the rest of the application stays up and you can
+ * see which area is affected.
  */
 export class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -30,9 +31,9 @@ export class ErrorBoundary extends React.Component {
                 background: '#fff4f5', border: '1px solid #f0c2c9',
                 color: '#a3283a', fontSize: 13, lineHeight: 1.5,
             }}>
-                <strong>{this.props.label || 'Dieser Bereich'} konnte nicht angezeigt werden.</strong>
+                <strong>{t('common.areaFailed', { area: this.props.label || t('common.thisArea') })}</strong>
                 <div style={{ marginTop: 4, color: '#676879' }}>
-                    Der Rest der Seite funktioniert weiter. Einzelheiten stehen in der Browser-Konsole.
+                    {t('common.areaFailedHint')}
                 </div>
                 <button type="button"
                     onClick={() => this.setState({ err: null })}
@@ -40,7 +41,7 @@ export class ErrorBoundary extends React.Component {
                         marginTop: 8, padding: '4px 10px', border: '1px solid #c3c6d4',
                         borderRadius: 4, background: '#fff', cursor: 'pointer', font: 'inherit', fontSize: 13,
                     }}>
-                    Nochmal versuchen
+                    {t('common.retry')}
                 </button>
             </div>
         )

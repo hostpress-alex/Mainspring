@@ -1,16 +1,16 @@
 /**
- * Breite des rechten Task-Fensters.
+ * Width of the right-hand task panel.
  *
- * Wie die Spaltenbreiten bewusst pro Benutzer im localStorage und nicht am
- * Board: wie breit jemand das Fenster haben will, haengt am Bildschirm und
- * geht die anderen nichts an.
+ * Like the column widths, deliberately per user in localStorage and not on
+ * the board: how wide someone wants the panel depends on the screen and is
+ * nobody else's business.
  */
 export const MIN_PANEL_WIDTH = 420
 export const DEFAULT_PANEL_WIDTH = 640
 
 const KEY = 'taskPanelWidth'
 
-/** Obergrenze richtet sich nach dem Fenster — das Board dahinter soll sichtbar bleiben. */
+/** The upper limit follows the window — the board behind should stay visible. */
 export function maxPanelWidth () {
     if (typeof window === 'undefined') return 1200
     return Math.max(MIN_PANEL_WIDTH, Math.round(window.innerWidth * 0.9))
@@ -36,6 +36,6 @@ export function savePanelWidth (value) {
     try {
         localStorage.setItem(KEY, String(clampPanelWidth(value)))
     } catch (err) {
-        // Kein localStorage (privates Fenster) — dann eben nur fuer diese Sitzung.
+        // No localStorage (private window) — then just for this session.
     }
 }

@@ -1,6 +1,6 @@
-/* Spaltenbreiten werden per Inline-Style gesetzt. Die Zelleninhalte bringen
-   aus der SCSS eigene min-width mit — hier mit hoeherer Spezifitaet aufgehoben,
-   damit sie sich der eingestellten Breite fuegen. */
+/* Column widths are set through an inline style. The cell contents bring their
+   own min-width from the SCSS — undone here with higher specificity, so that
+   they fit the width that was set. */
 .task-preview .col-cell,
 .task-preview-kanban .col-cell {
     display: flex;
@@ -15,7 +15,7 @@
 }
 .task-preview .col-cell > .task-person .members-imgs { width: 100%; }
 
-/* Greifer zum Ziehen der Spaltenbreite */
+/* Handle for dragging the column width */
 .cmp-order-title { position: relative; }
 .col-resizer {
     position: absolute;
@@ -41,10 +41,10 @@
 .col-resizer:hover::after,
 .col-resizer.is-active::after { background: #0073ea; }
 
-/* Waehrend des Ziehens keine Textauswahl im ganzen Board */
+/* No text selection anywhere on the board while dragging */
 body.is-col-resizing { cursor: col-resize; user-select: none; }
 
-/* Titelbereich einer Spalte: nur dieser Teil ist der Griff zum Umsortieren. */
+/* Title area of a column: only this part is the handle for reordering. */
 .cmp-order-title .col-drag {
     display: flex;
     align-items: center;

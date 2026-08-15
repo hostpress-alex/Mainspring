@@ -1,85 +1,86 @@
 import { useEffect, useRef, useState } from 'react'
 import './confirm-dialog.css'
+import { t } from '../i18n'
 
 /**
- * Rueckfrage vor dem Loeschen.
+ * Ask before deleting.
  *
- * Bewusst als Funktion statt als Komponente an jeder Stelle:
+ * Deliberately a function rather than a component at every call site:
  *
- *   if (!await confirmDelete({ was: 'diesen Task' })) return
+ *   if (!await confirmDelete({ what: t('task.thisTask') })) return
  *
- * So bleibt jede Aufrufstelle eine Zeile laenger statt fuenf, und es gibt
- * genau EINEN Dialog im Baum. `window.confirm` waere noch kuerzer, sieht aber
- * in jedem Browser anders aus und laesst sich nicht beschriften.
+ * That keeps a call site one line longer instead of five, and there is exactly
+ * ONE dialog in the tree. `window.confirm` would be shorter still, but it looks
+ * different in every browser and its buttons cannot be labelled.
  */
 
-let oeffne = null
+let openDialog = null
 
-export function confirmDialog(optionen = {}) {
-    // Kein Host im Baum (z. B. in einem Test): dann lieber durchlassen als blockieren.
-    if (!oeffne) return Promise.resolve(true)
-    return oeffne(optionen)
+export function confirmDialog(options = {}) {
+    // No host in the tree (in a test, say): let it through rather than block.
+    if (!openDialog) return Promise.resolve(true)
+    return openDialog(options)
 }
 
-/** Kurzform fuer den haeufigsten Fall. */
-export function confirmDelete({ was, hinweis = null, knopf = 'Löschen' } = {}) {
+/** Short form for the common case. */
+export function confirmDelete({ what, note = null, button = t('common.delete') } = {}) {
     return confirmDialog({
-        titel: 'Wirklich löschen?',
-        text: was ? `${was} wird gelöscht.` : 'Der Eintrag wird gelöscht.',
-        hinweis,
-        knopf,
-        gefahr: true,
+        title: t('common.deleteTitle'),
+        text: what ? t('common.deleteText', { what }) : t('common.deleteEntryText'),
+        note,
+        button,
+        danger: true,
     })
 }
 
-/** Gehoert einmal in den Anwendungsbaum, ganz aussen. */
+/** Belongs into the application tree once, at the very outside. */
 export function ConfirmHost() {
-    const [frage, setFrage] = useState(null)
-    const antwortRef = useRef(null)
-    const knopfRef = useRef(null)
+    const [question, setQuestion] = useState(null)
+    const answerRef = useRef(null)
+    const buttonRef = useRef(null)
 
     useEffect(() => {
-        oeffne = optionen => new Promise(resolve => {
-            antwortRef.current = resolve
-            setFrage(optionen)
+        openDialog = options => new Promise(resolve => {
+            answerRef.current = resolve
+            setQuestion(options)
         })
-        return () => { oeffne = null }
+        return () => { openDialog = null }
     }, [])
 
-    // Der bestaetigende Knopf bekommt den Fokus — Enter reicht, Escape bricht ab.
+    // The confirming button takes focus — Enter is enough, Escape cancels.
     useEffect(() => {
-        if (!frage) return
-        knopfRef.current?.focus()
+        if (!question) return
+        buttonRef.current?.focus()
         function onKey(ev) {
-            if (ev.key === 'Escape') { ev.preventDefault(); schliessen(false) }
+            if (ev.key === 'Escape') { ev.preventDefault(); close(false) }
         }
         document.addEventListener('keydown', onKey, true)
         return () => document.removeEventListener('keydown', onKey, true)
-    }, [frage])
+    }, [question])
 
-    function schliessen(antwort) {
-        const resolve = antwortRef.current
-        antwortRef.current = null
-        setFrage(null)
-        if (resolve) resolve(antwort)
+    function close(answer) {
+        const resolve = answerRef.current
+        answerRef.current = null
+        setQuestion(null)
+        if (resolve) resolve(answer)
     }
 
-    if (!frage) return null
+    if (!question) return null
 
     return (
         <div className="confirm-overlay" onMouseDown={ev => {
-            if (ev.target === ev.currentTarget) schliessen(false)
+            if (ev.target === ev.currentTarget) close(false)
         }}>
             <div className="confirm-box" role="alertdialog" aria-modal="true">
-                <h3 className="confirm-title">{frage.titel || 'Wirklich?'}</h3>
-                {frage.text && <p className="confirm-text">{frage.text}</p>}
-                {frage.hinweis && <p className="confirm-hint">{frage.hinweis}</p>}
+                <h3 className="confirm-title">{question.title || t('common.confirmTitle')}</h3>
+                {question.text && <p className="confirm-text">{question.text}</p>}
+                {question.note && <p className="confirm-hint">{question.note}</p>}
                 <div className="confirm-actions">
                     <button type="button" className="confirm-cancel"
-                        onClick={() => schliessen(false)}>Abbrechen</button>
-                    <button type="button" ref={knopfRef}
-                        className={frage.gefahr ? 'confirm-ok is-danger' : 'confirm-ok'}
-                        onClick={() => schliessen(true)}>{frage.knopf || 'Ja'}</button>
+                        onClick={() => close(false)}>{t('common.cancel')}</button>
+                    <button type="button" ref={buttonRef}
+                        className={question.danger ? 'confirm-ok is-danger' : 'confirm-ok'}
+                        onClick={() => close(true)}>{question.button || t('common.yes')}</button>
                 </div>
             </div>
         </div>

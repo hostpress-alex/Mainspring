@@ -210,7 +210,7 @@ SELECT g.title AS grp, t.position, t.title,
        JSON_VALUE(t.col_values, '$.priority') AS prio,
        JSON_VALUE(t.col_values, '$.dueDate')  AS due
 FROM task t
-JOIN board_group g ON g.board_id = t.board_id AND g.id = t.group_id
+         JOIN board_group g ON g.board_id = t.board_id AND g.id = t.group_id
 WHERE t.board_id = '…'
 ORDER BY g.position, t.position;
 ```
@@ -220,9 +220,9 @@ Who is working on what:
 ```sql
 SELECT u.fullname, b.title AS board, t.title AS task
 FROM task_member tm
-JOIN user  u ON u.id = tm.user_id
-JOIN task  t ON t.board_id = tm.board_id AND t.id = tm.task_id
-JOIN board b ON b.id = t.board_id
+         JOIN user  u ON u.id = tm.user_id
+         JOIN task  t ON t.board_id = tm.board_id AND t.id = tm.task_id
+         JOIN board b ON b.id = t.board_id
 ORDER BY u.fullname, b.title;
 ```
 
@@ -231,8 +231,8 @@ Who may do what:
 ```sql
 SELECT b.title, u.fullname, IF(bm.is_owner, 'Owner', 'Member') AS role
 FROM board_member bm
-JOIN board b ON b.id = bm.board_id
-LEFT JOIN user u ON u.id = bm.user_id
+         JOIN board b ON b.id = bm.board_id
+         LEFT JOIN user u ON u.id = bm.user_id
 ORDER BY b.title, bm.is_owner DESC, u.fullname;
 ```
 
@@ -242,7 +242,7 @@ Planned hours per person and week:
 SELECT u.fullname, YEARWEEK(s.start_at, 3) AS week,
        ROUND(SUM(TIMESTAMPDIFF(MINUTE, s.start_at, s.end_at)) / 60, 1) AS hours
 FROM schedule s
-JOIN user u ON u.id = s.user_id
+         JOIN user u ON u.id = s.user_id
 GROUP BY u.fullname, week
 ORDER BY week DESC, u.fullname;
 ```

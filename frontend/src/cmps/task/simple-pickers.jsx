@@ -3,8 +3,9 @@ import { BsCheckSquare, BsSquare } from 'react-icons/bs'
 import { FiExternalLink } from 'react-icons/fi'
 
 /**
- * Spaltentypen ohne eigenes Modal. Alle bekommen `field` und schreiben ihren
- * Wert dorthin — dadurch sind mehrere Spalten desselben Typs moeglich.
+ * Column types without a modal of their own. They all get `field` and write
+ * their value there — that is what makes several columns of the same type
+ * possible.
  */
 
 function useDraft (value) {
@@ -123,9 +124,9 @@ export function LinkPicker ({ info, field, onUpdate }) {
 }
 
 /**
- * Freie Auswahl mit Vorschlaegen. Die Vorschlagsliste entsteht aus den Werten,
- * die in dieser Spalte im Board bereits vorkommen — dadurch braucht die Spalte
- * keinen eigenen Einstellungsdialog.
+ * Free choice with suggestions. The suggestion list is built from the values
+ * that already occur in this column on the board — that way the column needs
+ * no settings dialog of its own.
  */
 export function DropdownPicker ({ info, field, onUpdate, board }) {
     const value = info[field] ?? ''

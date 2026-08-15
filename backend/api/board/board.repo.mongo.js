@@ -84,11 +84,6 @@ async function deleteById(boardId) {
     return String(boardId)
 }
 
-/** Ganzes Board ersetzen — nur fuer den Altbestands-Pfad. */
-async function replaceBoard(boardId, board) {
-    await applyOne(boardId, { $set: board, $unset: { ownerId: '' } })
-}
-
 /** Nur die uebergebenen Kopfdaten schreiben — nie das ganze Dokument. */
 const BOARD_META_FIELDS = ['title', 'description', 'folder', 'isStarred', 'archivedAt']
 
@@ -221,7 +216,7 @@ async function addActivity(boardId, activity) {
 }
 
 module.exports = {
-    findById, findForUser, insert, deleteById, replaceBoard,
+    findById, findForUser, insert, deleteById,
     updateMeta, setColumns, setMembers, setOwners,
     addGroup, removeGroup, updateGroupMeta, replaceGroup, reorderGroups,
     addTask, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,

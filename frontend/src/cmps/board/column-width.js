@@ -1,10 +1,10 @@
 /**
- * Spaltenbreiten. Bewusst pro Benutzer im localStorage, nicht am Board —
- * die Breite ist Ansichtssache und soll nicht fuer alle gelten.
+ * Column widths. Deliberately per user in localStorage, not on the board —
+ * the width is a matter of view and should not apply to everyone.
  *
- * Frueher kamen die Breiten aus SCSS-Klassen (.member-picker & Co). Das brach,
- * sobald Spalten frei benennbar wurden und neue Typen dazukamen: die Kopfzeile
- * bekam eine andere Klasse als die Zelle und beides lief auseinander.
+ * The widths used to come from SCSS classes (.member-picker & co). That broke
+ * as soon as columns became freely nameable and new types came along: the
+ * header row got a different class than the cell and the two drifted apart.
  */
 export const MIN_WIDTH = 70
 export const MAX_WIDTH = 600
@@ -43,7 +43,7 @@ export function saveWidths (boardId, widths) {
     if (!boardId) return
     try {
         localStorage.setItem(keyOf(boardId), JSON.stringify(widths))
-    } catch { /* localStorage voll oder gesperrt — Breite ist dann nur temporaer */ }
+    } catch { /* localStorage full or locked — the width is then only temporary */ }
 }
 
 export function widthOf (widths, column) {
@@ -52,7 +52,7 @@ export function widthOf (widths, column) {
     return Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, value))
 }
 
-/** Feste Breite als Inline-Style — schlaegt jede SCSS-Regel. */
+/** Fixed width as an inline style — beats any SCSS rule. */
 export function widthStyle (px) {
     return { width: px, minWidth: px, maxWidth: px, flex: `0 0 ${px}px` }
 }

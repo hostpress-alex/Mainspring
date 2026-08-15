@@ -4,8 +4,8 @@ const { getEntries, addEntry, updateEntry, removeEntry } = require('./schedule.c
 
 const router = express.Router()
 
-// Der Kalender ist persoenlich — jede Route arbeitet nur auf den eigenen
-// Eintraegen, die Pruefung sitzt im Service.
+// The calendar is personal — every route works only on the user's own
+// entries, the check sits in the service.
 router.use(requireAuth)
 
 router.get('/', getEntries)

@@ -8,7 +8,7 @@ export function PriorityPicker({ info, onUpdate, field = 'priority', column }) {
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const elPrioritySection = useRef()
 
-    // Siehe status-picker: die Liste gehoert zur Spalte, nicht zum Board.
+    // See status-picker: the list belongs to the column, not to the board.
     const labels = (column && Array.isArray(column.labels)) ? column.labels : (board.labels || [])
     const label = labels.find(label => label.title === info[field])
     const color = label ? label.color : '#c4c4c4'

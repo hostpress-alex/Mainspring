@@ -1,5 +1,5 @@
-/* Gemeinsame Huelle: Hauptleiste + Board-Spalte links, Inhalt rechts.
-   Damit bleibt die Navigation auf allen Seiten stehen. */
+/* Shared shell: main bar + board column on the left, content on the right.
+   That way the navigation stays put on every page. */
 .app-shell {
     display: flex;
     align-items: stretch;
@@ -13,8 +13,8 @@
     overflow: auto;
 }
 
-/* Der Kalender bringt eigene 100vh mit — in der Huelle uebernimmt die Hoehe
-   der Inhaltsbereich, sonst entsteht doppeltes Scrollen. */
+/* The calendar brings its own 100vh — inside the shell the content area takes
+   over the height, otherwise you get scrolling twice. */
 .app-shell-content > .cal { height: 100%; }
 
 .workspace-section + .workspace-section { border-top: 1px solid rgba(255,255,255,.08); }
@@ -24,8 +24,8 @@
     .app-shell-content { height: auto; }
 }
 
-/* Die SCSS setzt .workspace-sidebar .board-list-container { margin-top: 24px }.
-   Innerhalb eines Abschnitts ist dieser Abstand zu gross — hier mit gleicher
-   Spezifitaet und spaeterer Reihenfolge aufgehoben. */
+/* The SCSS sets .workspace-sidebar .board-list-container { margin-top: 24px }.
+   Inside a section that gap is too big — undone here with the same
+   specificity and a later position. */
 .workspace-sidebar .workspace-section > .board-list-container { margin-top: 2px; gap: 2px; }
 .workspace-sidebar .workspace-section > .board-list-container > .board-list { padding-top: 0; padding-bottom: 0; }

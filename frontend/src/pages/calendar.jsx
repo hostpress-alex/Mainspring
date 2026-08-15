@@ -13,6 +13,7 @@ import {
     weekDays, fmtDate, fmtMonthYear, fmtWeekdayLong, isoWeek, MS_MIN,
 } from '../services/date.util'
 import '../cmps/calendar/calendar.css'
+import { t } from '../i18n'
 
 const VIEWS = [
     { key: 'day', label: 'Tag' },
@@ -20,7 +21,7 @@ const VIEWS = [
     { key: 'month', label: 'Monat' },
 ]
 
-const readErr = e => e?.response?.data?.err || e?.message || 'Unbekannter Fehler'
+const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
 
 export function CalendarPage () {
     const user = useSelector(storeState => storeState.userModule.user)
@@ -33,11 +34,11 @@ export function CalendarPage () {
     const [busy, setBusy] = useState(false)
     const [err, setErr] = useState(null)
 
-    /** Sichtbarer Zeitraum — bestimmt, was geladen wird. */
+    /** Visible time range — decides what gets loaded. */
     const range = useMemo(() => {
         if (view === 'day') return { from: startOfDay(anchor), to: addDays(startOfDay(anchor), 1) }
         if (view === 'week') return { from: startOfWeek(anchor), to: addDays(startOfWeek(anchor), 7) }
-        // Monat: das Raster zeigt angeschnittene Nachbarwochen mit
+        // Month: the grid shows clipped neighbouring weeks with
         return { from: startOfWeek(startOfMonth(anchor)), to: addDays(startOfWeek(startOfMonth(anchor)), 42) }
     }, [view, anchor])
 
@@ -93,7 +94,7 @@ export function CalendarPage () {
         }
     }
 
-    /** Verschieben und Groesse aendern speichern direkt, ohne Dialog. */
+    /** Moving and resizing save straight away, without a dialog. */
     async function onMove (entry, { start, end }) {
         const prev = entries
         setEntries(list => list.map(e => e._id === entry._id ? { ...e, start, end } : e))
@@ -101,7 +102,7 @@ export function CalendarPage () {
             await scheduleService.save({ ...entry, start, end })
             await load()
         } catch (e) {
-            setEntries(prev)               // Rollback, damit die Anzeige nicht luegt
+            setEntries(prev)               // Rollback, so the display does not lie
             setErr(readErr(e))
         }
     }
@@ -116,10 +117,10 @@ export function CalendarPage () {
         <div className='cal'>
             <div className='cal-topbar'>
                 <div className='cal-topbar-left'>
-                    <button className='cal-btn' onClick={() => setAnchor(startOfDay(new Date()))}>Heute</button>
+                    <button className='cal-btn' onClick={() => setAnchor(startOfDay(new Date()))}>{t('calendar.today')}</button>
                     <div className='cal-nav'>
-                        <button onClick={() => step(-1)} title='Zurueck' aria-label='Zurueck'>‹</button>
-                        <button onClick={() => step(1)} title='Weiter' aria-label='Weiter'>›</button>
+                        <button onClick={() => step(-1)} title={t('common.back')} aria-label={t('common.back')}>‹</button>
+                        <button onClick={() => step(1)} title={t('common.forward')} aria-label={t('common.forward')}>›</button>
                     </div>
                     <h1 className='cal-title'>{title}</h1>
                     {view !== 'month' && <span className='cal-kw'>KW {isoWeek(anchor)}</span>}
@@ -136,7 +137,7 @@ export function CalendarPage () {
                                 onClick={() => setView(v.key)}>{v.label}</button>
                         ))}
                     </div>
-                    <Link to='/profil' title='Mein Profil'>
+                    <Link to='/profil' title={t('nav.profile')}>
                         <img src={user?.imgUrl || GUEST_IMG} alt=''
                             style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', display: 'block' }} />
                     </Link>
@@ -144,7 +145,7 @@ export function CalendarPage () {
             </div>
 
             {err && <div className='cal-error' style={{ margin: '10px 20px 0' }}>{err}</div>}
-            {isLoading && <div className='cal-loading'>lädt…</div>}
+            {isLoading && <div className='cal-loading'>{t('common.loading')}</div>}
 
             {view === 'month' ? (
                 <MonthGrid

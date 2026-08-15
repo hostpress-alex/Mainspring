@@ -7,6 +7,7 @@ import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
 import { setDynamicModalObj, toggleModal, updateTaskAction } from '../../store/board.actions'
 import { boardService } from '../../services/board.service'
 import { singleLineEditable } from '../../services/editable'
+import { t } from '../../i18n'
 
 export function TaskTitleKanban({task , group , board}) {
     const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
@@ -35,7 +36,7 @@ export function TaskTitleKanban({task , group , board}) {
         try {
             await updateTaskAction(board, group.id, { ...task, title: value }, activity)
         } catch (err) {
-            console.log('Speichern fehlgeschlagen')
+            console.log('saving failed')
         }
     }
 

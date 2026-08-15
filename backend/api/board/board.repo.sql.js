@@ -1,20 +1,19 @@
 /**
- * Speicherzugriff auf Boards — Umsetzung fuer MariaDB.
+ * Storage access for boards — MariaDB implementation.
  *
- * Gleiche Aussenseite wie board.repo.mongo.js. Wer diese Datei liest, sollte
- * drei Entscheidungen kennen:
+ * Same outside as board.repo.mongo.js. Anyone reading this file should know
+ * three decisions:
  *
- * 1. Alles, wonach man sucht oder sortiert, ist eine echte Spalte. Nur die
- *    Werte der frei konfigurierbaren Board-Spalten liegen zusammen in
- *    task.col_values als JSON.
- * 2. Jeder Schreibvorgang laeuft in einer Transaktion. Beim Aendern einzelner
- *    Felder wird die Task-Zeile vorher mit SELECT ... FOR UPDATE gesperrt.
- *    Damit koennen zwei Leute denselben Task gleichzeitig anfassen, ohne dass
- *    einer den anderen ueberschreibt — das war mit MongoDB ohne Replica Set
- *    nicht sauber moeglich.
- * 3. Task in andere Gruppe verschieben ist hier EINE Transaktion. In MongoDB
- *    musste erst eingefuegt und dann entfernt werden, mit dem Risiko eines
- *    doppelten Tasks bei einem Abbruch dazwischen.
+ * 1. Everything you search or sort by is a real column. Only the values of
+ *    the freely configurable board columns sit together in task.col_values
+ *    as JSON.
+ * 2. Every write runs in a transaction. When changing single fields the task
+ *    row is locked first with SELECT ... FOR UPDATE. That way two people can
+ *    touch the same task at the same time without one overwriting the other —
+ *    with MongoDB and no replica set that was not cleanly possible.
+ * 3. Moving a task to another group is ONE transaction here. In MongoDB it
+ *    had to be inserted first and then removed, with the risk of a duplicate
+ *    task if it broke off in between.
  */
 const crypto = require('crypto')
 const { db, parseJson, toJson } = require('../../db/knex')
@@ -31,7 +30,7 @@ const sid = v => (v === undefined || v === null) ? '' : String(v)
 const newBoardId = () => crypto.randomBytes(12).toString('hex')
 const newShortId = () => crypto.randomBytes(6).toString('hex')
 
-/** Board-Ids sind 24 Hexzeichen — wie frueher die ObjectId. */
+/** Board ids are 24 hex characters — like the ObjectId used to be. */
 function checkBoardId(boardId) {
     const id = sid(boardId)
     if (!/^[a-f0-9]{24}$/i.test(id)) throw httpError(404, 'Board nicht gefunden')
@@ -67,10 +66,10 @@ function buildComment(row) {
 }
 
 /**
- * from/to einer Aktivitaet sind mal ein Label-Objekt, mal eine Zeichenkette,
- * mal eine Zahl. Damit beim Lesen nicht geraten werden muss, wandern sie in
- * einen Umschlag: {"v": <wert>}. Ein blanker Wert aus der Zeit davor wird
- * weiterhin verstanden.
+ * from/to of an activity is sometimes a label object, sometimes a string,
+ * sometimes a number. So nobody has to guess when reading, they go into an
+ * envelope: {"v": <value>}. A bare value from the time before is still
+ * understood.
  */
 function wrapValue(value) {
     if (value === undefined || value === null) return null
@@ -80,7 +79,7 @@ function wrapValue(value) {
 function unwrapValue(raw) {
     const parsed = parseJson(raw, null)
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && 'v' in parsed) return parsed.v
-    // Altbestand: der Wert stand ohne Umschlag in der Spalte.
+    // Legacy: the value sat in the column without an envelope.
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && !Object.keys(parsed).length) return null
     return parsed
 }
@@ -107,9 +106,9 @@ function bucket(rows, keyFn) {
 }
 
 /**
- * Board-Zeilen zu den Objekten zusammensetzen, die der Rest der Anwendung
- * kennt. Bewusst nacheinander abgefragt: laeuft das Ganze in einer
- * Transaktion, haengt alles an einer Verbindung und darf nicht parallel gehen.
+ * Assemble the board rows into the objects the rest of the application knows.
+ * Deliberately queried one after another: if the whole thing runs in a
+ * transaction, everything hangs on one connection and must not go in parallel.
  */
 async function assemble(k, boardRows) {
     if (!boardRows.length) return []
@@ -180,10 +179,10 @@ async function findById(boardId) {
 }
 
 /**
- * Die Boards, die dieser Benutzer sehen darf.
+ * The boards this user is allowed to see.
  *
- * Loest das frueher an dieser Stelle durchgereichte Mongo-Kriterium ab —
- * das haette sich nicht in SQL uebersetzen lassen.
+ * Replaces the Mongo criteria that used to be passed through here —
+ * that would not have translated into SQL.
  */
 async function findForUser(user, filterBy = {}) {
     if (!user) return []
@@ -237,8 +236,8 @@ function splitTask(task) {
         values,
         memberIds: Array.isArray(task && task.memberIds) ? task.memberIds.map(sid).filter(Boolean) : [],
         comments: Array.isArray(task && task.comments) ? task.comments : [],
-        // Spiegel fuer DBeaver und spaetere Auswertungen. Die Wahrheit steht
-        // weiterhin in col_values.updatedBy, damit nichts verloren geht.
+        // Mirror for DBeaver and later analysis. The truth still lives
+        // in col_values.updatedBy, so nothing gets lost.
         updatedAt: Number.isFinite(Number(updatedBy.date)) ? Number(updatedBy.date) : null,
         updatedById: updatedBy._id ? sid(updatedBy._id) : null,
         updatedByImg: typeof updatedBy.imgUrl === 'string' ? updatedBy.imgUrl : '',
@@ -283,7 +282,7 @@ async function syncTaskComments(trx, boardId, taskId, comments) {
     await trx('task_comment').insert(rows)
 }
 
-/** Kompletten Task schreiben (anlegen oder ersetzen). */
+/** Write a whole task (create or replace). */
 async function writeTask(trx, boardId, groupId, task, position) {
     const s = splitTask(task)
     const id = sid(task && task.id) || newShortId()
@@ -297,7 +296,7 @@ async function writeTask(trx, boardId, groupId, task, position) {
     return id
 }
 
-/** Die Tasks einer Gruppe auf die uebergebene Liste bringen. */
+/** Bring the tasks of a group to the given list. */
 async function syncGroupTasks(trx, boardId, groupId, tasks) {
     const wanted = tasks.map(t => sid(t.id)).filter(Boolean)
     const existing = await trx('task').where({ board_id: boardId, group_id: groupId }).select('id')
@@ -400,32 +399,6 @@ async function deleteById(boardId) {
     return id
 }
 
-/**
- * Ganzes Board ersetzen — nur fuer den Altbestands-Pfad. Alles andere geht
- * ueber die gezielten Funktionen weiter unten.
- */
-async function replaceBoard(boardId, board) {
-    await tx(async trx => {
-        const id = await requireBoardRow(trx, boardId)
-        await trx('board').where({ id }).update(boardMetaRow(board))
-        if (board.members !== undefined || board.ownerIds !== undefined) {
-            await writeMembers(trx, id, board.members, board.ownerIds)
-        }
-        if (board.columns !== undefined) await writeColumns(trx, id, board.columns)
-        if (board.groups !== undefined) {
-            const groups = Array.isArray(board.groups) ? board.groups : []
-            const wanted = groups.map(g => sid(g.id)).filter(Boolean)
-            const existing = await trx('board_group').where({ board_id: id }).select('id')
-            const gone = existing.map(r => r.id).filter(gid => !wanted.includes(gid))
-            if (gone.length) await trx('board_group').where({ board_id: id }).whereIn('id', gone).del()
-            for (let i = 0; i < groups.length; i++) {
-                const groupId = await writeGroup(trx, id, groups[i], i)
-                await syncGroupTasks(trx, id, groupId, Array.isArray(groups[i].tasks) ? groups[i].tasks : [])
-            }
-        }
-    })
-}
-
 const BOARD_META_FIELDS = {
     title: 'title', description: 'description', folder: 'folder',
     isStarred: 'is_starred', archivedAt: 'archived_at',
@@ -518,7 +491,7 @@ async function replaceGroup(boardId, groupId, group) {
     })
 }
 
-/** Bekommt die Gruppen in der gewuenschten Reihenfolge; nur Positionen aendern sich. */
+/** Gets the groups in the wanted order; only positions change. */
 async function reorderGroups(boardId, groups) {
     await tx(async trx => {
         const id = await requireBoardRow(trx, boardId)
@@ -551,12 +524,12 @@ async function removeTask(boardId, groupId, taskId) {
 }
 
 /**
- * Einzelne Felder eines Tasks setzen — der haeufigste Schreibvorgang.
+ * Set single fields of a task — the most common write.
  *
- * Die Zeile wird gesperrt gelesen, in JavaScript zusammengefuehrt und
- * zurueckgeschrieben. Klingt nach Umweg, ist aber genau das, was verhindert,
- * dass zwei gleichzeitige Aenderungen an verschiedenen Spalten desselben
- * Tasks sich gegenseitig ueberschreiben: die zweite Transaktion wartet.
+ * The row is read locked, merged in JavaScript and written back. Sounds like a
+ * detour, but it is exactly what stops two concurrent changes to different
+ * columns of the same task from overwriting each other: the second
+ * transaction waits.
  */
 async function updateTaskFields(boardId, groupId, taskId, patch) {
     const entries = Object.entries(patch || {}).filter(([key]) => key !== 'id')
@@ -615,9 +588,9 @@ async function setGroupTasks(boardId, groupId, tasks) {
 }
 
 /**
- * Task in eine andere Gruppe verschieben — eine Transaktion, kein
- * Zwischenzustand. Der Task selbst wird dabei nicht neu geschrieben, nur
- * seine Zugehoerigkeit; Kommentare und Zuweisungen bleiben stehen.
+ * Move a task to another group — one transaction, no in-between state. The
+ * task itself is not rewritten, only where it belongs; comments and
+ * assignments stay put.
  */
 async function moveTask(boardId, fromGroupId, toGroupId, task, index = null) {
     await tx(async trx => {
@@ -659,7 +632,7 @@ async function addActivity(boardId, activity) {
     await tx(async trx => {
         const id = await requireBoardRow(trx, boardId)
         await insertActivity(trx, id, activity)
-        // Auf die letzten MAX_ACTIVITIES kuerzen — wie das $slice in MongoDB.
+        // Trim to the last MAX_ACTIVITIES — like the $slice in MongoDB.
         const keep = await trx('activity').where({ board_id: id })
             .orderBy('seq', 'desc').limit(MAX_ACTIVITIES).select('seq')
         if (keep.length === MAX_ACTIVITIES) {
@@ -670,7 +643,7 @@ async function addActivity(boardId, activity) {
 }
 
 module.exports = {
-    findById, findForUser, insert, deleteById, replaceBoard,
+    findById, findForUser, insert, deleteById,
     updateMeta, setColumns, setMembers, setOwners,
     addGroup, removeGroup, updateGroupMeta, replaceGroup, reorderGroups,
     addTask, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,

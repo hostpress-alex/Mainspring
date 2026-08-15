@@ -27,6 +27,20 @@
         color: #333;
     }
 
+    // A failed attempt has to be visible. Before this the form simply did
+    // nothing, which looks the same as a broken button.
+    .login-error {
+        margin: 0 0 12px;
+        padding: 8px 12px;
+        border: 1px solid #f0c2c9;
+        border-radius: 4px;
+        background: #fff4f5;
+        color: #a3283a;
+        font-size: 14px;
+        line-height: 1.4;
+        text-align: center;
+    }
+
     .login-explain {
         font-weight: 500;
         margin-bottom: 20px;

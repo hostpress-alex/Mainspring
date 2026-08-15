@@ -12,7 +12,7 @@ const SOCKET_EMIT_LOGIN = 'set-user-socket'
 const SOCKET_EMIT_LOGOUT = 'unset-user-socket'
 
 
-// Gleiche Origin — in Dev uebernimmt der Vite-Proxy (ws: true).
+// Same origin — in dev the Vite proxy takes over (ws: true).
 const baseUrl = ''
 export const socketService = createSocketService()
 
@@ -22,14 +22,37 @@ window.socketService = socketService
 socketService.setup()
 
 function createSocketService() {
-  var socket = null;
+  var socket = null
+
+  /**
+   * The room this client last asked for.
+   *
+   * A reconnect starts the socket in no room at all, so without this a
+   * reconnect silently stops all live updates until the next navigation.
+   */
+  var lastTopic = null
+
   const socketService = {
     setup() {
       socket = io(baseUrl)
-      setTimeout(()=>{
+
+      /**
+       * Everything that needs the outside world happens in here, not while
+       * this module is being evaluated.
+       *
+       * user.service imports this file and this file imports user.service, so
+       * reaching for `userService` at module level hits a const that does not
+       * exist yet and takes the whole bundle down with a ReferenceError.
+       * A connect handler runs long after both modules are in place.
+       */
+      socket.on('connect', () => {
         const user = userService.getLoggedinUser()
-        if (user) this.login(user._id)
-      }, 500)
+        if (user) socket.emit(SOCKET_EMIT_LOGIN, user._id)
+        if (lastTopic) socket.emit(SOCKET_EMIT_SET_TOPIC, lastTopic)
+      })
+
+      // The server refuses a room instead of going quiet. Worth seeing.
+      socket.on('socket-denied', info => console.warn('socket denied:', info))
     },
     on(eventName, cb) {
       socket.on(eventName, cb)
@@ -40,13 +63,20 @@ function createSocketService() {
       else socket.off(eventName, cb)
     },
     emit(eventName, data) {
+      if (eventName === SOCKET_EMIT_SET_TOPIC) lastTopic = data
       socket.emit(eventName, data)
     },
     login(userId) {
+      // The handshake is a snapshot taken when the socket connected — which
+      // was before this login, so the server still sees an anonymous client.
+      // Reconnect so it gets the new cookie.
+      socket.disconnect().connect()
       socket.emit(SOCKET_EMIT_LOGIN, userId)
     },
     logout() {
       socket.emit(SOCKET_EMIT_LOGOUT)
+      lastTopic = null
+      socket.disconnect().connect()
     },
     terminate() {
       socket = null

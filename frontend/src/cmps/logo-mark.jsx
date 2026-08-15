@@ -1,15 +1,15 @@
 /**
- * Bildmarke: Zifferblatt mit zwei Zeigern — der lange Zeiger bricht durch den
- * Ring und wird zum Haken. Zeit und Erledigt in einer Form.
+ * Logo mark: a clock face with two hands — the long hand breaks through the
+ * ring and turns into a tick. Time and done in one shape.
  *
- * Warum drei Varianten und nicht einfach Deckkraft:
- * Der Ring lebt vom Kontrast zum Untergrund. Orange mit 38 % Deckkraft
- * verschwindet auf der dunklen Seitenleiste (#292f4c) fast vollstaendig.
- * Deshalb bringt jede Variante ihre eigene Ringfarbe mit.
+ * Why three variants and not simply opacity:
+ * The ring lives off the contrast with its background. Orange at 38 % opacity
+ * all but disappears on the dark sidebar (#292f4c). So every variant brings
+ * its own ring colour.
  *
- *   tone="brand"  helle Flaechen — Haken in der Hausfarbe, Ring blass daneben
- *   tone="light"  dunkle Flaechen (Seitenleiste, App-Kachel) — alles in Weiss
- *   tone="mono"   erbt die Textfarbe, z. B. fuer Druck oder Graustufen
+ *   tone="brand"  light surfaces — tick in the house colour, pale ring beside it
+ *   tone="light"  dark surfaces (sidebar, app tile) — everything in white
+ *   tone="mono"   inherits the text colour, for print or greyscale say
  */
 export const BRAND_COLOR = '#EB5522'
 

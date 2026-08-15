@@ -48,8 +48,8 @@
 
                     .comment-modal {
                         @include mixins.menu-modal();
-                        // Ohne das sieht das Menue klickbar aus, verhaelt sich
-                        // aber wie Text.
+                        // Without this the menu looks clickable but behaves
+                        // like text.
                         > * { cursor: pointer; }
                         right: 0;
                         width: 265px;

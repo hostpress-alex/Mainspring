@@ -6,7 +6,7 @@
  * forgetting the other does not fail at start-up. It fails much later, when
  * somebody switches the driver back and one particular button stops working.
  *
- * That is a rule written down in DATENBANK.md, and a rule nobody can check by
+ * That is a rule written down in DATABASE.md, and a rule nobody can check by
  * eye is a rule that quietly rots. This test checks it.
  *
  * It compares exported names only. Whether both implementations *behave* the

@@ -14,6 +14,7 @@ import { HiOutlineChatBubbleOvalLeft } from 'react-icons/hi2'
 import { GUEST_IMG } from '../../services/avatar'
 import { DynamicCmp } from '../task/task-preview'
 import { widthOf } from '../board/column-width'
+import { t } from '../../i18n'
 
 export function TaskPreviewKanban({ task, group, board , isTaskModalOpen ,setIsTaskModalOpen, widths = {} }) {
     const user = useSelector(storeState => storeState.userModule.user)
@@ -31,15 +32,15 @@ export function TaskPreviewKanban({ task, group, board , isTaskModalOpen ,setIsT
 
 
     async function onRemoveTask(taskId) {
-        const t = (group.tasks || []).find(x => x.id === taskId)
-        if (!await confirmDelete({ was: t?.title ? `Der Task „${t.title}"` : 'Dieser Task' })) return
+        const toDelete = (group.tasks || []).find(x => x.id === taskId)
+        if (!await confirmDelete({ what: toDelete?.title ? t('task.deleteName', { title: toDelete.title }) : t('task.thisTask') })) return
         try {
             const tasksToSave = group.tasks.filter(task => task.id !== taskId)
             group.tasks = tasksToSave
             await updateGroupAction(board, group)
             setIsTaskModalOpen(false)
         } catch (err) {
-            console.log('Task konnte nicht gelöscht werden', err)
+            console.log('deleting a task failed', err)
         }
     }
 

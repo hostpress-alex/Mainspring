@@ -2,22 +2,23 @@ import { useMemo, useState } from 'react'
 import { AiOutlinePlus, AiOutlineSearch, AiOutlineStar } from 'react-icons/ai'
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md'
 import { BoardPreview } from '../../board/board-preview'
+import { t } from '../../../i18n'
 
-export const NO_FOLDER = 'Ohne Gruppe'
+export const NO_FOLDER = t('group.none')
 
 /**
- * Board-Spalte der Seitenleiste.
+ * Board column of the sidebar.
  *
- * Die Workspace-Auswahl ("Sprint 4") ist entfallen — es gibt nur einen
- * Workspace. Stattdessen: ein Favoriten-Abschnitt und darunter die Boards
- * nach `board.folder` gruppiert (z.B. "IT", "Marketing").
+ * The workspace picker ("Sprint 4") is gone — there is only one workspace.
+ * Instead: a favourites section and below it the boards grouped by
+ * `board.folder` (e.g. "IT", "Marketing").
  */
 export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCreateModalOpen, boards = [] }) {
     const [collapsed, setCollapsed] = useState({})
 
     const starred = useMemo(() => boards.filter(b => b.isStarred), [boards])
 
-    /** Boards nach Ordner gruppieren; Ordner alphabetisch, "Ohne Gruppe" zuletzt. */
+    /** Group boards by folder; folders alphabetically, "no folder" last. */
     const folders = useMemo(() => {
         const map = new Map()
         for (const board of boards) {
@@ -70,12 +71,12 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
         <div className="workspace-sidebar-header">
             <div className='workspace-sidebar-items'>
                 <div className="workspace-title-container flex space-between align-center">
-                    <span className='workspace-title'>Boards</span>
+                    <span className='workspace-title'>{t('nav.boards')}</span>
                 </div>
                 <div className='workspace-btns'>
                     <div onClick={() => setIsCreateModalOpen((prev) => !prev)}>
                         <AiOutlinePlus className='icon' />
-                        <span>Hinzufügen</span>
+                        <span>{t('common.add')}</span>
                     </div>
                     <div className='search-board'>
                         <div className='flex'>
@@ -84,7 +85,7 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
                                 name='title'
                                 className='search-input'
                                 value={filterByToEdit.title}
-                                placeholder="Suchen"
+                                placeholder={t('common.search')}
                                 onChange={handleChange}
                             />
                         </div>
@@ -93,7 +94,7 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
             </div>
 
             <ul className='board-list-container flex column'>
-                <Section id='__fav' title='Favoriten' list={starred}
+                <Section id='__fav' title={t('board.favorites')} list={starred}
                     icon={<AiOutlineStar style={{ color: '#fdab3d' }} />} />
                 {folders.map(([name, list]) => (
                     <Section key={name} id={name} title={name} list={list} icon={null} />

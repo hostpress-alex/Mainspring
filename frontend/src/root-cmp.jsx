@@ -12,9 +12,9 @@ import { store } from './store/store'
 import { ConfirmHost } from './cmps/confirm-dialog'
 
 /**
- * Schuetzt eine Route. Ohne eingeloggten Benutzer wird auf /auth/login
- * umgeleitet; der urspruenglich gewuenschte Pfad wandert in location.state,
- * damit man nach dem Login dorthin zurueckkommt.
+ * Protects a route. Without a logged-in user it redirects to /auth/login; the
+ * path originally asked for travels in location.state, so that you land back
+ * there after logging in.
  */
 function RequireAuth ({ children }) {
     const user = useSelector(storeState => storeState.userModule.user)
@@ -24,7 +24,7 @@ function RequireAuth ({ children }) {
     return children
 }
 
-/** Wie RequireAuth, verlangt zusaetzlich das Admin-Flag. */
+/** Like RequireAuth, additionally demands the admin flag. */
 function RequireAdmin ({ children }) {
     const user = useSelector(storeState => storeState.userModule.user)
     if (!user) return <Navigate to='/auth/login' replace />
@@ -53,7 +53,7 @@ export function RootCmp () {
                         <Route path='*' element={<Navigate to='/' replace />} />
                     </Routes>
                 </main>
-                {/* Genau ein Bestaetigungsdialog fuer die ganze Anwendung. */}
+                {/* Exactly one confirmation dialog for the whole application. */}
                 <ConfirmHost />
             </div>
         </Provider>

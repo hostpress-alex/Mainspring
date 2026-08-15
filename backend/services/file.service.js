@@ -1,9 +1,9 @@
 /**
- * Dateiablage auf der Platte, Metadaten in der Datenbank.
+ * Files on disk, metadata in the database.
  *
- * Dateien liegen unter backend/uploads/<jahr>/<monat>/<id>.<ext> — bewusst
- * NICHT unter public/, damit sie nicht versehentlich ungeschuetzt ausgeliefert
- * werden. Die Auslieferung laeuft ueber GET /api/upload/:id mit requireAuth.
+ * Files live under backend/uploads/<year>/<month>/<id>.<ext> — deliberately
+ * NOT under public/, so they cannot be served unprotected by accident.
+ * Serving goes through GET /api/upload/:id with requireAuth.
  */
 const fs = require('fs/promises')
 const fsSync = require('fs')
@@ -15,10 +15,11 @@ const logger = require('./logger.service')
 const UPLOAD_ROOT = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads')
 
 /**
- * Erlaubte Dateitypen.
+ * Allowed file types.
  *
- * Bewusst eine Liste und kein "alles ausser exe": was hier nicht steht, kommt
- * nicht auf die Platte. Ausfuehrbares, Skripte und HTML fehlen absichtlich.
+ * Deliberately a list and not "everything except exe": what is not in here
+ * does not get onto the disk. Executables, scripts and HTML are missing on
+ * purpose.
  */
 const ALLOWED = {
     // Bilder
@@ -44,7 +45,7 @@ const ALLOWED = {
     'application/vnd.ms-powerpoint': 'ppt',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
     'application/vnd.oasis.opendocument.presentation': 'odp',
-    // Text und Daten
+    // text and data
     'text/plain': 'txt',
     'text/csv': 'csv',
     'text/markdown': 'md',
@@ -57,18 +58,18 @@ const ALLOWED = {
 }
 
 /**
- * Rueckfall ueber die Dateiendung.
+ * Fallback via the file extension.
  *
- * Browser schicken fuer Office-Dateien je nach Betriebssystem gern
- * application/octet-stream oder gar nichts. Ohne diesen Weg liesse sich eine
- * .docx dann nicht hochladen, obwohl sie erlaubt ist.
+ * For Office files browsers like to send application/octet-stream or nothing
+ * at all, depending on the operating system. Without this path a .docx could
+ * not be uploaded even though it is allowed.
  */
 const BY_EXTENSION = Object.fromEntries(
     Object.entries(ALLOWED).map(([mime, ext]) => [ext, mime]))
 
 const VAGUE_MIMES = new Set(['', 'application/octet-stream', 'binary/octet-stream', 'application/x-zip-compressed'])
 
-/** Bilder und PDF darf der Browser direkt anzeigen. Alles andere wird geladen. */
+/** Images and PDF may be shown inline by the browser. Everything else is downloaded. */
 const INLINE_MIMES = new Set([
     'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/bmp', 'application/pdf',
 ])
@@ -92,8 +93,8 @@ function extensionOf(name) {
 }
 
 /**
- * Ermittelt den tatsaechlichen Typ aus dem gemeldeten MIME und dem Dateinamen.
- * Wirft, wenn beides nicht zu einem erlaubten Typ fuehrt.
+ * Works out the real type from the reported MIME type and the file name.
+ * Throws if neither of the two leads to an allowed type.
  */
 function resolveType(mime, originalName) {
     const clean = String(mime || '').toLowerCase().split(';')[0].trim()
@@ -106,7 +107,7 @@ function resolveType(mime, originalName) {
     throw httpError(415, `Dateityp ${mime || 'unbekannt'} ist nicht erlaubt`)
 }
 
-/** Nur fuer den Download-Namen: keine Pfade, keine Anfuehrungszeichen. */
+/** Only for the download name: no paths, no quotes. */
 function safeFilename(name, fallbackExt) {
     const clean = String(name || '').replace(/[\\/\r\n"]/g, '').trim().slice(0, 120)
     if (clean) return clean

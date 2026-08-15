@@ -11,8 +11,8 @@
     border-radius: 8px;
     z-index: 1000;
 
-    // Was in einem Popup anklickbar ist, soll auch so aussehen. Bisher hing
-    // der Zeigerwechsel an jeder Popup-Datei einzeln — und fehlte prompt.
+    // Whatever is clickable in a popup should look it. Until now the cursor
+    // change hung off each popup file separately — and was promptly missing.
     li,
     button,
     [role='button'],

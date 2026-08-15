@@ -10,13 +10,14 @@ import WorkspaceIcon from './workspace-icon'
 import { Tooltip } from '@mui/material'
 import { LogoMark } from '../logo-mark'
 import { GUEST_IMG } from '../../services/avatar'
+import { t } from '../../i18n'
 
 /**
- * Linke Hauptnavigation. Laeuft in zwei Zusammenhaengen:
- *  - innerhalb der Board-Ansicht: dort steuern die oberen Symbole die
- *    Workspace-Leiste (setWorkspaceDisplay/setIsWorkspaceOpen werden gereicht)
- *  - in der AppShell auf allen anderen Seiten: dann fehlen diese Props und die
- *    Symbole navigieren stattdessen zur Boarduebersicht
+ * Left-hand main navigation. Runs in two contexts:
+ *  - inside the board view: there the top icons drive the workspace bar
+ *    (setWorkspaceDisplay/setIsWorkspaceOpen are passed in)
+ *  - in the AppShell on every other page: then those props are missing and the
+ *    icons navigate to the board overview instead
  */
 export function MainSidebar ({ setIsLoginModalOpen, setWorkspaceDisplay, setIsWorkspaceOpen }) {
     const [display, setDisplay] = useState('board')
@@ -29,8 +30,8 @@ export function MainSidebar ({ setIsLoginModalOpen, setWorkspaceDisplay, setIsWo
 
     function onChooseIcon (icon) {
         if (!hasBoardContext) {
-            // Ausserhalb der Board-Ansicht gibt es keine Workspace-Leiste zum
-            // Aufklappen — dann fuehrt das Symbol zurueck zur Uebersicht.
+            // Outside the board view there is no workspace bar to unfold —
+            // then the icon leads back to the overview.
             navigate('/')
             return
         }
@@ -48,21 +49,21 @@ export function MainSidebar ({ setIsLoginModalOpen, setWorkspaceDisplay, setIsWo
             </span>
 
             <Link to={'/'} className='icon-link'>
-                <Tooltip title="Startseite" arrow placement="right">
-                    <LogoMark className='home-img' size={26} tone="light" title="Startseite"
+                <Tooltip title={t('nav.home')} arrow placement="right">
+                    <LogoMark className='home-img' size={26} tone="light" title={t('nav.home')}
                         onClick={closeDynamicModal} />
                 </Tooltip>
             </Link>
 
             <div className='tools-container flex column align-center'>
-                <Tooltip title="Workspaces" arrow placement="right">
+                <Tooltip title={t('nav.workspaces')} arrow placement="right">
                     <div className="icon-container" onClick={() => onChooseIcon('board')}>
                         <WorkspaceIcon />
                         {active('board') && <VscTriangleLeft className="triangle-icon" />}
                     </div>
                 </Tooltip>
 
-                <Tooltip title="Kalender" arrow placement="right">
+                <Tooltip title={t('nav.calendar')} arrow placement="right">
                     <Link to='/kalender' className='icon-container'
                         style={{ color: '#fff', opacity: location.pathname === '/kalender' ? 1 : .75 }}>
                         <MdCalendarMonth />
@@ -71,7 +72,7 @@ export function MainSidebar ({ setIsLoginModalOpen, setWorkspaceDisplay, setIsWo
                 </Tooltip>
 
                 {user?.isAdmin && (
-                    <Tooltip title="Administration" arrow placement="right">
+                    <Tooltip title={t('nav.administration')} arrow placement="right">
                         <Link to='/admin' className='icon-container'
                             style={{ color: '#fff', opacity: location.pathname === '/admin' ? 1 : .75 }}>
                             <MdOutlineAdminPanelSettings />
@@ -82,7 +83,7 @@ export function MainSidebar ({ setIsLoginModalOpen, setWorkspaceDisplay, setIsWo
             </div>
 
             <div className='bottom'>
-                <Tooltip title={user ? `${user.fullname} — Profil und Abmelden` : 'Anmelden'} arrow placement="right">
+                <Tooltip title={user ? t('nav.profileTooltip', { name: user.fullname }) : t('nav.login')} arrow placement="right">
                     <img className='logged-user-img' src={(user && user.imgUrl) ? user.imgUrl : GUEST_IMG} alt=""
                         onClick={() => setIsLoginModalOpen && setIsLoginModalOpen(prev => !prev)} />
                 </Tooltip>

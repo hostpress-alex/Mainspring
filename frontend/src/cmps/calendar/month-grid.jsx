@@ -1,11 +1,12 @@
 import { monthGrid, isToday, isSameDay, startOfDay, addDays, fmtTime, WEEKDAYS_SHORT, MS_MIN } from '../../services/date.util'
+import { t } from '../../i18n'
 
 const MAX_CHIPS = 3
 
 /**
- * Monatsansicht: 6 feste Wochenzeilen, damit das Raster beim Blaettern nicht
- * springt. Klick auf eine Zelle legt einen Eintrag ab 09:00 an, Klick auf einen
- * Chip oeffnet ihn.
+ * Month view: 6 fixed week rows, so the grid does not jump while paging. A
+ * click on a cell creates an entry starting at 09:00, a click on a chip opens
+ * it.
  */
 export function MonthGrid ({ date, entries, onCreate, onOpen, onPickDay }) {
     const days = monthGrid(date)
@@ -45,7 +46,7 @@ export function MonthGrid ({ date, entries, onCreate, onOpen, onPickDay }) {
                                     onMouseDown={ev => onCellMouseDown(ev, day)}>
                                     <span className='cal-month-num'
                                         onMouseDown={ev => { ev.stopPropagation(); onPickDay(day) }}
-                                        title='Tagesansicht öffnen'>
+                                        title={t('calendar.openDayView')}>
                                         {day.getDate()}
                                     </span>
                                     {list.slice(0, MAX_CHIPS).map(e => (

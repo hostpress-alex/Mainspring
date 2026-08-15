@@ -17,14 +17,9 @@ async function findById(id) {
     return await collection.findOne({ _id: id })
 }
 
-async function findAll() {
-    const collection = await col()
-    return await collection.find({}).toArray()
-}
-
 async function deleteById(id) {
     const collection = await col()
     await collection.deleteOne({ _id: id })
 }
 
-module.exports = { insert, findById, findAll, deleteById }
+module.exports = { insert, findById, deleteById }

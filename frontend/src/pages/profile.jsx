@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { updateProfile } from '../store/user.actions'
 import { uploadAvatar, imagesFromClipboard } from '../services/upload.service'
 import { GUEST_IMG } from '../services/avatar'
+import { t } from '../i18n'
 
 const S = {
     page: { minHeight: '100vh', background: '#f6f7fb' },
@@ -26,7 +27,7 @@ const S = {
     link: { color: '#0073ea', textDecoration: 'none' },
 }
 
-const readErr = e => e?.response?.data?.err || e?.message || 'Unbekannter Fehler'
+const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
 
 export function ProfilePage () {
     const user = useSelector(storeState => storeState.userModule.user)
@@ -48,7 +49,7 @@ export function ProfilePage () {
         ev.preventDefault(); setErr(null); setBusy(true)
         try {
             await updateProfile(user._id, { fullname: fullname.trim() })
-            flash('Name gespeichert.')
+            flash(t('profile.nameSaved'))
         } catch (e) { setErr(readErr(e)) } finally { setBusy(false) }
     }
 
@@ -66,7 +67,7 @@ export function ProfilePage () {
         if (file) await handleAvatarFile(file)
     }
 
-    /** Bild aus der Zwischenablage einfuegen — Strg+V irgendwo auf der Seite. */
+    /** Paste an image from the clipboard — Ctrl+V anywhere on the page. */
     async function onPaste (ev) {
         const [blob] = imagesFromClipboard(ev)
         if (blob) await handleAvatarFile(blob)
@@ -78,7 +79,7 @@ export function ProfilePage () {
         try {
             await updateProfile(user._id, { imgUrl: preview })
             setPreview(null)
-            flash('Profilbild gespeichert.')
+            flash(t('profile.pictureSaved'))
         } catch (e) { setErr(readErr(e)) } finally { setBusy(false) }
     }
 
@@ -87,19 +88,19 @@ export function ProfilePage () {
         try {
             await updateProfile(user._id, { imgUrl: '' })
             setPreview(null)
-            flash('Profilbild entfernt.')
+            flash(t('profile.pictureRemoved'))
         } catch (e) { setErr(readErr(e)) } finally { setBusy(false) }
     }
 
     async function onChangePassword (ev) {
         ev.preventDefault(); setErr(null)
-        if (pw.next !== pw.repeat) return setErr('Die neuen Passwoerter stimmen nicht ueberein.')
-        if (pw.next.length < 8) return setErr('Das neue Passwort braucht mindestens 8 Zeichen.')
+        if (pw.next !== pw.repeat) return setErr(t('profile.passwordMismatch'))
+        if (pw.next.length < 8) return setErr(t('profile.passwordTooShort'))
         setBusy(true)
         try {
             await updateProfile(user._id, { password: pw.next, currentPassword: pw.current })
             setPw({ current: '', next: '', repeat: '' })
-            flash('Passwort geaendert.')
+            flash(t('profile.passwordChanged'))
         } catch (e) { setErr(readErr(e)) } finally { setBusy(false) }
     }
 
@@ -114,12 +115,12 @@ export function ProfilePage () {
             </div>
 
             <div style={S.main}>
-                <h1 style={S.h1}>Mein Profil</h1>
+                <h1 style={S.h1}>{t('nav.profile')}</h1>
                 {err && <div style={S.err}>{err}</div>}
                 {msg && <div style={S.ok}>{msg}</div>}
 
                 <div style={S.card}>
-                    <h2 style={S.h2}>Profilbild</h2>
+                    <h2 style={S.h2}>{t('profile.picture')}</h2>
                     <p style={S.hint}>
                         Wird im Browser auf 256×256 verkleinert und auf deinem Server gespeichert.
                         Du kannst ein Bild auch einfach mit Strg+V einfuegen.
@@ -130,52 +131,52 @@ export function ProfilePage () {
                             <button style={S.btnGhost} onClick={() => fileInput.current.click()} disabled={busy}>
                                 Bild waehlen
                             </button>
-                            {preview && <button style={S.btn} onClick={onSaveAvatar} disabled={busy}>Speichern</button>}
-                            {preview && <button style={S.btnGhost} onClick={() => setPreview(null)} disabled={busy}>Verwerfen</button>}
-                            {!preview && user.imgUrl && <button style={S.btnGhost} onClick={onRemoveAvatar} disabled={busy}>Entfernen</button>}
+                            {preview && <button style={S.btn} onClick={onSaveAvatar} disabled={busy}>{t('common.save')}</button>}
+                            {preview && <button style={S.btnGhost} onClick={() => setPreview(null)} disabled={busy}>{t('update.discard')}</button>}
+                            {!preview && user.imgUrl && <button style={S.btnGhost} onClick={onRemoveAvatar} disabled={busy}>{t('common.remove')}</button>}
                         </div>
                     </div>
                     <input ref={fileInput} type='file' accept='image/*' onChange={onPickFile} style={{ display: 'none' }} />
-                    {preview && <p style={{ ...S.hint, marginBottom: 0 }}>Vorschau — noch nicht gespeichert.</p>}
+                    {preview && <p style={{ ...S.hint, marginBottom: 0 }}>{t('profile.preview')}</p>}
                 </div>
 
                 <div style={S.card}>
-                    <h2 style={S.h2}>Name</h2>
-                    <p style={S.hint}>So erscheinst du in Boards, Tasks und Kommentaren.</p>
+                    <h2 style={S.h2}>{t('common.name')}</h2>
+                    <p style={S.hint}>{t('profile.nameHint')}</p>
                     <form onSubmit={onSaveName}>
                         <div style={S.row}>
-                            <span style={S.label}>Voller Name</span>
+                            <span style={S.label}>{t('profile.fullName')}</span>
                             <input style={S.input} value={fullname} onChange={e => setFullname(e.target.value)} required />
                         </div>
                         <div style={S.row}>
-                            <span style={S.label}>Benutzername (nicht aenderbar)</span>
+                            <span style={S.label}>{t('profile.usernameFixed')}</span>
                             <input style={{ ...S.input, background: '#f6f7fb', color: '#676879' }}
                                 value={user.username || '—'} disabled />
                         </div>
-                        <button style={S.btn} type='submit' disabled={busy || !fullname.trim()}>Name speichern</button>
+                        <button style={S.btn} type='submit' disabled={busy || !fullname.trim()}>{t('profile.saveName')}</button>
                     </form>
                 </div>
 
                 <div style={S.card}>
-                    <h2 style={S.h2}>Passwort aendern</h2>
-                    <p style={S.hint}>Mindestens 8 Zeichen. Dein aktuelles Passwort wird zur Bestaetigung gebraucht.</p>
+                    <h2 style={S.h2}>{t('profile.changePassword')}</h2>
+                    <p style={S.hint}>{t('profile.passwordHint')}</p>
                     <form onSubmit={onChangePassword}>
                         <div style={S.row}>
-                            <span style={S.label}>Aktuelles Passwort</span>
+                            <span style={S.label}>{t('profile.currentPassword')}</span>
                             <input style={S.input} type='password' value={pw.current}
                                 onChange={e => setPw({ ...pw, current: e.target.value })} required />
                         </div>
                         <div style={S.row}>
-                            <span style={S.label}>Neues Passwort</span>
+                            <span style={S.label}>{t('profile.newPassword')}</span>
                             <input style={S.input} type='password' value={pw.next}
                                 onChange={e => setPw({ ...pw, next: e.target.value })} required />
                         </div>
                         <div style={S.row}>
-                            <span style={S.label}>Neues Passwort wiederholen</span>
+                            <span style={S.label}>{t('profile.repeatPassword')}</span>
                             <input style={S.input} type='password' value={pw.repeat}
                                 onChange={e => setPw({ ...pw, repeat: e.target.value })} required />
                         </div>
-                        <button style={S.btn} type='submit' disabled={busy}>Passwort aendern</button>
+                        <button style={S.btn} type='submit' disabled={busy}>{t('profile.changePassword')}</button>
                     </form>
                 </div>
             </div>

@@ -1,17 +1,17 @@
 /**
- * Speicherzugriff auf Boards — die einzige Stelle, die weiss, wie ein Board
- * abgelegt ist.
+ * Storage access for boards — the only place that knows how a board is
+ * stored.
  *
- * Diese Datei waehlt nur aus. Die eigentliche Arbeit steckt in:
+ * This file only picks. The actual work sits in:
  *   board.repo.mongo.js   MongoDB
  *   board.repo.sql.js     MariaDB
  *
- * Umschalten ohne Codeaenderung:
+ * Switching without a code change:
  *   DB_DRIVER=mariadb npm start
  *
- * Beide Umsetzungen haben dieselbe Aussenseite. Wird hier etwas ergaenzt,
- * muss es in BEIDEN Dateien ergaenzt werden — der Wechsel soll jederzeit in
- * beide Richtungen moeglich bleiben.
+ * Both implementations have the same outside. If something is added here,
+ * it has to be added in BOTH files — switching should stay possible in both
+ * directions at any time.
  */
 const config = require('../../config')
 

@@ -5,17 +5,19 @@ import { setDynamicModalObj, closeDynamicModal, saveColumnLabels } from '../../s
 import { LabelEditor } from './label-editor'
 import { RxPencil1 } from 'react-icons/rx'
 import { VscTriangleUp } from 'react-icons/vsc'
+import { t } from '../../i18n'
 
 /**
- * Auswahl fuer Status- und Prioritaets-Spalten.
+ * Picker for status and priority columns.
  *
- * Die Liste gehoert seit der Umstellung zur SPALTE (column.labels), nicht mehr
- * zum Board. board.labels bleibt nur als Rueckfall fuer Boards, die noch nie
- * gelesen wurden.
+ * Since the change the list belongs to the COLUMN (column.labels), no longer
+ * to the board. board.labels stays only as a fallback for boards that have
+ * never been read.
  *
- * Der Editor wird bewusst OHNE die Klassen .modal-status-priority(-content)
- * gerendert: deren Regeln geben jedem li eine feste Hoehe von 32px und weisse
- * Schrift — gedacht fuer die bunten Auswahlkacheln, toedlich fuer ein Formular.
+ * The editor is deliberately rendered WITHOUT the classes
+ * .modal-status-priority(-content): their rules give every li a fixed height
+ * of 32px and white text — meant for the colourful picker tiles, deadly for a
+ * form.
  */
 export function ModalStatusPriority({ dynamicModalObj }) {
     const board = useSelector(storeState => storeState.boardModule.board)
@@ -40,7 +42,7 @@ export function ModalStatusPriority({ dynamicModalObj }) {
             await saveColumnLabels(board, column, nextLabels, renames, removed)
             closeDynamicModal()
         } catch (e) {
-            setErr(e?.response?.data?.err || 'Labels konnten nicht gespeichert werden.')
+            setErr(e?.response?.data?.err || t('label.saveFailed'))
             setIsSaving(false)
         }
     }
@@ -68,11 +70,11 @@ export function ModalStatusPriority({ dynamicModalObj }) {
                 </ul>
                 <div className="edit-labels-btn">
                     <button type="button"
-                        title={column ? 'Labels dieser Spalte bearbeiten' : 'Für diese Spalte nicht verfügbar'}
+                        title={column ? t('label.editTitle') : t('label.notAvailable')}
                         disabled={!column}
                         onClick={() => setIsEditOpen(true)}>
                         <RxPencil1 className='icon' />
-                        <span>Labels bearbeiten</span>
+                        <span>{t('label.edit')}</span>
                     </button>
                 </div>
             </section>

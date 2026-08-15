@@ -3,13 +3,13 @@ const {requireAuth, requireAdmin} = require('../../middlewares/requireAuth.middl
 const {getUser, getUsers, deleteUser, updateUser, addUser} = require('./user.controller')
 const router = express.Router()
 
-// Auch die Benutzerliste ist nicht oeffentlich.
+// The user list is not public either.
 router.use(requireAuth)
 
 router.get('/', getUsers)
 router.get('/:id', getUser)
 router.post('/', requireAdmin, addUser)
-router.put('/:id', updateUser)          // Selbst oder Admin — geprueft im Service
+router.put('/:id', updateUser)          // Self or admin — checked in the service
 router.delete('/:id', requireAdmin, deleteUser)
 
 module.exports = router

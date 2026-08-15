@@ -17,10 +17,10 @@ export function DynamicModal () {
     const elModal = useRef()
 
     /**
-     * Schliessen per Klick irgendwo ausserhalb — und per Escape.
-     * Klickt man auf den Button, der das Popup geoeffnet hat, wuerde dessen
-     * onClick es direkt wieder aufmachen; das faengt der Schutz in
-     * setDynamicModalObj ab (gleiche Kennung innerhalb von 400 ms).
+     * Close on a click anywhere outside — and on Escape.
+     * Clicking the button that opened the popup would have its onClick open it
+     * straight away again; the guard in setDynamicModalObj catches that (same
+     * identity within 400 ms).
      */
     useEffect(() => {
         if (!dynamicModalObj?.isOpen) return

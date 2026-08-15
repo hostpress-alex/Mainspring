@@ -18,6 +18,13 @@ package-lock.json
 
 # production
 /build
+frontend/build
+
+# The built frontend that the server hands out in production. Build output,
+# not source: it is stale the moment it is written, and the old react-scripts
+# version sat here at 19.6 MB, 17 of them a sourcemap for code that no longer
+# exists. Produced by "npm run build" in the frontend.
+backend/public
 
 # misc
 # Zugangsdaten zur Datenbank gehoeren nicht ins Repository

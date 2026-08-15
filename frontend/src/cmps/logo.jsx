@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { LogoMark } from './logo-mark'
 
 /**
- * Bildmarke mit Schriftzug. Der Name steht bewusst an genau einer Stelle —
- * hier — damit ein spaeterer Wechsel nicht durch die halbe Anwendung geht.
+ * Logo mark with wordmark. The name deliberately sits in exactly one place —
+ * here — so a later change does not run through half the application.
  */
 export const APP_NAME = 'myday'
 

@@ -2,6 +2,7 @@ import { Tooltip } from '@mui/material'
 import { updateGroupAction } from '../../store/board.actions'
 import { singleLineEditable } from '../../services/editable'
 import { TaskListKanban } from './task-list-kanban'
+import { t } from '../../i18n'
 
 export function GroupPreviewKanban ({ group, board, index }) {
 
@@ -11,7 +12,7 @@ export function GroupPreviewKanban ({ group, board, index }) {
         try {
             await updateGroupAction(board, group)
         } catch (err) {
-            console.log('Speichern fehlgeschlagen')
+            console.log('saving failed')
         }
     }
     return (

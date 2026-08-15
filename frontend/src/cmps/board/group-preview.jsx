@@ -19,6 +19,7 @@ import { BsFillCircleFill } from 'react-icons/bs'
 import { BiDotsHorizontalRounded } from 'react-icons/bi'
 import { AiOutlinePlus } from 'react-icons/ai'
 import { GUEST_IMG } from '../../services/avatar'
+import { t } from '../../i18n'
 
 export function GroupPreview ({ group, board, idx }) {
     const [taskToEdit, setTaskToEdit] = useState(boardService.getEmptyTask())
@@ -33,7 +34,7 @@ export function GroupPreview ({ group, board, idx }) {
     useEffect(() => { setWidths(loadWidths(board._id)) }, [board._id])
 
 
-    /** Breite ziehen: waehrend der Bewegung live, beim Loslassen gespeichert. */
+    /** Drag the width: live while moving, saved on release. */
     function onStartResize (ev, column) {
         ev.preventDefault()
         ev.stopPropagation()
@@ -65,7 +66,7 @@ export function GroupPreview ({ group, board, idx }) {
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const user = useSelector(storeState => storeState.userModule.user)
 
-    // Nur Owner und Admins duerfen die Spaltenreihenfolge aendern.
+    // Only owners and admins may change the column order.
     const canReorderColumns = boardService.canManageMembers(board, user)
     const elMainGroup = useRef()
     const elAddColumn = useRef()
@@ -78,7 +79,7 @@ export function GroupPreview ({ group, board, idx }) {
             await updateBoardColumns(board, [...columns, column])
             loadBoard(board._id)
         } catch (err) {
-            console.log('Spalte konnte nicht angelegt werden', err)
+            console.log('creating a column failed', err)
         }
     }
 
@@ -87,7 +88,7 @@ export function GroupPreview ({ group, board, idx }) {
             await updateBoardColumns(board, columns.map(c => c.id === column.id ? { ...c, title } : c))
             loadBoard(board._id)
         } catch (err) {
-            console.log('Spalte konnte nicht umbenannt werden', err)
+            console.log('renaming a column failed', err)
         }
     }
 
@@ -116,7 +117,7 @@ export function GroupPreview ({ group, board, idx }) {
             setIsTyping(false)
             setIsShowColorPicker(false)
         } catch (err) {
-            console.log('Speichern fehlgeschlagen')
+            console.log('saving failed')
         }
     }
 
@@ -148,8 +149,8 @@ export function GroupPreview ({ group, board, idx }) {
 
     async function handleCheckboxChange (task) {
         try {
-            // Bewusst ohne Verlaufseintrag: das Haekchen markiert einen Task
-            // nur fuer die Mehrfachauswahl und aendert am Task selbst nichts.
+            // Deliberately without a history entry: the checkbox marks a task
+            // only for the multi-select and changes nothing on the task itself.
             if (selectedTasks.includes(task)) {
                 selectedTasks.splice(selectedTasks.indexOf(task), 1)
                 setSelectedTasks((selectedTasks) => ([...selectedTasks]))
@@ -169,9 +170,7 @@ export function GroupPreview ({ group, board, idx }) {
 
     function getSumOfTasks () {
         const sum = group.tasks.length
-        if (sum > 1) return sum + ' items'
-        else if (sum === 1) return 1 + ' item'
-        else return 'No items'
+        return sum ? t('task.count', { n: sum }) : t('task.none')
     }
 
     function getAddColumnClassName () {
@@ -209,7 +208,7 @@ export function GroupPreview ({ group, board, idx }) {
                                             <div className="check-box"  >
                                                 <input type="checkbox" checked={isMainCheckbox.isActive} onChange={onClickMainCheckbox} />
                                             </div>
-                                            <div className="task title">Task</div>
+                                            <div className="task title">{t('task.task')}</div>
                                         </div>
                                         {columns.map((column, idx) =>
                                             <Draggable key={column.id} draggableId={column.id} index={idx}
@@ -219,15 +218,15 @@ export function GroupPreview ({ group, board, idx }) {
                                                         {...provided.draggableProps}
                                                         style={{ ...provided.draggableProps.style, ...widthStyle(widthOf(widths, column)) }}
                                                         className={`${column.type}-picker cmp-order-title title`}>
-                                                        {/* Nur der Titel ist der Griff zum Umsortieren — sonst wuerde
-                                                            der Breiten-Greifer gleichzeitig einen Spaltenzug ausloesen. */}
+                                                        {/* Only the title is the handle for reordering — otherwise
+                                                            the width grabber would trigger a column drag at the same time. */}
                                                         <span className='col-drag' {...provided.dragHandleProps}>
                                                             <TitleGroupPreview column={column} group={group} board={board}
                                                                 onRename={onRenameColumn} />
                                                         </span>
                                                         <span
                                                             className={`col-resizer${resizing?.id === column.id ? ' is-active' : ''}`}
-                                                            title='Breite ziehen'
+                                                            title={t('column.dragWidth')}
                                                             onMouseDown={ev => onStartResize(ev, column)} />
                                                     </li>
                                                 )}
@@ -267,7 +266,7 @@ export function GroupPreview ({ group, board, idx }) {
                                                 <input type="text"
                                                     name="title"
                                                     value={taskToEdit.title}
-                                                    placeholder="+ Task hinzufügen"
+                                                    placeholder={t('task.add')}
                                                     onChange={handleChange}
                                                     onBlur={onAddTask} />
                                             </form>

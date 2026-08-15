@@ -3,6 +3,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Bar, Doughnut, Pie } from 'react-chartjs-2';
 import { BiDotsHorizontalRounded } from 'react-icons/bi';
 import { setDynamicModalObj } from '../../store/board.actions';
+import { t } from '../../i18n'
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 
@@ -23,9 +24,9 @@ export function LabelChart ({ board, dynamicModalObj }) {
       }
 
       /**
-       * Labels haengen seit der Umstellung an der Spalte, nicht mehr am Board.
-       * Fuer die Auswertung werden die Listen aller Status- und
-       * Prioritaets-Spalten zusammengefasst; gleiche Titel zaehlen zusammen.
+       * Since the switch, labels hang off the column, not off the board.
+       * For the evaluation the lists of all status and priority columns are
+       * merged; identical titles count together.
        */
       function getLabelColumns() {
         return (board.columns || []).filter(c => c.type === 'status' || c.type === 'priority')
@@ -39,7 +40,7 @@ export function LabelChart ({ board, dynamicModalObj }) {
             seen.set(label.title, label)
           }
         }
-        // Rueckfall fuer Boards, die noch keine spaltenweisen Listen haben.
+        // Fallback for boards that do not have per-column lists yet.
         if (!seen.size) {
           for (const label of (board.labels || [])) {
             if (label && !seen.has(label.title)) seen.set(label.title, label)
@@ -92,7 +93,7 @@ export function LabelChart ({ board, dynamicModalObj }) {
         <section className='label-chart'>
           <div className='chart-header'>
             <div className='header-content'>
-              <h2>Diagramm: Labels</h2>
+              <h2>{t('chart.labels')}</h2>
               <span className='icon-container' ref={elModalBtn} onClick={onToggleTypeModal}>
                 <BiDotsHorizontalRounded />
               </span>

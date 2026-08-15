@@ -9,6 +9,7 @@ import { VscTriangleUp } from 'react-icons/vsc'
 import { CiSearch } from 'react-icons/ci'
 import { CgClose } from 'react-icons/cg'
 import { GUEST_IMG } from '../../services/avatar'
+import { t } from '../../i18n'
 
 export function ModalMemberInvite({ board, setIsInviteModalOpen }) {
     const [filter, setFilter] = useState({ txt: '' })
@@ -24,9 +25,9 @@ export function ModalMemberInvite({ board, setIsInviteModalOpen }) {
     async function onRemoveMember(removeMemberId) {
         const m = board.members.find(x => x._id === removeMemberId)
         const ok = await confirmDelete({
-            was: m?.fullname ? `${m.fullname}` : 'Dieses Mitglied',
-            hinweis: 'Die Person verliert den Zugriff auf das Board und wird aus allen Tasks ausgetragen.',
-            knopf: 'Entfernen',
+            what: m?.fullname ? `${m.fullname}` : t('member.thisMember'),
+            note: t('member.removeNote'),
+            button: t('common.remove'),
         })
         if (!ok) return
         try {
@@ -87,14 +88,14 @@ export function ModalMemberInvite({ board, setIsInviteModalOpen }) {
                 {canManage && <div className="outTaskMembers">
                     <form className="search-div flex space-between" onSubmit={onSubmit}>
                         <input type="text"
-                            placeholder="Namen suchen"
+                            placeholder={t('member.search')}
                             name="txt"
                             value={filter.txt}
                             onChange={handleChange}
                         />
                         <button className="icon-container"><CiSearch className="icon" /></button>
                     </form>
-                    <span>Vorschläge</span>
+                    <span>{t('member.suggestions')}</span>
                     {outBoardMembers.length > 0 && <ul className="out-member-list">
                         {
                             outBoardMembers.map(member => {

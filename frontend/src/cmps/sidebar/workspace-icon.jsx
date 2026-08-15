@@ -1,8 +1,8 @@
 import React from 'react'
 
 /**
- * Symbol fuer "Workspaces". Bewusst ein Haus statt des fruehreren monday-Logos —
- * erbt die Farbe der Seitenleiste ueber currentColor.
+ * Icon for "workspaces". Deliberately a house rather than the former monday
+ * logo — inherits the colour of the sidebar through currentColor.
  */
 export default function WorkspaceIcon () {
     return (

@@ -47,7 +47,7 @@ export const boardService = {
 
 const sid = v => (v === undefined || v === null) ? '' : String(v)
 
-/** Owner-Liste eines Boards, mit Rueckfall auf das alte Einzelfeld ownerId. */
+/** Owner list of a board, with a fallback to the old single field ownerId. */
 function ownerIdsOf(board) {
     if (!board) return []
     if (Array.isArray(board.ownerIds)) return board.ownerIds.map(sid)
@@ -60,7 +60,7 @@ function isBoardOwner(board, user) {
     return ownerIdsOf(board).includes(sid(user._id))
 }
 
-/** Mitglieder und Owner aendern duerfen nur Board-Owner und Admins. */
+/** Only board owners and admins may change members and owners. */
 function canManageMembers(board, user) {
     if (!user) return false
     if (user.isAdmin) return true
@@ -73,11 +73,11 @@ function query(filter = getDefaultFilterBoards()) {
 }
 
 /**
- * Gefilterte Sicht auf ein Board.
+ * Filtered view of a board.
  *
- * Ohne aktiven Filter nur eine flache Kopie. Mit Filter wird tief kopiert:
- * frueher wurde hier group.tasks des ECHTEN Boards ueberschrieben, damit
- * verschwanden Tasks auch aus dem Original.
+ * With no active filter just a shallow copy. With a filter it is deep-copied:
+ * this used to overwrite group.tasks of the REAL board, so tasks vanished
+ * from the original as well.
  */
 function getFilteredBoard(board, filterBy = getDefaultFilterBoard()) {
     if (!board) return board
@@ -86,8 +86,8 @@ function getFilteredBoard(board, filterBy = getDefaultFilterBoard()) {
 
     const filteredBoard = structuredClone(board)
     if (f.title) {
-        // Wie gehabt: die Gruppenliste bleibt vollstaendig, nur in Gruppen mit
-        // passendem Titel werden die Tasks eingeschraenkt.
+        // As before: the group list stays complete, only in groups with a
+        // matching title are the tasks narrowed down.
         const regex = new RegExp(f.title, 'i')
         ;(filteredBoard.groups || []).filter(group => regex.test(group.title)).forEach(group => {
             group.tasks = (group.tasks || []).filter(task => regex.test(task.title))
@@ -123,17 +123,17 @@ function updateGroup(boardId, group) {
 }
 
 /* ======================================================================
- * Gezielte Schreibvorgaenge
+ * Targeted writes
  *
- * `save(board)` schreibt das GANZE Board. Arbeiten zwei Leute gleichzeitig
- * am selben Board, gewinnt der letzte Schreibvorgang und alles dazwischen
- * ist weg. Die Funktionen hier schicken nur das, was sich wirklich
- * geaendert hat, und bekommen das frische Board zurueck.
+ * `save(board)` writes the WHOLE board. If two people work on the same board
+ * at the same time, the last write wins and everything in between is gone.
+ * The functions here send only what has really changed, and get the fresh
+ * board back.
  *
- * Rueckgabe ist immer das komplette, aktuelle Board vom Server.
+ * The return value is always the complete, current board from the server.
  * ==================================================================== */
 
-/** Kopf-Daten des Boards: title, description, folder, isStarred, labels ... */
+/** Header data of the board: title, description, folder, isStarred, labels ... */
 function updateMeta(boardId, patch) {
     return httpService.patch(`${BASE_URL}${boardId}`, patch)
 }
@@ -150,18 +150,18 @@ function setOwners(boardId, ownerIds) {
     return httpService.put(`${BASE_URL}${boardId}/owners`, { ownerIds })
 }
 
-/** index === null haengt die Gruppe hinten an. */
+/** index === null appends the group at the end. */
 function addGroup(boardId, group, index = null) {
     return httpService.post(`${BASE_URL}${boardId}/group`, { group, index })
 }
 
-/** Nur einzelne Felder der Gruppe (Titel, Farbe) — Tasks bleiben unberuehrt. */
+/** Only single fields of the group (title, color) — tasks stay untouched. */
 function patchGroup(boardId, groupId, patch) {
     return httpService.patch(`${BASE_URL}${boardId}/group/${groupId}`, patch)
 }
 
-/** Ganze Gruppe inkl. Tasks ersetzen. Nur benutzen, wenn sich mehrere Tasks
- *  einer Gruppe gleichzeitig aendern — sonst ist patchTask das Richtige. */
+/** Replace a whole group including its tasks. Only use this when several tasks
+ *  of one group change at the same time — otherwise patchTask is the right one. */
 function replaceGroup(boardId, groupId, group) {
     return httpService.put(`${BASE_URL}${boardId}/group/${groupId}`, { group })
 }
@@ -178,9 +178,9 @@ function addTask(boardId, groupId, task, index = null) {
     return httpService.post(`${BASE_URL}${boardId}/group/${groupId}/task`, { task, index })
 }
 
-/** Der haeufigste Schreibvorgang: einzelne Felder eines Tasks.
- *  Zwei Leute koennen so gleichzeitig verschiedene Spalten desselben
- *  Tasks aendern, ohne sich zu ueberschreiben. */
+/** The most common write: single fields of a task.
+ *  This way two people can change different columns of the same task at
+ *  the same time without overwriting each other. */
 function patchTask(boardId, groupId, taskId, patch) {
     return httpService.patch(`${BASE_URL}${boardId}/group/${groupId}/task/${taskId}`, patch)
 }
@@ -261,8 +261,8 @@ function getEmptyComment() {
             "fullname": "Guest",
             "imgUrl": GUEST_IMG
         },
-        // null = eigenstaendiges Update, sonst die Id des Updates, auf das
-        // geantwortet wird. Bewusst nur eine Ebene tief.
+        // null = standalone update, otherwise the id of the update being
+        // replied to. Deliberately only one level deep.
         "parentId": null,
         "txt": "",
         "attachments": [],
@@ -288,9 +288,9 @@ function getEmptyActivity() {
             "id": "c101",
             "title": "Replace Logo"
         },
-        // null, nicht {}: from/to sind je nach Aktion Text, Zahl oder Label.
-        // Ein leeres Objekt landete frueher in der Datenbank und liess die
-        // Verlaufsanzeige beim Rendern auflaufen.
+        // null, not {}: from/to are text, number or label depending on the action.
+        // An empty object used to end up in the database and made the
+        // history view blow up while rendering.
         "from": null,
         "to": null
     }

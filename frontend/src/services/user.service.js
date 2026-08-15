@@ -38,12 +38,12 @@ async function update({user}) {
     return httpService.post(BASE_URL, user)
 }
 
-/** Nur fuer Admins: neuen Benutzer anlegen. */
+/** Admins only: create a new user. */
 function create(user) {
     return httpService.post(BASE_URL, user)
 }
 
-/** Nur fuer Admins: Admin-Flag setzen oder entziehen. */
+/** Admins only: grant or revoke the admin flag. */
 function setAdmin(userId, isAdmin) {
     return httpService.put(BASE_URL + userId, { isAdmin })
 }

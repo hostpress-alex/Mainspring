@@ -9,6 +9,7 @@ import { MdKeyboardArrowLeft } from 'react-icons/md'
 import WorkspaceBoard from './workspace/workspace-board'
 import { useCallback } from 'react'
 import { Tooltip } from '@mui/material'
+import { t } from '../../i18n'
 
 export function WorkspaceSidebar ({ workspaceDisplay, setIsCreateModalOpen, setIsWorkspaceOpen, isWorkspaceOpen, setWorkspaceDisplay }) {
     const [filterByToEdit, setFilterByToEdit] = useState(boardService.getDefaultFilterBoards())
@@ -29,7 +30,7 @@ export function WorkspaceSidebar ({ workspaceDisplay, setIsCreateModalOpen, setI
 
     return (
         <section className={`workspace-sidebar ${isWorkspaceOpen ? 'open' : 'close'}`}>
-            <Tooltip title={isWorkspaceOpen ? 'Navigation schließen' : 'Navigation öffnen'} arrow>
+            <Tooltip title={isWorkspaceOpen ? t('nav.collapse') : t('nav.expand')} arrow>
                 <div onClick={onToggleWorkspace} className='toggle-workspace '>
                     {isWorkspaceOpen && <MdKeyboardArrowLeft />}
                     {!isWorkspaceOpen && <MdKeyboardArrowRight />}

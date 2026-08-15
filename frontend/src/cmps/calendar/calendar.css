@@ -1,5 +1,5 @@
-/* Kalender — eigenstaendiges Stylesheet, bewusst nicht in der SCSS-Kette,
-   damit es nicht von den globalen Altlasten ueberschrieben wird. */
+/* Calendar — a stylesheet of its own, deliberately not in the SCSS chain, so
+   that the global legacy rules do not overwrite it. */
 
 .cal {
     --cal-border: #e0e3ee;
@@ -128,7 +128,7 @@
 .cal-event.is-continues-before { border-top-left-radius: 0; border-top-right-radius: 0; }
 .cal-event.is-continues-after { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 
-/* Entwurf beim Ziehen im leeren Raster */
+/* Draft while dragging in the empty grid */
 .cal-draft {
     position: absolute; left: 2px; right: 2px; border-radius: 6px;
     background: rgba(0,115,234,.28); border: 1px dashed var(--cal-accent);

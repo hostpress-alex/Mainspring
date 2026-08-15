@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { uploadService } from '../../services/upload.service'
 import { GUEST_IMG } from '../../services/avatar'
+import { t } from '../../i18n'
 export function ImgUploader({ onUploaded = null }) {
   const [imgData, setImgData] = useState({
     imgUrl: null,
@@ -18,8 +19,8 @@ export function ImgUploader({ onUploaded = null }) {
   }
 
   function getUploadLabel() {
-    if (imgData.imgUrl) return 'Upload Another?'
-    return isUploading ? 'Uploading....' : 'Profilbild hochladen'
+    if (imgData.imgUrl) return t('profile.replacePicture')
+    return isUploading ? t('update.uploading') : t('profile.uploadPicture')
   }
 
   // TODO: fix all

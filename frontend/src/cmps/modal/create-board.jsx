@@ -2,6 +2,7 @@ import { useState } from "react";
 import { boardService } from "../../services/board.service";
 import { loadBoards, saveBoard } from "../../store/board.actions";
 import { AiOutlineClose } from "react-icons/ai";
+import { t } from '../../i18n'
 
 export function CreateBoard({ setIsModalOpen }) {
     const[board, setBoard] = useState(boardService.getEmptyBoard())
@@ -27,8 +28,8 @@ export function CreateBoard({ setIsModalOpen }) {
             <div className="close" onClick={() => setIsModalOpen(false)}>
                 <AiOutlineClose className="icon" />
             </div>
-            <h1>Board anlegen</h1>
-            <h3>Board-Name</h3>
+            <h1>{t('board.create')}</h1>
+            <h3>{t('board.name')}</h3>
             <form onSubmit={onAddBoard}>
                 <input  type="text"
                         name="title"

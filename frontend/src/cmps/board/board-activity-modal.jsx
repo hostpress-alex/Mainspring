@@ -6,6 +6,7 @@ import { toggleModal, updateTaskAction } from "../../store/board.actions"
 import { ActivityPreview } from "../activity-preview"
 import { LastViewed } from "../last-viewed"
 import { CommentPreview } from "../task/comment-preview"
+import { t } from '../../i18n'
 
 export function BoardActivityModal({ board, activityLog }) {
     const navigate = useNavigate()
@@ -58,11 +59,11 @@ export function BoardActivityModal({ board, activityLog }) {
         <section className="board-activity-modal">
             <div className="board-activity-header">
                     <CgClose className="close-btn" onClick={onCloseModal} />
-                    <h3 className="board-title">{board.title} <span>Verlauf</span></h3>
+                    <h3 className="board-title">{board.title} <span>{t('activity.activity')}</span></h3>
                     <div className="views flex">
-                    <span className={view === 'activity' ? 'active' : ''} onClick={() => setView('activity')}>Verlauf</span>
-                        <span className={view === 'last-viewed' ? 'active' : ''} onClick={() => setView('last-viewed')}>Zuletzt geöffnet</span>
-                        <span className={view === 'updates' ? 'active' : ''} onClick={() => setView('updates')}>Updates</span>
+                    <span className={view === 'activity' ? 'active' : ''} onClick={() => setView('activity')}>{t('activity.activity')}</span>
+                        <span className={view === 'last-viewed' ? 'active' : ''} onClick={() => setView('last-viewed')}>{t('activity.lastSeen')}</span>
+                        <span className={view === 'updates' ? 'active' : ''} onClick={() => setView('updates')}>{t('update.updates')}</span>
                     </div>
             </div>
             <div className="board-activity-content">
@@ -74,8 +75,8 @@ export function BoardActivityModal({ board, activityLog }) {
                 {view === 'last-viewed' &&
                     <section className="last-viewed">
                         <div className="title flex space-between">
-                            <span>Name</span>
-                            <span>Zuletzt geöffnet</span>
+                            <span>{t('common.name')}</span>
+                            <span>{t('activity.lastSeen')}</span>
                         </div>
 
                         {board.members.map(member => {

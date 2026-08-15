@@ -11,27 +11,99 @@ permission model are not.
 
 ## Running it
 
-You need two processes.
+Once, to install everything:
 
 ```bash
-cd backend
-npm install
-npm start          # http://127.0.0.1:3030
+npm install        # project root, for the wrapper
+npm run setup      # installs backend/ and frontend/
 ```
+
+Then, every day:
 
 ```bash
-cd frontend
-npm install
-npm start          # http://localhost:3000
+npm run dev
 ```
 
-Then open http://localhost:3000. Vite proxies `/api` and `/socket.io` to port
-3030 so the browser only ever talks to one origin. That saves us CORS
-exceptions and cross-site cookie problems, and relative paths behave the same
-in dev as in production.
+That starts both halves and prefixes their output with `api` and `web`. Open
+http://localhost:3000.
+
+It is also the restart. Before starting, `predev` clears anything still
+holding 3000, 3001 or 3030 and waits until the ports are actually free —
+killing is asynchronous, and binding a port half a second after the SIGTERM
+gets you the `EADDRINUSE` you were trying to avoid. So you never have to stop
+the old run first; just run it again.
+
+One thing that surprises people: if the backend throws, the frontend keeps
+running. Nodemon catches the crash and waits for you to fix the file, so from
+`concurrently`'s point of view the process never died and `--kill-others`
+never fires. That is the behaviour you want — fix the file and it restarts by
+itself — but the api pane will be sitting on a stack trace while the page
+still loads. Read the `api` lines, not the browser.
+
+They are two processes in development and that is deliberate. Vite's dev
+server is what gives you hot reload: it pushes a changed component into the
+running page without a refresh, and compiles JSX and Sass on the way through.
+Express handing out files cannot do any of that. In production there is
+nothing left to compile, so the built frontend is static files and the Node
+process serves them itself — one process there, two here.
+
+To run them apart, when one is misbehaving and you want its output on its own:
+
+```bash
+cd backend  && npm start     # http://127.0.0.1:3030
+cd frontend && npm start     # http://localhost:3000
+```
+
+Vite proxies `/api` and `/socket.io` to port 3030 so the browser only ever
+talks to one origin. That saves us CORS exceptions and cross-site cookie
+problems, and relative paths behave the same in dev as in production.
+
+### When a port is stuck
+
+`npm run dev` clears the ports by itself, so this should be rare. To stop
+everything without starting it again:
+
+```bash
+npm run stop
+```
+
+That is `scripts/stop-ports.sh`. It works in three steps because there are
+three different reasons a process will not go away, and only the last one
+calls for force:
+
+1. **TERM**, and its parent too when the parent is one of our supervisors.
+   Killing only the listener is pointless when nodemon or concurrently is
+   sitting above it handing you a fresh one.
+2. **CONT then TERM**, for a process someone suspended with Ctrl-Z. A stopped
+   process does not get to handle TERM until it runs again, so it looks like
+   it is ignoring the signal.
+3. **KILL**, which cannot be caught or deferred.
+
+Between the steps it waits for the ports to be free *and stay* free — a
+supervisor respawning leaves a gap of a few hundred milliseconds, and checking
+once lands right in it and reports success just before the collision.
+
+If it still fails it prints who is holding the port with the STAT column, and
+`Z` there means a zombie: already dead, waiting to be collected by its parent.
+You cannot kill those and they hold no ports, so if one turns up, whatever is
+on the port is something else.
+
+Find processes **by port, never by name**. `pkill -f vite` matches its own
+command line and kills the shell you typed it into, and `pkill -x node` takes
+down everything else you have running, which on this machine included the
+Claude device bridge.
+
+Plain `kill` sends TERM and lets the process shut down; `kill -9` skips that,
+so the database pool never closes cleanly. Only reach for it when TERM is
+ignored.
+
+Watch for `Port 3000 is in use, trying another one...` in the `web` output.
+Vite moves to 3001 rather than failing, so everything works and you spend ten
+minutes wondering why your change is not showing — you are looking at the tab
+on 3000, served by last session's leftover process.
 
 By default the server expects a local MongoDB. If you want MariaDB instead,
-read [DATENBANK.md](DATENBANK.md). It also covers moving existing data over.
+read [DATABASE.md](DATABASE.md). It also covers moving existing data over.
 
 You'll need an account before anything is useful:
 
@@ -52,9 +124,15 @@ cd frontend && npm run build
 cd ../backend && npm run server:prod:mac
 ```
 
-One catch: `backend/public` still holds an old react-scripts build from before
-we moved to Vite. No calendar, no admin page, no route guards, no
-translations. Replace it before you deploy anything.
+The server looks for the build in `backend/public`, which is gitignored. It's
+output, not source. Until recently a react-scripts build from before the Vite
+move was committed there instead: 19.6 MB, 17 of them a sourcemap for code
+that no longer existed, and it was what production actually served.
+
+One step is still open. Vite writes to `frontend/build`, so a build doesn't
+land where the server looks for it. Either point `outDir` at
+`../backend/public` in `frontend/vite.config.js`, or copy the folder across by
+hand after building.
 
 ## Configuration
 
@@ -186,8 +264,6 @@ threaded comments, translations.
 ## Rough edges
 
 Listed here because they're easier to find in a README than in the code.
-
-`backend/public` is a stale build, see above.
 
 The login rate limit lives in memory. A restart clears it and a second process
 would count separately. Fine for us, not fine for anything public.

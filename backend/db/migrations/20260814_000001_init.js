@@ -1,14 +1,14 @@
 /**
- * Ausgangsschema.
+ * Initial schema.
  *
- * Leitgedanke: alles, wonach man sucht, sortiert oder filtert, ist eine echte
- * Spalte. Nur die Werte der frei konfigurierbaren Board-Spalten (Status,
- * Prioritaet, Datum, eigene Text- und Zahlenspalten) liegen zusammen in
- * task.col_values als JSON — sonst braeuchte jede neue Spaltenart eine
- * Schema-Aenderung.
+ * Guiding idea: everything you search, sort or filter by is a real column.
+ * Only the values of the freely configurable board columns (status,
+ * priority, date, custom text and number columns) sit together in
+ * task.col_values as JSON — otherwise every new kind of column would need a
+ * schema change.
  *
- * Personen-Zuweisungen liegen bewusst NICHT im JSON, sondern in task_member:
- * "welche Tasks hat Person X" ist eine Abfrage, die man wirklich braucht.
+ * People assignments are deliberately NOT in the JSON but in task_member:
+ * "which tasks does person X have" is a query you really do need.
  */
 exports.up = async function up(knex) {
     await knex.schema.createTable('user', t => {
@@ -27,8 +27,8 @@ exports.up = async function up(knex) {
         t.text('description')
         t.string('folder', 190).notNullable().defaultTo('')
         t.boolean('is_starred').notNullable().defaultTo(false)
-        // Ersteller: Verweis plus Namenskopie, damit die Anzeige auch nach dem
-        // Loeschen des Benutzers noch etwas Sinnvolles zeigt.
+        // Creator: a reference plus a copy of the name, so the display still
+        // shows something sensible after the user is deleted.
         t.string('created_by_id', 24).nullable()
         t.string('created_by_name', 190).notNullable().defaultTo('')
         t.string('created_by_img', 500).notNullable().defaultTo('')
@@ -45,7 +45,7 @@ exports.up = async function up(knex) {
         t.string('user_id', 24).notNullable()
         t.boolean('is_owner').notNullable().defaultTo(false)
         t.integer('position').notNullable().defaultTo(0)
-        // Kopie aus dem Moment der Einladung — Rueckfall fuer geloeschte Benutzer.
+        // Copy from the moment of the invite — fallback for deleted users.
         t.string('fullname', 190).notNullable().defaultTo('')
         t.string('img_url', 500).notNullable().defaultTo('')
         t.primary(['board_id', 'user_id'])
@@ -59,7 +59,7 @@ exports.up = async function up(knex) {
         t.integer('position').notNullable().defaultTo(0)
         t.string('type', 40).notNullable().defaultTo('text')
         t.string('title', 190).notNullable().defaultTo('')
-        // Unter welchem Schluessel der Wert in task.col_values liegt.
+        // Under which key the value sits in task.col_values.
         t.string('field', 80).notNullable().defaultTo('')
         t.json('settings')
         t.primary(['board_id', 'id'])
@@ -83,7 +83,7 @@ exports.up = async function up(knex) {
         t.string('group_id', 40).notNullable()
         t.integer('position').notNullable().defaultTo(0)
         t.text('title')
-        // Werte der Board-Spalten: { "status": "l101", "dueDate": "...", "c_ab12cd34": 7 }
+        // Values of the board columns: { "status": "l101", "dueDate": "...", "c_ab12cd34": 7 }
         t.json('col_values')
         t.bigInteger('updated_at').nullable()
         t.string('updated_by_id', 24).nullable()
@@ -149,7 +149,7 @@ exports.up = async function up(knex) {
         t.string('note', 500).notNullable().defaultTo('')
         t.datetime('created_at').nullable()
         t.datetime('updated_at').nullable()
-        // Wird ein Board geloescht, verschwinden auch die Planungen dazu.
+        // If a board is deleted, the schedule entries for it go as well.
         t.foreign('board_id').references('board.id').onDelete('CASCADE')
         t.index(['user_id', 'start_at'], 'idx_schedule_user_time')
     })

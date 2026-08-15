@@ -2,9 +2,9 @@ export function StatisticGroup({ column, group, board }) {
     const cmpType = column?.type
     const field = column?.field || column?.id
     function getStatisticsStatus(cmp) {
-        // Labels werden ueber den TITEL gematcht, nicht ueber die id.
-        // Ein Task mit unbekanntem Status lieferte hier undefined und riss
-        // ohne Error Boundary den kompletten React-Baum ab.
+        // Labels are matched by TITLE, not by id.
+        // A task with an unknown status returned undefined here and tore down
+        // the entire React tree without an error boundary.
         const source = Array.isArray(column?.labels) ? column.labels : (board.labels || [])
         const labels = group.tasks
             .map(task => source.find(label => label.title === task[cmp]))

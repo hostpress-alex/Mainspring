@@ -1,10 +1,10 @@
 /*
- * Antworten auf ein Update.
+ * Replies to an update.
  *
- * Die Selektoren sind bewusst unter .comments-list gehaengt: dort gilt
- * `li { border: 1px solid …; padding: 16px; margin-bottom: 16px }` fuer die
- * Updates. Ohne hoehere Spezifitaet baekommt jede Antwort denselben Rahmen und
- * saehe aus wie ein eigenstaendiges Update.
+ * The selectors deliberately hang under .comments-list: there
+ * `li { border: 1px solid …; padding: 16px; margin-bottom: 16px }` applies to
+ * the updates. Without higher specificity every reply gets the same frame and
+ * would look like an update in its own right.
  */
 .comment-replies {
     margin-top: 10px;
@@ -18,7 +18,7 @@
     padding: 0;
 }
 
-/* Der Reset gegen die Update-Kachel. */
+/* The reset against the update tile. */
 .comments-list .comment-replies .reply-list > li {
     border: none;
     border-left: 2px solid #e6e9ef;
@@ -36,7 +36,7 @@
     background: transparent;
 }
 
-/* Kleinerer Avatar und ruhigere Kopfzeile als beim Update selbst. */
+/* Smaller avatar and a quieter header than on the update itself. */
 .comments-list .comment-replies .comment-preview.is-reply .header-comment {
     padding-bottom: 2px;
 }

@@ -6,21 +6,22 @@ import { TaskModal } from "../modal/task-modal"
 import { BoardActivityModal } from "./board-activity-modal"
 import { setModalOpen } from "../../store/board.actions"
 import { loadPanelWidth, savePanelWidth, clampPanelWidth, MIN_PANEL_WIDTH } from "./panel-width"
+import { t } from '../../i18n'
 
 /**
- * Der rechte Dialog haengt allein an der URL.
+ * The right-hand dialog hangs off the URL alone.
  *
- * Vorher: ein separates Flag im Store wurde von jedem Oeffner per
- * `toggleModal(aktuellerZustand)` umgeschaltet, und der Task wurde in einem
- * Effekt mit `[isOpen]` als einziger Abhaengigkeit geladen. Dadurch
- *  - blieb der erste Klick wirkungslos (das Flag kippte, bevor die Route stand),
- *  - und ein Wechsel auf einen anderen Task lud nichts nach, weil sich das Flag
- *    dabei nicht aenderte — man sah weiter den vorherigen Task.
+ * Before: a separate flag in the store was toggled by every opener through
+ * `toggleModal(currentState)`, and the task was loaded in an effect with
+ * `[isOpen]` as its only dependency. Because of that
+ *  - the first click did nothing (the flag flipped before the route was there),
+ *  - and switching to another task loaded nothing, because the flag did not
+ *    change in the process — you kept seeing the previous task.
  *
- * Jetzt wird alles aus den Route-Parametern abgeleitet; das Store-Flag wird nur
- * noch nachgezogen, weil Hintergrund-Abdunklung und Socket-Effekt es lesen.
+ * Now everything is derived from the route parameters; the store flag is only
+ * kept in step because the background dimming and the socket effect read it.
  *
- * Die Breite laesst sich am linken Rand ziehen und bleibt pro Browser gemerkt.
+ * The width can be dragged at the left edge and is remembered per browser.
  */
 export function BoardModal() {
     const { groupId, taskId, activityLog } = useParams()
@@ -40,7 +41,7 @@ export function BoardModal() {
 
     useEffect(() => { setModalOpen(isOpen) }, [isOpen])
 
-    // Wird das Browserfenster kleiner, darf das Panel nicht darueber hinausragen.
+    // If the browser window gets smaller, the panel must not stick out beyond it.
     useEffect(() => {
         function onWindowResize() { setWidth(w => clampPanelWidth(w)) }
         window.addEventListener('resize', onWindowResize)
@@ -55,7 +56,7 @@ export function BoardModal() {
 
     useEffect(() => {
         if (!isResizing) return
-        // Das Panel sitzt rechts: nach links ziehen macht es breiter.
+        // The panel sits on the right: dragging left makes it wider.
         function onMove(ev) {
             setWidth(clampPanelWidth(startRef.current.width + (startRef.current.x - ev.clientX)))
         }
@@ -63,7 +64,7 @@ export function BoardModal() {
             setIsResizing(false)
             setWidth(w => { savePanelWidth(w); return w })
         }
-        // Waehrend des Ziehens nichts markieren und den Zeiger nicht wechseln lassen.
+        // While dragging, select nothing and do not let the cursor change.
         const prevSelect = document.body.style.userSelect
         const prevCursor = document.body.style.cursor
         document.body.style.userSelect = 'none'
@@ -79,7 +80,7 @@ export function BoardModal() {
         }
     }, [isResizing])
 
-    /** Doppelklick auf den Griff: zurueck auf die Grundbreite. */
+    /** Double-click on the handle: back to the base width. */
     function onGrabDoubleClick() {
         const next = clampPanelWidth(640)
         setWidth(next)
@@ -93,7 +94,7 @@ export function BoardModal() {
             {isOpen && (
                 <div className={`board-modal-resizer ${isResizing ? 'is-active' : ''}`}
                     style={{ right: width }}
-                    title="Breite ziehen — Doppelklick setzt zurück"
+                    title={t('panel.width')}
                     onPointerDown={onGrabStart}
                     onDoubleClick={onGrabDoubleClick} />
             )}

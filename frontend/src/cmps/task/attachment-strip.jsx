@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { t } from '../../i18n'
 
 const S = {
     strip: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 },
@@ -20,8 +21,8 @@ function prettySize (bytes) {
 }
 
 /**
- * Zeigt Anhaenge eines Updates. Mit onRemove erscheinen Loeschen-Buttons —
- * so wird derselbe Strip fuer den Entwurf und fuer gespeicherte Updates benutzt.
+ * Shows the attachments of an update. With onRemove, delete buttons appear —
+ * that way the same strip serves both the draft and saved updates.
  */
 export function AttachmentStrip ({ attachments = [], onRemove = null }) {
     const [lightbox, setLightbox] = useState(null)
@@ -35,17 +36,17 @@ export function AttachmentStrip ({ attachments = [], onRemove = null }) {
                         <img src={a.url} alt={a.name || ''} title={a.name || ''} style={S.thumb}
                             onClick={() => setLightbox(a)} />
                         {onRemove && (
-                            <button type='button' style={S.remove} title='Entfernen'
+                            <button type='button' style={S.remove} title={t('common.remove')}
                                 onMouseDown={ev => { ev.preventDefault(); onRemove(a._id) }}>×</button>
                         )}
                     </div>
                 ) : (
                     <a key={a._id} href={a.url} target='_blank' rel='noreferrer' style={S.file}>
-                        <span>{a.name || 'Datei'}</span>
+                        <span>{a.name || t('file.file')}</span>
                         <span style={{ color: '#676879' }}>{prettySize(a.size)}</span>
                         {onRemove && (
                             <button type='button' style={{ ...S.remove, position: 'static', background: '#c3c6d4' }}
-                                title='Entfernen'
+                                title={t('common.remove')}
                                 onMouseDown={ev => { ev.preventDefault(); ev.stopPropagation(); onRemove(a._id) }}>×</button>
                         )}
                     </a>

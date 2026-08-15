@@ -10,10 +10,11 @@ import { IoCloseOutline } from "react-icons/io5"
 import { BsArrowRightCircle } from "react-icons/bs"
 import { BsFillCircleFill } from 'react-icons/bs'
 import _ from 'lodash'
+import { t } from '../../i18n'
 
 export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMainCheckbox }) {
-    // Fuer das Verschieben bewusst das UNgefilterte Board aus dem Store: wird
-    // ein gefiltertes Board gespeichert, verschwinden ausgeblendete Tasks.
+    // For moving, deliberately the UNfiltered board from the store: if a
+    // filtered board is saved, hidden tasks disappear.
     const fullBoard = useSelector(storeState => storeState.boardModule.board) || board
     const [isMoveOpen, setIsMoveOpen] = useState(false)
     const elMove = useRef()
@@ -28,13 +29,13 @@ export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMai
 
     async function onRemoveTasks() {
         const ok = await confirmDelete({
-            was: tasks.length === 1 ? 'Der markierte Task' : `${tasks.length} markierte Tasks`,
-            knopf: tasks.length === 1 ? 'Task löschen' : 'Tasks löschen',
+            what: t('task.selectedCount', { n: tasks.length }),
+            button: tasks.length === 1 ? t('task.delete') : t('task.deleteMany'),
         })
         if (!ok) return
         try {
-            // Bewusst EIN Aufruf mit dem Endstand: die Schleife von frueher
-            // schickte mehrere Aenderungen los, die alle vom selben veralteten
+            // Deliberately ONE call with the final state: the loop this used to be
+            // fired off several changes that all started from the same stale
             // Stand ausgingen.
             const ids = new Set(tasks.map(task => task.id))
             await updateGroupAction(board, {
@@ -57,20 +58,20 @@ export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMai
     }
 
     /**
-     * Verschiebt die markierten Tasks in eine andere Gruppe desselben Boards.
-     * Jeder Task wird einzeln verschoben — der Server haengt ihn hinten an
-     * die Zielgruppe und nimmt ihn aus der Quellgruppe heraus.
+     * Moves the selected tasks into another group of the same board. Each task
+     * is moved on its own — the server appends it to the target group and
+     * takes it out of the source group.
      */
     async function onMoveTo(targetGroupId) {
         setIsMoveOpen(false)
         try {
-            const taskIds = tasks.map(t => t.id)
+            const taskIds = tasks.map(task => task.id)
             if (!taskIds.length) return
             await moveTasksToGroup(fullBoard._id, taskIds, group.id, targetGroupId)
             loadBoard(fullBoard._id)
             reset()
         } catch (err) {
-            console.log('Verschieben fehlgeschlagen', err)
+            console.log('moving a task failed', err)
         }
     }
 
@@ -89,7 +90,7 @@ export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMai
                 </div>
                 <div className="tasks-container flex">
                     <div className="task-info flex">
-                        <span>Task ausgewählt</span>
+                        <span>{t('task.selectedLabel', { n: tasks.length })}</span>
                         <div className="group-color flex">
                             {_.times(tasks.length, () => <BsFillCircleFill key={_.uniqueId('KEY_')} className="icon" style={{ color: group.color }} />)}
                         </div>
@@ -97,15 +98,15 @@ export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMai
                     <div className="task-btns flex">
                         <div onClick={onDuplicateTasks}>
                             <HiOutlineDocumentDuplicate className="icon" />
-                            Duplicate
+                            {t('common.duplicate')}
                         </div>
                         <div onClick={onRemoveTasks}>
                             <FiTrash className="icon" />
-                            Delete
+                            {t('common.delete')}
                         </div>
                         <div ref={elMove} style={{ position: 'relative' }}
                             onClick={() => targets.length && setIsMoveOpen(open => !open)}
-                            title={targets.length ? 'In eine andere Gruppe verschieben' : 'Es gibt keine andere Gruppe'}
+                            title={targets.length ? t('task.moveToTitle') : t('task.noOtherGroup')}
                             className={targets.length ? '' : 'is-disabled'}>
                             <BsArrowRightCircle className="icon" />
                             Move to
@@ -116,7 +117,7 @@ export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMai
                                     boxShadow: '0 6px 22px rgba(0,0,0,.25)', padding: 6, listStyle: 'none',
                                     maxHeight: 260, overflow: 'auto', textAlign: 'left',
                                 }} onClick={ev => ev.stopPropagation()}>
-                                    <li style={{ padding: '4px 10px', fontSize: 12, color: '#676879' }}>Verschieben nach</li>
+                                    <li style={{ padding: '4px 10px', fontSize: 12, color: '#676879' }}>{t('task.moveTo')}</li>
                                     {targets.map(g => (
                                         <li key={g.id}
                                             onClick={() => onMoveTo(g.id)}

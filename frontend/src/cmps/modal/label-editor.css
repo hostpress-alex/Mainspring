@@ -1,7 +1,7 @@
 /*
- * Der Editor haengt in .dynamic-modal, wo je nach Popup-Typ eigene Regeln
- * gelten. Deshalb setzt er alles, worauf er sich verlaesst, selbst — und
- * benutzt durchgaengig eigene Klassennamen statt nackter Elemente.
+ * The editor hangs inside .dynamic-modal, where different rules apply
+ * depending on the type of popup. So it sets everything it relies on itself —
+ * and uses class names of its own throughout rather than bare elements.
  */
 .label-editor {
     width: 296px;
@@ -33,8 +33,8 @@
     white-space: nowrap;
 }
 
-/* Scrollen passiert hier, nicht auf der Liste — so kann die Farbpalette
-   mitwachsen, ohne abgeschnitten zu werden. */
+/* Scrolling happens here, not on the list — that way the colour palette can
+   grow with it without being cut off. */
 .label-editor-scroll {
     max-height: 300px;
     overflow-y: auto;

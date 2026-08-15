@@ -1,15 +1,15 @@
 /**
- * Legt einen Admin an oder hebt einen bestehenden Benutzer zum Admin hoch.
+ * Creates an admin or lifts an existing user to admin.
  *
  *   ADMIN_USER=alex ADMIN_PASS='...' ADMIN_NAME='Alex Neumann' npm run seed:admin
  *
- * Das Passwort wird nur als bcrypt-Hash gespeichert und taucht weder im Code
- * noch in der Datenbank im Klartext auf. Bei einem bestehenden Benutzer wird
- * das Passwort ueberschrieben — damit ist das Skript auch der Reset-Weg.
+ * The password is only stored as a bcrypt hash and shows up neither in the
+ * code nor in the database in clear text. For an existing user the password is
+ * overwritten — so the script is also the reset path.
  *
- * Schreibt in die Datenbank, die DB_DRIVER vorgibt:
- *   npm run seed:admin                     -> was in backend/.env steht
- *   DB_DRIVER=mariadb npm run seed:admin   -> ausdruecklich MariaDB
+ * Writes to the database that DB_DRIVER dictates:
+ *   npm run seed:admin                     -> whatever backend/.env says
+ *   DB_DRIVER=mariadb npm run seed:admin   -> explicitly MariaDB
  */
 const bcrypt = require('bcrypt')
 const config = require('../config')
@@ -54,9 +54,9 @@ async function main() {
     console.log(`  _id=${saved._id}`)
 }
 
-/** Die MariaDB-Verbindung haelt den Prozess sonst offen. */
+/** Otherwise the MariaDB connection keeps the process open. */
 async function closeAll() {
-    try { await require('../db/knex').destroy() } catch (err) { /* kein MariaDB im Spiel */ }
+    try { await require('../db/knex').destroy() } catch (err) { /* no MariaDB involved */ }
 }
 
 main()

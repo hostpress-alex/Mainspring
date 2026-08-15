@@ -84,8 +84,8 @@ export function BoardDetails () {
                 {boardType === 'dashboard' && <Dashboard />}
             </main>
             {isCreateModalOpen && <CreateBoard setIsModalOpen={setIsCreateModalOpen} />}
-            {/* Bewusst ohne den Task-Dialog: das Board bleibt bedienbar und scrollbar,
-                waehrend rechts ein Task offen ist. */}
+            {/* Deliberately without the task dialog: the board stays usable and
+                scrollable while a task is open on the right. */}
             {(isInviteModalOpen || isCreateModalOpen) && <div className='dark-screen'></div>}
             {isShowDescription &&
                 <>

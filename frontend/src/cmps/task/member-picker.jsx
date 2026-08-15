@@ -14,7 +14,7 @@ export function MemberPicker({ info, onUpdate, field = 'memberIds' }) {
     activity.action = 'person'
     activity.task = { id: info.id, title: info.title }
 
-    // getMember liefert undefined, wenn eine memberId nicht mehr im Board ist
+    // getMember returns undefined when a memberId is no longer in the board
     const members = (info[field] || []).map(member => getMember(member)).filter(Boolean)
     const elMemberSection = useRef()
 

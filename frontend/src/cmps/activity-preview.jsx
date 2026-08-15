@@ -9,31 +9,32 @@ import { TbNumbers } from "react-icons/tb"
 import { RxPencil1 } from 'react-icons/rx'
 import statusImg from '../assets/img/status.png'
 import { GUEST_IMG } from '../services/avatar'
+import { t } from '../i18n'
 
 /**
- * Ein Eintrag im Aktivitaetsverlauf.
+ * One entry in the activity log.
  *
- * Die Eintraege kommen aus der Datenbank und sind ueber Jahre in
- * unterschiedlichen Formen entstanden: from/to sind mal ein Label-Objekt, mal
- * eine Zeichenkette, mal eine Zahl, mal gar nichts. React wirft, sobald ein
- * Objekt als Kind gerendert wird — und ohne Error Boundary reisst das die
- * ganze Seite ab (weisse Seite statt Verlauf).
+ * The entries come from the database and have grown over years in various
+ * shapes: from/to is sometimes a label object, sometimes a string, sometimes a
+ * number, sometimes nothing at all. React throws as soon as an object is
+ * rendered as a child — and without an error boundary that tears down the
+ * whole page (a white page instead of the log).
  *
- * Deshalb hier durchgaengig: nichts direkt rendern, was kein Text ist, und
- * keine Eigenschaft ohne Pruefung lesen.
+ * Hence, throughout: render nothing directly that is not text, and read no
+ * property without checking it.
  */
 
-/** Rendert nur, was sich gefahrlos anzeigen laesst. Objekte werden zu ''. */
+/** Renders only what is safe to show. Objects become ''. */
 function text(value) {
     if (value === null || value === undefined) return ''
     if (typeof value === 'string' || typeof value === 'number') return String(value)
     if (typeof value === 'boolean') return value ? 'ja' : 'nein'
-    // Ein Objekt hat hier nichts zu suchen — aber lieber leer als kaputt.
+    // An object has no business here — but better empty than broken.
     if (typeof value === 'object') return String(value.title ?? value.fullname ?? '')
     return ''
 }
 
-/** Farbe nur, wenn es wirklich eine ist. */
+/** A colour only if it really is one. */
 function colorOf(value) {
     return (value && typeof value === 'object' && typeof value.color === 'string') ? value.color : undefined
 }
@@ -42,15 +43,15 @@ function imgOf(value) {
     return (typeof value === 'string' && value) ? value : GUEST_IMG
 }
 
-/** Was in der Zeile steht. Ohne Eintrag bleibt der rohe Name stehen. */
+/** What the line says. Without an entry the raw name stays. */
 const ACTION_LABELS = {
-    status: 'Status',
-    priority: 'Priorität',
-    date: 'Datum',
-    person: 'Person',
-    number: 'Zahl',
-    create: 'angelegt',
-    title: 'Titel',
+    status: t('activity.action.status'),
+    priority: t('activity.action.priority'),
+    date: t('activity.action.date'),
+    person: t('activity.action.person'),
+    number: t('activity.action.number'),
+    create: t('activity.action.create'),
+    title: t('activity.action.title'),
 }
 
 export function ActivityPreview({ activity }) {
@@ -110,9 +111,9 @@ export function ActivityPreview({ activity }) {
                     <IoTimeOutline />
                     <span>{activity.createdAt ? utilService.calculateTime(activity.createdAt) : ''}</span>
                 </div>
-                {/* Frueher stand hier der Task-Name — im Verlauf EINES Tasks
-                    also in jeder Zeile derselbe. Wer etwas getan hat, ist die
-                    nuetzlichere Information. */}
+                {/* This used to show the task name — in the log of ONE task
+                    that means the same name on every line. Who did something
+                    is the more useful piece of information. */}
                 <div className='title flex align-center'>
                     <img src={imgOf(byMember.imgUrl)} alt="" />
                     <span>{text(byMember.fullname)}</span>
@@ -137,7 +138,7 @@ function FromToStatusPriority({ activity }) {
     )
 }
 
-/** Datum nur formatieren, wenn wirklich eins drinsteht. */
+/** Only format a date if there really is one. */
 function asDate(value) {
     if (value === null || value === undefined || value === '') return null
     if (typeof value === 'object') return null

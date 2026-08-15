@@ -5,6 +5,7 @@ import { setDynamicModalObj } from "../../store/board.actions"
 import { CiSearch } from 'react-icons/ci'
 import { VscTriangleUp } from 'react-icons/vsc'
 import { GUEST_IMG } from '../../services/avatar'
+import { t } from '../../i18n'
 
 export function ModalMember({ dynamicModalObj }) {
 
@@ -73,14 +74,14 @@ export function ModalMember({ dynamicModalObj }) {
                 <div className="outTaskMembers">
                     <form className="search-div flex space-between" onSubmit={onSubmit}>
                         <input type="text"
-                            placeholder="Namen suchen"
+                            placeholder={t('member.search')}
                             name="txt"
                             value={filter.txt}
                             onChange={handleChange}
                         />
                         <button className="icon-container"><CiSearch className="icon" /></button>
                     </form>
-                    <span>Vorschläge</span>
+                    <span>{t('member.suggestions')}</span>
                     {outTaskMembers.length > 0 && <ul className="out-member-list">
                         {
                             outTaskMembers.map(taskMember => {

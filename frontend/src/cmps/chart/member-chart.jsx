@@ -4,6 +4,7 @@ import { Bar, Doughnut, Pie } from 'react-chartjs-2';
 import { utilService } from '../../services/util.service';
 import { BiDotsHorizontalRounded } from "react-icons/bi"
 import { setDynamicModalObj } from '../../store/board.actions';
+import { t } from '../../i18n'
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 export function MemberChart ({ board, dynamicModalObj }) {
@@ -61,7 +62,7 @@ export function MemberChart ({ board, dynamicModalObj }) {
         <section className='member-chart'>
             <div className='chart-header'>
               <div className='header-content'>
-                <h2>Diagramm: Personen</h2>
+                <h2>{t('chart.people')}</h2>
                 <span className='icon-container' ref={elModalBtn} onClick={onToggleTypeModal}>
                   <BiDotsHorizontalRounded />
                 </span>

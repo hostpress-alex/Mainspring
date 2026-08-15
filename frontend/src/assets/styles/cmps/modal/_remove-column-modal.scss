@@ -2,8 +2,8 @@
 @use "../../setup/mixins";
 @use "../../setup/variables";
 
-// Das Markup benutzt .remove-column-modal — die alte Klasse .delete-modal
-// stand nur im SCSS und hat nie gegriffen. Deshalb war die Box so gross und
+// The markup uses .remove-column-modal — the old class .delete-modal
+// only existed in the SCSS and never took effect. That is why the box was so big and
 // ohne Zeigerwechsel.
 .remove-column-modal,
 .delete-modal {

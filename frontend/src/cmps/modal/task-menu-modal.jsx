@@ -8,21 +8,22 @@ import { boardService } from "../../services/board.service";
 import { utilService } from "../../services/util.service";
 import { duplicateTask, setDynamicModalObj, toggleModal, updateGroupAction } from "../../store/board.actions";
 import { confirmDelete } from "../confirm-dialog";
+import { t } from '../../i18n'
 
 export function TaskMenuModal({ dynamicModalObj }) {
     const board = useSelector(storeState => storeState.boardModule.filteredBoard)
     const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
     const navigate = useNavigate()
     async function onRemoveTask() {
-        const titel = dynamicModalObj.task?.title
-        if (!await confirmDelete({ was: titel ? `Der Task „${titel}"` : 'Dieser Task' })) return
+        const title = dynamicModalObj.task?.title
+        if (!await confirmDelete({ what: title ? t('task.deleteName', { title }) : t('task.thisTask') })) return
         try {
             const tasksToSave = dynamicModalObj.group.tasks.filter(task => task.id !== dynamicModalObj.task.id)
             const updatedGroup = { ...dynamicModalObj.group, tasks: tasksToSave }
             updateGroupAction(board, updatedGroup)
             setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
         } catch (err) {
-            console.log('Task konnte nicht gelöscht werden', err)
+            console.log('deleting a task failed', err)
         }
     }
 
@@ -59,19 +60,19 @@ export function TaskMenuModal({ dynamicModalObj }) {
         <section className="task-menu-modal">
             <div onClick={onOpenModal}>
                 <TbArrowsDiagonal />
-                <span>Öffnen</span>
+                <span>{t('common.open')}</span>
             </div>
             <div onClick={onDuplicateTask}>
                 <HiOutlineDocumentDuplicate />
-                <span>Duplizieren</span>
+                <span>{t('common.duplicate')}</span>
             </div>
             <div onClick={() => onRemoveTask()}>
                 <FiTrash />
-                <span>Löschen</span>
+                <span>{t('common.delete')}</span>
             </div>
             <div onClick={onCreateNewTaskBelow}>
                 <AiOutlinePlus />
-                <span>Neuen Task darunter</span>
+                <span>{t('task.newBelow')}</span>
             </div>
         </section>
     )

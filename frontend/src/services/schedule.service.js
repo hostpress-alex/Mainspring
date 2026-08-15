@@ -9,7 +9,7 @@ export const scheduleService = {
     tasksFromBoards,
 }
 
-/** Eintraege, die den Zeitraum [from, to) beruehren. */
+/** Entries that touch the period [from, to). */
 function query(from, to) {
     return httpService.get(BASE_URL, { from: from.toISOString(), to: to.toISOString() })
 }
@@ -31,8 +31,8 @@ function remove(entryId) {
 }
 
 /**
- * Flache, durchsuchbare Liste aller Tasks aus den Boards des Benutzers —
- * Datenquelle fuer die Task-Auswahl im Dialog.
+ * A flat, searchable list of all tasks from the user's boards — the data
+ * source for the task picker in the dialog.
  */
 function tasksFromBoards(boards = []) {
     const out = []

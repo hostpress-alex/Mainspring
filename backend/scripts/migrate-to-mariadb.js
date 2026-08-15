@@ -1,19 +1,19 @@
 /**
- * Bestandsdaten von MongoDB nach MariaDB uebertragen.
+ * Move existing data from MongoDB to MariaDB.
  *
- * Vorher: Tabellen anlegen mit  npx knex migrate:latest
+ * First: create the tables with  npx knex migrate:latest
  *
- * Probelauf (schreibt nichts, zeigt nur, was passieren wuerde):
+ * Trial run (writes nothing, only shows what would happen):
  *   node scripts/migrate-to-mariadb.js --dry
  *
- * Wirklich uebertragen:
+ * Really transfer:
  *   node scripts/migrate-to-mariadb.js
  *
- * Sind in MariaDB schon Daten, bricht das Skript ab. Mit --force werden die
- * Zieltabellen vorher geleert — das loescht in MariaDB alles, was da ist.
+ * If MariaDB already holds data the script stops. With --force the target
+ * tables are emptied first — that deletes everything in MariaDB.
  *
- * Die Ids bleiben erhalten: aus der ObjectId 66f1... wird die Zeichenkette
- * 66f1... Damit funktionieren bestehende Links und Lesezeichen weiter.
+ * The ids are kept: ObjectId 66f1... becomes the string 66f1... That way
+ * existing links and bookmarks keep working.
  */
 const { MongoClient } = require('mongodb')
 
@@ -35,9 +35,9 @@ const TABLES = ['file', 'schedule', 'activity', 'task_comment', 'task_member', '
                 'board_group', 'board_column', 'board_member', 'board', 'user']
 
 /**
- * Spalten aus der alten cmpsOrder herleiten, falls ein Board noch keine hat.
- * Gleiche Zuordnung wie board.service.ensureColumns — hier einmal fest
- * geschrieben, damit die Spalten in MariaDB wirklich als Zeilen landen.
+ * Derive columns from the old cmpsOrder if a board has none yet.
+ * Same mapping as board.service.ensureColumns — written out once here so the
+ * columns really land as rows in MariaDB.
  */
 const LEGACY_COLUMNS = {
     'status-picker':   { type: 'status',   field: 'status',    title: 'Status' },
@@ -84,7 +84,7 @@ async function main() {
 
     const k = db()
 
-    // Sind die Tabellen wirklich da?
+    // Are the tables really there?
     for (const table of TABLES) {
         if (!(await k.schema.hasTable(table))) {
             console.error(`Tabelle "${table}" fehlt. Erst "npx knex migrate:latest" ausfuehren.`)
@@ -149,7 +149,7 @@ async function main() {
         board.members = (board.members || []).filter(Boolean).map(m => ({
             _id: sid(m._id), fullname: m.fullname || '', imgUrl: m.imgUrl || '',
         }))
-        // Owner muessen Mitglied sein — sonst faellt die Owner-Kennzeichnung weg.
+        // Owners must be members — otherwise the owner flag falls away.
         const memberIds = board.members.map(m => m._id)
         const orphans = board.ownerIds.filter(o => !memberIds.includes(o))
         if (orphans.length) {
@@ -195,9 +195,9 @@ async function main() {
     }
     console.log(`Kalendereintraege: ${report.schedule}`)
 
-    // ------------------------------------------------- Datei-Metadaten
-    // Die Dateien selbst liegen auf der Platte und bleiben, wo sie sind.
-    // Hier wandert nur der Verweis darauf mit.
+    // ------------------------------------------------- File metadata
+    // The files themselves sit on disk and stay where they are.
+    // Only the reference to them moves along.
     const files = await mongo.collection('file').find({}).toArray()
     for (const f of files) {
         const id = sid(f._id)

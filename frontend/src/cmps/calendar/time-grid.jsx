@@ -4,20 +4,20 @@ import {
     startOfDay, fmtTime, fmtDuration, pad, WEEKDAYS_SHORT, MS_MIN,
 } from '../../services/date.util'
 
-const SNAP = 15                 // Minuten-Raster fuer Ziehen und Anlegen
-const MIN_DRAG_MINUTES = 15     // darunter gilt es als Klick, nicht als Ziehen
-const DEFAULT_MINUTES = 60      // Dauer beim einfachen Klick ins Raster
-const GUTTER_PX = 58           // Breite der Stundenleiste, siehe calendar.css
+const SNAP = 15                 // minute grid for dragging and creating
+const MIN_DRAG_MINUTES = 15     // below this it counts as a click, not as a drag
+const DEFAULT_MINUTES = 60      // duration for a plain click into the grid
+const GUTTER_PX = 58           // width of the hour rail, see calendar.css
 
 /**
- * Tages- und Wochenansicht.
+ * Day and week view.
  *
- * Interaktion:
- *  - Ziehen im leeren Raster legt einen neuen Eintrag an
- *  - Klick ins leere Raster legt einen Eintrag ueber DEFAULT_MINUTES an
- *  - Ziehen eines Eintrags verschiebt ihn (auch auf einen anderen Tag)
- *  - Ziehen am unteren Rand aendert die Dauer
- *  - Klick ohne Bewegung oeffnet den Bearbeiten-Dialog
+ * Interaction:
+ *  - dragging in the empty grid creates a new entry
+ *  - clicking the empty grid creates an entry of DEFAULT_MINUTES
+ *  - dragging an entry moves it (onto another day as well)
+ *  - dragging the bottom edge changes the duration
+ *  - clicking without moving opens the edit dialog
  */
 export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
     const elGrid = useRef()
@@ -31,7 +31,7 @@ export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
         return () => clearInterval(id)
     }, [])
 
-    // Beim Oeffnen in den Arbeitstag scrollen statt auf Mitternacht zu starten
+    // Scroll into the working day on opening instead of starting at midnight
     useLayoutEffect(() => {
         const body = elBody.current
         if (!body) return
@@ -39,8 +39,8 @@ export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
     }, [days.length])
 
     /**
-     * Messgrundlage ist das Rasterelement. Die Spalten selbst liegen in einem
-     * display:contents-Wrapper und haetten keine eigene Box.
+     * Measurements are taken from the grid element. The columns themselves sit
+     * in a display:contents wrapper and would have no box of their own.
      */
     function gridBox () {
         const box = elGrid.current.getBoundingClientRect()
@@ -53,7 +53,7 @@ export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
         return snapMinutes(((ev.clientY - box.top) / box.height) * 1440, SNAP)
     }
 
-    /** Pixelposition -> Spaltenindex (fuer das Verschieben zwischen Tagen). */
+    /** Pixel position -> column index (for moving between days). */
     function dayIndexFromEvent (ev) {
         const box = gridBox()
         const idx = Math.floor(((ev.clientX - box.left) / box.width) * days.length)
@@ -154,7 +154,7 @@ export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
         onMove(d.entry, { start: d.origStart, end })
     }
 
-    /** Vorschau waehrend des Ziehens statt der gespeicherten Zeiten. */
+    /** Preview while dragging instead of the saved times. */
     function previewFor (entry) {
         if (!drag || !drag.entry || drag.entry._id !== entry._id || !drag.moved) return null
         if (drag.mode === 'move') {

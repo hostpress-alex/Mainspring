@@ -7,12 +7,12 @@ import { DynamicModal } from '../modal/dynamic-modal'
 import './app-shell.css'
 
 /**
- * Rahmen fuer alle Seiten ausserhalb der Board-Ansicht: Hauptleiste, darunter
- * die Board-Spalte, rechts der Inhalt. Dadurch sieht man ueberall dieselbe
- * Board-Liste wie innerhalb eines Boards.
+ * Frame for all pages outside the board view: main bar, below it the board
+ * column, content on the right. That way you see the same board list
+ * everywhere as you do inside a board.
  *
- * Die Board-Ansicht selbst bringt beide Leisten schon mit und laeuft deshalb
- * nicht durch diese Huelle.
+ * The board view itself already brings both bars and therefore does not run
+ * through this shell.
  */
 export function AppShell ({ children, showBoards = true }) {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)

@@ -21,6 +21,7 @@ import { socketService, SOCKET_EMIT_SEND_MSG, SOCKET_EMIT_SET_TOPIC, SOCKET_EVEN
 import noUpdate from '../../assets/img/empty-update.png'
 import { uploadFile, imagesFromClipboard } from '../../services/upload.service'
 import { AttachmentStrip } from '../task/attachment-strip'
+import { t } from '../../i18n'
 export function TaskModal({ task, board, groupId, setModalCurrTask }) {
     const user = useSelector(storeState => storeState.userModule.user)
     const [comment, setComment] = useState(boardService.getEmptyComment())
@@ -34,15 +35,15 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
     const elTextarea = useRef()
     const navigate = useNavigate()
 
-    // Beim Wechsel auf einen anderen Task muss der lokale Stand mitziehen —
-    // sonst zeigt der Dialog weiter den vorherigen Task.
+    // When switching to another task the local state has to follow —
+    // otherwise the dialog keeps showing the previous task.
     useEffect(() => {
         setCurrTask(task)
         setComment(boardService.getEmptyComment())
         setIsWriteNewUpdate(false)
     }, [task])
 
-    // Wer auf "Write an update" klickt, will schreiben — nicht erst noch
+    // Whoever clicks "Write an update" wants to write — not click into the
     // einmal ins Feld klicken muessen.
     useEffect(() => {
         if (isWriteNewUpdate) elTextarea.current?.focus()
@@ -59,18 +60,18 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
     }, [task.id])
 
     /**
-     * Kommentar von einem anderen Browser (Socket). Bewusst mit neuen Objekten
-     * statt unshift: currTask ist dasselbe Objekt wie im Store, und wer daran
-     * direkt herumaendert, macht den Vergleich beim Speichern blind.
+     * A comment from another browser (socket). Deliberately with new objects
+     * rather than unshift: currTask is the same object as in the store, and
+     * changing it in place makes the comparison on save blind.
      */
     function addComment(comment) {
         setCurrTask(prev => ({ ...prev, comments: [comment, ...(prev.comments || [])] }))
     }
 
     /**
-     * Updates und ihre Antworten. Antworten sind Kommentare mit parentId;
-     * sie erscheinen chronologisch unter ihrem Update, waehrend die Updates
-     * selbst neueste zuerst stehen.
+     * Updates and their replies. Replies are comments with a parentId; they
+     * appear in chronological order under their update, while the updates
+     * themselves are newest first.
      */
     const threads = useMemo(() => {
         const all = currTask.comments || []
@@ -105,9 +106,9 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
     }
 
     function loadTaskActivity() {
-        // 'check' war das Markieren fuer die Mehrfachauswahl — wird nicht mehr
-        // erzeugt. Alte Eintraege werden hier ausgeblendet und rotieren mit der
-        // Zeit von selbst aus der Liste (max. 40 Eintraege pro Board).
+        // 'check' was the marking for multi-select — it is no longer
+        // produced. Old entries are hidden here and rotate out of the list
+        // on their own over time (max. 40 entries per board).
         const taskActivities = (board.activities || [])
             .filter(activity => activity && activity.task && activity.task.id === task.id)
             .filter(activity => activity.action !== 'check')
@@ -132,7 +133,7 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
             await updateTaskAction(board, groupId, next, activity)
             setCurrTask(next)
         } catch (err) {
-            console.log('Speichern fehlgeschlagen')
+            console.log('saving failed')
         }
     }
 
@@ -157,9 +158,9 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
     }
 
     /**
-     * Der Entwurf darf nur verworfen werden, wenn der Fokus das Formular
-     * wirklich verlaesst. Vorher hat ein Klick auf einen Button im Formular
-     * (z.B. Datei anhaengen) den halbfertigen Update geloescht.
+     * The draft may only be discarded when the focus really leaves the form.
+     * Before this, a click on a button inside the form (attaching a file, say)
+     * deleted the half-finished update.
      */
     function close(ev) {
         const next = ev.relatedTarget
@@ -187,17 +188,17 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
                 const saved = await uploadFile(file, { scope: 'task', taskId: currTask.id, name: file.name })
                 setComment(prev => ({
                     ...prev,
-                    attachments: [...(prev.attachments || []), { ...saved, name: saved.name || file.name || 'Datei' }],
+                    attachments: [...(prev.attachments || []), { ...saved, name: saved.name || file.name || t('file.file') }],
                 }))
             }
         } catch (err) {
-            setUploadErr(err.message || 'Upload fehlgeschlagen')
+            setUploadErr(err.message || t('file.uploadFailed'))
         } finally {
             setIsUploading(false)
         }
     }
 
-    /** Strg+V im Update-Bereich: Bilder aus der Zwischenablage anhaengen. */
+    /** Ctrl+V in the update area: attach images from the clipboard. */
     async function onPasteUpdate(ev) {
         const blobs = imagesFromClipboard(ev)
         if (!blobs.length) return
@@ -217,7 +218,7 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
 
     async function onRemoveComment(commentId) {
         try {
-            // Antworten ohne ihr Update waeren nirgends mehr sichtbar.
+            // Replies without their update would not be visible anywhere.
             const next = {
                 ...currTask,
                 comments: currTask.comments.filter(c => c.id !== commentId && c.parentId !== commentId),
@@ -277,13 +278,13 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
         <div className="task-modal-type flex">
             <div onClick={() => setIsShowUpdate(!isShowUpdate)} className={`updates-btn ${isShowUpdate ? 'active' : ''}`}>
                 <GrHomeRounded />
-                <span>Updates</span>
+                <span>{t('update.updates')}</span>
             </div>
             <div onClick={() => setIsShowUpdate(!isShowUpdate)} className={`activity-btn ${!isShowUpdate ? 'active' : ''}`}>
-                <span>Verlauf</span>
+                <span>{t('activity.activity')}</span>
             </div>
         </div>
-        {!isShowUpdate && <ErrorBoundary label="Der Verlauf">
+        {!isShowUpdate && <ErrorBoundary label={t('activity.area')}>
             <ul className="activities">
                 {
                     taskActivities.map((activity, idx) => {
@@ -293,7 +294,7 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
             </ul>
         </ErrorBoundary>}
         {isShowUpdate && <section className="update">
-            {!isWriteNewUpdate && <span className="close-input-container flex align-center" onClick={() => setIsWriteNewUpdate(true)}>Update schreiben</span>}
+            {!isWriteNewUpdate && <span className="close-input-container flex align-center" onClick={() => setIsWriteNewUpdate(true)}>{t('update.write')}</span>}
             {isWriteNewUpdate && <form className="input-container" onPaste={onPasteUpdate}>
                 <div className="style-txt">
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontWeight')}><AiOutlineBold /></span>
@@ -302,7 +303,7 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><TbAlignLeft /></span>
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><TbAlignCenter /></span>
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><TbAlignRight /></span>
-                    <span title="Bild oder Datei anhängen" style={{ marginLeft: 'auto' }}
+                    <span title={t('update.attach')} style={{ marginLeft: 'auto' }}
                         onMouseDown={(ev) => { ev.preventDefault(); elFileInput.current?.click() }}>
                         <MdAttachFile />
                     </span>
@@ -312,7 +313,7 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
                     name="txt"
                     style={comment.style}
                     value={comment.txt}
-                    placeholder="Update schreiben — Bilder kannst du mit Strg+V einfügen"
+                    placeholder={t('update.placeholder')}
                     onBlur={close}
                     onChange={handleChange}></textarea>
 
@@ -322,15 +323,15 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
 
                 <AttachmentStrip attachments={comment.attachments} onRemove={onRemoveAttachment} />
 
-                {isUploading && <p style={{ fontSize: 13, color: '#676879', margin: '8px 0 0' }}>Wird hochgeladen…</p>}
+                {isUploading && <p style={{ fontSize: 13, color: '#676879', margin: '8px 0 0' }}>{t('update.uploading')}</p>}
                 {uploadErr && <p style={{ fontSize: 13, color: '#a3283a', margin: '8px 0 0' }}>{uploadErr}</p>}
             </form>}
             {isWriteNewUpdate && <div className="button-container">
                 <button className="save" onMouseDown={onAddComment}
-                    disabled={isUploading || (!comment.txt.trim() && !(comment.attachments || []).length)}>Update</button>
-                <button className="cancel" onMouseDown={onDiscard}>Verwerfen</button>
+                    disabled={isUploading || (!comment.txt.trim() && !(comment.attachments || []).length)}>{t('update.update')}</button>
+                <button className="cancel" onMouseDown={onDiscard}>{t('update.discard')}</button>
             </div>}
-            <ErrorBoundary label="Die Updates">
+            <ErrorBoundary label={t('update.area')}>
             <ul className="comments-list">
                 {
                     threads.map(({ comment, replies }) => {
@@ -352,7 +353,7 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
                 <div className="no-updates flex column align-center">
                     <img src={noUpdate} alt="" />
                     <div className="txt flex column align-center">
-                        <h2>Noch keine Updates zu diesem Task</h2>
+                        <h2>{t('update.none')}</h2>
                         <p>Be the first one to update about progress, mention someone
                             <br />or upload files to share with your team members
                         </p>
