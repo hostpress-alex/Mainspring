@@ -45,14 +45,15 @@
             padding: 6px;
             border-radius: 50%;
             @include mixins.center-flex();
+
             &.active {
                 background-color: variables.$card-selected-background-color;
             }
         }
     }
 
-    @include mixins.for-mobile-layout(){
-        &.filter-member-modal{
+    @include mixins.for-mobile-layout() {
+        &.filter-member-modal {
             left: -133px;
             width: max-content;
         }

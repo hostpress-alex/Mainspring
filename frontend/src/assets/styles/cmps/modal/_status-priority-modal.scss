@@ -26,7 +26,7 @@
         .edit-labels-btn {
             padding: 0 variables.$spacing-medium variables.$spacing-small variables.$spacing-medium;
             @include mixins.center-flex();
-            border-top: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+            border-top: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
             button {
                 width: 152px;
@@ -51,6 +51,7 @@
         right: 95px;
     }
 }
+
 .modal-status-priority-content ul li {
     background-color: var(--label-color);
 }

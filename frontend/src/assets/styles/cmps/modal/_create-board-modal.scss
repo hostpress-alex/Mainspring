@@ -13,7 +13,7 @@
     box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
     font-size: functions.rem(14px);
     z-index: 51;
-    border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
     h1 {
         font-size: functions.rem(32px);
@@ -27,7 +27,7 @@
         margin-bottom: variables.$spacing-small;
     }
 
-    form { 
+    form {
         width: 100%;
         padding: unset;
 
@@ -46,24 +46,27 @@
             }
         }
 
-        button{
+        button {
             display: none;
         }
 
     }
+
     .close {
         display: flex;
         flex-direction: row-reverse;
         align-items: center;
+
         .icon {
             padding: variables.$spacing-xs variables.$spacing-small;
             width: 32px;
             height: 28px;
             cursor: pointer;
+
             &:hover {
                 background-color: variables.$workspace-hover;
                 border-radius: variables.$spacing-small;
-              }
+            }
         }
     }
 }

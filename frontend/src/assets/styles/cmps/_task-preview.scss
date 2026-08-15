@@ -17,9 +17,10 @@
         }
     }
 
-    .sticky-div.on-typing{
+    .sticky-div.on-typing {
         background-color: variables.$workspace-board-active;
     }
+
     .task-menu {
         @include mixins.center-flex();
         position: absolute;
@@ -60,7 +61,7 @@
     .picker {
         min-width: variables.$cell-width;
         height: variables.$cell-height;
-        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
     }
 
     .task-title {
@@ -94,7 +95,7 @@
             font-size: functions.rem(24px);
             padding: 0 variables.$spacing-medium;
             height: 100%;
-            border-left: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+            border-left: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
             color: variables.$chat-icon-color;
             @include mixins.center-flex();
             position: relative;
@@ -159,7 +160,7 @@
     }
 
     .empty-div {
-        border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         flex-grow: 100%;
         padding-right: 188px;
     }

@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
-import { AiOutlinePlus, AiOutlineSearch, AiOutlineStar } from 'react-icons/ai'
-import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md'
-import { BoardPreview } from '../../board/board-preview'
-import { t } from '../../../i18n'
+import {useMemo, useState} from 'react'
+import {useLocation, useParams} from 'react-router-dom'
+import {AiOutlinePlus, AiOutlineSearch, AiOutlineStar} from 'react-icons/ai'
+import {MdKeyboardArrowDown, MdKeyboardArrowRight} from 'react-icons/md'
+import {BoardPreview} from '../../board/board-preview'
+import {t} from '../../../i18n'
 
 export const NO_FOLDER = t('group.none')
 
@@ -17,9 +17,9 @@ const FAVOURITES = '__fav'
  * Instead: a favourites section and below it the boards grouped by
  * `board.folder` (e.g. "IT", "Marketing").
  */
-export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCreateModalOpen, boards = [] }) {
+export default function WorkspaceBoard({handleChange, filterByToEdit, setIsCreateModalOpen, boards = []}){
     const [collapsed, setCollapsed] = useState({})
-    const { boardId } = useParams()
+    const {boardId} = useParams()
     const location = useLocation()
 
     /**
@@ -29,13 +29,13 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
      * a jump from the overview — the board's own folder wins, not favourites.
      */
     const activeSection = useMemo(() => {
-        if (!boardId) return null
+        if(!boardId) return null
         const open = boards.find(b => b._id === boardId)
-        if (!open) return null
+        if(!open) return null
         const home = (open.folder || '').trim() || NO_FOLDER
         // Favourites only count while the board really is one — un-starring it
         // while it is open would otherwise leave nothing marked at all.
-        if (location.state?.sidebarSection === FAVOURITES) return open.isStarred ? FAVOURITES : home
+        if(location.state?.sidebarSection === FAVOURITES) return open.isStarred?FAVOURITES:home
         return home
     }, [boardId, location.state, boards])
 
@@ -44,42 +44,41 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
     /** Group boards by folder; folders alphabetically, "no folder" last. */
     const folders = useMemo(() => {
         const map = new Map()
-        for (const board of boards) {
+        for(const board of boards){
             const key = (board.folder || '').trim() || NO_FOLDER
-            if (!map.has(key)) map.set(key, [])
+            if(!map.has(key)) map.set(key, [])
             map.get(key).push(board)
         }
         return [...map.entries()].sort(([a], [b]) => {
-            if (a === NO_FOLDER) return 1
-            if (b === NO_FOLDER) return -1
+            if(a === NO_FOLDER) return 1
+            if(b === NO_FOLDER) return -1
             return a.localeCompare(b, 'de')
         })
     }, [boards])
 
-    const toggle = key => setCollapsed(prev => ({ ...prev, [key]: !prev[key] }))
+    const toggle = key => setCollapsed(prev => ({...prev, [key]: !prev[key]}))
 
-    function Section ({ id, title, icon, list }) {
+    function Section({id, title, icon, list}){
         const isCollapsed = collapsed[id]
         return (
-            <li className='workspace-section'>
-                <div className='workspace-section-head' onClick={() => toggle(id)}>
-                    {isCollapsed ? <MdKeyboardArrowRight /> : <MdKeyboardArrowDown />}
+            <li className="workspace-section">
+                <div className="workspace-section-head" onClick={() => toggle(id)}>
+                    {isCollapsed?<MdKeyboardArrowRight/>:<MdKeyboardArrowDown/>}
                     {icon}
-                    <span className='workspace-section-name'>
+                    <span className="workspace-section-name">
                         {title}
                     </span>
-                    <span className='workspace-section-count'>{list.length}</span>
+                    <span className="workspace-section-count">{list.length}</span>
                 </div>
                 {!isCollapsed && (
-                    <ul className='board-list-container flex column'>
+                    <ul className="board-list-container flex column">
                         {list.map(board => (
-                            <li key={board._id} className='board-list'>
-                                <BoardPreview board={board} sectionId={id}
-                                    isActive={board._id === boardId && id === activeSection} />
+                            <li key={board._id} className="board-list">
+                                <BoardPreview board={board} sectionId={id} isActive={board._id === boardId && id === activeSection}/>
                             </li>
                         ))}
                         {!list.length && (
-                            <li className='workspace-section-empty'>
+                            <li className="workspace-section-empty">
                                 {t('board.empty')}
                             </li>
                         )}
@@ -91,35 +90,29 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
 
     return (
         <div className="workspace-sidebar-header">
-            <div className='workspace-sidebar-items'>
+            <div className="workspace-sidebar-items">
                 <div className="workspace-title-container flex space-between align-center">
-                    <span className='workspace-title'>{t('nav.boards')}</span>
+                    <span className="workspace-title">{t('nav.boards')}</span>
                 </div>
-                <div className='workspace-btns'>
+                <div className="workspace-btns">
                     <div onClick={() => setIsCreateModalOpen((prev) => !prev)}>
-                        <AiOutlinePlus className='icon' />
+                        <AiOutlinePlus className="icon"/>
                         <span>{t('common.add')}</span>
                     </div>
-                    <div className='search-board'>
-                        <div className='flex'>
-                            <AiOutlineSearch className='icon' />
-                            <input type="text"
-                                name='title'
-                                className='search-input'
-                                value={filterByToEdit.title}
-                                placeholder={t('common.search')}
-                                onChange={handleChange}
-                            />
+                    <div className="search-board">
+                        <div className="flex">
+                            <AiOutlineSearch className="icon"/>
+                            <input type="text" name="title" className="search-input" value={filterByToEdit.title} placeholder={t('common.search')} onChange={handleChange}/>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <ul className='board-list-container flex column'>
-                <Section id={FAVOURITES} title={t('board.favorites')} list={starred}
-                    icon={<AiOutlineStar className='workspace-star' />} />
+            <ul className="board-list-container flex column">
+                <Section id={FAVOURITES} title={t('board.favorites')} list={starred} icon={
+                    <AiOutlineStar className="workspace-star"/>}/>
                 {folders.map(([name, list]) => (
-                    <Section key={name} id={name} title={name} list={list} icon={null} />
+                    <Section key={name} id={name} title={name} list={list} icon={null}/>
                 ))}
             </ul>
         </div>

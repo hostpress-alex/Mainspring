@@ -1,6 +1,6 @@
 const express = require('express')
-const { getBoards, getBoardById, addBoard, removeBoard } = require('./board.controller')
-const { requireAuth } = require('../../middlewares/requireAuth.middleware')
+const {getBoards, getBoardById, addBoard, removeBoard} = require('./board.controller')
+const {requireAuth} = require('../../middlewares/requireAuth.middleware')
 const logger = require('../../services/logger.service')
 const g = require('./board.controller.granular')
 const router = express.Router()
@@ -54,12 +54,12 @@ router.delete('/:boardId', removeBoard)
 const RETIRED = {
     board: 'PUT /api/board/:boardId is retired. Use PATCH /api/board/:boardId for the header fields, or one of the targeted group/task routes.',
     group: 'PUT /api/board/:boardId/:groupId is retired. Use PATCH or PUT /api/board/:boardId/group/:groupId.',
-    task: 'PUT /api/board/:boardId/:groupId/:taskId is retired. Use PATCH or PUT /api/board/:boardId/group/:groupId/task/:taskId.',
+    task: 'PUT /api/board/:boardId/:groupId/:taskId is retired. Use PATCH or PUT /api/board/:boardId/group/:groupId/task/:taskId.'
 }
 
 const retired = which => (req, res) => {
     logger.warn(`Retired route called: ${req.method} ${req.originalUrl}`)
-    res.status(410).send({ err: RETIRED[which] })
+    res.status(410).send({err: RETIRED[which]})
 }
 
 router.put('/:boardId/:groupId/:taskId', retired('task'))

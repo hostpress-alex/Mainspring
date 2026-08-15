@@ -6,6 +6,7 @@
     display: flex;
     overflow: hidden;
 }
+
 .task-preview .col-cell > .picker,
 .task-preview .col-cell > .task-person,
 .task-preview-kanban .col-cell > .picker,
@@ -13,10 +14,16 @@
     min-width: 0;
     width: 100%;
 }
-.task-preview .col-cell > .task-person .members-imgs { width: 100%; }
+
+.task-preview .col-cell > .task-person .members-imgs {
+    width: 100%;
+}
 
 /* Handle for dragging the column width */
-.cmp-order-title { position: relative; }
+.cmp-order-title {
+    position: relative;
+}
+
 .col-resizer {
     position: absolute;
     top: 0;
@@ -27,6 +34,7 @@
     z-index: 3;
     user-select: none;
 }
+
 .col-resizer::after {
     content: '';
     position: absolute;
@@ -38,11 +46,17 @@
     background: transparent;
     transition: background .12s;
 }
+
 .col-resizer:hover::after,
-.col-resizer.is-active::after { background: #0073ea; }
+.col-resizer.is-active::after {
+    background: #0073ea;
+}
 
 /* No text selection anywhere on the board while dragging */
-body.is-col-resizing { cursor: col-resize; user-select: none; }
+body.is-col-resizing {
+    cursor: col-resize;
+    user-select: none;
+}
 
 /* Title area of a column: only this part is the handle for reordering. */
 .cmp-order-title .col-drag {

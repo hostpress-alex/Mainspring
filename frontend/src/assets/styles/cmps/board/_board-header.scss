@@ -12,9 +12,9 @@
     z-index: 30;
 
     .board-title {
-        color: variables.$workspace-icon-color ;
+        color: variables.$workspace-icon-color;
 
-        >* {
+        > * {
             display: flex;
             align-items: center;
             padding-top: variables.$spacing-xs;
@@ -34,11 +34,11 @@
                 letter-spacing: 0.5px;
 
                 &:hover {
-                    border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+                    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
                 }
             }
 
-            &>* {
+            & > * {
                 cursor: pointer;
 
                 &:hover:not(:first-child) {
@@ -51,7 +51,7 @@
                 @include mixins.center-flex();
                 border-radius: 4px;
                 padding: 2px;
-                
+
                 .star {
                     margin-bottom: 2px;
                 }
@@ -62,65 +62,6 @@
             }
         }
 
-        .board-tools {
-            gap: variables.$spacing-medium;
-            height: fit-content;
-
-            >* {
-                padding: variables.$spacing-xs;
-                @include mixins.center-flex();
-                border-radius: 6px;
-                cursor: pointer;
-            }
-
-            .activity {
-                &:hover {
-                    background-color: variables.$workspace-hover;
-                }
-            }
-
-            .members-last-seen {
-                width: max-content;
-                gap: variables.$spacing-xs;
-                height: functions.rem(32px);
-
-                &:hover {
-                    background-color: variables.$workspace-hover;
-                }
-
-                .last-seen-title {
-                    display: none;
-                    @include mixins.for-normal-layout() {
-                        display: block;
-                    }
-                }
-            }
-
-            .invite {
-                height: functions.rem(32px);
-                width: max-content;
-
-                &:hover {
-                    background-color: variables.$workspace-hover;
-                }
-
-                &-title{
-                    display: none;
-                    @include mixins.for-normal-layout() {
-                        display: block;
-                    }
-                }
-
-                .invite-icon {
-                    width: 32px;
-                }
-            }
-
-            .members-imgs {
-                @include mixins.member-img(white, #323338, 24px, 26px);
-
-            }
-        }
     }
 
     .board-description {
@@ -177,7 +118,7 @@
                     display: block;
                 }
             }
-            
+
             @include mixins.for-narrow-layout() {
                 &:hover {
                     background-color: variables.$workspace-hover;
@@ -201,7 +142,7 @@
     .board-border {
         height: 1px;
         width: 100%;
-        background-color: color.adjust(variables.$border-color , $lightness: -20%);
+        background-color: color.adjust(variables.$border-color, $lightness: -20%);
     }
 
     @include mixins.for-mobile-layout() {

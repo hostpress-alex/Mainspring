@@ -6,9 +6,10 @@
 .comments-list {
     li {
         border-radius: 4px;
-        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         margin-bottom: variables.$spacing-medium;
         padding: variables.$spacing-medium;
+
         .header-comment {
             padding-bottom: variables.$spacing-small;
             font-size: functions.rem(14px);
@@ -50,7 +51,10 @@
                         @include mixins.menu-modal();
                         // Without this the menu looks clickable but behaves
                         // like text.
-                        > * { cursor: pointer; }
+                        > * {
+                            cursor: pointer;
+                        }
+
                         right: 0;
                         width: 265px;
                     }

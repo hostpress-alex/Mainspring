@@ -3,7 +3,10 @@
 @use "../../setup/variables";
 
 .number-picker {
-    max-width: 140px;
+    // No fixed cap: the column width is dragged by the user and lives on the
+    // cell. A max-width here made the field stop growing at 140px while its
+    // cell kept getting wider — the value then floated in an empty column.
+    width: 100%;
     @include mixins.center-flex();
     position: relative;
     font-size: functions.rem(14px);

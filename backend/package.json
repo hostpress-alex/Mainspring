@@ -1,43 +1,39 @@
 {
-    "name": "server",
-    "version": "1.0.0",
-    "description": "production ready server",
-    "main": "server.js",
-    "scripts": {
-        "start": "nodemon server.js",
-        "server:dev": "nodemon server.js",
-        "server:prod": "set NODE_ENV=production&&node server.js",
+    "name":            "server",
+    "version":         "1.0.0",
+    "description":     "production ready server",
+    "main":            "server.js",
+    "scripts":         {
+        "start":           "nodemon server.js",
+        "server:dev":      "nodemon server.js",
+        "server:prod":     "set NODE_ENV=production&&node server.js",
         "server:prod:mac": "export NODE_ENV=production&&node server.js",
-        "seed": "node scripts/seed.js",
-        "seed:admin": "node scripts/seed-admin.js",
-        "claim:boards": "node scripts/claim-boards.js",
-        "db:migrate": "knex migrate:latest",
-        "db:rollback": "knex migrate:rollback",
-        "db:status": "knex migrate:status",
-        "db:import": "node scripts/migrate-to-mariadb.js",
-        "db:import:dry": "node scripts/migrate-to-mariadb.js --dry",
-        "start:mariadb": "DB_DRIVER=mariadb nodemon server.js",
-        "test": "node --test test/*.test.js"
+        "seed":            "node scripts/seed.js",
+        "seed:admin":      "node scripts/seed-admin.js",
+        "claim:boards":    "node scripts/claim-boards.js",
+        "db:migrate":      "knex migrate:latest",
+        "db:rollback":     "knex migrate:rollback",
+        "db:status":       "knex migrate:status",
+        "test":            "node --test test/*.test.js"
     },
-    "author": "Me",
-    "license": "ISC",
-    "dependencies": {
-        "bcrypt": "^6.0.0",
+    "author":          "Me",
+    "license":         "ISC",
+    "dependencies":    {
+        "bcrypt":        "^6.0.0",
         "cookie-parser": "^1.4.7",
-        "cors": "^2.8.6",
-        "cryptr": "^6.4.0",
-        "dotenv": "^17.4.2",
-        "express": "^5.2.1",
-        "knex": "^3.3.0",
-        "mongodb": "^7.5.0",
-        "mysql2": "^3.23.3",
-        "socket.io": "^4.8.3"
+        "cors":          "^2.8.6",
+        "cryptr":        "^6.4.0",
+        "dotenv":        "^17.4.2",
+        "express":       "^5.2.1",
+        "knex":          "^3.3.0",
+        "mysql2":        "^3.23.3",
+        "socket.io":     "^4.8.3"
     },
     "devDependencies": {
         "nodemon": "^3.1.14"
     },
-    "allowScripts": {
-        "bcrypt@6.0.0": true,
+    "allowScripts":    {
+        "bcrypt@6.0.0":   true,
         "fsevents@2.3.3": true
     }
 }

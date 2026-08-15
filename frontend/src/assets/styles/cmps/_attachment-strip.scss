@@ -48,7 +48,7 @@
     height: 20px;
     border-radius: 50%;
     border: none;
-    background: rgba(0,0,0,.6);
+    background: rgba(0, 0, 0, .6);
     color: #fff;
     cursor: pointer;
     line-height: 20px;
@@ -59,7 +59,7 @@
 .attachment-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.8);
+    background: rgba(0, 0, 0, .8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -70,7 +70,7 @@
 .attachment-full {
     max-width: 92vw;
     max-height: 92vh;
-    box-shadow: 0 6px 40px rgba(0,0,0,.5);
+    box-shadow: 0 6px 40px rgba(0, 0, 0, .5);
 }
 
 

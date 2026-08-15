@@ -102,8 +102,8 @@ Vite moves to 3001 rather than failing, so everything works and you spend ten
 minutes wondering why your change is not showing — you are looking at the tab
 on 3000, served by last session's leftover process.
 
-By default the server expects a local MongoDB. If you want MariaDB instead,
-read [DATABASE.md](DATABASE.md). It also covers moving existing data over.
+The database is MariaDB. Setting it up, the schema, and a handful of useful
+queries are in [DATABASE.md](DATABASE.md).
 
 You'll need an account before anything is useful:
 
@@ -142,9 +142,6 @@ as well. It's not in the repo and shouldn't be.
 | Variable | Default | Notes |
 |---|---|---|
 | `PORT` | `3030` | |
-| `DB_DRIVER` | `mongo` | `mongo` or `mariadb` |
-| `MONGO_URL` | `mongodb://127.0.0.1:27017` | |
-| `MONGO_DB` | `monday_DB` | |
 | `MYSQL_*` | see `config/dev.js` | host, port, user, password, db |
 | `ALLOWED_ORIGINS` | three localhost variants | comma separated. Applies to the API and the socket both. |
 | `ALLOW_SIGNUP` | `true` | set `false` on anything reachable, or strangers will sign themselves up and see every board |
@@ -201,7 +198,7 @@ backend/
   middlewares/         auth, logging, async local storage
   services/            socket, files, logging, db connection
   test/                node:test
-  scripts/             seeding, admin, mongo -> mariadb import
+  scripts/             seeding, admin, board ownership
 
 frontend/src/
   cmps/                components by area
@@ -214,8 +211,8 @@ frontend/src/
 
 Every backend area is the same three layers. Controller turns HTTP into a
 call, service holds the rules and the permission checks, repo talks to the
-database. The repos exist twice, once per database, and `DB_DRIVER` picks one
-at startup.
+database. Nothing above the repo knows what a row looks like, which is what
+made swapping the storage engine out possible in the first place.
 
 ## Tests
 
@@ -226,11 +223,6 @@ cd frontend && npm test
 
 Coverage is thin, and it's worth saying which parts are covered rather than
 implying the rest is.
-
-`repo-parity.test.js` checks that the Mongo and SQL repositories still export
-the same functions. Adding a method to one and forgetting the other is the
-easiest way to break this codebase and it stays invisible until someone
-switches drivers, which is why it's tested at all.
 
 `board-access.test.js` covers who can see and administer a board, including
 the old boards that carry a single `ownerId` instead of an `ownerIds` array.
@@ -248,8 +240,11 @@ saved second wiped out the first one's work. Now a change sends only what
 changed. The three old whole-document `PUT` routes answer `410` and tell you
 what to call instead.
 
-Storage is pluggable, Mongo or MariaDB, one environment variable. Frontend
-moved from react-scripts to Vite, React 19, Vitest. Boards got owners and
+Storage moved from MongoDB to MariaDB. It ran on both for a while, one
+environment variable apart, which is how the move happened without a big-bang
+switch — but carrying two implementations of every repository costs more than
+it returns once you have picked one, so the Mongo half is gone. Frontend moved
+from react-scripts to Vite, React 19, Vitest. Boards got owners and
 members with actual enforcement on the server, not just hidden buttons.
 
 The socket used to trust whatever a client told it. It announced a user id and
@@ -292,9 +287,6 @@ Comments say why, not what. If a comment restates the line below it, delete
 it.
 
 User-facing text goes in `frontend/src/i18n/`, never inline in JSX.
-
-If you touch a `*.repo.mongo.js` you touch its `*.repo.sql.js` in the same
-commit. `npm test` will catch you if you don't.
 
 Migrations are additive and numbered. Don't edit one that has already run.
 

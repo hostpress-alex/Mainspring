@@ -5,34 +5,36 @@
 
 .workspace-sidebar {
     position: relative;
-    background-color: variables.$sidebar-workspace-bg ;
-    border-right: 1px solid color.adjust(variables.$border-color , $lightness: -30%);
+    background-color: variables.$sidebar-workspace-bg;
+    border-right: 1px solid color.adjust(variables.$border-color, $lightness: -30%);
     color: variables.$workspace-icon-color;
     transition: .4s;
 
     &.open {
         width: 230px;
-        .workspace-sidebar-header{
+
+        .workspace-sidebar-header {
             transition-delay: .25s;
             opacity: 1;
         }
     }
-    
+
     &.close {
         width: 0;
         @include mixins.for-narrow-layout() {
             width: 30px;
         }
-        .workspace-sidebar-header{
+
+        .workspace-sidebar-header {
             opacity: 0;
             pointer-events: none;
         }
     }
-    
+
 
     .workspace-sidebar-items {
         margin: variables.$spacing-medium variables.$spacing-medium 18px variables.$spacing-medium;
-        border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -30%);
+        border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -30%);
         gap: 10px;
     }
 
@@ -130,11 +132,11 @@
         }
 
         span {
-            color: variables.$primary-text-color ;
+            color: variables.$primary-text-color;
             font-weight: 400;
         }
 
-        >* {
+        > * {
             transition: .2s;
             display: flex;
             align-items: center;
@@ -144,7 +146,7 @@
             font-size: functions.rem(14px);
         }
 
-        >*:hover {
+        > *:hover {
             background-color: variables.$workspace-hover;
             border-radius: 4px;
         }
@@ -166,7 +168,7 @@
                 margin-left: 2px;
 
                 &::-webkit-input-placeholder {
-                    color: variables.$primary-text-color ;
+                    color: variables.$primary-text-color;
                     font-weight: 400;
                 }
 
@@ -239,6 +241,7 @@
         }
     }
 }
+
 // Sections of the board column (favourites, folders). Was inline in
 // workspace-board.jsx.
 .workspace-section-head {

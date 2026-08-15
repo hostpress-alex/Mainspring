@@ -3,44 +3,44 @@
 @use "../../setup/variables";
 
 .screenshot-section {
-      background: variables.$home-tertiary-bg;
-      font-family: variables.$title-font-family;
-      padding: 10vh 0;
+    background: variables.$home-tertiary-bg;
+    font-family: variables.$title-font-family;
+    padding: 10vh 0;
 
-      .header {
-            padding: 0 20px;
-            margin: auto;
+    .header {
+        padding: 0 20px;
+        margin: auto;
 
 
+        .title {
+            background: linear-gradient(360deg, #adadad 53.95%, #8080e0 121.37%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 18px;
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: functions.rem(28px);
+            line-height: functions.rem(36px);
+        }
+
+        .info {
+            color: variables.$workspace-icon-color;
+            font-size: functions.rem(15px);
+            font-weight: 500;
+            line-height: 28px;
+            margin-bottom: 26px;
+        }
+
+        @include mixins.for-normal-layout() {
             .title {
-                  background: linear-gradient(360deg, #adadad 53.95%, #8080e0 121.37%);
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
-                  padding: 18px;
-                  text-align: center;
-                  margin-bottom: 16px;
-                  font-size: functions.rem(28px);
-                  line-height: functions.rem(36px);
+                font-size: functions.rem(46px);
+                line-height: functions.rem(65px);
             }
 
             .info {
-                  color: variables.$workspace-icon-color;
-                  font-size: functions.rem(15px);
-                  font-weight: 500;
-                  line-height: 28px;
-                  margin-bottom: 26px;
+                font-size: functions.rem(20px);
+                line-height: functions.rem(28px);
             }
-
-            @include mixins.for-normal-layout() {
-                  .title {
-                        font-size: functions.rem(46px);
-                        line-height: functions.rem(65px);
-                  }
-
-                  .info {
-                        font-size: functions.rem(20px);
-                        line-height: functions.rem(28px);
-                  }
-            }
-      }
+        }
+    }
 }

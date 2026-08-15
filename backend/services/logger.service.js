@@ -1,52 +1,51 @@
 const fs = require('fs')
 const asyncLocalStorage = require('./als.service')
 
-
 const logsDir = './logs'
-if (!fs.existsSync(logsDir)) {
+if(!fs.existsSync(logsDir)){
     fs.mkdirSync(logsDir)
 }
 
 //define the time format
-function getTime() {
+function getTime(){
     let now = new Date()
     return now.toLocaleString('he')
 }
 
-function isError(e) {
+function isError(e){
     return e && e.stack && e.message
 }
 
-function doLog(level, ...args) {
+function doLog(level, ...args){
 
     const strs = args.map(arg =>
-        (typeof arg === 'string' || isError(arg)) ? arg : JSON.stringify(arg)
+        (typeof arg === 'string' || isError(arg))?arg:JSON.stringify(arg)
     )
 
     var line = strs.join(' | ')
     const store = asyncLocalStorage.getStore()
     const userId = store?.loggedinUser?._id
-    const str = userId ? `(userId: ${userId})` : ''
+    const str = userId?`(userId: ${userId})`:''
     line = `${getTime()} - ${level} - ${line} ${str}\n`
     console.log(line)
-    fs.appendFile('./logs/backend.log', line, (err) =>{
-        if (err) console.log('FATAL: cannot write to log file')
+    fs.appendFile('./logs/backend.log', line, (err) => {
+        if(err) console.log('FATAL: cannot write to log file')
     })
 }
 
 module.exports = {
-    debug(...args) {
+    debug(...args){
         // Read NODE_NEV for a long time, so debug logging ran in production too.
-        if (process.env.NODE_ENV === 'production') return
+        if(process.env.NODE_ENV === 'production') return
         doLog('DEBUG', ...args)
     },
-    info(...args) {
+    info(...args){
         doLog('INFO', ...args)
     },
-    warn(...args) {
+    warn(...args){
         doLog('WARN', ...args)
     },
-    error(...args) {
+    error(...args){
         doLog('ERROR', ...args)
     }
 }

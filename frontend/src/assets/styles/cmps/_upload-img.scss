@@ -2,7 +2,7 @@
 @use "../setup/variables";
 
 .upload-preview {
-    .img-picker{
+    .img-picker {
         @include mixins.center-flex();
         flex-direction: column;
         gap: variables.$spacing-medium;

@@ -8,15 +8,15 @@
 const boardService = require('./board.service')
 const logger = require('../../services/logger.service')
 
-function fail(res, err, fallback) {
-    if (!err.status) logger.error(fallback, err)
-    res.status(err.status || 500).send({ err: err.status ? err.message : fallback })
+function fail(res, err, fallback){
+    if(!err.status) logger.error(fallback, err)
+    res.status(err.status || 500).send({err: err.status?err.message:fallback})
 }
 
-const handler = (fn, fallback) => async (req, res) => {
+const handler = (fn, fallback) => async(req, res) => {
     try {
         res.json(await fn(req))
-    } catch (err) {
+    } catch(err) {
         fail(res, err, fallback)
     }
 }
@@ -69,5 +69,5 @@ module.exports = {
             req.params.taskId, req.body.index ?? null), 'Task konnte nicht verschoben werden'),
 
     postActivity: handler(req =>
-        boardService.addActivity(req.params.boardId, req.body.activity), 'Aktivitaet konnte nicht gespeichert werden'),
+        boardService.addActivity(req.params.boardId, req.body.activity), 'Aktivitaet konnte nicht gespeichert werden')
 }

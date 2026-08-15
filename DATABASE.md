@@ -1,31 +1,21 @@
-# Database: MongoDB or MariaDB
+# Database
 
-The server can do both. A single environment variable decides which one is
-used:
+MariaDB, reached through knex. Nothing above `*.repo.js` knows that: the
+service layer asks the repository, the repository is the only place that knows
+what a row looks like.
 
-```
-DB_DRIVER=mongo      # default
-DB_DRIVER=mariadb
-```
+| Area | File |
+|---|---|
+| Boards, groups, tasks, activities | `api/board/board.repo.js` |
+| Users | `api/user/user.repo.js` |
+| Calendar | `api/schedule/schedule.repo.js` |
+| Uploads | `services/file.repo.js` |
 
-The rest of the application never notices. Behind the switch sit two
-implementations of the same storage layer:
-
-| Area | MongoDB | MariaDB |
-|---|---|---|
-| Boards | `api/board/board.repo.mongo.js` | `api/board/board.repo.sql.js` |
-| Users | `api/user/user.repo.mongo.js` | `api/user/user.repo.sql.js` |
-| Calendar | `api/schedule/schedule.repo.mongo.js` | `api/schedule/schedule.repo.sql.js` |
-| Uploads | `services/file.repo.mongo.js` | `services/file.repo.sql.js` |
-
-The files without a suffix (`board.repo.js` and friends) only pick one.
-
-> Anyone extending one of these files has to extend its counterpart as well.
-> Otherwise switching back stops working.
-
-That rule is checked now, so it cannot rot unnoticed: `test/repo-parity.test.js`
-compares the exported names of every pair and fails once they have drifted
-apart. Run it with `npm test` in the `backend` folder.
+This ran on MongoDB until August 2026, and for a while on both at once behind
+a `DB_DRIVER` switch — that is how the move happened without a big-bang
+cutover. Once MariaDB was the only one in use, carrying a second
+implementation of every repository cost more than it returned, so the MongoDB
+half is gone. The history is in git if you ever need it.
 
 ---
 
@@ -49,7 +39,6 @@ FLUSH PRIVILEGES;
    other way):
 
 ```
-DB_DRIVER=mariadb
 MYSQL_HOST=127.0.0.1
 MYSQL_PORT=3306
 MYSQL_USER=projectmanager
@@ -77,48 +66,12 @@ particular button, which is miserable to track down later.
 
 ---
 
-## 2. Taking existing data across from MongoDB
+## 2. Starting
 
-First look at what would happen — this run writes nothing:
+`npm run dev` in the project root starts the server along with the frontend.
+Backend on its own: `npm start` in `backend/`.
 
-```
-npm run db:import:dry
-```
-
-It also reports what will **not** come across: users with an unusable id,
-boards without an owner, calendar entries pointing at deleted boards.
-
-If the result looks right:
-
-```
-npm run db:import
-```
-
-If the target already holds data the script stops. `node scripts/migrate-to-mariadb.js --force`
-empties the tables first — **that deletes everything in MariaDB**.
-
-What happens along the way:
-
-* Ids are preserved. The ObjectId `66f1…` becomes the string `66f1…`, which is
-  why existing links and bookmarks keep working.
-* The old single `ownerId` field becomes a row in `board_member` with
-  `is_owner = 1`.
-* Boards without `columns` get their columns from `cmpsOrder` — derived once
-  and stored for good, instead of being rebuilt on every read.
-* Activities are trimmed to the last 40, same as during normal operation.
-* References to uploaded files come across. The files themselves live under
-  `backend/uploads/` and are not touched.
-
----
-
-## 3. Starting
-
-```
-npm run start:mariadb        # same as DB_DRIVER=mariadb npm start
-npm start                    # uses whatever is in .env
-```
-
-The helper scripts follow the same switch:
+Helper scripts:
 
 ```
 ADMIN_USER=alex ADMIN_PASS='…' ADMIN_NAME='Alex' npm run seed:admin
@@ -128,12 +81,9 @@ npm run seed            # demo boards, only into an empty database
 
 `seed:admin` is also how a forgotten password gets reset.
 
-Back to MongoDB: set `DB_DRIVER` to `mongo` again. The migration does not
-touch the MongoDB data, it is still sitting there unchanged.
-
 ---
 
-## 4. Access with DBeaver
+## 3. Access with DBeaver
 
 New connection → **MariaDB**:
 
@@ -153,7 +103,7 @@ and keep `127.0.0.1` as the host.
 
 ---
 
-## 5. How the data is laid out
+## 4. How the data is laid out
 
 ```
 user            users (password as a bcrypt hash)
@@ -249,24 +199,22 @@ ORDER BY week DESC, u.fullname;
 
 ---
 
-## 6. What changes in practice
+## 5. What this costs and what it buys
 
-**Better:**
+**What the database does for you:**
 
-* Moving a task into another group is one transaction. On MongoDB without a
-  replica set it had to insert first and remove afterwards — if it broke in
-  between, the task stood there twice.
-* Changing individual fields locks the task row. Two people setting different
-  columns of the same task at the same time no longer overwrite each other.
+* Moving a task into another group is one transaction, so it can never end up
+  in two groups or none.
+* Changing individual fields locks the task row, so two people setting
+  different columns of the same task do not overwrite each other.
 * Deleting a board takes its groups, tasks, comments, memberships and calendar
-  entries with it. Orphaned calendar entries used to be left behind.
+  entries with it. No orphans to clean up later.
 
-**Worth knowing:**
+**What it does not:**
 
-* Reading a board is seven queries now instead of one. The board overview also
-  loads all tasks of all boards while doing so — that was the same on MongoDB,
-  but it will start to show eventually. When the overview turns sluggish, this
-  is the place.
+* Reading one board is seven queries. The board overview loads all tasks of
+  all boards while it is at it. Fine at this size; when the overview turns
+  sluggish, this is the place to look.
 * `col_values` is not indexed. Filtering on a status value across all boards
   works, but it is a full pass. A generated column with an index can be added
   for that if it ever matters.
@@ -276,7 +224,7 @@ ORDER BY week DESC, u.fullname;
 
 ---
 
-## 7. Who is allowed to read what
+## 6. Who is allowed to read what
 
 Access control lives in `api/board/board.service.js`: `hasAccess` (owner,
 member or admin) and `isOwner` (owner or admin). Both are covered by

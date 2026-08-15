@@ -8,7 +8,7 @@
     font-size: functions.rem(14px);
     gap: 5px;
 
-    >* {
+    > * {
         display: flex;
         align-items: center;
         padding: variables.$spacing-xs variables.$spacing-small;

@@ -6,38 +6,32 @@
  * The password is only stored as a bcrypt hash and shows up neither in the
  * code nor in the database in clear text. For an existing user the password is
  * overwritten — so the script is also the reset path.
- *
- * Writes to the database that DB_DRIVER dictates:
- *   npm run seed:admin                     -> whatever backend/.env says
- *   DB_DRIVER=mariadb npm run seed:admin   -> explicitly MariaDB
  */
 const bcrypt = require('bcrypt')
-const config = require('../config')
 const userRepo = require('../api/user/user.repo')
 
 const SALT_ROUNDS = 10
 
-async function main() {
+async function main(){
     const username = process.env.ADMIN_USER
     const password = process.env.ADMIN_PASS
     const fullname = process.env.ADMIN_NAME || username
 
-    if (!username || !password) {
+    if(!username || !password){
         console.error('Fehlt: ADMIN_USER und ADMIN_PASS muessen gesetzt sein.')
-        console.error("Beispiel: ADMIN_USER=alex ADMIN_PASS='geheim' npm run seed:admin")
+        console.error('Beispiel: ADMIN_USER=alex ADMIN_PASS=\'geheim\' npm run seed:admin')
         process.exit(1)
     }
-    if (password.length < 8) {
+    if(password.length < 8){
         console.error('ADMIN_PASS ist kuerzer als 8 Zeichen. Abbruch.')
         process.exit(1)
     }
 
-    console.log(`Datenbank: ${config.driver}`)
     const hash = await bcrypt.hash(password, SALT_ROUNDS)
     const existing = await userRepo.findByUsername(username)
 
-    if (existing) {
-        await userRepo.updateFields(existing._id, { password: hash, isAdmin: true, fullname })
+    if(existing){
+        await userRepo.updateFields(existing._id, {password: hash, isAdmin: true, fullname})
         console.log(`Benutzer "${username}" aktualisiert: Passwort neu gesetzt, isAdmin=true`)
         console.log(`  _id=${existing._id}`)
         return
@@ -48,17 +42,25 @@ async function main() {
         password: hash,
         fullname,
         imgUrl: '',
-        isAdmin: true,
+        isAdmin: true
     })
     console.log(`Admin "${username}" angelegt.`)
     console.log(`  _id=${saved._id}`)
 }
 
 /** Otherwise the MariaDB connection keeps the process open. */
-async function closeAll() {
-    try { await require('../db/knex').destroy() } catch (err) { /* no MariaDB involved */ }
+async function closeAll(){
+    try {
+        await require('../db/knex').destroy()
+    } catch(err) { /* no MariaDB involved */
+    }
 }
 
-main()
-    .then(async () => { await closeAll(); process.exit(0) })
-    .catch(async err => { console.error('seed-admin fehlgeschlagen:', err); await closeAll(); process.exit(1) })
+main().then(async() => {
+    await closeAll();
+    process.exit(0)
+}).catch(async err => {
+    console.error('seed-admin fehlgeschlagen:', err);
+    await closeAll();
+    process.exit(1)
+})

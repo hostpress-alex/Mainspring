@@ -33,29 +33,29 @@ const attempts = new Map()
 
 const now = () => Date.now()
 
-function bucket(key, at) {
+function bucket(key, at){
     const found = attempts.get(key)
-    if (found && at - found.firstAt < WINDOW_MS) return found
+    if(found && at - found.firstAt < WINDOW_MS) return found
 
-    const fresh = { count: 0, firstAt: at }
+    const fresh = {count: 0, firstAt: at}
     attempts.set(key, fresh)
     return fresh
 }
 
 /** Drop everything past its window. Cheap, and only runs while recording. */
-function sweep(at) {
-    for (const [key, entry] of attempts) {
-        if (at - entry.firstAt >= WINDOW_MS) attempts.delete(key)
+function sweep(at){
+    for(const [key, entry] of attempts){
+        if(at - entry.firstAt >= WINDOW_MS) attempts.delete(key)
     }
-    if (attempts.size <= MAX_KEYS) return
+    if(attempts.size <= MAX_KEYS) return
 
     // Still too many after sweeping: give up the oldest. Map keeps insertion
     // order, so the front of it is the oldest.
     const excess = attempts.size - MAX_KEYS
     let dropped = 0
-    for (const key of attempts.keys()) {
+    for(const key of attempts.keys()){
         attempts.delete(key)
-        if (++dropped >= excess) break
+        if(++dropped >= excess) break
     }
 }
 
@@ -66,25 +66,25 @@ const addressKey = address => `i:${address}`
  * May this address try this username right now?
  * Returns { allowed } or { allowed: false, retryAfter } in whole seconds.
  */
-function check(address, username, at = now()) {
+function check(address, username, at = now()){
     const pairs = [
         [attempts.get(accountKey(address, username)), MAX_PER_ACCOUNT],
-        [attempts.get(addressKey(address)), MAX_PER_ADDRESS],
+        [attempts.get(addressKey(address)), MAX_PER_ADDRESS]
     ]
 
     let longestWait = 0
-    for (const [entry, max] of pairs) {
-        if (!entry) continue
+    for(const [entry, max] of pairs){
+        if(!entry) continue
         const age = at - entry.firstAt
-        if (age >= WINDOW_MS || entry.count < max) continue
+        if(age >= WINDOW_MS || entry.count < max) continue
         longestWait = Math.max(longestWait, WINDOW_MS - age)
     }
 
-    if (!longestWait) return { allowed: true }
-    return { allowed: false, retryAfter: Math.ceil(longestWait / 1000) }
+    if(!longestWait) return {allowed: true}
+    return {allowed: false, retryAfter: Math.ceil(longestWait / 1000)}
 }
 
-function recordFailure(address, username, at = now()) {
+function recordFailure(address, username, at = now()){
     sweep(at)
     bucket(accountKey(address, username), at).count++
     bucket(addressKey(address), at).count++
@@ -95,12 +95,12 @@ function recordFailure(address, username, at = now()) {
  * one correct password should not wipe out thirty wrong guesses at thirty
  * other accounts from the same place.
  */
-function recordSuccess(address, username) {
+function recordSuccess(address, username){
     attempts.delete(accountKey(address, username))
 }
 
 /** Tests only. */
-function reset() {
+function reset(){
     attempts.clear()
 }
 
@@ -111,5 +111,5 @@ module.exports = {
     reset,
     WINDOW_MS,
     MAX_PER_ACCOUNT,
-    MAX_PER_ADDRESS,
+    MAX_PER_ADDRESS
 }

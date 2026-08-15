@@ -7,17 +7,17 @@
  * environment variables count.
  */
 try {
-  require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), quiet: true })
-} catch (err) {
-  // dotenv is optional.
+    require('dotenv').config({path: require('path').resolve(__dirname, '..', '.env'), quiet: true})
+} catch(err) {
+    // dotenv is optional.
 }
 
 var config
 
-if (process.env.NODE_ENV === 'production') {
-  config = require('./prod')
+if(process.env.NODE_ENV === 'production'){
+    config = require('./prod')
 } else {
-  config = require('./dev')
+    config = require('./dev')
 }
 
 // Guest mode disables authentication entirely — for the REST API and for the

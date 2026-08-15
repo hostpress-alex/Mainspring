@@ -32,20 +32,21 @@
 
     }
 }
+
 .board-menu-modal {
     color: variables.$primary-text-color;
     font-size: functions.rem(14px);
 
-  >* {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: variables.$spacing-xs variables.$spacing-small;
-    cursor: pointer;
+    > * {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: variables.$spacing-xs variables.$spacing-small;
+        cursor: pointer;
 
-    &:hover {
-      background-color: variables.$workspace-hover;
-      border-radius: variables.$spacing-small;
+        &:hover {
+            background-color: variables.$workspace-hover;
+            border-radius: variables.$spacing-small;
+        }
     }
-  }
 }

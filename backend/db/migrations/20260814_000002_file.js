@@ -5,7 +5,7 @@
  * nur, wo sie liegt und wem sie gehoert. Die Id ist dieselbe wie im
  * Auslieferungspfad /api/upload/<id> — 32 Hexzeichen.
  */
-exports.up = async function up(knex) {
+exports.up = async function up(knex){
     await knex.schema.createTable('file', t => {
         t.string('id', 32).primary()
         t.string('rel_path', 500).notNullable()
@@ -21,6 +21,6 @@ exports.up = async function up(knex) {
     })
 }
 
-exports.down = async function down(knex) {
+exports.down = async function down(knex){
     await knex.schema.dropTableIfExists('file')
 }

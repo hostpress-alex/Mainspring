@@ -10,7 +10,7 @@
  * People assignments are deliberately NOT in the JSON but in task_member:
  * "which tasks does person X have" is a query you really do need.
  */
-exports.up = async function up(knex) {
+exports.up = async function up(knex){
     await knex.schema.createTable('user', t => {
         t.string('id', 24).primary()
         t.string('username', 190).notNullable().unique()
@@ -155,9 +155,9 @@ exports.up = async function up(knex) {
     })
 }
 
-exports.down = async function down(knex) {
-    for (const table of ['schedule', 'activity', 'task_comment', 'task_member', 'task',
-                         'board_group', 'board_column', 'board_member', 'board', 'user']) {
+exports.down = async function down(knex){
+    for(const table of ['schedule', 'activity', 'task_comment', 'task_member', 'task',
+        'board_group', 'board_column', 'board_member', 'board', 'user']){
         await knex.schema.dropTableIfExists(table)
     }
 }

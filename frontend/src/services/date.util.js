@@ -2,39 +2,64 @@
  * Date and layout helpers for the calendar.
  * All in local time, the week starts on Monday (DIN 1355).
  */
-import { getLanguage } from '../i18n'
+import {getLanguage} from '../i18n'
 
 /**
  * Weekday and month names come from the browser in the active language, so
  * they do not have to be kept in the text catalogue for every language.
  * 2024-01-01 was a Monday, which is why the week starts there.
  */
-const named = (options, count, date) => Array.from({ length: count }, (unused, i) =>
+const named = (options, count, date) => Array.from({length: count}, (unused, i) =>
     new Intl.DateTimeFormat(getLanguage(), options).format(date(i)))
 
-export const WEEKDAYS_SHORT = named({ weekday: 'short' }, 7, i => new Date(Date.UTC(2024, 0, 1 + i)))
-export const WEEKDAYS_LONG = named({ weekday: 'long' }, 7, i => new Date(Date.UTC(2024, 0, 1 + i)))
-export const MONTHS = named({ month: 'long' }, 12, i => new Date(Date.UTC(2024, i, 1)))
+export const WEEKDAYS_SHORT = named({weekday: 'short'}, 7, i => new Date(Date.UTC(2024, 0, 1 + i)))
+export const WEEKDAYS_LONG = named({weekday: 'long'}, 7, i => new Date(Date.UTC(2024, 0, 1 + i)))
+export const MONTHS = named({month: 'long'}, 12, i => new Date(Date.UTC(2024, i, 1)))
 
 export const MS_MIN = 60 * 1000
 export const MS_HOUR = 60 * MS_MIN
 export const MS_DAY = 24 * MS_HOUR
 
-export const startOfDay = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
-export const endOfDay = d => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x }
-export const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x }
-export const addMonths = (d, n) => { const x = new Date(d); x.setDate(1); x.setMonth(x.getMonth() + n); return x }
+export const startOfDay = d => {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x
+}
+export const endOfDay = d => {
+    const x = new Date(d);
+    x.setHours(23, 59, 59, 999);
+    return x
+}
+export const addDays = (d, n) => {
+    const x = new Date(d);
+    x.setDate(x.getDate() + n);
+    return x
+}
+export const addMonths = (d, n) => {
+    const x = new Date(d);
+    x.setDate(1);
+    x.setMonth(x.getMonth() + n);
+    return x
+}
 export const addMinutes = (d, n) => new Date(new Date(d).getTime() + n * MS_MIN)
 
 /** Monday of the week that d falls in. */
-export function startOfWeek (d) {
+export function startOfWeek(d){
     const x = startOfDay(d)
     const shift = (x.getDay() + 6) % 7   // So=0 -> 6, Mo=1 -> 0
     return addDays(x, -shift)
 }
 
-export const startOfMonth = d => { const x = startOfDay(d); x.setDate(1); return x }
-export const endOfMonth = d => { const x = startOfMonth(d); x.setMonth(x.getMonth() + 1); return addDays(x, -1) }
+export const startOfMonth = d => {
+    const x = startOfDay(d);
+    x.setDate(1);
+    return x
+}
+export const endOfMonth = d => {
+    const x = startOfMonth(d);
+    x.setMonth(x.getMonth() + 1);
+    return addDays(x, -1)
+}
 
 export const isSameDay = (a, b) =>
     a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
@@ -60,7 +85,7 @@ export const fromLocalInput = value => {
 }
 
 /** Calendar week per ISO 8601. */
-export function isoWeek (d) {
+export function isoWeek(d){
     const x = startOfDay(d)
     x.setDate(x.getDate() + 3 - ((x.getDay() + 6) % 7))
     const firstThursday = new Date(x.getFullYear(), 0, 4)
@@ -69,26 +94,26 @@ export function isoWeek (d) {
 }
 
 /** The seven days of the week that d falls in. */
-export const weekDays = d => Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(d), i))
+export const weekDays = d => Array.from({length: 7}, (_, i) => addDays(startOfWeek(d), i))
 
 /**
  * 6 weeks x 7 days for the month view — always the same height, so the grid
  * does not jump when you page through.
  */
-export function monthGrid (d) {
+export function monthGrid(d){
     const first = startOfWeek(startOfMonth(d))
-    return Array.from({ length: 42 }, (_, i) => addDays(first, i))
+    return Array.from({length: 42}, (_, i) => addDays(first, i))
 }
 
 export const minutesOfDay = d => d.getHours() * 60 + d.getMinutes()
 
 /** Dauer als "1 h 30 min" / "45 min". */
-export function fmtDuration (ms) {
+export function fmtDuration(ms){
     const total = Math.round(ms / MS_MIN)
     const h = Math.floor(total / 60)
     const m = total % 60
-    if (!h) return `${m} min`
-    if (!m) return `${h} h`
+    if(!h) return `${m} min`
+    if(!m) return `${h} h`
     return `${h} h ${m} min`
 }
 
@@ -96,18 +121,18 @@ export function fmtDuration (ms) {
  * Clips an entry to one day. Returns null if it does not touch that day at
  * all. Needed for entries that run over midnight.
  */
-export function clipToDay (entry, day) {
+export function clipToDay(entry, day){
     const dayStart = startOfDay(day)
     const dayEnd = addDays(dayStart, 1)
     const start = new Date(entry.start)
     const end = new Date(entry.end)
-    if (end <= dayStart || start >= dayEnd) return null
+    if(end <= dayStart || start >= dayEnd) return null
     return {
         entry,
-        start: start < dayStart ? dayStart : start,
-        end: end > dayEnd ? dayEnd : end,
+        start: start < dayStart?dayStart:start,
+        end: end > dayEnd?dayEnd:end,
         continuesBefore: start < dayStart,
-        continuesAfter: end > dayEnd,
+        continuesAfter: end > dayEnd
     }
 }
 
@@ -121,7 +146,7 @@ export function clipToDay (entry, day) {
  *
  * Returned per entry: { ...clip, col, cols, topPct, heightPct }
  */
-export function layoutDay (entries, day) {
+export function layoutDay(entries, day){
     const clips = entries.map(e => clipToDay(e, day)).filter(Boolean)
     clips.sort((a, b) => a.start - b.start || b.end - a.end)
 
@@ -130,24 +155,26 @@ export function layoutDay (entries, day) {
     let clusterEnd = null
 
     const flush = () => {
-        if (!cluster.length) return
+        if(!cluster.length) return
         const columns = []            // per column, the end of the last entry
-        for (const c of cluster) {
+        for(const c of cluster){
             let col = columns.findIndex(end => end <= c.start)
-            if (col === -1) { col = columns.length; columns.push(c.end) }
-            else columns[col] = c.end
+            if(col === -1){
+                col = columns.length;
+                columns.push(c.end)
+            } else columns[col] = c.end
             c.col = col
         }
         const cols = columns.length
-        for (const c of cluster) out.push({ ...c, cols })
+        for(const c of cluster) out.push({...c, cols})
         cluster = []
         clusterEnd = null
     }
 
-    for (const c of clips) {
-        if (clusterEnd !== null && c.start >= clusterEnd) flush()
+    for(const c of clips){
+        if(clusterEnd !== null && c.start >= clusterEnd) flush()
         cluster.push(c)
-        clusterEnd = clusterEnd === null ? c.end : new Date(Math.max(clusterEnd, c.end))
+        clusterEnd = clusterEnd === null?c.end:new Date(Math.max(clusterEnd, c.end))
     }
     flush()
 
@@ -155,11 +182,11 @@ export function layoutDay (entries, day) {
     return out.map(c => {
         const topMin = (c.start - dayStart) / MS_MIN
         const heightMin = Math.max((c.end - c.start) / MS_MIN, 15)   // minimum height so it stays clickable
-        return { ...c, topPct: (topMin / 1440) * 100, heightPct: (heightMin / 1440) * 100 }
+        return {...c, topPct: (topMin / 1440) * 100, heightPct: (heightMin / 1440) * 100}
     })
 }
 
 /** Round to a grid (e.g. 15 minutes) — for dragging and creating. */
-export function snapMinutes (minutes, step = 15) {
+export function snapMinutes(minutes, step = 15){
     return Math.max(0, Math.min(1440, Math.round(minutes / step) * step))
 }

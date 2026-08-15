@@ -54,7 +54,7 @@ const ALLOWED = {
     'application/xml': 'xml',
     // Archive
     'application/zip': 'zip',
-    'application/x-7z-compressed': '7z',
+    'application/x-7z-compressed': '7z'
 }
 
 /**
@@ -71,55 +71,55 @@ const VAGUE_MIMES = new Set(['', 'application/octet-stream', 'binary/octet-strea
 
 /** Images and PDF may be shown inline by the browser. Everything else is downloaded. */
 const INLINE_MIMES = new Set([
-    'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/bmp', 'application/pdf',
+    'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/bmp', 'application/pdf'
 ])
 
 const MAX_BYTES = Number(process.env.UPLOAD_MAX_BYTES || 10 * 1024 * 1024)
 
-function httpError(status, msg) {
+function httpError(status, msg){
     const err = new Error(msg)
     err.status = status
     return err
 }
 
-function isAllowed(mime) {
+function isAllowed(mime){
     return Object.prototype.hasOwnProperty.call(ALLOWED, mime)
 }
 
 /** Endung eines Dateinamens, klein geschrieben, ohne Punkt. */
-function extensionOf(name) {
+function extensionOf(name){
     const match = /\.([A-Za-z0-9]{1,8})$/.exec(String(name || ''))
-    return match ? match[1].toLowerCase() : ''
+    return match?match[1].toLowerCase():''
 }
 
 /**
  * Works out the real type from the reported MIME type and the file name.
  * Throws if neither of the two leads to an allowed type.
  */
-function resolveType(mime, originalName) {
+function resolveType(mime, originalName){
     const clean = String(mime || '').toLowerCase().split(';')[0].trim()
-    if (isAllowed(clean)) return { mime: clean, ext: ALLOWED[clean] }
+    if(isAllowed(clean)) return {mime: clean, ext: ALLOWED[clean]}
 
     const ext = extensionOf(originalName)
-    if (ext && BY_EXTENSION[ext] && (VAGUE_MIMES.has(clean) || !clean)) {
-        return { mime: BY_EXTENSION[ext], ext }
+    if(ext && BY_EXTENSION[ext] && (VAGUE_MIMES.has(clean) || !clean)){
+        return {mime: BY_EXTENSION[ext], ext}
     }
     throw httpError(415, `Dateityp ${mime || 'unbekannt'} ist nicht erlaubt`)
 }
 
 /** Only for the download name: no paths, no quotes. */
-function safeFilename(name, fallbackExt) {
+function safeFilename(name, fallbackExt){
     const clean = String(name || '').replace(/[\\/\r\n"]/g, '').trim().slice(0, 120)
-    if (clean) return clean
+    if(clean) return clean
     return `datei.${fallbackExt}`
 }
 
-function isInline(mime) {
+function isInline(mime){
     return INLINE_MIMES.has(mime)
 }
 
 /** Erlaubt nur harmlose Pfadsegmente — keine Slashes, keine Punkte. */
-function safeSegment(value) {
+function safeSegment(value){
     const clean = String(value || '').replace(/[^A-Za-z0-9_-]/g, '')
     return clean.slice(0, 64)
 }
@@ -130,20 +130,20 @@ function safeSegment(value) {
  *   task + taskId        -> uploads/task/<taskId>/
  *   alles andere         -> uploads/misc/<jahr>/<monat>/
  */
-function targetDir(scope, taskId, now) {
-    if (scope === 'profile') return 'profile'
-    if (scope === 'task') {
+function targetDir(scope, taskId, now){
+    if(scope === 'profile') return 'profile'
+    if(scope === 'task'){
         const id = safeSegment(taskId)
-        if (!id) throw httpError(400, 'taskId fehlt fuer scope=task')
+        if(!id) throw httpError(400, 'taskId fehlt fuer scope=task')
         return path.join('task', id)
     }
     return path.join('misc', String(now.getUTCFullYear()), String(now.getUTCMonth() + 1).padStart(2, '0'))
 }
 
-async function save(buffer, mime, user, opts = {}) {
-    if (!buffer || !buffer.length) throw httpError(400, 'Leere Datei')
+async function save(buffer, mime, user, opts = {}){
+    if(!buffer || !buffer.length) throw httpError(400, 'Leere Datei')
     const type = resolveType(mime, opts.name)
-    if (buffer.length > MAX_BYTES) {
+    if(buffer.length > MAX_BYTES){
         throw httpError(413, `Datei ist groesser als ${Math.round(MAX_BYTES / 1024 / 1024)} MB`)
     }
 
@@ -151,7 +151,7 @@ async function save(buffer, mime, user, opts = {}) {
     const now = new Date()
     const rel = targetDir(opts.scope, opts.taskId, now)
     const dir = path.join(UPLOAD_ROOT, rel)
-    await fs.mkdir(dir, { recursive: true })
+    await fs.mkdir(dir, {recursive: true})
 
     // Auf der Platte heisst die Datei nach ihrer Id — der urspruengliche Name
     // kommt nur in die Datenbank und wird beim Herunterladen wieder gesetzt.
@@ -166,39 +166,43 @@ async function save(buffer, mime, user, opts = {}) {
         size: buffer.length,
         scope: opts.scope || 'misc',
         originalName,
-        taskId: opts.scope === 'task' ? safeSegment(opts.taskId) : null,
-        uploadedBy: user ? String(user._id) : null,
-        uploadedByName: user ? user.fullname : null,
-        createdAt: now,
+        taskId: opts.scope === 'task'?safeSegment(opts.taskId):null,
+        uploadedBy: user?String(user._id):null,
+        uploadedByName: user?user.fullname:null,
+        createdAt: now
     }
     await fileRepo.insert(doc)
 
-    return { _id: id, url: `/api/upload/${id}`, mime: type.mime, size: buffer.length, name: originalName }
+    return {_id: id, url: `/api/upload/${id}`, mime: type.mime, size: buffer.length, name: originalName}
 }
 
-async function getMeta(id) {
-    if (!/^[a-f0-9]{32}$/.test(String(id || ''))) throw httpError(404, 'Datei nicht gefunden')
+async function getMeta(id){
+    if(!/^[a-f0-9]{32}$/.test(String(id || ''))) throw httpError(404, 'Datei nicht gefunden')
     const doc = await fileRepo.findById(id)
-    if (!doc) throw httpError(404, 'Datei nicht gefunden')
+    if(!doc) throw httpError(404, 'Datei nicht gefunden')
     return doc
 }
 
 /** Absoluter Pfad, gegen Ausbrechen aus dem Upload-Verzeichnis abgesichert. */
-function absPathOf(doc) {
+function absPathOf(doc){
     const abs = path.resolve(UPLOAD_ROOT, doc.relPath)
-    if (!abs.startsWith(path.resolve(UPLOAD_ROOT) + path.sep)) {
+    if(!abs.startsWith(path.resolve(UPLOAD_ROOT) + path.sep)){
         throw httpError(400, 'Ungueltiger Pfad')
     }
     return abs
 }
 
-function createReadStream(doc) {
+function createReadStream(doc){
     return fsSync.createReadStream(absPathOf(doc))
 }
 
-async function remove(id) {
+async function remove(id){
     const doc = await getMeta(id)
-    try { await fs.unlink(absPathOf(doc)) } catch (err) { logger.error('Datei nicht loeschbar', err) }
+    try {
+        await fs.unlink(absPathOf(doc))
+    } catch(err) {
+        logger.error('Datei nicht loeschbar', err)
+    }
     await fileRepo.deleteById(id)
     return id
 }
@@ -206,5 +210,5 @@ async function remove(id) {
 module.exports = {
     save, getMeta, createReadStream, remove,
     isAllowed, resolveType, safeSegment, safeFilename, isInline, extensionOf,
-    UPLOAD_ROOT, MAX_BYTES, ALLOWED,
+    UPLOAD_ROOT, MAX_BYTES, ALLOWED
 }

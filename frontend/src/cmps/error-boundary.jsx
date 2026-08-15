@@ -1,5 +1,5 @@
 import React from 'react'
-import { t } from '../i18n'
+import {t} from '../i18n'
 
 /**
  * Catches errors during rendering.
@@ -10,30 +10,28 @@ import { t } from '../i18n'
  * see which area is affected.
  */
 export class ErrorBoundary extends React.Component {
-    constructor(props) {
+    constructor(props){
         super(props)
-        this.state = { err: null }
+        this.state = {err: null}
     }
 
-    static getDerivedStateFromError(err) {
-        return { err }
+    static getDerivedStateFromError(err){
+        return {err}
     }
 
-    componentDidCatch(err, info) {
+    componentDidCatch(err, info){
         console.error('Fehler in', this.props.label || 'einem Bereich', err, info)
     }
 
-    render() {
-        if (!this.state.err) return this.props.children
+    render(){
+        if(!this.state.err) return this.props.children
         return (
             <div className="error-boundary">
-                <strong>{t('common.areaFailed', { area: this.props.label || t('common.thisArea') })}</strong>
+                <strong>{t('common.areaFailed', {area: this.props.label || t('common.thisArea')})}</strong>
                 <div className="error-boundary-hint">
                     {t('common.areaFailedHint')}
                 </div>
-                <button type="button"
-                    onClick={() => this.setState({ err: null })}
-                    className="error-boundary-retry">
+                <button type="button" onClick={() => this.setState({err: null})} className="error-boundary-retry">
                     {t('common.retry')}
                 </button>
             </div>

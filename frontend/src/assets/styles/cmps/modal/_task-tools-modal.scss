@@ -46,18 +46,19 @@
         color: variables.$primary-text-color;
         width: 100%;
 
-        >* {
+        > * {
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
         @include mixins.for-mobile-layout() {
-            & >*{
+            & > * {
                 align-items: flex-start;
             }
-          
+
         }
+
         .task-count {
             @include mixins.center-flex();
             border-top-left-radius: 5px;
@@ -87,8 +88,9 @@
                 padding-left: variables.$spacing-xs;
                 gap: variables.$spacing-xs;
             }
+
             @include mixins.for-mobile-layout() {
-                &{
+                & {
                     flex-direction: column;
                 }
             }
@@ -98,7 +100,7 @@
             margin-left: auto;
             gap: 20px;
 
-            &>* {
+            & > * {
                 display: flex;
                 flex-direction: column;
                 font-size: 12px;
@@ -113,7 +115,7 @@
                 .icon {
                     font-size: functions.rem(18px);
                     margin: 0 auto;
-                    color: color.adjust(variables.$workspace-icon-color , $lightness: -20%);
+                    color: color.adjust(variables.$workspace-icon-color, $lightness: -20%);
                 }
             }
 
@@ -152,6 +154,7 @@
         }
     }
 }
+
 // "Move to" — the list of target groups floats above the toolbar.
 // Was inline in cmps/modal/task-tools-modal.jsx.
 .move-to {

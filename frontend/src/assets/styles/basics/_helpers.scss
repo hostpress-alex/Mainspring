@@ -1,13 +1,33 @@
 @use "../setup/functions";
 
 // Font Sizes
-.fs12 { font-size: functions.rem(12px); }
-.fs14 { font-size: functions.rem(14px); }
-.fs18 { font-size: functions.rem(18px); }
-.fs20 { font-size: functions.rem(20px); }
-.fs24 { font-size: functions.rem(24px); }
-.fs28 { font-size: functions.rem(28px); }
-.fs30 { font-size: functions.rem(30px); }
+.fs12 {
+    font-size: functions.rem(12px);
+}
+
+.fs14 {
+    font-size: functions.rem(14px);
+}
+
+.fs18 {
+    font-size: functions.rem(18px);
+}
+
+.fs20 {
+    font-size: functions.rem(20px);
+}
+
+.fs24 {
+    font-size: functions.rem(24px);
+}
+
+.fs28 {
+    font-size: functions.rem(28px);
+}
+
+.fs30 {
+    font-size: functions.rem(30px);
+}
 
 // flex helpers
 
@@ -18,18 +38,23 @@
     > *.full {
         flex: 1;
     }
+
     &.column {
         flex-direction: column;
     }
+
     &.justify-center {
         justify-content: center;
     }
+
     &.space-between {
         justify-content: space-between;
     }
+
     &.space-around {
         justify-content: space-around;
     }
+
     &.align-center {
         align-items: center;
     }

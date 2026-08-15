@@ -5,7 +5,11 @@
     align-items: stretch;
     min-height: 100vh;
 }
-.app-shell-nav { flex: 0 0 auto; }
+
+.app-shell-nav {
+    flex: 0 0 auto;
+}
+
 .app-shell-content {
     flex: 1 1 auto;
     min-width: 0;
@@ -15,17 +19,33 @@
 
 /* The calendar brings its own 100vh — inside the shell the content area takes
    over the height, otherwise you get scrolling twice. */
-.app-shell-content > .cal { height: 100%; }
+.app-shell-content > .cal {
+    height: 100%;
+}
 
-.workspace-section + .workspace-section { border-top: 1px solid rgba(255,255,255,.08); }
+.workspace-section + .workspace-section {
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
 
 @media (max-width: 560px) {
-    .app-shell { flex-direction: column; }
-    .app-shell-content { height: auto; }
+    .app-shell {
+        flex-direction: column;
+    }
+
+    .app-shell-content {
+        height: auto;
+    }
 }
 
 /* The SCSS sets .workspace-sidebar .board-list-container { margin-top: 24px }.
    Inside a section that gap is too big — undone here with the same
    specificity and a later position. */
-.workspace-sidebar .workspace-section > .board-list-container { margin-top: 2px; gap: 2px; }
-.workspace-sidebar .workspace-section > .board-list-container > .board-list { padding-top: 0; padding-bottom: 0; }
+.workspace-sidebar .workspace-section > .board-list-container {
+    margin-top: 2px;
+    gap: 2px;
+}
+
+.workspace-sidebar .workspace-section > .board-list-container > .board-list {
+    padding-top: 0;
+    padding-bottom: 0;
+}

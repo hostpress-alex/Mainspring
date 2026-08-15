@@ -70,7 +70,7 @@
         padding: 0 variables.$spacing-large;
         border-bottom: 1px solid variables.$border-color;
 
-        >* {
+        > * {
             @include mixins.center-flex();
             gap: variables.$spacing-small;
             border-right: 1px solid variables.$border-color;
@@ -169,7 +169,7 @@
                 display: flex;
                 border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
-                >* {
+                > * {
                     @include mixins.center-flex();
                     padding: variables.$spacing-xs variables.$spacing-small;
                     cursor: pointer;
@@ -224,6 +224,7 @@
         overflow: auto;
     }
 }
+
 /**
  * Drag handle for the width of the right-hand task panel.
  *

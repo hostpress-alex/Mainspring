@@ -29,7 +29,7 @@
             position: absolute;
             right: 4px;
         }
-        
+
         &:hover {
             .open-modal-icon {
                 @include mixins.center-flex();
@@ -61,8 +61,8 @@
         }
 
         .add-picker-task {
-            border-top: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
-            border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+            border-top: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+            border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
             width: 100%;
             transition: transform .2s, color .1s ease;
             padding-right: 150px;
@@ -81,16 +81,16 @@
                     transform: rotate(45deg);
                     color: variables.$primary-hover-color;
                 }
-                
-                .close{
+
+                .close {
                     transition: transform .2s ease, color .1s ease;
                     transform: rotate(0);
                 }
-                
+
                 &:hover {
                     background-color: variables.$layout-border-color;
                 }
-                
+
                 &.active {
                     background-color: variables.$layout-border-color;
                 }
@@ -102,7 +102,7 @@
         @include mixins.center-flex();
         min-width: variables.$cell-width;
         height: variables.$cell-height;
-        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         font-size: functions.rem(14px);
 
         &.task {
@@ -245,7 +245,7 @@
     .check-box {
         min-width: 33px;
         @include mixins.center-flex();
-        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
         input {
             width: 15px;
@@ -258,7 +258,7 @@
 
         .empty-div {
             width: 100%;
-            border-bottom: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+            border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         }
 
         .add-task-form {
@@ -278,11 +278,11 @@
             border: none;
 
             &:focus-visible {
-                outline: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+                outline: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
             }
 
             &:hover {
-                border: .5px solid color.adjust(variables.$border-color , $lightness: -20%);
+                border: .5px solid color.adjust(variables.$border-color, $lightness: -20%);
             }
         }
 
@@ -324,6 +324,7 @@
         opacity: .6;
     }
 }
+
 /**
  * Group colour.
  *
@@ -371,4 +372,19 @@
     color: #676879;
     font-size: 13px;
     cursor: pointer;
+}
+
+// The task column carries a grabber like every other column. The header cell
+// needs a positioning context for it and room for the label beside it.
+.group-preview .title-container .task.title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .col-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }

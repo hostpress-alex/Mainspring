@@ -1,7 +1,7 @@
 const express = require('express')
-const { requireAuth } = require('../../middlewares/requireAuth.middleware')
+const {requireAuth} = require('../../middlewares/requireAuth.middleware')
 const fileService = require('../../services/file.service')
-const { uploadFile, serveFile } = require('./upload.controller')
+const {uploadFile, serveFile} = require('./upload.controller')
 
 const router = express.Router()
 
@@ -18,7 +18,7 @@ router.use(requireAuth)
 // das Groessenlimit greift hier davor.
 router.post('/', express.raw({
     type: '*/*',
-    limit: fileService.MAX_BYTES,
+    limit: fileService.MAX_BYTES
 }), uploadFile)
 
 router.get('/:id', serveFile)

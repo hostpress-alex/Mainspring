@@ -1,19 +1,19 @@
 @use "../../setup/variables";
 
-.task-preview-kanban{
+.task-preview-kanban {
     display: flex;
     flex-direction: column;
     width: 140px;
-    >*{
+
+    > * {
         margin-bottom: 8px;
     }
-    
-    & .picker{
+
+    & .picker {
         cursor: pointer;
         background-color: variables.$board-description-bg;
         height: 36px;
     }
 
-    
 
 }

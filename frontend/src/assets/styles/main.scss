@@ -18,7 +18,7 @@
 @use "views/admin-page";
 
 // Components
-    // task-picker
+// task-picker
 @use "cmps/task-picker/status-priority-picker";
 @use "cmps/task-picker/member-picker";
 @use "cmps/task-picker/number-picker";
@@ -31,7 +31,7 @@
 @use "cmps/sidebar/main-sidebar";
 @use "cmps/sidebar/workspace-sidebar";
 
-    // modal
+// modal
 @use "cmps/modal/status-priority-modal";
 @use "cmps/modal/board-modal";
 @use "cmps/modal/board-activity-modal";
@@ -52,17 +52,17 @@
 @use "cmps/modal/chart-type-modal";
 @use "cmps/modal/label-editor";
 
-    // group
+// group
 @use "cmps/group/group-list";
 @use "cmps/group/group-preview";
 @use "cmps/group/group-statistics";
 
-    // board
+// board
 @use "cmps/board/board-header";
 @use "cmps/board/board-filter";
 @use "cmps/board/board-preview";
 
-    // Kanban
+// Kanban
 @use "cmps/kanban/group-list-kanban";
 @use "cmps/kanban/group-preview-kanban";
 @use "cmps/kanban/task-list-kanban";

@@ -124,7 +124,9 @@
     font-size: 13px;
 }
 
-.comments-list .comment-replies .reply-actions .save:hover { background: #0060b9; }
+.comments-list .comment-replies .reply-actions .save:hover {
+    background: #0060b9;
+}
 
 .comments-list .comment-replies .reply-actions .save:disabled {
     background: #c3c6d4;
@@ -144,4 +146,6 @@
     font-size: 13px;
 }
 
-.comments-list .comment-replies .reply-actions .cancel:hover { background: #dcdfec; }
+.comments-list .comment-replies .reply-actions .cancel:hover {
+    background: #dcdfec;
+}

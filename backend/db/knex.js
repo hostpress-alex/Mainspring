@@ -1,23 +1,22 @@
 /**
  * Connection to MariaDB.
  *
- * The connection is opened on first use. When the server runs with
- * DB_DRIVER=mongo this file is still loaded but never connects — MariaDB does
- * not even have to be running.
+ * The connection is opened on first use, not when this file is loaded, so a
+ * script that only needs config does not drag a database connection along.
  */
 const config = require('../config')
 
 let instance = null
 
-function db() {
-    if (instance) return instance
+function db(){
+    if(instance) return instance
     const cfg = config.mysql || {}
-    if (!cfg.host || !cfg.user || !cfg.database) {
+    if(!cfg.host || !cfg.user || !cfg.database){
         throw new Error('MariaDB is not configured: set MYSQL_HOST, MYSQL_USER and MYSQL_DB')
     }
     instance = require('knex')({
         client: 'mysql2',
-        migrations: { directory: require('path').join(__dirname, 'migrations'), tableName: 'knex_migrations' },
+        migrations: {directory: require('path').join(__dirname, 'migrations'), tableName: 'knex_migrations'},
         connection: {
             host: cfg.host,
             port: cfg.port,
@@ -27,15 +26,15 @@ function db() {
             charset: 'utf8mb4',
             timezone: 'Z',
             supportBigNumbers: true,
-            dateStrings: false,
+            dateStrings: false
         },
-        pool: { min: 0, max: 10 },
+        pool: {min: 0, max: 10}
     })
     return instance
 }
 
-async function destroy() {
-    if (!instance) return
+async function destroy(){
+    if(!instance) return
     await instance.destroy()
     instance = null
 }
@@ -51,19 +50,19 @@ async function destroy() {
  * fallback and get lost. So if unpacking fails, the value was already
  * unpacked and is passed through untouched.
  */
-function parseJson(value, fallback = null) {
-    if (value === null || value === undefined) return fallback
-    if (typeof value !== 'string') return value
+function parseJson(value, fallback = null){
+    if(value === null || value === undefined) return fallback
+    if(typeof value !== 'string') return value
     try {
         return JSON.parse(value)
-    } catch (err) {
+    } catch(err) {
         return value
     }
 }
 
 /** Counterpart to parseJson: null stays null, everything else gets packed. */
-function toJson(value) {
-    if (value === undefined || value === null) return null
+function toJson(value){
+    if(value === undefined || value === null) return null
     return JSON.stringify(value)
 }
 
@@ -74,10 +73,10 @@ function toJson(value) {
  * writing falls over in exactly one place, and in the interface it looks as
  * if a single button is broken. Better to stop loudly.
  */
-async function assertMigrated() {
+async function assertMigrated(){
     const [, pending] = await db().migrate.list()
-    if (!pending.length) return
-    const names = pending.map(p => (typeof p === 'string' ? p : p.file || p.name)).join(', ')
+    if(!pending.length) return
+    const names = pending.map(p => (typeof p === 'string'?p:p.file || p.name)).join(', ')
     const err = new Error(
         `${pending.length} database migration(s) are missing: ${names}\n` +
         '   Please run this in the backend folder:  npm run db:migrate')
@@ -85,4 +84,4 @@ async function assertMigrated() {
     throw err
 }
 
-module.exports = { db, destroy, parseJson, toJson, assertMigrated }
+module.exports = {db, destroy, parseJson, toJson, assertMigrated}

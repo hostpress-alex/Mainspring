@@ -2,28 +2,28 @@
 @use "../setup/mixins";
 
 .logo {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      gap: 7px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 7px;
 
-      &-title {
-          font-size: functions.rem(20px);
-          font-weight:700;
-          color: black;
-      }
+    &-title {
+        font-size: functions.rem(20px);
+        font-weight: 700;
+        color: black;
+    }
 
-      &-img {
-          height: functions.rem(18px);
-      }
+    &-img {
+        height: functions.rem(18px);
+    }
 
-      @include mixins.for-normal-layout() {
-          &-title {
-              font-size: functions.rem(24px);
-          }
+    @include mixins.for-normal-layout() {
+        &-title {
+            font-size: functions.rem(24px);
+        }
 
-          &-img {
-              height: functions.rem(20px);
-          }
-      }            
-  }
+        &-img {
+            height: functions.rem(20px);
+        }
+    }
+}

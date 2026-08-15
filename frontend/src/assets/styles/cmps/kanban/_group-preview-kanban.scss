@@ -4,6 +4,7 @@
 .group-preview-kanban {
     width: 260px;
     background-color: variables.$sidebar-workspace-bg;
+
     .group-title-container {
         height: 44px;
         color: variables.$app-bg;
@@ -17,6 +18,7 @@
         display: flex;
     }
 }
+
 .group-title-container {
     background-color: var(--group-color);
 }

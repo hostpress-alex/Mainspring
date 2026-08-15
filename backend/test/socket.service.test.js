@@ -12,7 +12,7 @@
 const test = require('node:test')
 const assert = require('node:assert')
 
-const { readCookie, boardHasTask } = require('../services/socket.service')
+const {readCookie, boardHasTask} = require('../services/socket.service')
 
 /* ------------------------------------------------------------ readCookie -- */
 
@@ -70,9 +70,9 @@ test('an empty cookie value is empty, not missing', () => {
 
 const board = {
     groups: [
-        { id: 'g1', tasks: [{ id: 't1' }, { id: 't2' }] },
-        { id: 'g2', tasks: [{ id: 't3' }] },
-    ],
+        {id: 'g1', tasks: [{id: 't1'}, {id: 't2'}]},
+        {id: 'g2', tasks: [{id: 't3'}]}
+    ]
 }
 
 test('finds a task in any group', () => {
@@ -85,12 +85,12 @@ test('does not find a task that belongs to another board', () => {
 })
 
 test('compares as text, so a numeric id still matches', () => {
-    assert.strictEqual(boardHasTask({ groups: [{ tasks: [{ id: 7 }] }] }, '7'), true)
+    assert.strictEqual(boardHasTask({groups: [{tasks: [{id: 7}]}]}, '7'), true)
 })
 
 test('copes with boards that are missing pieces', () => {
     assert.strictEqual(boardHasTask({}, 't1'), false)
     assert.strictEqual(boardHasTask(null, 't1'), false)
-    assert.strictEqual(boardHasTask({ groups: [] }, 't1'), false)
-    assert.strictEqual(boardHasTask({ groups: [{ id: 'g1' }] }, 't1'), false)
+    assert.strictEqual(boardHasTask({groups: []}, 't1'), false)
+    assert.strictEqual(boardHasTask({groups: [{id: 'g1'}]}, 't1'), false)
 })

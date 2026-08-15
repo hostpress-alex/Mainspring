@@ -37,6 +37,7 @@
             font-size: functions.rem(24px);
             padding: variables.$spacing-xs;
             cursor: pointer;
+
             &:hover {
                 @include mixins.hover-sidebar();
             }
@@ -83,7 +84,7 @@
             }
         }
 
-        >*:hover {
+        > *:hover {
             @include mixins.hover-sidebar()
         }
     }
@@ -134,6 +135,7 @@
         }
     }
 }
+
 // Calendar and administration: white, dimmed unless it is the current page.
 // Deliberately only .nav-link — the board icon above never had this.
 .main-sidebar .icon-container.nav-link {

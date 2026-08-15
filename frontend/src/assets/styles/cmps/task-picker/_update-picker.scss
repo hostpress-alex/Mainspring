@@ -5,7 +5,8 @@
 
 .updated-picker {
     @include mixins.center-flex();
-    &-content{
+
+    &-content {
         width: 60px;
     }
 

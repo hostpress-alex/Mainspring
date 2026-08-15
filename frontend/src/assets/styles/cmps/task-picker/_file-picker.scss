@@ -2,10 +2,12 @@
 @use "../../setup/mixins";
 
 .file-picker {
-    max-width: 140px;
+    // No fixed cap: the column width is dragged by the user and lives on the
+    // cell. A max-width here made the field stop growing at 140px while its
+    // cell kept getting wider — the value then floated in an empty column.
+    width: 100%;
     @include mixins.center-flex();
     position: relative;
-    width: 100%;
 
     &:hover {
         .icon {
@@ -29,6 +31,7 @@
         cursor: pointer;
     }
 }
+
 // The file column: upload button, thumbnail or file name with a remove cross.
 // These rules used to sit as inline styles in cmps/task/file-picker.jsx.
 .file-picker {

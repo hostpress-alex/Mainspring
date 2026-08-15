@@ -7,14 +7,14 @@
     font-size: functions.rem(16px);
     color: variables.$primary-text-color;
 
-    >* {
+    > * {
         display: flex;
         align-items: center;
         gap: variables.$spacing-small;
         padding: variables.$spacing-xs variables.$spacing-small;
         cursor: pointer;
 
-        &:hover{
+        &:hover {
             background-color: variables.$workspace-hover;
             border-radius: variables.$spacing-small;
         }

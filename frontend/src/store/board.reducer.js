@@ -1,4 +1,4 @@
-import { boardService } from "../services/board.service"
+import {boardService} from '../services/board.service'
 
 export const SET_BOARDS = 'SET_BOARDS'
 export const SET_BOARD = 'SET_BOARD'
@@ -17,36 +17,35 @@ const initialState = {
     filteredBoard: null,
     board: null,
     isBoardModalOpen: false,
-    dynamicModalObj: { isOpen: false, pos: { x: '', y: '' }, type: '' },
+    dynamicModalObj: {isOpen: false, pos: {x: '', y: ''}, type: ''},
     filter: boardService.getDefaultFilterBoard()
 }
 
-export function boardReducer(state = initialState, action) {
+export function boardReducer(state = initialState, action){
     let boards
-    switch (action.type) {
+    switch(action.type) {
         case SET_BOARDS:
-            return { ...state, boards: action.boards }
+            return {...state, boards: action.boards}
         case SET_BOARD:
-            return { ...state, board: { ...action.board } }
+            return {...state, board: {...action.board}}
         case SET_FILTER_BOARD:
-            return { ...state, filteredBoard: { ...action.filteredBoard } }
+            return {...state, filteredBoard: {...action.filteredBoard}}
         case REMOVE_BOARD:
             boards = state.boards.filter(board => board._id !== action.boardId)
-            return { ...state, boards }
+            return {...state, boards}
         case ADD_BOARD:
             boards = [action.board, ...state.boards]
-            return { ...state, boards }
+            return {...state, boards}
         case UPDATE_BOARD:
-            boards = state.boards.map(board => (board._id === action.board._id) ? action.board : board)
-            return { ...state, boards }
+            boards = state.boards.map(board => (board._id === action.board._id)?action.board:board)
+            return {...state, boards}
         case SET_MODAL:
-            return { ...state, isBoardModalOpen: action.isOpen }
+            return {...state, isBoardModalOpen: action.isOpen}
 
         case SET_FILTER:
-            return { ...state, filter: action.filter }
+            return {...state, filter: action.filter}
 
-
-        case SET_DYNAMIC_MODAL:{
+        case SET_DYNAMIC_MODAL: {
             return {...state, dynamicModalObj: action.dynamicModalObj}
         }
         default:

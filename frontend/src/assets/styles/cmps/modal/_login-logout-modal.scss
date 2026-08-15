@@ -12,10 +12,10 @@
     padding: variables.$spacing-small;
     font-size: functions.rem(14px);
     z-index: 10;
-    border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
     left: 74%;
-    bottom: 70px;    
-    
+    bottom: 70px;
+
     span, a {
         @include mixins.center-flex();
         cursor: pointer;
@@ -23,13 +23,14 @@
         border-radius: 4px;
         gap: variables.$spacing-xs;
         color: variables.$primary-text-color;
+
         &:hover {
             background-color: variables.$workspace-hover;
         }
     }
-    
+
     @include mixins.for-narrow-layout() {
-        &{
+        & {
             left: 60px;
             bottom: 15px;
         }

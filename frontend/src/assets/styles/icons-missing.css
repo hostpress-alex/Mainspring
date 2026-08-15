@@ -1,0 +1,10 @@
+/* Last-resort fallback for the `app-icons` alias in vite.config.js.
+
+   Neither Font Awesome Pro (vendor/, see vendor/README.md) nor the free
+   package is installed — run `npm install` in frontend/. Until then the icon
+   slots stay empty instead of showing replacement boxes, and the dev server
+   still starts. */
+.fa, .fas, .far, .fab, .fal, .fat, .fad,
+[class*='fa-'] {
+    font-family: inherit;
+}

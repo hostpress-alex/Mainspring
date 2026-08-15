@@ -13,25 +13,25 @@
  *   <blockquote contentEditable onBlur={onSave} {...singleLineEditable()} />
  *   <blockquote contentEditable onBlur={onSave} {...singleLineEditable({ onFocus: … })} />
  */
-export function singleLineEditable ({ onFocus } = {}) {
+export function singleLineEditable({onFocus} = {}){
     return {
         onFocus: ev => {
             // Fuer Escape merken, was vorher drinstand.
             ev.currentTarget.dataset.origText = ev.currentTarget.innerText
-            if (onFocus) onFocus(ev)
+            if(onFocus) onFocus(ev)
         },
         onKeyDown: ev => {
-            if (ev.key === 'Enter' && !ev.shiftKey) {
+            if(ev.key === 'Enter' && !ev.shiftKey){
                 ev.preventDefault()
                 ev.currentTarget.blur()
                 return
             }
-            if (ev.key === 'Escape') {
+            if(ev.key === 'Escape'){
                 ev.preventDefault()
                 const orig = ev.currentTarget.dataset.origText
-                if (orig !== undefined) ev.currentTarget.innerText = orig
+                if(orig !== undefined) ev.currentTarget.innerText = orig
                 ev.currentTarget.blur()
             }
-        },
+        }
     }
 }

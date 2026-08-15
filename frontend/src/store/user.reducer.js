@@ -1,4 +1,4 @@
-import { userService } from '../services/user.service.js'
+import {userService} from '../services/user.service.js'
 
 export const SET_USER = 'SET_USER'
 export const SET_WATCHED_USER = 'SET_WATCHED_USER'
@@ -10,14 +10,14 @@ const initialState = {
     users: []
 }
 
-export function userReducer(state = initialState, action = {}) {
+export function userReducer(state = initialState, action = {}){
     var newState = state
-    switch (action.type) {
+    switch(action.type) {
         case SET_USER:
-            newState = { ...state, user: action.user }
+            newState = {...state, user: action.user}
             break
         case SET_WATCHED_USER:
-            newState = { ...state, watchedUser: action.user }
+            newState = {...state, watchedUser: action.user}
             break
         case REMOVE_USER:
             newState = {
@@ -26,9 +26,10 @@ export function userReducer(state = initialState, action = {}) {
             }
             break
         case SET_USERS:
-            newState = { ...state, users: action.users }
+            newState = {...state, users: action.users}
             break
-        default: return state
+        default:
+            return state
     }
 
     return newState

@@ -1,6 +1,6 @@
 // import { storageService } from './async-storage.service'
-import { httpService } from './http.service'
-import { socketService } from './socket.service'
+import {httpService} from './http.service'
+import {socketService} from './socket.service'
 
 const STORAGE_KEY_LOGGEDIN_USER = 'loggedinUser'
 const BASE_URL = 'user/'
@@ -16,65 +16,71 @@ export const userService = {
     remove,
     update,
     create,
-    setAdmin,
+    setAdmin
 }
 
 window.userService = userService
 
-function getUsers() {
+function getUsers(){
     return httpService.get(BASE_URL)
 }
 
-async function getById(userId) {
+async function getById(userId){
     return httpService.get(BASE_URL + userId)
 }
 
-function remove(userId) {
+function remove(userId){
     return httpService.delete(BASE_URL + userId)
 }
 
-async function update({user}) {
-    if (user._id) return httpService.put(BASE_URL + user._id, user)
+async function update({user}){
+    if(user._id) return httpService.put(BASE_URL + user._id, user)
     return httpService.post(BASE_URL, user)
 }
 
 /** Admins only: create a new user. */
-function create(user) {
+function create(user){
     return httpService.post(BASE_URL, user)
 }
 
 /** Admins only: grant or revoke the admin flag. */
-function setAdmin(userId, isAdmin) {
-    return httpService.put(BASE_URL + userId, { isAdmin })
+function setAdmin(userId, isAdmin){
+    return httpService.put(BASE_URL + userId, {isAdmin})
 }
 
-async function login(userCred) {
+async function login(userCred){
     const user = await httpService.post('auth/login', userCred)
-    if (user) {
+    if(user){
         socketService.login(user._id)
         return saveLocalUser(user)
     }
 }
 
-async function signup(userCred) {
+async function signup(userCred){
     const user = await httpService.post('auth/signup', userCred)
     socketService.login(user._id)
     return saveLocalUser(user)
 }
 
-async function logout() {
+async function logout(){
     sessionStorage.removeItem(STORAGE_KEY_LOGGEDIN_USER)
     socketService.logout()
     return await httpService.post('auth/logout')
 }
 
-function saveLocalUser(user) {
-    user = { _id: user._id, username: user.username, fullname: user.fullname, imgUrl: user.imgUrl, isAdmin: user.isAdmin === true }
+function saveLocalUser(user){
+    user = {
+        _id: user._id,
+        username: user.username,
+        fullname: user.fullname,
+        imgUrl: user.imgUrl,
+        isAdmin: user.isAdmin === true
+    }
     sessionStorage.setItem(STORAGE_KEY_LOGGEDIN_USER, JSON.stringify(user))
     return user
 }
 
-function getLoggedinUser() {
+function getLoggedinUser(){
     return JSON.parse(sessionStorage.getItem(STORAGE_KEY_LOGGEDIN_USER))
 }
 

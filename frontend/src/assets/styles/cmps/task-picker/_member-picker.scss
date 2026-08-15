@@ -2,13 +2,13 @@
 @use "../../setup/mixins";
 @use "../../setup/variables";
 
-.task-preview , .task-preview-kanban{
+.task-preview, .task-preview-kanban {
     .task-person {
         cursor: pointer;
         height: 36px;
         min-width: variables.$cell-width-person;
         position: relative;
-        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
+        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         @include mixins.center-flex();
 
         .members-imgs {

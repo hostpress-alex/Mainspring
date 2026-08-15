@@ -1,4 +1,4 @@
-import { httpService } from './http.service'
+import {httpService} from './http.service'
 
 const BASE_URL = 'schedule/'
 
@@ -6,27 +6,27 @@ export const scheduleService = {
     query,
     save,
     remove,
-    tasksFromBoards,
+    tasksFromBoards
 }
 
 /** Entries that touch the period [from, to). */
-function query(from, to) {
-    return httpService.get(BASE_URL, { from: from.toISOString(), to: to.toISOString() })
+function query(from, to){
+    return httpService.get(BASE_URL, {from: from.toISOString(), to: to.toISOString()})
 }
 
-function save(entry) {
+function save(entry){
     const payload = {
         boardId: entry.boardId,
         taskId: entry.taskId,
         start: new Date(entry.start).toISOString(),
         end: new Date(entry.end).toISOString(),
-        note: entry.note || '',
+        note: entry.note || ''
     }
-    if (entry._id) return httpService.put(BASE_URL + entry._id, payload)
+    if(entry._id) return httpService.put(BASE_URL + entry._id, payload)
     return httpService.post(BASE_URL, payload)
 }
 
-function remove(entryId) {
+function remove(entryId){
     return httpService.delete(BASE_URL + entryId)
 }
 
@@ -34,11 +34,11 @@ function remove(entryId) {
  * A flat, searchable list of all tasks from the user's boards — the data
  * source for the task picker in the dialog.
  */
-function tasksFromBoards(boards = []) {
+function tasksFromBoards(boards = []){
     const out = []
-    for (const board of boards) {
-        for (const group of board.groups || []) {
-            for (const task of group.tasks || []) {
+    for(const board of boards){
+        for(const group of board.groups || []){
+            for(const task of group.tasks || []){
                 out.push({
                     boardId: board._id,
                     boardTitle: board.title,
@@ -47,7 +47,7 @@ function tasksFromBoards(boards = []) {
                     taskId: task.id,
                     taskTitle: task.title,
                     color: group.color || '#0073ea',
-                    search: `${task.title} ${group.title} ${board.title}`.toLowerCase(),
+                    search: `${task.title} ${group.title} ${board.title}`.toLowerCase()
                 })
             }
         }

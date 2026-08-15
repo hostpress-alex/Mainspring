@@ -12,14 +12,14 @@
         right: 10px;
         cursor: pointer;
     }
-    
+
     .modal-member-content {
         width: 360px;
         font-size: functions.rem(14px);
 
         @include mixins.for-mobile-layout() {
             & {
-               width: 250px;
+                width: 250px;
             }
         }
 
@@ -32,6 +32,7 @@
             flex-wrap: wrap;
             gap: variables.$spacing-small;
             margin-top: 0;
+
             li {
                 padding: variables.$spacing-xs variables.$spacing-small;
                 display: flex;
@@ -60,11 +61,11 @@
                 padding: variables.$spacing-xs variables.$spacing-xs;
                 width: 320px;
                 border-radius: 8px;
-                border: 2px solid color.adjust(variables.$border-color , $lightness: -20%);
+                border: 2px solid color.adjust(variables.$border-color, $lightness: -20%);
 
                 @include mixins.for-mobile-layout() {
                     & {
-                       width: 200px;
+                        width: 200px;
                     }
                 }
 
@@ -129,14 +130,14 @@
         font-size: functions.rem(14px);
         padding: variables.$spacing-medium;
         box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-        border: 1px solid color.adjust(variables.$border-color , $lightness: -20%);
-      
+        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+
 
         .modal-member-content {
             width: 420px;
             @include mixins.for-mobile-layout() {
                 & {
-                   width: 280px;
+                    width: 280px;
                 }
             }
         }
@@ -152,7 +153,7 @@
         color: white;
         @include mixins.for-mobile-layout() {
             & {
-               right: 75px
+                right: 75px
             }
         }
     }

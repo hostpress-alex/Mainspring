@@ -1,15 +1,15 @@
-import { utilService } from "../services/util.service"
+import {utilService} from '../services/util.service'
 
-import { IoTimeOutline } from 'react-icons/io5'
-import { IoIosArrowForward, IoIosCheckboxOutline } from 'react-icons/io'
-import { CiCalendarDate } from 'react-icons/ci'
-import { BsPlusCircle, BsPersonPlus } from 'react-icons/bs'
-import { FcCheckmark } from 'react-icons/fc'
-import { TbNumbers } from "react-icons/tb"
-import { RxPencil1 } from 'react-icons/rx'
+import {IoTimeOutline} from 'react-icons/io5'
+import {IoIosArrowForward, IoIosCheckboxOutline} from 'react-icons/io'
+import {CiCalendarDate} from 'react-icons/ci'
+import {BsPlusCircle, BsPersonPlus} from 'react-icons/bs'
+import {FcCheckmark} from 'react-icons/fc'
+import {TbNumbers} from 'react-icons/tb'
+import {RxPencil1} from 'react-icons/rx'
 import statusImg from '../assets/img/status.png'
-import { GUEST_IMG } from '../services/avatar'
-import { t } from '../i18n'
+import {GUEST_IMG} from '../services/avatar'
+import {t} from '../i18n'
 
 /**
  * One entry in the activity log.
@@ -25,22 +25,22 @@ import { t } from '../i18n'
  */
 
 /** Renders only what is safe to show. Objects become ''. */
-function text(value) {
-    if (value === null || value === undefined) return ''
-    if (typeof value === 'string' || typeof value === 'number') return String(value)
-    if (typeof value === 'boolean') return value ? 'ja' : 'nein'
+function text(value){
+    if(value === null || value === undefined) return ''
+    if(typeof value === 'string' || typeof value === 'number') return String(value)
+    if(typeof value === 'boolean') return value?'ja':'nein'
     // An object has no business here — but better empty than broken.
-    if (typeof value === 'object') return String(value.title ?? value.fullname ?? '')
+    if(typeof value === 'object') return String(value.title ?? value.fullname ?? '')
     return ''
 }
 
 /** A colour only if it really is one. */
-function colorOf(value) {
-    return (value && typeof value === 'object' && typeof value.color === 'string') ? value.color : undefined
+function colorOf(value){
+    return (value && typeof value === 'object' && typeof value.color === 'string')?value.color:undefined
 }
 
-function imgOf(value) {
-    return (typeof value === 'string' && value) ? value : GUEST_IMG
+function imgOf(value){
+    return (typeof value === 'string' && value)?value:GUEST_IMG
 }
 
 /** What the line says. Without an entry the raw name stays. */
@@ -51,7 +51,7 @@ const ACTION_LABELS = {
     person: t('activity.action.person'),
     number: t('activity.action.number'),
     create: t('activity.action.create'),
-    title: t('activity.action.title'),
+    title: t('activity.action.title')
 }
 
 /**
@@ -61,71 +61,71 @@ const ACTION_LABELS = {
  * would be the same name on every line, so the task dialog leaves it out; the
  * board log needs it, otherwise you cannot tell what was touched.
  */
-export function ActivityPreview({ activity, taskTitle = null }) {
-    if (!activity) return null
-    const byMember = (activity.byMember && typeof activity.byMember === 'object') ? activity.byMember : {}
-    const action = typeof activity.action === 'string' ? activity.action : ''
+export function ActivityPreview({activity, taskTitle = null}){
+    if(!activity) return null
+    const byMember = (activity.byMember && typeof activity.byMember === 'object')?activity.byMember:{}
+    const action = typeof activity.action === 'string'?activity.action:''
 
-    function getIconAction() {
-        switch (action) {
+    function getIconAction(){
+        switch(action) {
             case 'status':
             case 'priority':
-                return <img src={statusImg} alt="" />
+                return <img src={statusImg} alt=""/>
             case 'date':
-                return <CiCalendarDate className='icon' />
+                return <CiCalendarDate className="icon"/>
             case 'create':
-                return <BsPlusCircle className='icon' />
+                return <BsPlusCircle className="icon"/>
             case 'person':
-                return <BsPersonPlus className='icon' />
+                return <BsPersonPlus className="icon"/>
             case 'check':
-                return <IoIosCheckboxOutline className='icon' />
+                return <IoIosCheckboxOutline className="icon"/>
             case 'number':
-                return <TbNumbers className='icon' />
+                return <TbNumbers className="icon"/>
             case 'title':
-                return <RxPencil1 className='icon' />
+                return <RxPencil1 className="icon"/>
             default:
                 return null
         }
     }
 
-    function getFromTo() {
-        switch (action) {
+    function getFromTo(){
+        switch(action) {
             case 'status':
             case 'priority':
-                return <FromToStatusPriority activity={activity} />
+                return <FromToStatusPriority activity={activity}/>
             case 'date':
-                return <FromToDueDate activity={activity} />
+                return <FromToDueDate activity={activity}/>
             case 'create':
-                return <FromToCreate activity={activity} />
+                return <FromToCreate activity={activity}/>
             case 'person':
-                return <FromToPerson activity={activity} />
+                return <FromToPerson activity={activity}/>
             case 'check':
-                return <FromToCheck activity={activity} />
+                return <FromToCheck activity={activity}/>
             case 'number':
-                return <FromToNumber activity={activity} />
+                return <FromToNumber activity={activity}/>
             case 'title':
-                return <FromToTitle activity={activity} />
+                return <FromToTitle activity={activity}/>
             default:
                 return null
         }
     }
 
     return (
-        <section className={`activity-preview${taskTitle ? ' with-task' : ''}`}>
+        <section className={`activity-preview${taskTitle?' with-task':''}`}>
             <div className="time-title flex align-center">
                 <div className="time flex align-center">
-                    <IoTimeOutline />
-                    <span>{activity.createdAt ? utilService.calculateTime(activity.createdAt) : ''}</span>
+                    <IoTimeOutline/>
+                    <span>{activity.createdAt?utilService.calculateTime(activity.createdAt):''}</span>
                 </div>
-                <div className='who-what'>
-                    <div className='title flex align-center'>
-                        <img src={imgOf(byMember.imgUrl)} alt="" />
+                <div className="who-what">
+                    <div className="title flex align-center">
+                        <img src={imgOf(byMember.imgUrl)} alt=""/>
                         <span>{text(byMember.fullname)}</span>
                     </div>
-                    {taskTitle && <div className='activity-task' title={taskTitle}>{taskTitle}</div>}
+                    {taskTitle && <div className="activity-task" title={taskTitle}>{taskTitle}</div>}
                 </div>
             </div>
-            <div className='action flex align-center space-between'>
+            <div className="action flex align-center space-between">
                 {getIconAction()}
                 <div>{ACTION_LABELS[action] || action}</div>
             </div>
@@ -134,82 +134,82 @@ export function ActivityPreview({ activity, taskTitle = null }) {
     )
 }
 
-function FromToStatusPriority({ activity }) {
+function FromToStatusPriority({activity}){
     return (
-        <div className='from-to label-container flex align-center'>
-            <span className='label' style={{ '--label-color': colorOf(activity.from) }}>{text(activity.from)}</span>
-            <IoIosArrowForward className='icon' />
-            <span className='label' style={{ '--label-color': colorOf(activity.to) }}>{text(activity.to)}</span>
+        <div className="from-to label-container flex align-center">
+            <span className="label" style={{'--label-color': colorOf(activity.from)}}>{text(activity.from)}</span>
+            <IoIosArrowForward className="icon"/>
+            <span className="label" style={{'--label-color': colorOf(activity.to)}}>{text(activity.to)}</span>
         </div>
     )
 }
 
 /** Only format a date if there really is one. */
-function asDate(value) {
-    if (value === null || value === undefined || value === '') return null
-    if (typeof value === 'object') return null
+function asDate(value){
+    if(value === null || value === undefined || value === '') return null
+    if(typeof value === 'object') return null
     const date = new Date(value)
-    return Number.isNaN(date.getTime()) ? null : date
+    return Number.isNaN(date.getTime())?null:date
 }
 
-function FromToDueDate({ activity }) {
+function FromToDueDate({activity}){
     const from = asDate(activity.from)
     const to = asDate(activity.to)
-    const fmt = date => date ? `${utilService.getMonthName(date)}  ${date.getDate()}` : '-'
+    const fmt = date => date?`${utilService.getMonthName(date)}  ${date.getDate()}`:'-'
     return (
-        <div className='from-to date-container'>
-            <span className='date'>{fmt(from)}</span>
-            <IoIosArrowForward className='icon' />
-            <span className='date'>{fmt(to)}</span>
+        <div className="from-to date-container">
+            <span className="date">{fmt(from)}</span>
+            <IoIosArrowForward className="icon"/>
+            <span className="date">{fmt(to)}</span>
         </div>
     )
 }
 
-function FromToCreate({ activity }) {
+function FromToCreate({activity}){
     return (
-        <div className='from-to create-container'>
+        <div className="from-to create-container">
             <span>{t('group.group')}: </span>
-            <span className='activity-title' style={{ '--label-color': colorOf(activity.from) }}>{text(activity.from)}</span>
+            <span className="activity-title" style={{'--label-color': colorOf(activity.from)}}>{text(activity.from)}</span>
         </div>
     )
 }
 
-function FromToPerson({ activity }) {
-    const img = typeof activity.to === 'string' ? activity.to : ''
+function FromToPerson({activity}){
+    const img = typeof activity.to === 'string'?activity.to:''
     return (
-        <div className='from-to person-container'>
+        <div className="from-to person-container">
             <span>{text(activity.from)}</span>
-            {img && <img src={img} alt="activity-img" />}
+            {img && <img src={img} alt="activity-img"/>}
         </div>
     )
 }
 
-function FromToCheck({ activity }) {
+function FromToCheck({activity}){
     const on = value => value === true || value === 'true' || value === 1
     return (
-        <div className='from-to check-container'>
-            <span>{on(activity.from) ? <FcCheckmark /> : '    '}</span>
-            <span>{on(activity.to) ? <FcCheckmark /> : '    '}</span>
+        <div className="from-to check-container">
+            <span>{on(activity.from)?<FcCheckmark/>:'    '}</span>
+            <span>{on(activity.to)?<FcCheckmark/>:'    '}</span>
         </div>
     )
 }
 
-function FromToTitle({ activity }) {
+function FromToTitle({activity}){
     return (
-        <div className='from-to number-container'>
-            <span className='number'>{text(activity.from) || '—'}</span>
-            <IoIosArrowForward className='icon' />
-            <span className='number'>{text(activity.to)}</span>
+        <div className="from-to number-container">
+            <span className="number">{text(activity.from) || '—'}</span>
+            <IoIosArrowForward className="icon"/>
+            <span className="number">{text(activity.to)}</span>
         </div>
     )
 }
 
-function FromToNumber({ activity }) {
+function FromToNumber({activity}){
     return (
-        <div className='from-to number-container'>
-            <span className='number'>{text(activity.from)}</span>
-            <IoIosArrowForward className='icon' />
-            <span className='number'>{text(activity.to)}</span>
+        <div className="from-to number-container">
+            <span className="number">{text(activity.from)}</span>
+            <IoIosArrowForward className="icon"/>
+            <span className="number">{text(activity.to)}</span>
         </div>
     )
 }

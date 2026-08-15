@@ -31,18 +31,18 @@ let warnedAboutDevSecret = false
  * Built on first use rather than at import time, so that a tool which only
  * wants userService does not fall over on a missing key.
  */
-function cryptr() {
-    if (cryptrInstance) return cryptrInstance
+function cryptr(){
+    if(cryptrInstance) return cryptrInstance
 
     let secret = config.sessionSecret
-    if (!secret) {
-        if (process.env.NODE_ENV === 'production') {
+    if(!secret){
+        if(process.env.NODE_ENV === 'production'){
             // server.js catches this at start-up. Reaching here means someone
             // bypassed it, and carrying on would be worse than crashing.
             throw new Error('SECRET1 is not set')
         }
         secret = DEV_SECRET
-        if (!warnedAboutDevSecret) {
+        if(!warnedAboutDevSecret){
             warnedAboutDevSecret = true
             logger.warn('SECRET1 is not set, using the development key. Never do this on a reachable server.')
         }
@@ -61,39 +61,39 @@ function cryptr() {
  */
 const DUMMY_HASH = bcrypt.hashSync('there-is-no-user-with-this-name', SALT_ROUNDS)
 
-async function login(username, password) {
+async function login(username, password){
     logger.debug(`auth.service - login with username: ${username}`)
     const user = await userService.getByUsername(username)
 
     // Same amount of work either way, and the same message either way.
     const match = await bcrypt.compare(password || '', (user && user.password) || DUMMY_HASH)
-    if (!user || !match) return Promise.reject('Invalid username or password')
+    if(!user || !match) return Promise.reject('Invalid username or password')
 
     delete user.password
     user._id = user._id.toString()
     return user
 }
 
-async function signup({ username, password, fullname, imgUrl }) {
+async function signup({username, password, fullname, imgUrl}){
     logger.debug(`auth.service - signup with username: ${username}, fullname: ${fullname}`)
-    if (!username || !password || !fullname) return Promise.reject('Missing required signup information')
+    if(!username || !password || !fullname) return Promise.reject('Missing required signup information')
 
     const userExist = await userService.getByUsername(username)
-    if (userExist) return Promise.reject('Username already taken')
+    if(userExist) return Promise.reject('Username already taken')
 
     const hash = await bcrypt.hash(password, SALT_ROUNDS)
-    return userService.add({ username, password: hash, fullname, imgUrl, isAdmin: false })
+    return userService.add({username, password: hash, fullname, imgUrl, isAdmin: false})
 }
 
-function getLoginToken(user) {
-    const userInfo = { _id: user._id, fullname: user.fullname, isAdmin: user.isAdmin }
+function getLoginToken(user){
+    const userInfo = {_id: user._id, fullname: user.fullname, isAdmin: user.isAdmin}
     return cryptr().encrypt(JSON.stringify(userInfo))
 }
 
-function validateToken(loginToken) {
+function validateToken(loginToken){
     try {
         return JSON.parse(cryptr().decrypt(loginToken))
-    } catch (err) {
+    } catch(err) {
         // An expired or tampered cookie is normal traffic, not an incident.
         // It used to print on every single request carrying a stale cookie.
         logger.debug('Invalid login token')
@@ -105,5 +105,5 @@ module.exports = {
     signup,
     login,
     getLoginToken,
-    validateToken,
+    validateToken
 }

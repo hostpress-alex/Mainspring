@@ -1,28 +1,26 @@
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
+import {DragDropContext, Draggable, Droppable} from '@hello-pangea/dnd'
 
-import { handleOnDragEnd } from "../../store/board.actions"
-import { GroupPreviewKanban } from "./group-preview-kanban"
+import {handleOnDragEnd} from '../../store/board.actions'
+import {GroupPreviewKanban} from './group-preview-kanban'
 
-export function GroupListKanban({ board }) {
+export function GroupListKanban({board}){
 
-    if (!board.groups) return <div></div>
+    if(!board.groups) return <div></div>
     return (
         <DragDropContext onDragEnd={(ev) => handleOnDragEnd(ev, board)}>
-            <Droppable droppableId='groupList' type='group' direction='horizontal'>
+            <Droppable droppableId="groupList" type="group" direction="horizontal">
                 {(provided) => (
                     <div ref={provided.innerRef}
-                        {...provided.droppableProps}>
+                         {...provided.droppableProps}>
                         <div className="group-list-kanban">
                             {board.groups.map((group, index) =>
                                 <div className="group-list-ul" key={group.id}>
-                                    <Draggable key={group.id} draggableId={`${group.id}`} index={index} >
+                                    <Draggable key={group.id} draggableId={`${group.id}`} index={index}>
                                         {(provided) => (
                                             <div
                                                 {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                ref={provided.innerRef}
-                                                className='flex'>
-                                                <GroupPreviewKanban board={board} group={group} index={index} />
+                                                {...provided.dragHandleProps} ref={provided.innerRef} className="flex">
+                                                <GroupPreviewKanban board={board} group={group} index={index}/>
                                             </div>
                                         )}
                                     </Draggable>
@@ -30,7 +28,7 @@ export function GroupListKanban({ board }) {
                             )}
                         </div>
                         {provided.placeholder}
-                    </div >
+                    </div>
                 )}
             </Droppable>
         </DragDropContext>

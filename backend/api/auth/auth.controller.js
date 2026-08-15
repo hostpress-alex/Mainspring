@@ -9,11 +9,11 @@ const config = require('../../config')
  * httpOnly so that no script can read it, sameSite Lax so it does not travel
  * with cross-site requests, secure once there is TLS to be secure over.
  */
-function setLoginCookie(res, user) {
+function setLoginCookie(res, user){
     res.cookie('loginToken', authService.getLoginToken(user), {
         httpOnly: true,
         sameSite: 'Lax',
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production'
     })
 }
 
@@ -27,12 +27,12 @@ function setLoginCookie(res, user) {
  */
 const addressOf = req => req.ip || (req.socket && req.socket.remoteAddress) || 'unknown'
 
-async function login(req, res) {
-    const { username, password } = req.body
+async function login(req, res){
+    const {username, password} = req.body
     const address = addressOf(req)
 
     const verdict = throttle.check(address, username)
-    if (!verdict.allowed) {
+    if(!verdict.allowed){
         logger.warn(`Login blocked for ${address} (user: ${username}), ${verdict.retryAfter}s left`)
         res.set('Retry-After', String(verdict.retryAfter))
         // The frontend turns the code into a message; err is the fallback for
@@ -40,7 +40,7 @@ async function login(req, res) {
         return res.status(429).send({
             code: 'TOO_MANY_ATTEMPTS',
             retryAfter: verdict.retryAfter,
-            err: 'Too many failed login attempts',
+            err: 'Too many failed login attempts'
         })
     }
 
@@ -50,19 +50,19 @@ async function login(req, res) {
         setLoginCookie(res, user)
         logger.info(`User login: ${user.username || user.fullname}`)
         res.json(user)
-    } catch (err) {
+    } catch(err) {
         throttle.recordFailure(address, username)
         // Deliberately not logged as an error: a mistyped password is not a
         // fault, and at error level it drowns out the ones that are.
         logger.warn(`Failed login for ${username} from ${address}`)
-        res.status(401).send({ err: 'Failed to Login' })
+        res.status(401).send({err: 'Failed to Login'})
     }
 }
 
-async function signup(req, res) {
+async function signup(req, res){
     try {
-        if (!config.allowSignup) {
-            return res.status(403).send({ err: 'Registrierung ist deaktiviert' })
+        if(!config.allowSignup){
+            return res.status(403).send({err: 'Registrierung ist deaktiviert'})
         }
         const credentials = req.body
         const account = await authService.signup(credentials)
@@ -71,23 +71,23 @@ async function signup(req, res) {
         logger.info(`User signup: ${user.username || user.fullname}`)
         setLoginCookie(res, user)
         res.json(user)
-    } catch (err) {
+    } catch(err) {
         logger.error('Failed to signup ' + err)
-        res.status(500).send({ err: 'Failed to signup' })
+        res.status(500).send({err: 'Failed to signup'})
     }
 }
 
-async function logout(req, res) {
+async function logout(req, res){
     try {
         res.clearCookie('loginToken')
-        res.send({ msg: 'Logged out successfully' })
-    } catch (err) {
-        res.status(500).send({ err: 'Failed to logout' })
+        res.send({msg: 'Logged out successfully'})
+    } catch(err) {
+        res.status(500).send({err: 'Failed to logout'})
     }
 }
 
 module.exports = {
     login,
     signup,
-    logout,
+    logout
 }

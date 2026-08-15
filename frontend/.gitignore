@@ -1,0 +1,5 @@
+# Font Awesome Pro is licensed per seat and must not be redistributed.
+# The files stay on the machine that has the licence; the repository only
+# carries the free version as a dependency. See vendor/README.md.
+vendor/*
+!vendor/README.md

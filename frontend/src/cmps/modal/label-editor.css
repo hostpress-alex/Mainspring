@@ -13,7 +13,9 @@
     text-align: left;
 }
 
-.label-editor * { box-sizing: border-box; }
+.label-editor * {
+    box-sizing: border-box;
+}
 
 .label-editor-head {
     display: flex;
@@ -23,7 +25,10 @@
     margin-bottom: 10px;
 }
 
-.label-editor-title { font-weight: 600; color: #323338; }
+.label-editor-title {
+    font-weight: 600;
+    color: #323338;
+}
 
 .label-editor-col {
     font-size: 12px;
@@ -123,7 +128,10 @@
     padding: 0;
 }
 
-.label-editor-remove:hover { background: #ffe6e9; color: #a3283a; }
+.label-editor-remove:hover {
+    background: #ffe6e9;
+    color: #a3283a;
+}
 
 .label-editor-palette {
     display: grid;
@@ -145,7 +153,9 @@
     padding: 0;
 }
 
-.label-editor-palette button.is-active { border-color: #323338; }
+.label-editor-palette button.is-active {
+    border-color: #323338;
+}
 
 .label-editor-empty {
     margin: 4px 0 8px;
@@ -168,7 +178,9 @@
     font-size: 14px;
 }
 
-.label-editor-add:hover { text-decoration: underline; }
+.label-editor-add:hover {
+    text-decoration: underline;
+}
 
 .label-editor-err {
     margin: 8px 0 0;
@@ -201,8 +213,14 @@
     font-size: 14px;
 }
 
-.label-editor-save:hover { background: #0060b9; }
-.label-editor-save:disabled { background: #c3c6d4; cursor: default; }
+.label-editor-save:hover {
+    background: #0060b9;
+}
+
+.label-editor-save:disabled {
+    background: #c3c6d4;
+    cursor: default;
+}
 
 .label-editor-cancel {
     flex: 0 0 auto;
@@ -217,5 +235,11 @@
     font-size: 14px;
 }
 
-.label-editor-cancel:hover { background: #dcdfec; }
-.label-editor-cancel:disabled { color: #a0a3b1; cursor: default; }
+.label-editor-cancel:hover {
+    background: #dcdfec;
+}
+
+.label-editor-cancel:disabled {
+    color: #a0a3b1;
+    cursor: default;
+}

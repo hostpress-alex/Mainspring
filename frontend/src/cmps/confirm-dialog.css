@@ -63,7 +63,9 @@
     color: #323338;
 }
 
-.confirm-cancel:hover { background: #dcdfec; }
+.confirm-cancel:hover {
+    background: #dcdfec;
+}
 
 .confirm-ok {
     border: none;
@@ -71,10 +73,17 @@
     color: #fff;
 }
 
-.confirm-ok:hover { background: #0060b9; }
+.confirm-ok:hover {
+    background: #0060b9;
+}
 
-.confirm-ok.is-danger { background: #d83a52; }
-.confirm-ok.is-danger:hover { background: #b92e43; }
+.confirm-ok.is-danger {
+    background: #d83a52;
+}
+
+.confirm-ok.is-danger:hover {
+    background: #b92e43;
+}
 
 .confirm-ok:focus-visible {
     outline: 2px solid #323338;

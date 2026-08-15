@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import {useEffect, useState} from 'react'
+import {useSelector} from 'react-redux'
 
-import { setDynamicModalObj } from "../../store/board.actions"
-import { CiSearch } from 'react-icons/ci'
-import { VscTriangleUp } from 'react-icons/vsc'
-import { GUEST_IMG } from '../../services/avatar'
-import { t } from '../../i18n'
+import {setDynamicModalObj} from '../../store/board.actions'
+import {CiSearch} from 'react-icons/ci'
+import {VscTriangleUp} from 'react-icons/vsc'
+import {GUEST_IMG} from '../../services/avatar'
+import {t} from '../../i18n'
 
-export function ModalMember({ dynamicModalObj }) {
+export function ModalMember({dynamicModalObj}){
 
-    const [filter, setFilter] = useState({ txt: '' })
+    const [filter, setFilter] = useState({txt: ''})
     const [outTaskMembers, setOutTaskMembers] = useState([])
     const board = useSelector(storeState => storeState.boardModule.board)
     const [taskMembers, setTaskMembers] = useState(dynamicModalObj.task.memberIds.map(member => getMember(member)))
@@ -18,38 +18,38 @@ export function ModalMember({ dynamicModalObj }) {
         setOutTaskMembers(board.members.filter(member => !taskMembers.includes(member)))
     }, [])
 
-    function getMember(memberId) {
+    function getMember(memberId){
         return board.members.find(member => member._id === memberId)
     }
 
-    function onRemoveMember(RemoveTaskMember) {
+    function onRemoveMember(RemoveTaskMember){
         dynamicModalObj.activity.from = 'Remove'
         dynamicModalObj.activity.to = RemoveTaskMember.imgUrl
         const members = taskMembers.filter(taskMember => taskMember._id !== RemoveTaskMember._id)
         const membersIds = members.map(taskMember => taskMember._id)
         dynamicModalObj.onTaskUpdate(dynamicModalObj.field || 'memberIds', membersIds, dynamicModalObj.activity)
-        setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
+        setDynamicModalObj({...dynamicModalObj, isOpen: false})
     }
 
-    function onAddMember(taskMember) {
+    function onAddMember(taskMember){
         dynamicModalObj.activity.from = 'Added'
         dynamicModalObj.activity.to = taskMember.imgUrl
         taskMembers.push(taskMember)
         const membersIds = taskMembers.map(taskMember => taskMember._id)
         dynamicModalObj.onTaskUpdate(dynamicModalObj.field || 'memberIds', membersIds, dynamicModalObj.activity)
-        setDynamicModalObj({ ...dynamicModalObj, isOpen: false })
+        setDynamicModalObj({...dynamicModalObj, isOpen: false})
     }
 
-    function handleChange({ target }) {
-        let { value, name: field } = target
-        setFilter((prevFilter) => ({ ...prevFilter, [field]: value }))
+    function handleChange({target}){
+        let {value, name: field} = target
+        setFilter((prevFilter) => ({...prevFilter, [field]: value}))
     }
 
-    function onSubmit(ev) {
+    function onSubmit(ev){
         ev.preventDefault()
         console.log('filter:', filter)
         let members = board.members.filter(member => !taskMembers.includes(member))
-        if (filter.txt) {
+        if(filter.txt){
             const regex = new RegExp(filter.txt, 'i')
             members = members.filter(member => regex.test(member.fullname))
         }
@@ -59,12 +59,12 @@ export function ModalMember({ dynamicModalObj }) {
     return (
         <section className="modal-member">
             <VscTriangleUp className="triangle-icon"/>
-            <section className="modal-member-content" >
+            <section className="modal-member-content">
                 <ul className="taskMembers">
                     {
                         taskMembers.map(taskMember => {
                             return <li key={taskMember._id}>
-                                <img src={taskMember.imgUrl || GUEST_IMG} alt="member-img" />
+                                <img src={taskMember.imgUrl || GUEST_IMG} alt="member-img"/>
                                 <span>{taskMember.fullname}</span>
                                 <span onClick={() => onRemoveMember(taskMember)} className="remove">x</span>
                             </li>
@@ -73,20 +73,15 @@ export function ModalMember({ dynamicModalObj }) {
                 </ul>
                 <div className="outTaskMembers">
                     <form className="search-div flex space-between" onSubmit={onSubmit}>
-                        <input type="text"
-                            placeholder={t('member.search')}
-                            name="txt"
-                            value={filter.txt}
-                            onChange={handleChange}
-                        />
-                        <button className="icon-container"><CiSearch className="icon" /></button>
+                        <input type="text" placeholder={t('member.search')} name="txt" value={filter.txt} onChange={handleChange}/>
+                        <button className="icon-container"><CiSearch className="icon"/></button>
                     </form>
                     <span>{t('member.suggestions')}</span>
                     {outTaskMembers.length > 0 && <ul className="out-member-list">
                         {
                             outTaskMembers.map(taskMember => {
                                 return <li key={taskMember._id} onClick={() => onAddMember(taskMember)}>
-                                    <img src={taskMember.imgUrl || GUEST_IMG} alt="member-img" />
+                                    <img src={taskMember.imgUrl || GUEST_IMG} alt="member-img"/>
                                     <span>{taskMember.fullname}</span>
                                 </li>
                             })

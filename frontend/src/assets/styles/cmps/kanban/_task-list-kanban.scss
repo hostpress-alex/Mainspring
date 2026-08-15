@@ -9,7 +9,7 @@
 
     .task-container {
         border-radius: 4px;
-        box-shadow: 0px 4px 8px rgb(0 0 0 / 20%);
+        box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
         font-size: functions.rem(13px);
         font-weight: 400;
         cursor: pointer;
@@ -100,7 +100,7 @@
     }
 
     .title-container {
-        >* {
+        > * {
             height: 36px;
             margin-bottom: variables.$spacing-small;
             display: flex;

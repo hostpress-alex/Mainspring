@@ -6,7 +6,7 @@
     padding: variables.$spacing-medium 0;
     gap: 5px;
 
-    >* {
+    > * {
         @include mixins.center-flex();
         font-size: functions.rem(14px);
         height: 32px;
@@ -14,7 +14,7 @@
     }
 
     .board-tools {
-        >* {
+        > * {
             @include mixins.center-flex();
             gap: variables.$spacing-xs;
             padding: 0 8px;
@@ -130,5 +130,74 @@
         .member-img {
             @include mixins.members();
         }
+    }
+}
+
+/**
+ * Members, activity and the invite button.
+ *
+ * These used to sit in the title row, flush right, where they read like an
+ * application bar — as if the invite went into the whole tool. They belong to
+ * one board, so they now sit in that board's own toolbar. The rules below
+ * came over unchanged from _board-header.scss.
+ */
+.board-filter .board-members {
+    margin-left: auto;
+
+    gap: variables.$spacing-medium;
+    height: fit-content;
+
+    > * {
+        padding: variables.$spacing-xs;
+        @include mixins.center-flex();
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .activity {
+        &:hover {
+            background-color: variables.$workspace-hover;
+        }
+    }
+
+    .members-last-seen {
+        width: max-content;
+        gap: variables.$spacing-xs;
+        height: functions.rem(32px);
+
+        &:hover {
+            background-color: variables.$workspace-hover;
+        }
+
+        .last-seen-title {
+            display: none;
+            @include mixins.for-normal-layout() {
+                display: block;
+            }
+        }
+    }
+
+    .invite {
+        height: functions.rem(32px);
+        width: max-content;
+
+        &:hover {
+            background-color: variables.$workspace-hover;
+        }
+
+        &-title {
+            display: none;
+            @include mixins.for-normal-layout() {
+                display: block;
+            }
+        }
+
+        .invite-icon {
+            width: 32px;
+        }
+    }
+
+    .members-imgs {
+        @include mixins.member-img(white, #323338, 24px, 26px);
     }
 }

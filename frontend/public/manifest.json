@@ -1,32 +1,32 @@
 {
-  "short_name": "myday",
-  "name": "myday — Aufgaben und Zeitplanung",
-  "icons": [
-    {
-      "src": "logo.svg",
-      "type": "image/svg+xml",
-      "sizes": "any"
-    },
-    {
-      "src": "favicon.png",
-      "type": "image/png",
-      "sizes": "64x64"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#EB5522",
-  "background_color": "#ffffff"
+    "short_name":       "myday",
+    "name":             "myday — Aufgaben und Zeitplanung",
+    "icons":            [
+        {
+            "src":   "logo.svg",
+            "type":  "image/svg+xml",
+            "sizes": "any"
+        },
+        {
+            "src":   "favicon.png",
+            "type":  "image/png",
+            "sizes": "64x64"
+        },
+        {
+            "src":     "logo192.png",
+            "type":    "image/png",
+            "sizes":   "192x192",
+            "purpose": "any"
+        },
+        {
+            "src":     "logo512.png",
+            "type":    "image/png",
+            "sizes":   "512x512",
+            "purpose": "any"
+        }
+    ],
+    "start_url":        ".",
+    "display":          "standalone",
+    "theme_color":      "#EB5522",
+    "background_color": "#ffffff"
 }

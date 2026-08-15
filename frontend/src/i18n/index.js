@@ -24,7 +24,7 @@
 import en from './en.json'
 import de from './de.json'
 
-const LANGUAGES = { en, de }
+const LANGUAGES = {en, de}
 
 /** Missing keys fall back to this one. */
 const FALLBACK_LANGUAGE = 'en'
@@ -36,20 +36,21 @@ const STORAGE_KEY = 'language'
 
 let current = detectLanguage()
 
-function detectLanguage() {
+function detectLanguage(){
     try {
         const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored && LANGUAGES[stored]) return stored
-    } catch (err) { /* no localStorage */ }
-    const fromBrowser = (typeof navigator !== 'undefined' ? navigator.language || '' : '').slice(0, 2)
-    return LANGUAGES[fromBrowser] ? fromBrowser : DEFAULT_LANGUAGE
+        if(stored && LANGUAGES[stored]) return stored
+    } catch(err) { /* no localStorage */
+    }
+    const fromBrowser = (typeof navigator !== 'undefined'?navigator.language || '':'').slice(0, 2)
+    return LANGUAGES[fromBrowser]?fromBrowser:DEFAULT_LANGUAGE
 }
 
-export function getLanguage() {
+export function getLanguage(){
     return current
 }
 
-export function availableLanguages() {
+export function availableLanguages(){
     return Object.keys(LANGUAGES)
 }
 
@@ -60,48 +61,51 @@ export function availableLanguages() {
  * Switching happens once a year — that does not justify a rebuild in which
  * every component hangs off a context.
  */
-export function setLanguage(code) {
-    if (!LANGUAGES[code] || code === current) return
-    try { localStorage.setItem(STORAGE_KEY, code) } catch (err) { /* never mind */ }
+export function setLanguage(code){
+    if(!LANGUAGES[code] || code === current) return
+    try {
+        localStorage.setItem(STORAGE_KEY, code)
+    } catch(err) { /* never mind */
+    }
     window.location.reload()
 }
 
 /** Look up a value for a key like "task.delete". */
-function lookUp(dictionary, key) {
+function lookUp(dictionary, key){
     let value = dictionary
-    for (const part of String(key).split('.')) {
-        if (value === null || typeof value !== 'object') return undefined
+    for(const part of String(key).split('.')){
+        if(value === null || typeof value !== 'object') return undefined
         value = value[part]
     }
     return value
 }
 
 /** Replace {name} with the given values. A missing value keeps its placeholder. */
-function interpolate(template, values) {
-    if (!values) return template
+function interpolate(template, values){
+    if(!values) return template
     return String(template).replace(/\{(\w+)\}/g, (match, name) =>
-        Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match)
+        Object.prototype.hasOwnProperty.call(values, name)?String(values[name]):match)
 }
 
-export function t(key, values) {
+export function t(key, values){
     let value = lookUp(LANGUAGES[current], key)
-    if (value === undefined && current !== FALLBACK_LANGUAGE) {
+    if(value === undefined && current !== FALLBACK_LANGUAGE){
         value = lookUp(LANGUAGES[FALLBACK_LANGUAGE], key)
     }
 
-    if (value === undefined) {
+    if(value === undefined){
         // Do not silently show the key — a gap should not have to be spotted
         // in the running interface first.
-        if (import.meta.env?.DEV) console.warn('[i18n] no text for:', key)
+        if(import.meta.env?.DEV) console.warn('[i18n] no text for:', key)
         return key
     }
 
     // Singular and plural: { "one": "1 task", "other": "{n} tasks" }
-    if (value !== null && typeof value === 'object') {
+    if(value !== null && typeof value === 'object'){
         const n = Number(values && values.n)
-        const form = n === 1 ? 'one' : 'other'
-        value = value[form] !== undefined ? value[form] : value.other
-        if (value === undefined) return key
+        const form = n === 1?'one':'other'
+        value = value[form] !== undefined?value[form]:value.other
+        if(value === undefined) return key
     }
 
     return interpolate(value, values)

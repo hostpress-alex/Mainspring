@@ -1,33 +1,33 @@
-import { useState } from "react"
-import { AiOutlineClose } from "react-icons/ai"
-import { BsFillPlusCircleFill } from "react-icons/bs"
-import { TbNumbers } from "react-icons/tb"
-import { boardService } from "../../services/board.service"
+import {useState} from 'react'
+import {AiOutlineClose} from 'react-icons/ai'
+import {BsFillPlusCircleFill} from 'react-icons/bs'
+import {TbNumbers} from 'react-icons/tb'
+import {boardService} from '../../services/board.service'
 
-export function NumberPicker({ info, onUpdate, field = 'number' }) {
+export function NumberPicker({info, onUpdate, field = 'number'}){
     const [number, setNumber] = useState(info[field] || '')
     const [isShowInput, setIsShowInput] = useState(false)
     const activity = boardService.getEmptyActivity()
 
     activity.action = 'number'
     activity.from = info[field] || '-'
-    activity.task = { id: info.id, title: info.title }
+    activity.task = {id: info.id, title: info.title}
 
-    function handleNumberChange({ target }) {
+    function handleNumberChange({target}){
         setNumber((target.value))
     }
 
-    function onSave() {
+    function onSave(){
         console.log('number:', number)
         if(activity.from === '-' && !number){
             setIsShowInput(false)
             return
-        } 
+        }
         activity.to = number
         onUpdate('number', parseInt(number), activity)
     }
 
-    function onClearNumber() {
+    function onClearNumber(){
         setNumber('')
         activity.to = '-'
         onUpdate('number', '', activity)
@@ -35,15 +35,12 @@ export function NumberPicker({ info, onUpdate, field = 'number' }) {
 
     return (
         <section className="number-picker picker">
-            {(!number && !isShowInput) && <span onClick={() => setIsShowInput(true)} className="add-number-icons"><BsFillPlusCircleFill className="plus-icon" /><TbNumbers /></span>}
+            {(!number && !isShowInput) &&
+                <span onClick={() => setIsShowInput(true)} className="add-number-icons"><BsFillPlusCircleFill className="plus-icon"/><TbNumbers/></span>}
             {(number || isShowInput) &&
                 <>
-                    <input type="number"
-                        name="number"
-                        value={number}
-                        onChange={handleNumberChange}
-                        onBlur={onSave} />
-                    <span className="clear-input" onClick={onClearNumber}><AiOutlineClose /></span>
+                    <input type="number" name="number" value={number} onChange={handleNumberChange} onBlur={onSave}/>
+                    <span className="clear-input" onClick={onClearNumber}><AiOutlineClose/></span>
                 </>
             }
         </section>
