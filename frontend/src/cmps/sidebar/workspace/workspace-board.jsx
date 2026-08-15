@@ -1,10 +1,14 @@
 import { useMemo, useState } from 'react'
+import { useLocation, useParams } from 'react-router-dom'
 import { AiOutlinePlus, AiOutlineSearch, AiOutlineStar } from 'react-icons/ai'
 import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md'
 import { BoardPreview } from '../../board/board-preview'
 import { t } from '../../../i18n'
 
 export const NO_FOLDER = t('group.none')
+
+/** Section id of the favourites list — not a folder name. */
+const FAVOURITES = '__fav'
 
 /**
  * Board column of the sidebar.
@@ -15,6 +19,25 @@ export const NO_FOLDER = t('group.none')
  */
 export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCreateModalOpen, boards = [] }) {
     const [collapsed, setCollapsed] = useState({})
+    const { boardId } = useParams()
+    const location = useLocation()
+
+    /**
+     * The section the open board counts as active in.
+     *
+     * Normally the one it was clicked in. Opened without that — a direct link,
+     * a jump from the overview — the board's own folder wins, not favourites.
+     */
+    const activeSection = useMemo(() => {
+        if (!boardId) return null
+        const open = boards.find(b => b._id === boardId)
+        if (!open) return null
+        const home = (open.folder || '').trim() || NO_FOLDER
+        // Favourites only count while the board really is one — un-starring it
+        // while it is open would otherwise leave nothing marked at all.
+        if (location.state?.sidebarSection === FAVOURITES) return open.isStarred ? FAVOURITES : home
+        return home
+    }, [boardId, location.state, boards])
 
     const starred = useMemo(() => boards.filter(b => b.isStarred), [boards])
 
@@ -39,26 +62,25 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
         const isCollapsed = collapsed[id]
         return (
             <li className='workspace-section'>
-                <div className='workspace-section-head' onClick={() => toggle(id)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
-                        padding: '7px 8px 5px', color: '#676879', fontSize: 13 }}>
+                <div className='workspace-section-head' onClick={() => toggle(id)}>
                     {isCollapsed ? <MdKeyboardArrowRight /> : <MdKeyboardArrowDown />}
                     {icon}
-                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className='workspace-section-name'>
                         {title}
                     </span>
-                    <span style={{ fontSize: 12, opacity: .8 }}>{list.length}</span>
+                    <span className='workspace-section-count'>{list.length}</span>
                 </div>
                 {!isCollapsed && (
                     <ul className='board-list-container flex column'>
                         {list.map(board => (
                             <li key={board._id} className='board-list'>
-                                <BoardPreview board={board} />
+                                <BoardPreview board={board} sectionId={id}
+                                    isActive={board._id === boardId && id === activeSection} />
                             </li>
                         ))}
                         {!list.length && (
-                            <li style={{ padding: '4px 12px 8px', color: '#9699a6', fontSize: 12 }}>
-                                Noch nichts hier
+                            <li className='workspace-section-empty'>
+                                {t('board.empty')}
                             </li>
                         )}
                     </ul>
@@ -94,8 +116,8 @@ export default function WorkspaceBoard ({ handleChange, filterByToEdit, setIsCre
             </div>
 
             <ul className='board-list-container flex column'>
-                <Section id='__fav' title={t('board.favorites')} list={starred}
-                    icon={<AiOutlineStar style={{ color: '#fdab3d' }} />} />
+                <Section id={FAVOURITES} title={t('board.favorites')} list={starred}
+                    icon={<AiOutlineStar className='workspace-star' />} />
                 {folders.map(([name, list]) => (
                     <Section key={name} id={name} title={name} list={list} icon={null} />
                 ))}

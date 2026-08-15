@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom"
 import { TaskModal } from "../modal/task-modal"
 import { BoardActivityModal } from "./board-activity-modal"
 import { setModalOpen } from "../../store/board.actions"
-import { loadPanelWidth, savePanelWidth, clampPanelWidth, MIN_PANEL_WIDTH } from "./panel-width"
+import { loadPanelWidth, savePanelWidth, clampPanelWidth } from "./panel-width"
 import { t } from '../../i18n'
 
 /**
@@ -93,13 +93,13 @@ export function BoardModal() {
         <>
             {isOpen && (
                 <div className={`board-modal-resizer ${isResizing ? 'is-active' : ''}`}
-                    style={{ right: width }}
+                    style={{ '--panel-width': `${width}px` }}
                     title={t('panel.width')}
                     onPointerDown={onGrabStart}
                     onDoubleClick={onGrabDoubleClick} />
             )}
             <section className={`board-modal ${isOpen ? 'open' : ''}`}
-                style={{ width, minWidth: MIN_PANEL_WIDTH }}>
+                style={{ '--panel-width': `${width}px` }}>
                 {!activityLog && (
                     <TaskModal key={currTask.id} task={currTask} board={board}
                         groupId={groupId} setModalCurrTask={() => {}} />

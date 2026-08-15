@@ -124,7 +124,7 @@ export function LabelEditor ({ column, board, onSave, onCancel, isSaving = false
                             <li key={row.id} className="label-editor-row">
                                 <div className="label-editor-line">
                                     <button type="button" className="label-editor-swatch"
-                                        style={{ backgroundColor: row.color }}
+                                        style={{ '--label-color': row.color }}
                                         title={t('label.changeColor')}
                                         onClick={() => setOpenPalette(openPalette === row.id ? null : row.id)} />
                                     <input className="label-editor-input" value={row.title} placeholder={t('common.name')}
@@ -150,7 +150,7 @@ export function LabelEditor ({ column, board, onSave, onCancel, isSaving = false
                                         {PALETTE.map(color => (
                                             <button key={color} type="button"
                                                 className={color === row.color ? 'is-active' : ''}
-                                                style={{ backgroundColor: color }}
+                                                style={{ '--label-color': color }}
                                                 title={color}
                                                 onClick={() => { setRow(row.id, { color }); setOpenPalette(null) }} />
                                         ))}

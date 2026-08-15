@@ -161,3 +161,38 @@
         }
     }
 }
+// The label colour comes from the data; see cmps/_error-boundary.scss for why.
+.activity-preview .label {
+    background-color: var(--label-color);
+}
+
+/**
+ * The task an entry belongs to. Only shown in the board log — in the log of a
+ * single task it would be the same name on every line, so the task dialog
+ * passes no title and this whole block stays out of the way.
+ *
+ * Stacked under the member rather than beside it: the row is 60px tall and
+ * only about 30 of them are in use, whereas horizontally every column is
+ * already fighting for space.
+ */
+.activity-preview.with-task {
+    .time-title {
+        width: 250px;
+    }
+
+    .who-what {
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .activity-task {
+        margin-top: 1px;
+        font-size: functions.rem(13px);
+        font-weight: 500;
+        line-height: 1.2;
+        color: variables.$primary-text-color;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

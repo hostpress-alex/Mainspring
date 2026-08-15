@@ -20,3 +20,8 @@
         cursor: pointer;
     }
 }
+// Position comes from the button that opened it.
+.dynamic-modal {
+    left: var(--modal-x);
+    top: var(--modal-y);
+}

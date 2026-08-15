@@ -82,7 +82,7 @@ export function ModalMemberInvite({ board, setIsInviteModalOpen }) {
                         })
                     }
                 </ul>
-                {!canManage && <p style={{ padding: '8px 4px', color: '#676879', fontSize: 13 }}>
+                {!canManage && <p className='invite-hint'>
                     Nur Owner dieses Boards koennen Mitglieder hinzufuegen oder entfernen.
                 </p>}
                 {canManage && <div className="outTaskMembers">

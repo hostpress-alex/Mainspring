@@ -64,8 +64,8 @@ export function MainSidebar ({ setIsLoginModalOpen, setWorkspaceDisplay, setIsWo
                 </Tooltip>
 
                 <Tooltip title={t('nav.calendar')} arrow placement="right">
-                    <Link to='/kalender' className='icon-container'
-                        style={{ color: '#fff', opacity: location.pathname === '/kalender' ? 1 : .75 }}>
+                    <Link to='/kalender'
+                        className={`icon-container nav-link${location.pathname === '/kalender' ? ' is-active' : ''}`}>
                         <MdCalendarMonth />
                         {location.pathname === '/kalender' && <VscTriangleLeft className="triangle-icon" />}
                     </Link>
@@ -73,8 +73,8 @@ export function MainSidebar ({ setIsLoginModalOpen, setWorkspaceDisplay, setIsWo
 
                 {user?.isAdmin && (
                     <Tooltip title={t('nav.administration')} arrow placement="right">
-                        <Link to='/admin' className='icon-container'
-                            style={{ color: '#fff', opacity: location.pathname === '/admin' ? 1 : .75 }}>
+                        <Link to='/admin'
+                            className={`icon-container nav-link${location.pathname === '/admin' ? ' is-active' : ''}`}>
                             <MdOutlineAdminPanelSettings />
                             {location.pathname === '/admin' && <VscTriangleLeft className="triangle-icon" />}
                         </Link>

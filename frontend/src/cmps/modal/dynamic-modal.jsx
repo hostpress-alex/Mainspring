@@ -63,7 +63,7 @@ export function DynamicModal () {
 
     return (
         <div ref={elModal} className="dynamic-modal"
-            style={{ left: dynamicModalObj.pos?.x, top: dynamicModalObj.pos?.y }}>
+            style={{ '--modal-x': `${dynamicModalObj.pos?.x ?? 0}px`, '--modal-y': `${dynamicModalObj.pos?.y ?? 0}px` }}>
             {getDynamicModalByType(dynamicModalObj.type)}
         </div>
     )

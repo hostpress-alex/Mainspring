@@ -54,10 +54,16 @@ const ACTION_LABELS = {
     title: t('activity.action.title'),
 }
 
-export function ActivityPreview({ activity }) {
+/**
+ * One entry of the activity log.
+ *
+ * `taskTitle` decides whether the task is named. In the log of ONE task that
+ * would be the same name on every line, so the task dialog leaves it out; the
+ * board log needs it, otherwise you cannot tell what was touched.
+ */
+export function ActivityPreview({ activity, taskTitle = null }) {
     if (!activity) return null
     const byMember = (activity.byMember && typeof activity.byMember === 'object') ? activity.byMember : {}
-    const task = (activity.task && typeof activity.task === 'object') ? activity.task : {}
     const action = typeof activity.action === 'string' ? activity.action : ''
 
     function getIconAction() {
@@ -105,18 +111,18 @@ export function ActivityPreview({ activity }) {
     }
 
     return (
-        <section className="activity-preview">
+        <section className={`activity-preview${taskTitle ? ' with-task' : ''}`}>
             <div className="time-title flex align-center">
                 <div className="time flex align-center">
                     <IoTimeOutline />
                     <span>{activity.createdAt ? utilService.calculateTime(activity.createdAt) : ''}</span>
                 </div>
-                {/* This used to show the task name — in the log of ONE task
-                    that means the same name on every line. Who did something
-                    is the more useful piece of information. */}
-                <div className='title flex align-center'>
-                    <img src={imgOf(byMember.imgUrl)} alt="" />
-                    <span>{text(byMember.fullname)}</span>
+                <div className='who-what'>
+                    <div className='title flex align-center'>
+                        <img src={imgOf(byMember.imgUrl)} alt="" />
+                        <span>{text(byMember.fullname)}</span>
+                    </div>
+                    {taskTitle && <div className='activity-task' title={taskTitle}>{taskTitle}</div>}
                 </div>
             </div>
             <div className='action flex align-center space-between'>
@@ -131,9 +137,9 @@ export function ActivityPreview({ activity }) {
 function FromToStatusPriority({ activity }) {
     return (
         <div className='from-to label-container flex align-center'>
-            <span className='label' style={{ backgroundColor: colorOf(activity.from) }}>{text(activity.from)}</span>
+            <span className='label' style={{ '--label-color': colorOf(activity.from) }}>{text(activity.from)}</span>
             <IoIosArrowForward className='icon' />
-            <span className='label' style={{ backgroundColor: colorOf(activity.to) }}>{text(activity.to)}</span>
+            <span className='label' style={{ '--label-color': colorOf(activity.to) }}>{text(activity.to)}</span>
         </div>
     )
 }
@@ -162,8 +168,8 @@ function FromToDueDate({ activity }) {
 function FromToCreate({ activity }) {
     return (
         <div className='from-to create-container'>
-            <span>Group: </span>
-            <span style={{ color: colorOf(activity.from) }}>{text(activity.from)}</span>
+            <span>{t('group.group')}: </span>
+            <span className='activity-title' style={{ '--label-color': colorOf(activity.from) }}>{text(activity.from)}</span>
         </div>
     )
 }

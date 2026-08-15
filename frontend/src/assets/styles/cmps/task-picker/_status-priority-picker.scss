@@ -29,3 +29,8 @@
         transition: border-width .2s ease-out;
     }
 }
+// The label colour comes from the board's label list, so the value arrives
+// from the JSX; the rule stays here.
+.status-priority-picker {
+    background-color: var(--label-color);
+}

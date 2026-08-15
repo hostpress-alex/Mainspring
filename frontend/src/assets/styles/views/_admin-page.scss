@@ -1,0 +1,172 @@
+/**
+ * Admin Page.
+ *
+ * Was a `const S = {...}` object inside admin.jsx. Moved here one to one;
+ * the JSX only carries class names now.
+ */
+.admin-page {
+    padding: 32px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-family: inherit;
+
+    .admin-title {
+        font-size: 28px;
+        margin-bottom: 4px;
+    }
+
+    .admin-sub {
+        color: #676879;
+        margin-bottom: 28px;
+    }
+
+    .admin-card {
+        background: #fff;
+        border: 1px solid #d0d4e4;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .admin-section-title {
+        font-size: 18px;
+        margin-bottom: 14px;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .admin-th {
+        text-align: left;
+        padding: 8px 10px;
+        border-bottom: 2px solid #e6e9ef;
+        color: #676879;
+        font-weight: 500;
+    }
+
+    .admin-td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #f0f1f5;
+        vertical-align: middle;
+    }
+
+    .admin-input {
+        padding: 7px 10px;
+        border: 1px solid #c3c6d4;
+        border-radius: 4px;
+        margin-right: 8px;
+        font-size: 14px;
+    }
+
+    .admin-btn {
+        padding: 7px 14px;
+        border: none;
+        border-radius: 4px;
+        background: #0073ea;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .admin-btn-ghost {
+        padding: 4px 10px;
+        border: 1px solid #c3c6d4;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 13px;
+        margin-right: 6px;
+    }
+
+    .admin-btn-danger {
+        padding: 4px 10px;
+        border: 1px solid #e2445c;
+        border-radius: 4px;
+        background: #fff;
+        color: #e2445c;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .admin-badge {
+        background: #00c875;
+        color: #fff;
+        border-radius: 10px;
+        padding: 2px 9px;
+        font-size: 12px;
+    }
+
+    .admin-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f0f1f5;
+        border-radius: 14px;
+        padding: 3px 6px 3px 10px;
+        margin-right: 6px;
+        margin-bottom: 4px;
+        font-size: 13px;
+    }
+
+    .admin-remove {
+        cursor: pointer;
+        color: #676879;
+        font-weight: 700;
+        padding: 0 4px;
+    }
+
+    .admin-error {
+        background: #fff0f2;
+        border: 1px solid #e2445c;
+        color: #a3283a;
+        padding: 10px 14px;
+        border-radius: 4px;
+        margin-bottom: 16px;
+    }
+
+    .admin-success {
+        background: #eefaf3;
+        border: 1px solid #00c875;
+        color: #00734a;
+        padding: 10px 14px;
+        border-radius: 4px;
+        margin-bottom: 16px;
+    }
+
+
+    .admin-checkbox {
+        margin-right: 12px;
+        font-size: 14px;
+    }
+
+    .admin-td.is-right {
+        text-align: right;
+    }
+
+    .admin-muted {
+        color: #9699a6;
+        font-size: 13px;
+
+        &.is-plain {
+            font-size: inherit;
+        }
+    }
+
+    // a member chip; owners are tinted
+    .admin-chip.is-owner {
+        background: #e6f2ff;
+    }
+
+    .admin-chip-toggle {
+        cursor: pointer;
+    }
+
+    .admin-sub.is-footnote {
+        margin-top: 14px;
+        margin-bottom: 0;
+        font-size: 13px;
+    }
+}

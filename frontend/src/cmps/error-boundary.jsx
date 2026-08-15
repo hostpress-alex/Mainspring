@@ -26,21 +26,14 @@ export class ErrorBoundary extends React.Component {
     render() {
         if (!this.state.err) return this.props.children
         return (
-            <div style={{
-                padding: '12px 14px', margin: '8px 0', borderRadius: 6,
-                background: '#fff4f5', border: '1px solid #f0c2c9',
-                color: '#a3283a', fontSize: 13, lineHeight: 1.5,
-            }}>
+            <div className="error-boundary">
                 <strong>{t('common.areaFailed', { area: this.props.label || t('common.thisArea') })}</strong>
-                <div style={{ marginTop: 4, color: '#676879' }}>
+                <div className="error-boundary-hint">
                     {t('common.areaFailedHint')}
                 </div>
                 <button type="button"
                     onClick={() => this.setState({ err: null })}
-                    style={{
-                        marginTop: 8, padding: '4px 10px', border: '1px solid #c3c6d4',
-                        borderRadius: 4, background: '#fff', cursor: 'pointer', font: 'inherit', fontSize: 13,
-                    }}>
+                    className="error-boundary-retry">
                     {t('common.retry')}
                 </button>
             </div>

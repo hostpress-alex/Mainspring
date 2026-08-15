@@ -79,25 +79,46 @@ function query(filter = getDefaultFilterBoards()) {
  * this used to overwrite group.tasks of the REAL board, so tasks vanished
  * from the original as well.
  */
+/** A search term is text, not a pattern — `Preis (netto)` must not throw. */
+function escapeForRegex(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * The board as the search leaves it. Never mutates the board it is given.
+ *
+ * A group survives if its own title matches — then it keeps all its tasks,
+ * because searching for "Concept" is a way of asking for that whole group —
+ * or if at least one task in it matches. Everything else drops out.
+ *
+ * This used to narrow the tasks only inside groups whose GROUP title matched,
+ * which meant that searching for a task title filtered nothing at all: no
+ * group is called after a task.
+ */
 function getFilteredBoard(board, filterBy = getDefaultFilterBoard()) {
     if (!board) return board
     const f = filterBy || getDefaultFilterBoard()
     if (!f.title && !f.memberId) return { ...board }
 
     const filteredBoard = structuredClone(board)
-    if (f.title) {
-        // As before: the group list stays complete, only in groups with a
-        // matching title are the tasks narrowed down.
-        const regex = new RegExp(f.title, 'i')
-        ;(filteredBoard.groups || []).filter(group => regex.test(group.title)).forEach(group => {
-            group.tasks = (group.tasks || []).filter(task => regex.test(task.title))
-        })
-    }
+    let groups = filteredBoard.groups || []
+
     if (f.memberId) {
-        (filteredBoard.groups || []).forEach(group => {
+        groups.forEach(group => {
             group.tasks = (group.tasks || []).filter(task => (task.memberIds || []).includes(f.memberId))
         })
     }
+
+    if (f.title) {
+        const regex = new RegExp(escapeForRegex(f.title.trim()), 'i')
+        groups = groups.filter(group => {
+            if (regex.test(group.title || '')) return true
+            group.tasks = (group.tasks || []).filter(task => regex.test(task.title || ''))
+            return group.tasks.length > 0
+        })
+    }
+
+    filteredBoard.groups = groups
     return filteredBoard
 }
 

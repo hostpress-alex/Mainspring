@@ -324,3 +324,51 @@
         opacity: .6;
     }
 }
+/**
+ * Group colour.
+ *
+ * The colour itself belongs to the data, so it comes in from the JSX as a
+ * custom property. The rule that uses it — text here, border there — stays
+ * where every other rule is.
+ */
+.group-header {
+    color: var(--group-color);
+}
+
+// The 6px stripe on the left is set further up as `border-left: 6px solid`
+// without a colour, so it took the colour from the inline style. That rule is
+// nested and therefore more specific — this one has to match it.
+.group-preview .sticky-div,
+.task-preview .sticky-div {
+    border-left-color: var(--group-color);
+}
+
+/**
+ * A folded group.
+ *
+ * Only the header stays, with the number of tasks next to it — so it is clear
+ * what is hidden away in there without having to unfold it first.
+ */
+.group-preview .arrow-icon {
+    cursor: pointer;
+    transition: transform .15s;
+}
+
+// A folded group needs no room for a table that is not there.
+.group-preview.is-collapsed {
+    margin-bottom: 12px;
+}
+
+.group-collapsed-bar {
+    position: sticky;
+    left: 40px;
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0 8px 40px;
+    padding: 4px 12px;
+    border-left: 6px solid var(--group-color);
+    background: #fff;
+    color: #676879;
+    font-size: 13px;
+    cursor: pointer;
+}

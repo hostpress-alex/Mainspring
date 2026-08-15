@@ -239,3 +239,32 @@
         }
     }
 }
+// Sections of the board column (favourites, folders). Was inline in
+// workspace-board.jsx.
+.workspace-section-head {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 7px 8px 5px;
+    color: #676879;
+    font-size: 13px;
+
+    .workspace-section-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .workspace-section-count {
+        font-size: 12px;
+        opacity: .8;
+    }
+}
+
+.workspace-section-empty {
+    padding: 4px 12px 8px;
+    color: #9699a6;
+    font-size: 12px;
+}

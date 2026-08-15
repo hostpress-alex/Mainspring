@@ -1,0 +1,96 @@
+/**
+ * Text, long text, checkbox and link columns.
+ * All of this used to sit as inline styles in cmps/task/simple-pickers.jsx.
+ */
+.text-picker input,
+.link-picker input,
+.dropdown-picker input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font: inherit;
+    color: inherit;
+    outline: none;
+}
+
+.longtext-picker {
+    position: relative;
+
+    .longtext-value {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 0 8px;
+        opacity: 1;
+
+        &.is-empty {
+            opacity: .45;
+        }
+    }
+
+    // The editor floats over the row below, hence the shadow and the z-index.
+    .longtext-box {
+        position: absolute;
+        z-index: 40;
+        top: 100%;
+        left: 0;
+        width: 280px;
+        background: #fff;
+        border: 1px solid #c3c6d4;
+        border-radius: 6px;
+        padding: 8px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+
+        textarea {
+            width: 100%;
+            border: 1px solid #e0e3ee;
+            border-radius: 4px;
+            padding: 6px;
+            font: inherit;
+            resize: vertical;
+        }
+    }
+}
+
+.checkbox-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .checkbox-on {
+        color: #00c875;
+        font-size: 18px;
+    }
+
+    .checkbox-off {
+        color: #c3c6d4;
+        font-size: 18px;
+    }
+}
+
+// The link column shows a link; while it is being edited it is a plain input.
+.link-picker.is-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    a {
+        color: #0073ea;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 80%;
+    }
+
+    .link-icon {
+        color: #0073ea;
+        flex-shrink: 0;
+    }
+
+    .link-empty {
+        opacity: .45;
+    }
+}

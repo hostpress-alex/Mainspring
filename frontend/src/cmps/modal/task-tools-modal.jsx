@@ -92,7 +92,7 @@ export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMai
                     <div className="task-info flex">
                         <span>{t('task.selectedLabel', { n: tasks.length })}</span>
                         <div className="group-color flex">
-                            {_.times(tasks.length, () => <BsFillCircleFill key={_.uniqueId('KEY_')} className="icon" style={{ color: group.color }} />)}
+                            {_.times(tasks.length, () => <BsFillCircleFill key={_.uniqueId('KEY_')} className="icon" style={{ '--group-color': group.color }} />)}
                         </div>
                     </div>
                     <div className="task-btns flex">
@@ -104,34 +104,20 @@ export function TaskToolsModal({ tasks, group, board, setSelectedTasks, setIsMai
                             <FiTrash className="icon" />
                             {t('common.delete')}
                         </div>
-                        <div ref={elMove} style={{ position: 'relative' }}
+                        <div ref={elMove} className={`move-to${targets.length ? '' : ' is-disabled'}`}
                             onClick={() => targets.length && setIsMoveOpen(open => !open)}
-                            title={targets.length ? t('task.moveToTitle') : t('task.noOtherGroup')}
-                            className={targets.length ? '' : 'is-disabled'}>
+                            title={targets.length ? t('task.moveToTitle') : t('task.noOtherGroup')}>
                             <BsArrowRightCircle className="icon" />
-                            Move to
+                            {t('task.moveTo')}
                             {isMoveOpen && (
-                                <ul style={{
-                                    position: 'absolute', bottom: '100%', left: 0, marginBottom: 8, zIndex: 60,
-                                    background: '#fff', color: '#323338', minWidth: 210, borderRadius: 8,
-                                    boxShadow: '0 6px 22px rgba(0,0,0,.25)', padding: 6, listStyle: 'none',
-                                    maxHeight: 260, overflow: 'auto', textAlign: 'left',
-                                }} onClick={ev => ev.stopPropagation()}>
-                                    <li style={{ padding: '4px 10px', fontSize: 12, color: '#676879' }}>{t('task.moveTo')}</li>
+                                <ul className="move-to-list" onClick={ev => ev.stopPropagation()}>
+                                    <li className="move-to-head">{t('task.moveTo')}</li>
                                     {targets.map(g => (
-                                        <li key={g.id}
-                                            onClick={() => onMoveTo(g.id)}
-                                            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
-                                                borderRadius: 6, cursor: 'pointer' }}
-                                            onMouseEnter={e => e.currentTarget.style.background = '#f0f4ff'}
-                                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                                            <BsFillCircleFill style={{ color: g.color, fontSize: 10, flexShrink: 0 }} />
-                                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                {g.title}
-                                            </span>
-                                            <span style={{ marginLeft: 'auto', color: '#676879', fontSize: 12 }}>
-                                                {(g.tasks || []).length}
-                                            </span>
+                                        <li key={g.id} className="move-to-item"
+                                            onClick={() => onMoveTo(g.id)}>
+                                            <BsFillCircleFill className="move-to-dot" style={{ '--group-color': g.color }} />
+                                            <span className="move-to-name">{g.title}</span>
+                                            <span className="move-to-count">{(g.tasks || []).length}</span>
                                         </li>
                                     ))}
                                 </ul>

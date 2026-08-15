@@ -303,7 +303,7 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><TbAlignLeft /></span>
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><TbAlignCenter /></span>
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><TbAlignRight /></span>
-                    <span title={t('update.attach')} style={{ marginLeft: 'auto' }}
+                    <span title={t('update.attach')} className="update-attach-btn"
                         onMouseDown={(ev) => { ev.preventDefault(); elFileInput.current?.click() }}>
                         <MdAttachFile />
                     </span>
@@ -319,12 +319,12 @@ export function TaskModal({ task, board, groupId, setModalCurrTask }) {
 
                 <input ref={elFileInput} type="file" multiple
                     accept="image/*,.pdf,.doc,.docx,.odt,.rtf,.xls,.xlsx,.ods,.csv,.ppt,.pptx,.odp,.txt,.md,.json,.xml,.zip,.7z"
-                    onChange={onPickFiles} style={{ display: 'none' }} />
+                    onChange={onPickFiles} className="update-file-input" />
 
                 <AttachmentStrip attachments={comment.attachments} onRemove={onRemoveAttachment} />
 
-                {isUploading && <p style={{ fontSize: 13, color: '#676879', margin: '8px 0 0' }}>{t('update.uploading')}</p>}
-                {uploadErr && <p style={{ fontSize: 13, color: '#a3283a', margin: '8px 0 0' }}>{uploadErr}</p>}
+                {isUploading && <p className="update-note">{t('update.uploading')}</p>}
+                {uploadErr && <p className="update-note is-error">{uploadErr}</p>}
             </form>}
             {isWriteNewUpdate && <div className="button-container">
                 <button className="save" onMouseDown={onAddComment}

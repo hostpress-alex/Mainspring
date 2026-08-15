@@ -46,8 +46,7 @@ export function TitleGroupPreview({ column, group, isKanban, onRename }) {
                     if (e.key === 'Escape') { setDraft(column.title); setIsEditing(false) }
                 }}
                 onClick={e => e.stopPropagation()}
-                style={{ width: '90%', border: '1px solid #0073ea', borderRadius: 4, padding: '2px 6px',
-                    font: 'inherit', textAlign: 'center' }} />
+                className='column-title-input' />
         )
     }
 

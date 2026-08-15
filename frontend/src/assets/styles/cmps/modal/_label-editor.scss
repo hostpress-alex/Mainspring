@@ -1,0 +1,9 @@
+// see label-editor.css — this file only carries the colours that come from
+// the data, so the rules do not have to live in the JSX.
+.label-editor-swatch {
+    background-color: var(--label-color);
+}
+
+.label-editor-palette button {
+    background-color: var(--label-color);
+}

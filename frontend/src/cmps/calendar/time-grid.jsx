@@ -195,7 +195,7 @@ export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
                     ))}
                 </div>
 
-                <div style={{ display: 'contents' }}>
+                <div className='cal-col-wrap'>
                     {days.map((day, dayIdx) => {
                         const items = layoutDay(shown, day)
                         const weekend = [0, 6].includes(day.getDay())
@@ -215,13 +215,13 @@ export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
                                 ))}
 
                                 {today && (
-                                    <div className='cal-now' style={{ top: `${(nowMin / 1440) * 100}%` }} />
+                                    <div className='cal-now' style={{ '--top': `${(nowMin / 1440) * 100}%` }} />
                                 )}
 
                                 {isDraftHere && draftTo > draftFrom && (
                                     <div className='cal-draft' style={{
-                                        top: `${(draftFrom / 1440) * 100}%`,
-                                        height: `${((draftTo - draftFrom) / 1440) * 100}%`,
+                                        '--top': `${(draftFrom / 1440) * 100}%`,
+                                        '--height': `${((draftTo - draftFrom) / 1440) * 100}%`,
                                     }}>
                                         {fmtTime(new Date(startOfDay(day).getTime() + draftFrom * MS_MIN))} –{' '}
                                         {fmtTime(new Date(startOfDay(day).getTime() + draftTo * MS_MIN))}
@@ -239,11 +239,11 @@ export function TimeGrid ({ days, entries, onCreate, onMove, onOpen }) {
                                                 `${item.continuesAfter ? ' is-continues-after' : ''}`}
                                             title={`${item.entry.taskTitle}\n${fmtTime(item.start)}–${fmtTime(item.end)}\n${item.entry.boardTitle} · ${item.entry.groupTitle}`}
                                             style={{
-                                                background: item.entry.color || '#0073ea',
-                                                top: `${item.topPct}%`,
-                                                height: `calc(${item.heightPct}% - 2px)`,
-                                                left: `calc(${item.col * width}% + 2px)`,
-                                                width: `calc(${width}% - 4px)`,
+                                                '--entry-color': item.entry.color || '#0073ea',
+                                                '--top': `${item.topPct}%`,
+                                                '--height': `${item.heightPct}%`,
+                                                '--left': `${item.col * width}%`,
+                                                '--width': `${width}%`,
                                             }}
                                             onMouseDown={ev => onEventMouseDown(ev, item, 'move')}>
                                             {short ? (

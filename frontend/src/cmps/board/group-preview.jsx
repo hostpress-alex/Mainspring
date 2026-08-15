@@ -11,10 +11,11 @@ import { TitleGroupPreview } from "./title-group-preview"
 import { AddColumnDialog } from "../modal/add-column-dialog"
 import { singleLineEditable } from "../../services/editable"
 import { loadWidths, saveWidths, widthOf, widthStyle, MIN_WIDTH, MAX_WIDTH } from "./column-width"
+import { isCollapsed, toggleCollapsed } from "./group-collapse"
 import "./board-columns.css"
 import { StatisticGroup } from "./statistics-group"
 
-import { MdKeyboardArrowDown } from 'react-icons/md'
+import { MdKeyboardArrowDown, MdKeyboardArrowRight } from 'react-icons/md'
 import { BsFillCircleFill } from 'react-icons/bs'
 import { BiDotsHorizontalRounded } from 'react-icons/bi'
 import { AiOutlinePlus } from 'react-icons/ai'
@@ -25,6 +26,9 @@ export function GroupPreview ({ group, board, idx }) {
     const [taskToEdit, setTaskToEdit] = useState(boardService.getEmptyTask())
     const [isTyping, setIsTyping] = useState(false)
     const [isShowColorPicker, setIsShowColorPicker] = useState(false)
+    const [isEditingTitle, setIsEditingTitle] = useState(false)
+    const [collapsed, setCollapsed] = useState(() => isCollapsed(board._id, group.id))
+    const elTitle = useRef()
     const [selectedTasks, setSelectedTasks] = useState([])
     const [isMainCheckbox, setIsMainCheckbox] = useState({ isActive: false })
     const [isAddColumnOpen, setIsAddColumnOpen] = useState(false)
@@ -32,6 +36,37 @@ export function GroupPreview ({ group, board, idx }) {
     const [resizing, setResizing] = useState(null)
 
     useEffect(() => { setWidths(loadWidths(board._id)) }, [board._id])
+    useEffect(() => { setCollapsed(isCollapsed(board._id, group.id)) }, [board._id, group.id])
+
+    /** Fold the group away. The arrow is the only handle — the rest of the
+     *  header is the drag handle, so the click must not travel further up. */
+    function onToggleCollapse (ev) {
+        ev.stopPropagation()
+        ev.preventDefault()
+        setCollapsed(toggleCollapsed(board._id, group.id))
+    }
+
+    /**
+     * The title only becomes editable once it is actually being edited.
+     *
+     * A permanently contentEditable heading acts as a caret magnet: clicking
+     * the blank space between two groups has no text of its own, so the
+     * browser puts the caret in the nearest editable text it can find — the
+     * heading below — and the group jumped into edit mode from a click far
+     * above it. Measured with caretRangeFromPoint: editable heading, the caret
+     * lands in it from 50 px away; plain heading, it does not.
+     */
+    useEffect(() => {
+        if (!isEditingTitle || !elTitle.current) return
+        const el = elTitle.current
+        el.focus()
+        const range = document.createRange()
+        range.selectNodeContents(el)
+        range.collapse(false)                       // caret at the end, nothing selected
+        const selection = window.getSelection()
+        selection.removeAllRanges()
+        selection.addRange(range)
+    }, [isEditingTitle])
 
 
     /** Drag the width: live while moving, saved on release. */
@@ -111,13 +146,19 @@ export function GroupPreview ({ group, board, idx }) {
 
     async function onSave (ev) {
         const value = ev.target.innerText
+        setIsEditingTitle(false)
+        if (value === group.title) {
+            setIsTyping(false)
+            setIsShowColorPicker(false)
+            return
+        }
         group.title = value
         try {
             await updateGroupAction(board, group)
             setIsTyping(false)
             setIsShowColorPicker(false)
         } catch (err) {
-            console.log('saving failed')
+            console.log('saving a group failed', err)
         }
     }
 
@@ -177,20 +218,29 @@ export function GroupPreview ({ group, board, idx }) {
         return dynamicModalObj.isOpen === true && dynamicModalObj.type === 'add-column' && dynamicModalObj?.group?.id === group.id
     }
 
-    return <ul className="group-preview flex column" >
+    return <ul className={`group-preview flex column${collapsed ? ' is-collapsed' : ''}`}>
         <Draggable key={group.id} draggableId={group.id} index={idx}>
             {(provided) => {
                 return <div ref={provided.innerRef}
                     {...provided.draggableProps}>
-                    <div {...provided.dragHandleProps} className={`group-header flex align-center ${!board.description ? ' not-des' : ''}`} style={{ color: group.color }}>
+                    <div {...provided.dragHandleProps}
+                        className={`group-header flex align-center${!board.description ? ' not-des' : ''}${collapsed ? ' is-collapsed' : ''}`}
+                        style={{ '--group-color': group.color }}>
                         <div className="group-header-title flex align-center">
-                            <MdKeyboardArrowDown className="arrow-icon" />
+                            {collapsed
+                                ? <MdKeyboardArrowRight className="arrow-icon" onClick={onToggleCollapse}
+                                    title={t('group.expand')} />
+                                : <MdKeyboardArrowDown className="arrow-icon" onClick={onToggleCollapse}
+                                    title={t('group.collapse')} />}
                             <div className="group-menu" ref={elMainGroup}>
                                 <BiDotsHorizontalRounded className="icon" onClick={onToggleMenuModal} />
                             </div>
                             <div className={`group-title-info flex align-center ${isShowColorPicker ? 'showBorder' : ''} `} onFocus={() => setIsShowColorPicker(true)}>
                                 {isShowColorPicker && <BsFillCircleFill onClick={onTogglePalette} />}
-                                <blockquote className="group-title" contentEditable onBlur={(ev) => onSave(ev)} suppressContentEditableWarning={true}
+                                <blockquote ref={elTitle} className="group-title"
+                                    contentEditable={isEditingTitle} suppressContentEditableWarning={true}
+                                    onClick={() => setIsEditingTitle(true)}
+                                    onBlur={(ev) => onSave(ev)}
                                     {...singleLineEditable({ onFocus: () => setIsTyping(true) })}>
                                     <h4>{group.title}</h4>
                                 </blockquote>
@@ -198,12 +248,16 @@ export function GroupPreview ({ group, board, idx }) {
                             </div>
                         </div>
                     </div>
-                    <div className="group-preview-content" >
+                    {collapsed && <div className="group-collapsed-bar" onClick={onToggleCollapse}
+                        style={{ '--group-color': group.color }}>
+                        {t('task.count', { n: (group.tasks || []).length })}
+                    </div>}
+                    {!collapsed && <div className="group-preview-content" >
                         <DragDropContext onDragEnd={handleHorizontalDrag}>
                             <Droppable droppableId="title" direction="horizontal">
                                 {(droppableProvided) => {
                                     return <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps} className={`title-container flex ${!board.description ? ' not-des' : ''}`}>
-                                        <div className="sticky-div titles flex" style={{ borderColor: group.color }}>
+                                        <div className="sticky-div titles flex" style={{ '--group-color': group.color }}>
                                             <div className="hidden"></div>
                                             <div className="check-box"  >
                                                 <input type="checkbox" checked={isMainCheckbox.isActive} onChange={onClickMainCheckbox} />
@@ -258,7 +312,7 @@ export function GroupPreview ({ group, board, idx }) {
                                     })}
                                     {droppableProvided.placeholder}
                                     <div className="add-task flex">
-                                        <div className="sticky-div" style={{ borderColor: group.color }}>
+                                        <div className="sticky-div" style={{ '--group-color': group.color }}>
                                             <div className="check-box add-task">
                                                 <input type="checkbox" disabled />
                                             </div>
@@ -290,7 +344,7 @@ export function GroupPreview ({ group, board, idx }) {
                             </div>
                             <div className="empty-div"></div>
                         </div>
-                    </div>
+                    </div>}
                 </div>
             }}
         </Draggable>

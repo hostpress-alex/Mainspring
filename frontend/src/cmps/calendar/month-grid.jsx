@@ -51,7 +51,7 @@ export function MonthGrid ({ date, entries, onCreate, onOpen, onPickDay }) {
                                     </span>
                                     {list.slice(0, MAX_CHIPS).map(e => (
                                         <div key={e._id} className='cal-chip'
-                                            style={{ background: e.color || '#0073ea' }}
+                                            style={{ '--entry-color': e.color || '#0073ea' }}
                                             title={`${e.taskTitle}\n${e.boardTitle} · ${e.groupTitle}`}
                                             onMouseDown={ev => { ev.stopPropagation(); onOpen(e) }}>
                                             <span className='cal-chip-time'>{fmtTime(new Date(e.start))}</span>

@@ -88,7 +88,7 @@ export function TaskPreview({ task, group, board, handleCheckboxChange, isMainCh
 
     return (
         <section className={'task-preview flex'} ref={elTaskPreview}>
-            <div ref={elMenuTask} className="sticky-div" style={{ borderColor: group.color }}>
+            <div ref={elMenuTask} className="sticky-div" style={{ '--group-color': group.color }}>
                 <div className="task-menu">
                     <BiDotsHorizontalRounded className="icon" onClick={onToggleTaskModal} />
                 </div>

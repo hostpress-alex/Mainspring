@@ -38,7 +38,7 @@ export function AppShell ({ children, showBoards = true }) {
             </div>
 
             {isLoginModalOpen && (
-                <div style={{ position: 'fixed', left: 70, bottom: 16, zIndex: 900 }}>
+                <div className='app-shell-corner'>
                     <LoginLogoutModal setIsLoginModalOpen={setIsLoginModalOpen} />
                 </div>
             )}

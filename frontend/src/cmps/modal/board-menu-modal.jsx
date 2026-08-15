@@ -62,23 +62,13 @@ export function BoardMenuModal({ dynamicModalObj }) {
             )}
 
             {isFolderOpen && (
-                <form onSubmit={onSaveFolder} style={{ padding: 10, minWidth: 210 }}>
-                    <label style={{ display: 'block', fontSize: 12, color: '#676879', marginBottom: 5 }}>
-                        Gruppe (z.B. IT, Marketing)
-                    </label>
+                <form onSubmit={onSaveFolder} className="folder-form">
+                    <label className="folder-form-label">{t('board.folderLabel')}</label>
                     <input autoFocus value={folder} placeholder={t('board.folderHint')}
-                        onChange={e => setFolder(e.target.value)}
-                        style={{ width: '100%', padding: '7px 9px', border: '1px solid #c3c6d4',
-                            borderRadius: 5, font: 'inherit' }} />
-                    <div style={{ display: 'flex', gap: 8, marginTop: 9 }}>
-                        <button type="submit" style={{ flex: 1, padding: '6px 10px', border: 'none',
-                            borderRadius: 5, background: '#0073ea', color: '#fff', cursor: 'pointer' }}>
-                            {t('common.save')}
-                        </button>
-                        <button type="button" onClick={close} style={{ padding: '6px 10px',
-                            border: '1px solid #c3c6d4', borderRadius: 5, background: '#fff', cursor: 'pointer' }}>
-                            {t('common.cancel')}
-                        </button>
+                        onChange={e => setFolder(e.target.value)} className="folder-form-input" />
+                    <div className="folder-form-actions">
+                        <button type="submit" className="folder-form-save">{t('common.save')}</button>
+                        <button type="button" onClick={close} className="folder-form-cancel">{t('common.cancel')}</button>
                     </div>
                 </form>
             )}

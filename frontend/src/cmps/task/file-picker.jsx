@@ -75,34 +75,32 @@ export function FilePicker({ info, onUpdate, field = 'file' }) {
     return (
         <section className="file-picker picker" title={err || (file ? (file.name || t('file.file')) : t('file.attach'))}>
             {!file && (
-                <label htmlFor={'file-upload' + info.id} style={{ cursor: 'pointer' }}>
-                    {isBusy ? <span style={{ fontSize: 11, color: '#676879' }}>…</span> : <AiOutlineFileAdd className="icon" />}
+                <label htmlFor={'file-upload' + info.id} className="file-picker-add">
+                    {isBusy ? <span className="file-picker-busy">…</span> : <AiOutlineFileAdd className="icon" />}
                 </label>
             )}
 
             {file && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 4, maxWidth: '100%' }}>
-                    <a href={file.url} target="_blank" rel="noreferrer"
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, textDecoration: 'none', color: '#0073ea' }}
+                <span className="file-picker-body">
+                    <a href={file.url} target="_blank" rel="noreferrer" className="file-picker-link"
                         onClick={ev => ev.stopPropagation()}>
                         {isImage
-                            ? <img className="file-img" src={file.url} alt="" style={{ maxWidth: 19, maxHeight: 19, display: 'block' }} />
+                            ? <img className="file-img" src={file.url} alt="" />
                             : <AiOutlineFileAdd className="icon" />}
                         {!isImage && file.name && (
-                            <span style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <span className="file-picker-name">
                                 {shortName(file.name)}
                             </span>
                         )}
                     </a>
-                    <button type="button" title={t('file.remove')} onClick={onClear}
-                        style={{ border: 'none', background: 'transparent', color: '#676879', cursor: 'pointer', padding: 0, lineHeight: 1, fontSize: 13 }}>
+                    <button type="button" title={t('file.remove')} onClick={onClear} className="file-picker-clear">
                         ×
                     </button>
                 </span>
             )}
 
             <input ref={elInput} type="file" accept={ACCEPT} onChange={onPick}
-                id={'file-upload' + info.id} style={{ display: 'none' }} />
+                id={'file-upload' + info.id} className="file-picker-input" />
         </section>
     )
 }

@@ -27,7 +27,7 @@ export function StatusPicker({ info, onUpdate, field = 'status', column }) {
     }
 
     return (
-        <section role="contentinfo" ref={elStatusSection} className="status-priority-picker picker" style={{ backgroundColor: color }} onClick={onToggleMenuModal}>
+        <section role="contentinfo" ref={elStatusSection} className="status-priority-picker picker" style={{ '--label-color': color }} onClick={onToggleMenuModal}>
             <div className={classText}>{info[field]}</div>
             <span className="fold"></span>
         </section>

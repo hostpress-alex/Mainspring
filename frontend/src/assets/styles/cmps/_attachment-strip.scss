@@ -1,0 +1,86 @@
+/**
+ * Attachments of an update: thumbnails, file rows, and the lightbox.
+ * Was a `const S = {...}` object in cmps/task/attachment-strip.jsx.
+ */
+.attachment-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.attachment-thumb-wrap {
+    position: relative;
+    width: 92px;
+    height: 92px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e0e3ee;
+    background: #f6f7fb;
+}
+
+.attachment-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
+    display: block;
+}
+
+.attachment-file {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid #e0e3ee;
+    border-radius: 6px;
+    background: #f6f7fb;
+    font-size: 13px;
+    text-decoration: none;
+    color: #0073ea;
+}
+
+.attachment-remove {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    cursor: pointer;
+    line-height: 20px;
+    padding: 0;
+    font-size: 13px;
+}
+
+.attachment-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    cursor: zoom-out;
+}
+
+.attachment-full {
+    max-width: 92vw;
+    max-height: 92vh;
+    box-shadow: 0 6px 40px rgba(0,0,0,.5);
+}
+
+
+// the size next to a file name
+.attachment-size {
+    color: #676879;
+}
+
+// the same button, but in the row of a non-image file
+.attachment-remove.is-inline {
+    position: static;
+    background: #c3c6d4;
+}

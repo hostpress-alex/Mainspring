@@ -29,8 +29,8 @@ export function ImgUploader({ onUploaded = null }) {
       <div className='img-picker'>
         {getUploadLabel()}
         <label htmlFor="imgUpload">
-          {!imgData.imgUrl && <img className="GUEST_IMG-img" src={GUEST_IMG} style={{ maxWidth: '200px', float: 'right' }} alt="" />}
-          {imgData.imgUrl && <img className="user-img" src={imgData.imgUrl} style={{ maxWidth: '100px', float: 'right' }} alt="" />}
+          {!imgData.imgUrl && <img className="GUEST_IMG-img" src={GUEST_IMG} className='img-uploader-preview is-large' alt="" />}
+          {imgData.imgUrl && <img className="user-img" src={imgData.imgUrl} className='img-uploader-preview' alt="" />}
         </label>
       </div>
       <input type="file" onChange={uploadImg} accept="img/*" id="imgUpload" />

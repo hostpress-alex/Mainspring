@@ -133,8 +133,7 @@ export function EntryDialog ({ draft, tasks, onSave, onDelete, onClose, busy }) 
                         </select>
                         {selected && (
                             <span className='cal-hint'>
-                                <span style={{ display: 'inline-block', width: 9, height: 9, borderRadius: 2,
-                                    background: selected.color, marginRight: 6 }} />
+                                <span className='cal-hint-dot' style={{ '--entry-color': selected.color }} />
                                 {selected.boardTitle} · {selected.groupTitle}
                             </span>
                         )}
@@ -185,7 +184,7 @@ export function EntryDialog ({ draft, tasks, onSave, onDelete, onClose, busy }) 
                                 }}>{t('common.delete')}</button>
                         )}
                     </div>
-                    <div style={{ display: 'flex', gap: 10 }}>
+                    <div className='cal-dialog-actions'>
                         <button type='button' className='cal-btn' onClick={onClose} disabled={busy}>{t('common.cancel')}</button>
                         <button type='submit' className='cal-btn cal-btn-primary' disabled={busy}>
                             {busy ? t('common.saving') : t('common.save')}

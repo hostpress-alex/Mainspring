@@ -152,3 +152,68 @@
         }
     }
 }
+// "Move to" — the list of target groups floats above the toolbar.
+// Was inline in cmps/modal/task-tools-modal.jsx.
+.move-to {
+    position: relative;
+
+    .move-to-list {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        margin-bottom: 8px;
+        z-index: 60;
+        background: #fff;
+        color: #323338;
+        min-width: 210px;
+        border-radius: 8px;
+        box-shadow: 0 6px 22px rgba(0, 0, 0, .25);
+        padding: 6px;
+        list-style: none;
+        max-height: 260px;
+        overflow: auto;
+        text-align: left;
+    }
+
+    .move-to-head {
+        padding: 4px 10px;
+        font-size: 12px;
+        color: #676879;
+    }
+
+    .move-to-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        // was two inline handlers writing to element.style
+        &:hover {
+            background: #f0f4ff;
+        }
+
+        .move-to-dot {
+            font-size: 10px;
+            flex-shrink: 0;
+            color: var(--group-color);
+        }
+
+        .move-to-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .move-to-count {
+            margin-left: auto;
+            color: #676879;
+            font-size: 12px;
+        }
+    }
+}
+
+.task-tools-modal .group-color .icon {
+    color: var(--group-color);
+}

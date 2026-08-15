@@ -6,13 +6,13 @@ export default defineConfig({
     server: {
         port: 3000,
         host: true,
-        // Frontend wird unter http://project.buff:3000 ausgeliefert.
-        // Ohne diesen Eintrag blockt Vite den Host-Header.
+        // The frontend is served at http://project.buff:3000.
+        // Without this entry Vite blocks the Host header.
         allowedHosts: ['project.buff', 'localhost', '127.0.0.1'],
-        // Backend wird durchgereicht, damit im Browser alles unter einer
-        // Origin laeuft: keine CORS-Sonderfaelle, keine Cross-Site-Cookies,
-        // und relative Pfade wie /api/upload/<id> funktionieren in Dev und Prod
-        // identisch.
+        // The backend is passed through so that everything runs under one
+        // origin in the browser: no CORS special cases, no cross-site cookies,
+        // and relative paths like /api/upload/<id> work the same in dev and in
+        // production.
         proxy: {
             '/api': { target: 'http://127.0.0.1:3030' },
             '/socket.io': { target: 'http://127.0.0.1:3030', ws: true },
@@ -21,8 +21,8 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                // TODO(Schuld): Nur ein Maulkorb, kein Fix.
-                // Echter Fix: npx sass-migrator module --migrate-deps src/assets/styles/main.scss
+                // TODO(debt): a muzzle, not a fix.
+                // The real fix: npx sass-migrator module --migrate-deps src/assets/styles/main.scss
                 silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
             },
         },

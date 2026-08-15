@@ -21,7 +21,7 @@ export function PriorityPicker({ info, onUpdate, field = 'priority', column }) {
         const { x, y } = elPrioritySection.current.getClientRects()[0]
         setDynamicModalObj({ isOpen, pos: { x: (x - 35), y: (y + 38) }, type: 'priority', field, column, task: info, onTaskUpdate: onUpdate, activity: activity })
     }
-    return <section ref={elPrioritySection} className="status-priority-picker picker" style={{ backgroundColor: color }} onClick={onToggleMenuModal}>
+    return <section ref={elPrioritySection} className="status-priority-picker picker" style={{ '--label-color': color }} onClick={onToggleMenuModal}>
         <div>{info[field]}</div>
         <span className="fold"></span>
     </section>

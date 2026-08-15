@@ -21,7 +21,7 @@ export function TaskListKanban({ board, group }) {
                                     {(provided) => (
                                         <div {...provided.draggableProps}{...provided.dragHandleProps} ref={provided.innerRef} className="flex column">
                                             <TaskTitleKanban task={task} group={group} board={board} />
-                                            <div className="flex" style={{ backgroundColor: 'white' }}>
+                                            <div className="flex" className='kanban-task-list'>
                                                 <div className="task-content">
                                                     <ul className="title-container">
                                                         {(board.columns || []).map(column =>

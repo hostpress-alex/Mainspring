@@ -87,7 +87,7 @@ export function AddColumnDialog ({ onAdd, onClose, existingTitles = [] }) {
                                         return (
                                             <button type='button' className='acd-item' key={c.type}
                                                 onClick={() => pick(c.type, c.label)}>
-                                                <span className='acd-icon' style={{ background: icon.bg }}>{icon.el}</span>
+                                                <span className='acd-icon' style={{ '--icon-bg': icon.bg }}>{icon.el}</span>
                                                 <span>{c.label}</span>
                                             </button>
                                         )

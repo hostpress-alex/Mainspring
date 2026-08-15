@@ -43,7 +43,7 @@ export function GroupMenuModal({ dynamicModalObj }) {
     return (
         <section className="group-menu-modal">
             <div className='color' onClick={openPaletteModal} >
-                <BsFillCircleFill style={{ color: 'yellow' }} />
+                <BsFillCircleFill className='group-color-dot' />
                 <span>{t('group.changeColor')}</span>
             </div>
             <div className="duplicate" onClick={onDuplicateGroup}>

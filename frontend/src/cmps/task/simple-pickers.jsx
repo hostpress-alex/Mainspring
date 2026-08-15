@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { BsCheckSquare, BsSquare } from 'react-icons/bs'
 import { FiExternalLink } from 'react-icons/fi'
+import { t } from '../../i18n'
 
 /**
  * Column types without a modal of their own. They all get `field` and write
@@ -30,9 +31,7 @@ export function TextPicker ({ info, field, onUpdate }) {
                 onFocus={() => setIsEditing(true)}
                 onChange={e => setDraft(e.target.value)}
                 onBlur={commit}
-                onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-                style={{ width: '100%', border: 'none', background: 'transparent',
-                    textAlign: 'center', font: 'inherit', color: 'inherit', outline: 'none' }} />
+                onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }} />
         </section>
     )
 }
@@ -50,20 +49,15 @@ export function LongTextPicker ({ info, field, onUpdate }) {
     }
 
     return (
-        <section className='picker longtext-picker' style={{ position: 'relative' }}
+        <section className='picker longtext-picker'
             onClick={() => { setIsOpen(true); setIsEditing(true) }}>
-            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap', padding: '0 8px', opacity: value ? 1 : .45 }}>
+            <span className={`longtext-value${value ? '' : ' is-empty'}`}>
                 {value || '—'}
             </span>
             {isOpen && (
-                <div ref={elBox} style={{ position: 'absolute', zIndex: 40, top: '100%', left: 0, width: 280,
-                    background: '#fff', border: '1px solid #c3c6d4', borderRadius: 6, padding: 8,
-                    boxShadow: '0 6px 20px rgba(0,0,0,.18)' }} onClick={e => e.stopPropagation()}>
+                <div ref={elBox} className='longtext-box' onClick={e => e.stopPropagation()}>
                     <textarea autoFocus rows={4} value={draft} onChange={e => setDraft(e.target.value)}
-                        onBlur={commit}
-                        style={{ width: '100%', border: '1px solid #e0e3ee', borderRadius: 4, padding: 6,
-                            font: 'inherit', resize: 'vertical' }} />
+                        onBlur={commit} />
                 </div>
             )}
         </section>
@@ -73,12 +67,12 @@ export function LongTextPicker ({ info, field, onUpdate }) {
 export function CheckboxPicker ({ info, field, onUpdate }) {
     const checked = Boolean(info[field])
     return (
-        <section className='picker checkbox-picker' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        <section className='picker checkbox-picker'
             onClick={() => onUpdate(field, !checked)}
-            title={checked ? 'Erledigt' : 'Offen'}>
+            title={checked ? t('common.done') : t('common.open2')}>
             {checked
-                ? <BsCheckSquare style={{ color: '#00c875', fontSize: 18 }} />
-                : <BsSquare style={{ color: '#c3c6d4', fontSize: 18 }} />}
+                ? <BsCheckSquare className='checkbox-on' />
+                : <BsSquare className='checkbox-off' />}
         </section>
     )
 }
@@ -100,25 +94,22 @@ export function LinkPicker ({ info, field, onUpdate }) {
             <section className='picker link-picker'>
                 <input autoFocus type='url' value={draft} placeholder='https://…'
                     onChange={e => setDraft(e.target.value)} onBlur={commit}
-                    onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-                    style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'center',
-                        font: 'inherit', color: 'inherit', outline: 'none' }} />
+                    onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }} />
             </section>
         )
     }
 
     return (
-        <section className='picker link-picker' onClick={() => setIsEditing(true)}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+        <section className='picker link-picker is-view' onClick={() => setIsEditing(true)}>
             {value
                 ? <>
                     <a href={value} target='_blank' rel='noreferrer' onClick={e => e.stopPropagation()}
-                        style={{ color: '#0073ea', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '80%' }}>
+                        >
                         {value.replace(/^https?:\/\//, '')}
                     </a>
-                    <FiExternalLink style={{ color: '#0073ea', flexShrink: 0 }} />
+                    <FiExternalLink className='link-icon' />
                 </>
-                : <span style={{ opacity: .45 }}>—</span>}
+                : <span className='link-empty'>—</span>}
         </section>
     )
 }
@@ -136,7 +127,7 @@ export function DropdownPicker ({ info, field, onUpdate, board }) {
 
     const listId = `dd-${field}`
     const options = [...new Set(
-        (board?.groups || []).flatMap(g => (g.tasks || []).map(t => t[field])).filter(v => typeof v === 'string' && v)
+        (board?.groups || []).flatMap(g => (g.tasks || []).map(task => task[field])).filter(v => typeof v === 'string' && v)
     )]
 
     function commit () {
@@ -152,8 +143,7 @@ export function DropdownPicker ({ info, field, onUpdate, board }) {
                 onChange={e => setDraft(e.target.value)}
                 onBlur={commit}
                 onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-                style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'center',
-                    font: 'inherit', color: 'inherit', outline: 'none' }} />
+                />
             <datalist id={listId}>
                 {options.map(o => <option key={o} value={o} />)}
             </datalist>

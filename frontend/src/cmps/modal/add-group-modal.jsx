@@ -1,5 +1,4 @@
 import React from 'react'
-import { BsArrowDownCircle } from 'react-icons/bs'
 import { CgViewComfortable } from 'react-icons/cg'
 import { useSelector } from 'react-redux'
 import { addGroup, setDynamicModalObj } from '../../store/board.actions'
@@ -21,10 +20,6 @@ export function AddGroupModal({ dynamicModalObj }) {
             <div className='add-group' onClick={onAddGroup}>
                 <CgViewComfortable className='icon' />
                 <span>{t('group.new')}</span>
-            </div>
-            <div className='import-tasks'>
-                <BsArrowDownCircle className='icon' />
-                <span>{t('task.import')}</span>
             </div>
         </div>
     )

@@ -23,7 +23,7 @@ export function ColorPalette({ dynamicModalObj }) {
         <div className='color-palette'>
             {colors.map((color, idx) => (
                 <BsFillCircleFill className='color-icon' onClick={() => onChangeGroupColor(color)}
-                    key={idx} style={{ color: color }} />
+                    key={idx} style={{ '--label-color': color }} />
             ))}
         </div>
     )

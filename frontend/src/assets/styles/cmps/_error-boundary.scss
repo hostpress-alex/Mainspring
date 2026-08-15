@@ -1,0 +1,128 @@
+/**
+ * The box that appears in place of a component that failed to render.
+ * Was inline in error-boundary.jsx.
+ */
+.error-boundary {
+    padding: 12px 14px;
+    margin: 8px 0;
+    border-radius: 6px;
+    background: #fff4f5;
+    border: 1px solid #f0c2c9;
+    color: #a3283a;
+    font-size: 13px;
+    line-height: 1.5;
+
+    .error-boundary-hint {
+        margin-top: 4px;
+        color: #676879;
+    }
+
+    .error-boundary-retry {
+        margin-top: 8px;
+        padding: 4px 10px;
+        border: 1px solid #c3c6d4;
+        border-radius: 4px;
+        background: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+    }
+}
+
+/**
+ * Odds and ends that used to be single inline styles. They live here rather
+ * than in a file of their own because each of them is one rule.
+ */
+.img-uploader-preview {
+    max-width: 100px;
+    float: right;
+
+    &.is-large {
+        max-width: 200px;
+    }
+}
+
+.cal-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.cal-error {
+    margin: 10px 20px 0;
+}
+
+.cal-dialog-actions {
+    display: flex;
+    gap: 10px;
+}
+
+// The columns of the week grid sit in a wrapper that must not form a box of
+// its own, otherwise the grid rows would not line up.
+.cal-col-wrap {
+    display: contents;
+}
+
+.app-shell-corner {
+    position: fixed;
+    left: 70px;
+    bottom: 16px;
+    z-index: 900;
+}
+
+.kanban-task-list {
+    background-color: white;
+}
+
+.invite-hint {
+    padding: 8px 4px;
+    color: #676879;
+    font-size: 13px;
+}
+
+.column-title-input {
+    width: 90%;
+    border: 1px solid #0073ea;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font: inherit;
+    text-align: center;
+}
+
+.group-color-dot {
+    color: yellow;
+}
+
+.workspace-star {
+    color: #fdab3d;
+}
+
+/**
+ * Values that only exist at runtime.
+ *
+ * The number or the colour comes in from the JSX as a custom property, the
+ * rule that uses it lives here. That keeps `style={{...}}` down to the bare
+ * value and leaves the styling in one place.
+ */
+.acd-icon {
+    background: var(--icon-bg);
+}
+
+.activity-title {
+    color: var(--label-color);
+}
+
+.cal-hint-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    margin-right: 6px;
+    background: var(--entry-color);
+}
+
+.group-list-inner {
+    min-width: var(--cell-width);
+}

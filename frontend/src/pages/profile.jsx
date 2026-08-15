@@ -7,25 +7,6 @@ import { uploadAvatar, imagesFromClipboard } from '../services/upload.service'
 import { GUEST_IMG } from '../services/avatar'
 import { t } from '../i18n'
 
-const S = {
-    page: { minHeight: '100vh', background: '#f6f7fb' },
-    bar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 32px', background: '#fff', borderBottom: '1px solid #e6e9ef' },
-    main: { maxWidth: 720, margin: '0 auto', padding: '32px 32px 64px' },
-    h1: { fontSize: 26, margin: '0 0 24px' },
-    card: { background: '#fff', border: '1px solid #e0e3ee', borderRadius: 10, padding: 22, marginBottom: 22 },
-    h2: { fontSize: 17, margin: '0 0 4px' },
-    hint: { color: '#676879', fontSize: 13, margin: '0 0 16px' },
-    row: { display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 14 },
-    label: { fontSize: 13, color: '#676879' },
-    input: { padding: '9px 12px', border: '1px solid #c3c6d4', borderRadius: 6, fontSize: 14, maxWidth: 380 },
-    btn: { padding: '9px 18px', border: 'none', borderRadius: 6, background: '#0073ea', color: '#fff', cursor: 'pointer', fontSize: 14 },
-    btnGhost: { padding: '8px 14px', border: '1px solid #c3c6d4', borderRadius: 6, background: '#fff', cursor: 'pointer', fontSize: 14 },
-    avatarRow: { display: 'flex', alignItems: 'center', gap: 18, marginBottom: 14 },
-    avatar: { width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', border: '1px solid #e0e3ee' },
-    err: { background: '#fff0f2', border: '1px solid #e2445c', color: '#a3283a', padding: '10px 14px', borderRadius: 6, marginBottom: 16 },
-    ok: { background: '#eefaf3', border: '1px solid #00c875', color: '#00734a', padding: '10px 14px', borderRadius: 6, marginBottom: 16 },
-    link: { color: '#0073ea', textDecoration: 'none' },
-}
 
 const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
 
@@ -107,76 +88,72 @@ export function ProfilePage () {
     const shown = preview || user.imgUrl || GUEST_IMG
 
     return (
-        <div style={S.page} onPaste={onPaste}>
-            <div style={S.bar}>
-                <div style={{ display: 'flex', gap: 16, fontSize: 14, alignItems: 'center' }}>
-                    <span style={{ color: '#676879' }}>{user.fullname}</span>
+        <div className='profile-page' onPaste={onPaste}>
+            <div className='profile-bar'>
+                <div className='profile-bar-user'>
+                    <span className='profile-bar-name'>{user.fullname}</span>
                 </div>
             </div>
 
-            <div style={S.main}>
-                <h1 style={S.h1}>{t('nav.profile')}</h1>
-                {err && <div style={S.err}>{err}</div>}
-                {msg && <div style={S.ok}>{msg}</div>}
+            <div className='profile-main'>
+                <h1 className='profile-title'>{t('nav.profile')}</h1>
+                {err && <div className='profile-error'>{err}</div>}
+                {msg && <div className='profile-success'>{msg}</div>}
 
-                <div style={S.card}>
-                    <h2 style={S.h2}>{t('profile.picture')}</h2>
-                    <p style={S.hint}>
-                        Wird im Browser auf 256×256 verkleinert und auf deinem Server gespeichert.
-                        Du kannst ein Bild auch einfach mit Strg+V einfuegen.
-                    </p>
-                    <div style={S.avatarRow}>
-                        <img src={shown} alt='' style={S.avatar} />
-                        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                            <button style={S.btnGhost} onClick={() => fileInput.current.click()} disabled={busy}>
-                                Bild waehlen
+                <div className='profile-card'>
+                    <h2 className='profile-section-title'>{t('profile.picture')}</h2>
+                    <p className='profile-hint'>{t('profile.pictureHint')}</p>
+                    <div className='profile-avatar-row'>
+                        <img src={shown} alt='' className='profile-avatar' />
+                        <div className='profile-avatar-actions'>
+                            <button className='profile-btn-ghost' onClick={() => fileInput.current.click()} disabled={busy}>
+{t('profile.choosePicture')}
                             </button>
-                            {preview && <button style={S.btn} onClick={onSaveAvatar} disabled={busy}>{t('common.save')}</button>}
-                            {preview && <button style={S.btnGhost} onClick={() => setPreview(null)} disabled={busy}>{t('update.discard')}</button>}
-                            {!preview && user.imgUrl && <button style={S.btnGhost} onClick={onRemoveAvatar} disabled={busy}>{t('common.remove')}</button>}
+                            {preview && <button className='profile-btn' onClick={onSaveAvatar} disabled={busy}>{t('common.save')}</button>}
+                            {preview && <button className='profile-btn-ghost' onClick={() => setPreview(null)} disabled={busy}>{t('update.discard')}</button>}
+                            {!preview && user.imgUrl && <button className='profile-btn-ghost' onClick={onRemoveAvatar} disabled={busy}>{t('common.remove')}</button>}
                         </div>
                     </div>
-                    <input ref={fileInput} type='file' accept='image/*' onChange={onPickFile} style={{ display: 'none' }} />
-                    {preview && <p style={{ ...S.hint, marginBottom: 0 }}>{t('profile.preview')}</p>}
+                    <input ref={fileInput} type='file' accept='image/*' onChange={onPickFile} className='profile-file-input' />
+                    {preview && <p className='profile-hint is-last'>{t('profile.preview')}</p>}
                 </div>
 
-                <div style={S.card}>
-                    <h2 style={S.h2}>{t('common.name')}</h2>
-                    <p style={S.hint}>{t('profile.nameHint')}</p>
+                <div className='profile-card'>
+                    <h2 className='profile-section-title'>{t('common.name')}</h2>
+                    <p className='profile-hint'>{t('profile.nameHint')}</p>
                     <form onSubmit={onSaveName}>
-                        <div style={S.row}>
-                            <span style={S.label}>{t('profile.fullName')}</span>
-                            <input style={S.input} value={fullname} onChange={e => setFullname(e.target.value)} required />
+                        <div className='profile-row'>
+                            <span className='profile-label'>{t('profile.fullName')}</span>
+                            <input className='profile-input' value={fullname} onChange={e => setFullname(e.target.value)} required />
                         </div>
-                        <div style={S.row}>
-                            <span style={S.label}>{t('profile.usernameFixed')}</span>
-                            <input style={{ ...S.input, background: '#f6f7fb', color: '#676879' }}
-                                value={user.username || '—'} disabled />
+                        <div className='profile-row'>
+                            <span className='profile-label'>{t('profile.usernameFixed')}</span>
+                            <input className='profile-input is-locked' value={user.username || '—'} disabled />
                         </div>
-                        <button style={S.btn} type='submit' disabled={busy || !fullname.trim()}>{t('profile.saveName')}</button>
+                        <button className='profile-btn' type='submit' disabled={busy || !fullname.trim()}>{t('profile.saveName')}</button>
                     </form>
                 </div>
 
-                <div style={S.card}>
-                    <h2 style={S.h2}>{t('profile.changePassword')}</h2>
-                    <p style={S.hint}>{t('profile.passwordHint')}</p>
+                <div className='profile-card'>
+                    <h2 className='profile-section-title'>{t('profile.changePassword')}</h2>
+                    <p className='profile-hint'>{t('profile.passwordHint')}</p>
                     <form onSubmit={onChangePassword}>
-                        <div style={S.row}>
-                            <span style={S.label}>{t('profile.currentPassword')}</span>
-                            <input style={S.input} type='password' value={pw.current}
+                        <div className='profile-row'>
+                            <span className='profile-label'>{t('profile.currentPassword')}</span>
+                            <input className='profile-input' type='password' value={pw.current}
                                 onChange={e => setPw({ ...pw, current: e.target.value })} required />
                         </div>
-                        <div style={S.row}>
-                            <span style={S.label}>{t('profile.newPassword')}</span>
-                            <input style={S.input} type='password' value={pw.next}
+                        <div className='profile-row'>
+                            <span className='profile-label'>{t('profile.newPassword')}</span>
+                            <input className='profile-input' type='password' value={pw.next}
                                 onChange={e => setPw({ ...pw, next: e.target.value })} required />
                         </div>
-                        <div style={S.row}>
-                            <span style={S.label}>{t('profile.repeatPassword')}</span>
-                            <input style={S.input} type='password' value={pw.repeat}
+                        <div className='profile-row'>
+                            <span className='profile-label'>{t('profile.repeatPassword')}</span>
+                            <input className='profile-input' type='password' value={pw.repeat}
                                 onChange={e => setPw({ ...pw, repeat: e.target.value })} required />
                         </div>
-                        <button style={S.btn} type='submit' disabled={busy}>{t('profile.changePassword')}</button>
+                        <button className='profile-btn' type='submit' disabled={busy}>{t('profile.changePassword')}</button>
                     </form>
                 </div>
             </div>

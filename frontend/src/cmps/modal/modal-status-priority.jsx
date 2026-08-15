@@ -64,7 +64,7 @@ export function ModalStatusPriority({ dynamicModalObj }) {
             <VscTriangleUp className="triangle-icon" />
             <section className="modal-status-priority-content" >
                 <ul>
-                    {labels.map((label, idx) => <li onClick={() => onClickModal(label.title)} key={label.id || idx} style={{ backgroundColor: label.color }}>
+                    {labels.map((label, idx) => <li onClick={() => onClickModal(label.title)} key={label.id || idx} style={{ '--label-color': label.color }}>
                         {label.title}
                     </li>)}
                 </ul>

@@ -29,3 +29,58 @@
         cursor: pointer;
     }
 }
+// The file column: upload button, thumbnail or file name with a remove cross.
+// These rules used to sit as inline styles in cmps/task/file-picker.jsx.
+.file-picker {
+    .file-picker-add {
+        cursor: pointer;
+    }
+
+    .file-picker-busy {
+        font-size: 11px;
+        color: #676879;
+    }
+
+    .file-picker-body {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        max-width: 100%;
+    }
+
+    .file-picker-link {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 0;
+        text-decoration: none;
+        color: #0073ea;
+    }
+
+    .file-img {
+        max-width: 19px;
+        max-height: 19px;
+        display: block;
+    }
+
+    .file-picker-name {
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .file-picker-clear {
+        border: none;
+        background: transparent;
+        color: #676879;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        font-size: 13px;
+    }
+
+    .file-picker-input {
+        display: none;
+    }
+}

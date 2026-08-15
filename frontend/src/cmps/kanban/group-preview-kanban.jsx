@@ -18,7 +18,7 @@ export function GroupPreviewKanban ({ group, board, index }) {
     return (
         <section className="group-preview-kanban" >
             <div className={`group-header ${!board.description ? ' not-des' : ''}`}>
-                <div className='group-title-container' style={{ backgroundColor: group.color }}>
+                <div className='group-title-container' style={{ '--group-color': group.color }}>
                     <blockquote className="group-title" contentEditable onBlur={(ev) => onSave(ev)} suppressContentEditableWarning={true}
                         {...singleLineEditable()}>
                         <Tooltip title={group.title} arrow>

@@ -15,7 +15,7 @@ export function GroupList({ board }) {
     }
 
     if (!board.groups) return <div></div>
-    return <div ref={containerRef} style={{ minWidth: getCellWidth() }}>
+    return <div ref={containerRef} className='group-list-inner' style={{ '--cell-width': `${getCellWidth()}px` }}>
         <DragDropContext onDragEnd={(ev) => handleOnDragEnd(ev, board)}>
             <Droppable droppableId={board._id} type='group'>
                 {(droppableProvided) => {

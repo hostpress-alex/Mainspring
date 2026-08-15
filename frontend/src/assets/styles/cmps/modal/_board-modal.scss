@@ -252,3 +252,31 @@
         }
     }
 }
+
+// Toolbar and notes of the update editor. Was inline in task-modal.jsx.
+.update-attach-btn {
+    margin-left: auto;
+}
+
+.update-file-input {
+    display: none;
+}
+
+.update-note {
+    font-size: 13px;
+    color: #676879;
+    margin: 8px 0 0;
+
+    &.is-error {
+        color: #a3283a;
+    }
+}
+
+// Panel width: dragged by the user, remembered per browser.
+.board-modal-resizer {
+    right: var(--panel-width);
+}
+
+.board-modal {
+    width: var(--panel-width);
+}

@@ -1,0 +1,159 @@
+/**
+ * Profile Page.
+ *
+ * Was a `const S = {...}` object inside profile.jsx. Moved here one to one;
+ * the JSX only carries class names now.
+ */
+.profile-page {
+    min-height: 100vh;
+    background: #f6f7fb;
+
+    .profile-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 32px;
+        background: #fff;
+        border-bottom: 1px solid #e6e9ef;
+    }
+
+    .profile-main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 32px 32px 64px;
+    }
+
+    .profile-title {
+        font-size: 26px;
+        margin: 0 0 24px;
+    }
+
+    .profile-card {
+        background: #fff;
+        border: 1px solid #e0e3ee;
+        border-radius: 10px;
+        padding: 22px;
+        margin-bottom: 22px;
+    }
+
+    .profile-section-title {
+        font-size: 17px;
+        margin: 0 0 4px;
+    }
+
+    .profile-hint {
+        color: #676879;
+        font-size: 13px;
+        margin: 0 0 16px;
+    }
+
+    .profile-row {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 14px;
+    }
+
+    .profile-label {
+        font-size: 13px;
+        color: #676879;
+    }
+
+    .profile-input {
+        padding: 9px 12px;
+        border: 1px solid #c3c6d4;
+        border-radius: 6px;
+        font-size: 14px;
+        max-width: 380px;
+    }
+
+    .profile-btn {
+        padding: 9px 18px;
+        border: none;
+        border-radius: 6px;
+        background: #0073ea;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .profile-btn-ghost {
+        padding: 8px 14px;
+        border: 1px solid #c3c6d4;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .profile-avatar-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 14px;
+    }
+
+    .profile-avatar {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #e0e3ee;
+    }
+
+    .profile-error {
+        background: #fff0f2;
+        border: 1px solid #e2445c;
+        color: #a3283a;
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+
+    .profile-success {
+        background: #eefaf3;
+        border: 1px solid #00c875;
+        color: #00734a;
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+
+    .profile-link {
+        color: #0073ea;
+        text-decoration: none;
+    }
+
+
+    .profile-bar-user {
+        display: flex;
+        gap: 16px;
+        font-size: 14px;
+        align-items: center;
+    }
+
+    .profile-bar-name {
+        color: #676879;
+    }
+
+    .profile-avatar-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .profile-file-input {
+        display: none;
+    }
+
+    // the preview note sits directly above the card edge
+    .profile-hint.is-last {
+        margin-bottom: 0;
+    }
+
+    // the username cannot be changed and should not look as if it could
+    .profile-input.is-locked {
+        background: #f6f7fb;
+        color: #676879;
+    }
+}

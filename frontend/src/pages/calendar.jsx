@@ -139,12 +139,12 @@ export function CalendarPage () {
                     </div>
                     <Link to='/profil' title={t('nav.profile')}>
                         <img src={user?.imgUrl || GUEST_IMG} alt=''
-                            style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', display: 'block' }} />
+                            className='cal-avatar' />
                     </Link>
                 </div>
             </div>
 
-            {err && <div className='cal-error' style={{ margin: '10px 20px 0' }}>{err}</div>}
+            {err && <div className='cal-error' className='cal-error'>{err}</div>}
             {isLoading && <div className='cal-loading'>{t('common.loading')}</div>}
 
             {view === 'month' ? (

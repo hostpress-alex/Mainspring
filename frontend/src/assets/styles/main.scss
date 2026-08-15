@@ -13,6 +13,9 @@
 @use "views/home-page";
 @use "views/login-signup";
 @use "views/dashboard";
+@use "views/boards-overview";
+@use "views/profile-page";
+@use "views/admin-page";
 
 // Components
     // task-picker
@@ -22,6 +25,7 @@
 @use "cmps/task-picker/update-picker";
 @use "cmps/task-picker/file-picker";
 @use "cmps/task-picker/date-picker";
+@use "cmps/task-picker/simple-pickers";
 
 // sidebar
 @use "cmps/sidebar/main-sidebar";
@@ -44,7 +48,9 @@
 @use "cmps/modal/dynamic-modal";
 @use "cmps/modal/remove-column-modal";
 @use "cmps/modal/add-group-modal";
+@use "cmps/modal/board-menu-modal";
 @use "cmps/modal/chart-type-modal";
+@use "cmps/modal/label-editor";
 
     // group
 @use "cmps/group/group-list";
@@ -75,5 +81,7 @@
 @use "cmps/activity-preview";
 @use "cmps/last-viewed";
 @use "cmps/upload-img";
+@use "cmps/error-boundary";
+@use "cmps/attachment-strip";
 @use "cmps/loader";
 @use "cmps/logo";

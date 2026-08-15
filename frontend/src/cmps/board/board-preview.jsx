@@ -9,17 +9,28 @@ import { boardService } from "../../services/board.service"
 import { BiDotsHorizontalRounded } from "react-icons/bi"
 import { t } from '../../i18n'
 
-export function BoardPreview({ board }) {
+/**
+ * One board in the sidebar.
+ *
+ * A board can appear in more than one section — under favourites and under its
+ * folder. `sectionId` says which of them this instance is; it travels along on
+ * navigation so the sidebar can tell which one was clicked. `isActive` is that
+ * decision, made by the sidebar; without it the old behaviour applies and every
+ * instance of the open board lights up.
+ */
+export function BoardPreview({ board, sectionId = null, isActive = null }) {
     const boards = useSelector(storeState => storeState.boardModule.boards)
     const { boardId } = useParams()
     const navigate = useNavigate()
     const elBoardPreview = useRef()
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
 
-    function onChangeBoard(boardId) {
-        navigate(`/board/${boardId}`)
+    function onChangeBoard(boardId, fromSection = null) {
+        navigate(`/board/${boardId}`, fromSection ? { state: { sidebarSection: fromSection } } : undefined)
         loadBoard(boardId)
     }
+
+    const active = isActive !== null ? isActive : board._id === boardId
 
     async function onRemove(boardId) {
         const b = boards.find(x => x._id === boardId)
@@ -55,7 +66,8 @@ export function BoardPreview({ board }) {
     }
 
     return (
-        <section ref={elBoardPreview} onClick={() => onChangeBoard(board._id)} className={`board-preview flex space-between align-center ${board._id === boardId ? ' active' : ''}`}>
+        <section ref={elBoardPreview} onClick={() => onChangeBoard(board._id, sectionId)}
+            className={`board-preview flex space-between align-center${active ? ' active' : ''}`}>
             <div>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fillRule="evenodd" clipRule="evenodd" d="M7.5 4.5H16C16.2761 4.5 16.5 4.72386 16.5 5V15C16.5 15.2761 16.2761 15.5 16 15.5H7.5L7.5 4.5ZM6 4.5H4C3.72386 4.5 3.5 4.72386 3.5 5V15C3.5 15.2761 3.72386 15.5 4 15.5H6L6 4.5ZM2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" fill="currentColor" />
