@@ -1,0 +1,31 @@
+/* Gemeinsame Huelle: Hauptleiste + Board-Spalte links, Inhalt rechts.
+   Damit bleibt die Navigation auf allen Seiten stehen. */
+.app-shell {
+    display: flex;
+    align-items: stretch;
+    min-height: 100vh;
+}
+.app-shell-nav { flex: 0 0 auto; }
+.app-shell-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100vh;
+    overflow: auto;
+}
+
+/* Der Kalender bringt eigene 100vh mit — in der Huelle uebernimmt die Hoehe
+   der Inhaltsbereich, sonst entsteht doppeltes Scrollen. */
+.app-shell-content > .cal { height: 100%; }
+
+.workspace-section + .workspace-section { border-top: 1px solid rgba(255,255,255,.08); }
+
+@media (max-width: 560px) {
+    .app-shell { flex-direction: column; }
+    .app-shell-content { height: auto; }
+}
+
+/* Die SCSS setzt .workspace-sidebar .board-list-container { margin-top: 24px }.
+   Innerhalb eines Abschnitts ist dieser Abstand zu gross — hier mit gleicher
+   Spezifitaet und spaeterer Reihenfolge aufgehoben. */
+.workspace-sidebar .workspace-section > .board-list-container { margin-top: 2px; gap: 2px; }
+.workspace-sidebar .workspace-section > .board-list-container > .board-list { padding-top: 0; padding-bottom: 0; }

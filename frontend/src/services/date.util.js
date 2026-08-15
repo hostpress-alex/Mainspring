@@ -1,0 +1,157 @@
+/**
+ * Datums- und Layouthelfer fuer den Kalender.
+ * Alles in lokaler Zeit, Woche beginnt am Montag (DIN 1355).
+ */
+
+export const WEEKDAYS_SHORT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+export const WEEKDAYS_LONG = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
+export const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+    'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
+
+export const MS_MIN = 60 * 1000
+export const MS_HOUR = 60 * MS_MIN
+export const MS_DAY = 24 * MS_HOUR
+
+export const startOfDay = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
+export const endOfDay = d => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x }
+export const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x }
+export const addMonths = (d, n) => { const x = new Date(d); x.setDate(1); x.setMonth(x.getMonth() + n); return x }
+export const addMinutes = (d, n) => new Date(new Date(d).getTime() + n * MS_MIN)
+
+/** Montag der Woche, in der d liegt. */
+export function startOfWeek (d) {
+    const x = startOfDay(d)
+    const shift = (x.getDay() + 6) % 7   // So=0 -> 6, Mo=1 -> 0
+    return addDays(x, -shift)
+}
+
+export const startOfMonth = d => { const x = startOfDay(d); x.setDate(1); return x }
+export const endOfMonth = d => { const x = startOfMonth(d); x.setMonth(x.getMonth() + 1); return addDays(x, -1) }
+
+export const isSameDay = (a, b) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
+
+export const isToday = d => isSameDay(d, new Date())
+
+export const pad = n => String(n).padStart(2, '0')
+
+export const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`
+export const fmtDate = d => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`
+export const fmtMonthYear = d => `${MONTHS[d.getMonth()]} ${d.getFullYear()}`
+export const fmtWeekdayLong = d => WEEKDAYS_LONG[(d.getDay() + 6) % 7]
+
+/** Wert fuer <input type="datetime-local"> — lokale Zeit, ohne Zeitzonen-Suffix. */
+export const toLocalInput = d =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+
+export const fromLocalInput = value => {
+    const [date, time] = String(value).split('T')
+    const [y, m, day] = date.split('-').map(Number)
+    const [h, min] = (time || '00:00').split(':').map(Number)
+    return new Date(y, m - 1, day, h, min, 0, 0)
+}
+
+/** Kalenderwoche nach ISO 8601. */
+export function isoWeek (d) {
+    const x = startOfDay(d)
+    x.setDate(x.getDate() + 3 - ((x.getDay() + 6) % 7))
+    const firstThursday = new Date(x.getFullYear(), 0, 4)
+    firstThursday.setDate(firstThursday.getDate() + 3 - ((firstThursday.getDay() + 6) % 7))
+    return 1 + Math.round((x - firstThursday) / (7 * MS_DAY))
+}
+
+/** Die sieben Tage der Woche, in der d liegt. */
+export const weekDays = d => Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(d), i))
+
+/**
+ * 6 Wochen x 7 Tage fuer die Monatsansicht — immer gleich hoch, damit das
+ * Raster beim Blaettern nicht springt.
+ */
+export function monthGrid (d) {
+    const first = startOfWeek(startOfMonth(d))
+    return Array.from({ length: 42 }, (_, i) => addDays(first, i))
+}
+
+export const minutesOfDay = d => d.getHours() * 60 + d.getMinutes()
+
+/** Dauer als "1 h 30 min" / "45 min". */
+export function fmtDuration (ms) {
+    const total = Math.round(ms / MS_MIN)
+    const h = Math.floor(total / 60)
+    const m = total % 60
+    if (!h) return `${m} min`
+    if (!m) return `${h} h`
+    return `${h} h ${m} min`
+}
+
+/**
+ * Schneidet einen Eintrag auf einen Tag zu. Gibt null zurueck, wenn er den
+ * Tag gar nicht beruehrt. Noetig fuer Eintraege ueber Mitternacht.
+ */
+export function clipToDay (entry, day) {
+    const dayStart = startOfDay(day)
+    const dayEnd = addDays(dayStart, 1)
+    const start = new Date(entry.start)
+    const end = new Date(entry.end)
+    if (end <= dayStart || start >= dayEnd) return null
+    return {
+        entry,
+        start: start < dayStart ? dayStart : start,
+        end: end > dayEnd ? dayEnd : end,
+        continuesBefore: start < dayStart,
+        continuesAfter: end > dayEnd,
+    }
+}
+
+/**
+ * Verteilt ueberlappende Eintraege nebeneinander — wie im Google-Kalender.
+ *
+ * Vorgehen: nach Beginn sortieren, in Cluster zerlegen (zusammenhaengende
+ * Ueberlappungsketten), innerhalb eines Clusters jedem Eintrag die erste freie
+ * Spalte geben. Die Breite ergibt sich aus der Spaltenzahl des Clusters, damit
+ * alle Eintraege eines Clusters gleich breit sind.
+ *
+ * Rueckgabe je Eintrag: { ...clip, col, cols, topPct, heightPct }
+ */
+export function layoutDay (entries, day) {
+    const clips = entries.map(e => clipToDay(e, day)).filter(Boolean)
+    clips.sort((a, b) => a.start - b.start || b.end - a.end)
+
+    const out = []
+    let cluster = []
+    let clusterEnd = null
+
+    const flush = () => {
+        if (!cluster.length) return
+        const columns = []            // je Spalte das Ende des letzten Eintrags
+        for (const c of cluster) {
+            let col = columns.findIndex(end => end <= c.start)
+            if (col === -1) { col = columns.length; columns.push(c.end) }
+            else columns[col] = c.end
+            c.col = col
+        }
+        const cols = columns.length
+        for (const c of cluster) out.push({ ...c, cols })
+        cluster = []
+        clusterEnd = null
+    }
+
+    for (const c of clips) {
+        if (clusterEnd !== null && c.start >= clusterEnd) flush()
+        cluster.push(c)
+        clusterEnd = clusterEnd === null ? c.end : new Date(Math.max(clusterEnd, c.end))
+    }
+    flush()
+
+    const dayStart = startOfDay(day)
+    return out.map(c => {
+        const topMin = (c.start - dayStart) / MS_MIN
+        const heightMin = Math.max((c.end - c.start) / MS_MIN, 15)   // Mindesthoehe fuer Klickbarkeit
+        return { ...c, topPct: (topMin / 1440) * 100, heightPct: (heightMin / 1440) * 100 }
+    })
+}
+
+/** Auf ein Raster runden (z.B. 15 Minuten) — fuer Ziehen und Anlegen. */
+export function snapMinutes (minutes, step = 15) {
+    return Math.max(0, Math.min(1440, Math.round(minutes / step) * step))
+}

@@ -1,0 +1,37 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+package-lock.json
+/backend/package-lock.json
+/frontend/package-lock.json
+/.idea
+
+# testing
+/coverage
+*/_to_delete
+*/node_modules
+*/logs
+uploads
+
+# production
+/build
+
+# misc
+# Zugangsdaten zur Datenbank gehoeren nicht ins Repository
+.env
+backend/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+todo.txt
+
+.DS_Store

@@ -1,0 +1,147 @@
+/*
+ * Antworten auf ein Update.
+ *
+ * Die Selektoren sind bewusst unter .comments-list gehaengt: dort gilt
+ * `li { border: 1px solid …; padding: 16px; margin-bottom: 16px }` fuer die
+ * Updates. Ohne hoehere Spezifitaet baekommt jede Antwort denselben Rahmen und
+ * saehe aus wie ein eigenstaendiges Update.
+ */
+.comment-replies {
+    margin-top: 10px;
+    border-top: 1px solid #e6e9ef;
+    padding-top: 6px;
+}
+
+.comments-list .comment-replies .reply-list {
+    list-style: none;
+    margin: 0 0 4px;
+    padding: 0;
+}
+
+/* Der Reset gegen die Update-Kachel. */
+.comments-list .comment-replies .reply-list > li {
+    border: none;
+    border-left: 2px solid #e6e9ef;
+    border-radius: 0;
+    margin: 0 0 2px;
+    padding: 2px 0 2px 12px;
+    background: transparent;
+}
+
+.comments-list .comment-replies .comment-preview.is-reply {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+}
+
+/* Kleinerer Avatar und ruhigere Kopfzeile als beim Update selbst. */
+.comments-list .comment-replies .comment-preview.is-reply .header-comment {
+    padding-bottom: 2px;
+}
+
+.comments-list .comment-replies .comment-preview.is-reply .header-comment .left {
+    font-size: 14px;
+}
+
+.comments-list .comment-replies .comment-preview.is-reply .header-comment .left img {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+}
+
+.comments-list .comment-replies .comment-preview.is-reply p {
+    font-size: 14px;
+    margin: 2px 0 0;
+}
+
+.comments-list .comment-replies .reply-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    color: #676879;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin: 0;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 13px;
+    width: auto;
+}
+
+.comments-list .comment-replies .reply-btn:hover {
+    background: #dcdfec;
+    color: #323338;
+}
+
+.comments-list .comment-replies .reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 0 2px;
+}
+
+.comments-list .comment-replies .reply-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 54px;
+    padding: 8px;
+    border: 1px solid #c3c6d4;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #323338;
+    background: #fff;
+}
+
+.comments-list .comment-replies .reply-form textarea:focus {
+    outline: none;
+    border-color: #0073ea;
+}
+
+.comments-list .comment-replies .reply-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.comments-list .comment-replies .reply-actions .save {
+    width: auto;
+    height: 30px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 4px;
+    background: #0073ea;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+}
+
+.comments-list .comment-replies .reply-actions .save:hover { background: #0060b9; }
+
+.comments-list .comment-replies .reply-actions .save:disabled {
+    background: #c3c6d4;
+    cursor: default;
+}
+
+.comments-list .comment-replies .reply-actions .cancel {
+    width: auto;
+    height: 30px;
+    padding: 0 14px;
+    border: 1px solid #c3c6d4;
+    border-radius: 4px;
+    background: #fff;
+    color: #323338;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+}
+
+.comments-list .comment-replies .reply-actions .cancel:hover { background: #dcdfec; }

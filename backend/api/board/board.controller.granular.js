@@ -1,0 +1,73 @@
+/**
+ * Controller fuer die gezielten Schreibvorgaenge.
+ *
+ * Alle geben das frische Board zurueck: der Schreibvorgang ist granular (nur
+ * das geaenderte Feld wandert in die Datenbank), das Lesen danach ist billig
+ * und haelt das Frontend einfach.
+ */
+const boardService = require('./board.service')
+const logger = require('../../services/logger.service')
+
+function fail(res, err, fallback) {
+    if (!err.status) logger.error(fallback, err)
+    res.status(err.status || 500).send({ err: err.status ? err.message : fallback })
+}
+
+const handler = (fn, fallback) => async (req, res) => {
+    try {
+        res.json(await fn(req))
+    } catch (err) {
+        fail(res, err, fallback)
+    }
+}
+
+module.exports = {
+    patchBoard: handler(req =>
+        boardService.updateMeta(req.params.boardId, req.body), 'Board konnte nicht geaendert werden'),
+
+    putColumns: handler(req =>
+        boardService.setColumns(req.params.boardId, req.body.columns), 'Spalten konnten nicht gespeichert werden'),
+
+    putMembers: handler(req =>
+        boardService.setMembers(req.params.boardId, req.body.members), 'Mitglieder konnten nicht gespeichert werden'),
+
+    putOwners: handler(req =>
+        boardService.setOwners(req.params.boardId, req.body.ownerIds), 'Owner konnten nicht gespeichert werden'),
+
+    postGroup: handler(req =>
+        boardService.addGroup(req.params.boardId, req.body.group, req.body.index ?? null), 'Gruppe konnte nicht angelegt werden'),
+
+    patchGroup: handler(req =>
+        boardService.updateGroupMeta(req.params.boardId, req.params.groupId, req.body), 'Gruppe konnte nicht geaendert werden'),
+
+    putGroup: handler(req =>
+        boardService.replaceGroup(req.params.boardId, req.params.groupId, req.body.group), 'Gruppe konnte nicht gespeichert werden'),
+
+    deleteGroup: handler(req =>
+        boardService.removeGroup(req.params.boardId, req.params.groupId), 'Gruppe konnte nicht geloescht werden'),
+
+    putGroupOrder: handler(req =>
+        boardService.reorderGroups(req.params.boardId, req.body.groupIds), 'Reihenfolge konnte nicht gespeichert werden'),
+
+    postTask: handler(req =>
+        boardService.addTask(req.params.boardId, req.params.groupId, req.body.task, req.body.index ?? null), 'Task konnte nicht angelegt werden'),
+
+    patchTask: handler(req =>
+        boardService.updateTaskFields(req.params.boardId, req.params.groupId, req.params.taskId, req.body), 'Task konnte nicht geaendert werden'),
+
+    putTask: handler(req =>
+        boardService.replaceTask(req.params.boardId, req.params.groupId, req.params.taskId, req.body.task), 'Task konnte nicht gespeichert werden'),
+
+    deleteTask: handler(req =>
+        boardService.removeTask(req.params.boardId, req.params.groupId, req.params.taskId), 'Task konnte nicht geloescht werden'),
+
+    putTaskOrder: handler(req =>
+        boardService.reorderTasks(req.params.boardId, req.params.groupId, req.body.taskIds), 'Reihenfolge konnte nicht gespeichert werden'),
+
+    postTaskMove: handler(req =>
+        boardService.moveTask(req.params.boardId, req.body.fromGroupId, req.body.toGroupId,
+            req.params.taskId, req.body.index ?? null), 'Task konnte nicht verschoben werden'),
+
+    postActivity: handler(req =>
+        boardService.addActivity(req.params.boardId, req.body.activity), 'Aktivitaet konnte nicht gespeichert werden'),
+}

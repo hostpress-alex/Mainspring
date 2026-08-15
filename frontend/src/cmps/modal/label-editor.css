@@ -1,0 +1,221 @@
+/*
+ * Der Editor haengt in .dynamic-modal, wo je nach Popup-Typ eigene Regeln
+ * gelten. Deshalb setzt er alles, worauf er sich verlaesst, selbst — und
+ * benutzt durchgaengig eigene Klassennamen statt nackter Elemente.
+ */
+.label-editor {
+    width: 296px;
+    box-sizing: border-box;
+    padding: 4px 4px 2px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #323338;
+    text-align: left;
+}
+
+.label-editor * { box-sizing: border-box; }
+
+.label-editor-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.label-editor-title { font-weight: 600; color: #323338; }
+
+.label-editor-col {
+    font-size: 12px;
+    color: #676879;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Scrollen passiert hier, nicht auf der Liste — so kann die Farbpalette
+   mitwachsen, ohne abgeschnitten zu werden. */
+.label-editor-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 0 -4px;
+    padding: 0 4px;
+}
+
+.label-editor-list {
+    list-style: none;
+    display: block;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    color: #323338;
+    font-size: 14px;
+}
+
+.label-editor-row {
+    display: block;
+    min-width: 0;
+    height: auto;
+    margin: 0 0 6px;
+    padding: 0;
+    cursor: default;
+    color: #323338;
+}
+
+.label-editor-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.label-editor-swatch {
+    width: 26px;
+    height: 30px;
+    flex: 0 0 26px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.label-editor-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 30px;
+    padding: 4px 8px;
+    border: 1px solid #c3c6d4;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 14px;
+    color: #323338;
+    background: #fff;
+}
+
+.label-editor-input:focus {
+    outline: none;
+    border-color: #0073ea;
+}
+
+.label-editor-usage {
+    flex: 0 0 auto;
+    min-width: 20px;
+    padding: 1px 6px;
+    border-radius: 9px;
+    background: #e6e9ef;
+    color: #676879;
+    font-size: 11px;
+    text-align: center;
+}
+
+.label-editor-remove {
+    flex: 0 0 26px;
+    width: 26px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: #676879;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0;
+}
+
+.label-editor-remove:hover { background: #ffe6e9; color: #a3283a; }
+
+.label-editor-palette {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+    margin: 6px 0 8px 32px;
+    padding: 8px;
+    background: #f6f7fb;
+    border: 1px solid #e6e9ef;
+    border-radius: 6px;
+}
+
+.label-editor-palette button {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.label-editor-palette button.is-active { border-color: #323338; }
+
+.label-editor-empty {
+    margin: 4px 0 8px;
+    font-size: 13px;
+    color: #676879;
+}
+
+.label-editor-add {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    margin: 4px 0 0;
+    border: none;
+    background: transparent;
+    color: #0073ea;
+    cursor: pointer;
+    padding: 4px 0;
+    font: inherit;
+    font-size: 14px;
+}
+
+.label-editor-add:hover { text-decoration: underline; }
+
+.label-editor-err {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #a3283a;
+}
+
+.label-editor-hint {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: #676879;
+    line-height: 1.4;
+}
+
+.label-editor-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.label-editor-save {
+    flex: 1 1 auto;
+    height: 34px;
+    border: none;
+    border-radius: 4px;
+    background: #0073ea;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+}
+
+.label-editor-save:hover { background: #0060b9; }
+.label-editor-save:disabled { background: #c3c6d4; cursor: default; }
+
+.label-editor-cancel {
+    flex: 0 0 auto;
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid #c3c6d4;
+    border-radius: 4px;
+    background: #fff;
+    color: #323338;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+}
+
+.label-editor-cancel:hover { background: #dcdfec; }
+.label-editor-cancel:disabled { color: #a0a3b1; cursor: default; }

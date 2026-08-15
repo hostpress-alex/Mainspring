@@ -1,0 +1,45 @@
+.acd-backdrop {
+    position: fixed; inset: 0; background: rgba(32,34,44,.45); z-index: 1200;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.acd {
+    background: #fff; color: #323338; border-radius: 12px; width: 100%; max-width: 620px;
+    max-height: 84vh; display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3); font-size: 14px;
+}
+.acd *, .acd *::before, .acd *::after { box-sizing: border-box; }
+.acd-head { padding: 18px 22px 0; display: flex; align-items: center; gap: 12px; }
+.acd-head h2 { margin: 0; font-size: 18px; font-weight: 600; flex: 1; }
+.acd-close {
+    border: none; background: transparent; font-size: 22px; line-height: 1; cursor: pointer;
+    color: #676879; width: 32px; height: 32px; border-radius: 50%;
+}
+.acd-close:hover { background: #f6f7fb; }
+.acd-search { padding: 14px 22px 4px; }
+.acd-search input {
+    width: 100%; padding: 11px 14px; border: 2px solid #0073ea; border-radius: 8px;
+    font-size: 15px; font-family: inherit; outline: none;
+}
+.acd-body { padding: 10px 22px 20px; overflow: auto; }
+.acd-cat { margin-top: 14px; color: #676879; font-size: 13px; }
+.acd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; margin-top: 8px; }
+.acd-item {
+    display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 8px;
+    cursor: pointer; border: none; background: transparent; font: inherit; color: inherit;
+    text-align: left; width: 100%;
+}
+.acd-item:hover { background: #f0f4ff; }
+.acd-icon {
+    width: 30px; height: 30px; border-radius: 7px; display: inline-flex; align-items: center;
+    justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0;
+}
+.acd-empty { color: #676879; padding: 24px 4px; text-align: center; }
+.acd-foot {
+    border-top: 1px solid #e0e3ee; padding: 12px 22px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px;
+}
+.acd-hint { color: #676879; font-size: 12px; }
+.acd-name { display: flex; align-items: center; gap: 8px; }
+.acd-name input {
+    padding: 8px 11px; border: 1px solid #c3c6d4; border-radius: 6px; font: inherit; width: 210px;
+}
