@@ -202,12 +202,6 @@ function ensureColumns(board) {
     return board
 }
 
-const sameSet = (a, b) => {
-    if (a.length !== b.length) return false
-    const sa = [...a].sort(), sb = [...b].sort()
-    return sa.every((v, i) => v === sb[i])
-}
-
 async function query(filterBy = {}) {
     const user = getLoggedinUser()
     try {
@@ -280,91 +274,17 @@ async function add(board) {
     }
 }
 
-async function update(board) {
-    const user = getLoggedinUser()
-    try {
-        const existing = await _getByIdRaw(board._id)
-        if (!existing) throw httpError(404, 'Board not found')
-        if (!hasAccess(existing, user)) throw httpError(403, 'Kein Zugriff auf dieses Board')
-
-        const boardToSave = { ...board }
-        delete boardToSave._id
-        delete boardToSave.ownerId   // Altfeld wird nicht fortgeschrieben
-
-        const wantsMembers = memberIdsOf(boardToSave)
-        const wantsOwners = ownerIdsOf(boardToSave)
-        const hasMembers = memberIdsOf(existing)
-        const hasOwners = ownerIdsOf(existing)
-
-        const touchesMembers = boardToSave.members !== undefined && !sameSet(wantsMembers, hasMembers)
-        const touchesOwners = boardToSave.ownerIds !== undefined && !sameSet(wantsOwners, hasOwners)
-
-        if ((touchesMembers || touchesOwners) && !isOwner(existing, user)) {
-            throw httpError(403, 'Nur ein Owner darf Mitglieder oder Owner dieses Boards aendern')
-        }
-
-        if (touchesOwners) {
-            if (!wantsOwners.length) throw httpError(400, 'Ein Board braucht mindestens einen Owner')
-            // Owner muessen immer auch Mitglied sein.
-            const members = Array.isArray(boardToSave.members) ? boardToSave.members : existing.members || []
-            const memberIds = members.filter(Boolean).map(m => sid(m._id))
-            const missing = wantsOwners.filter(id => !memberIds.includes(id))
-            if (missing.length) {
-                throw httpError(400, 'Owner muessen auch Mitglied des Boards sein')
-            }
-            boardToSave.ownerIds = wantsOwners
-        } else {
-            boardToSave.ownerIds = hasOwners
-        }
-
-        if (!touchesMembers) boardToSave.members = existing.members
-
-        // Ein Owner darf nicht aus der Mitgliederliste fallen.
-        const finalMemberIds = memberIdsOf(boardToSave)
-        const orphanOwners = boardToSave.ownerIds.filter(id => !finalMemberIds.includes(id))
-        if (orphanOwners.length) throw httpError(400, 'Owner koennen nicht als Mitglied entfernt werden')
-
-        await boardRepo.replaceBoard(board._id, boardToSave)
-        return { ...board, ownerIds: boardToSave.ownerIds, members: boardToSave.members }
-    } catch (err) {
-        if (!err.status) logger.error(`cannot update board ${board._id}`, err)
-        throw err
-    }
-}
-
-async function updateTask(boardId, groupId, taskId, saveTask) {
-    try {
-        const board = await getById(boardId)
-        const group = board.groups.find(group => group.id === groupId)
-        if (!group) throw httpError(404, 'Group not found')
-        group.tasks = group.tasks.map(task => (task.id === taskId) ? saveTask : task)
-        await update(board)
-        return board
-    } catch (err) {
-        if (!err.status) logger.error(`cannot update task ${taskId}`, err)
-        throw err
-    }
-}
-
-async function updateGroup(boardId, groupId, saveGroup) {
-    try {
-        const board = await getById(boardId)
-        board.groups = board.groups.map(group => (group.id === groupId) ? saveGroup : group)
-        await update(board)
-        return board
-    } catch (err) {
-        if (!err.status) logger.error(`cannot update group ${groupId}`, err)
-        throw err
-    }
-}
-
 /* ======================================================================
- * Gezielte Schreibvorgaenge
+ * Targeted writes
  *
- * Jede dieser Funktionen fasst nur das an, was sich wirklich aendert, und
- * gibt danach das frische Board zurueck. Damit ueberschreiben sich zwei
- * Personen, die am selben Board an verschiedenen Stellen arbeiten, nicht mehr
- * gegenseitig.
+ * Each of these touches only what actually changes and then hands back the
+ * fresh board. That is what stops two people working on different parts of
+ * the same board from overwriting each other.
+ *
+ * They replaced three whole-document writers — update(board),
+ * updateTask(...) and updateGroup(...) — which read a board, applied one
+ * change in memory and wrote the entire document back. See the note at the
+ * bottom of board.routes.js for the HTTP routes that went with them.
  * ==================================================================== */
 
 /** Board laden und Rechte pruefen. `owner: true` verlangt Owner oder Admin. */
@@ -538,9 +458,6 @@ module.exports = {
     query,
     getById,
     add,
-    update,
-    updateTask,
-    updateGroup,
     hasAccess,
     isOwner,
     ownerIdsOf,

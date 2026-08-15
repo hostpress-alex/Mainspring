@@ -1,148 +1,229 @@
+# Project Manager
 
-# MyDay - pixel perfect, E2E clone of Monday (React + Node.js). 
+Board-based task management. A board has groups, a group has tasks, and a task
+has whatever columns you gave the board: status, priority, dates, people,
+numbers, files, plain text.
 
-Table-style task management board app inspired by Monday.com, [Here is my project link](https://monday-8oy3.onrender.com/ "MyDay link").
+It started as MyDay, a Monday.com clone someone built as a bootcamp project
+(credits at the bottom). We've been rebuilding it since for our own use. The
+layout and most of the Sass are still theirs; the data layer, the API and the
+permission model are not.
 
-For those of you who are already familliar with Monday, we added some intersting and unique features - [features](#application-features).
-If you are not familliar with the App, read about it [here](#monday-description).
-And, if you are tired and just want to see some images of the website, [scroll to the bottom...](#showcase)
+## Running it
 
-![Main board image](frontend/src/assets/img/readme/table.png "Board-main-page")
+You need two processes.
 
-___
-
-### Table of Contents
-- [Recent Updates](#recent-updates)
-- [Monday Description](#monday-description)
-- [Application Features](#application-features)
-- [Technologies](#technologies)
-- [Getting started](#getting-started)
-- [Showcase](#showcase)
-
-## Recent Updates
-
-### 🔧 Task Menu Modal Fixes (Latest)
-**Status:** ✅ **Fully Fixed** - All task menu options now working correctly
-
-Fixed critical issues with the task context menu functionality:
-
-- **✅ Delete Task** - Fixed immutable state updates to properly remove tasks from groups
-- **✅ Duplicate Task** - Enhanced state management for reliable task duplication  
-- **✅ Create New Item Below** - Fixed array copying to properly insert new tasks
-- **✅ Open Task Modal** - Navigation to task detail view working correctly
-
-**Technical Improvements:**
-- Implemented proper React immutable state patterns
-- Fixed direct object mutations that were causing UI inconsistencies
-- Added comprehensive Playwright test coverage for all menu functions
-- Enhanced error handling and state synchronization
-
-### 🎯 Table Component Restoration
-**Status:** ✅ **Completed** - Table functionality fully operational
-
-Resolved major rendering issues in the main table view:
-
-- **✅ Component Picker Fix** - Resolved "UNKNOWN StatusPicker/MemberPicker/DatePicker" errors
-- **✅ Dynamic Component Rendering** - Fixed component name normalization from PascalCase to kebab-case
-- **✅ React Beautiful DND** - Fixed drag-and-drop functionality and missing draggableId errors
-- **✅ Task ID Generation** - Implemented proper unique ID generation for all tasks
-
-**Magic Link Authentication System** also implemented with email-based login functionality.
-
----
-
-## Monday Description
-Monday is an app in which you can manage projects and tasks using a table board. A board contains groups, lists and tasks. Usually each project is a board, and the groups and the tasks and titles to do in the project. Users can modify the board and change group and task locations using Drag and Drop.
-Users can work together and watch live changes. 
-There are many other features in monday, such as status, priority, due date for tasks, members and more. 
-Every thing Monday has, we also had. 
-More about it in the [features section](#application-features).
-
-You are more than welcome to ***check it out*** ( [right here](https://monday-8oy3.onrender.com/ "Github pages link"))
-
-## Application Features
-- Create ***Boards*** and manage projects: Using ***D&D***, create, remove, duplicate, update groups and tasks, activity log for all the activity in the board, and for each board you can remove and add task columns.
-- Create and edit ***Task*** to the deepest level: statuses, priority, due date, members, file images, numbers, last updated by, duplicate, move, activity log and live chat.
-- ***Groups:*** - Change the color of the group with the palette color modal using ***lodash library***.
- ***Filtering*** by members / group and task title.
-- Google Login, along with regular authentication which is encrypted and safe.
-
-Of course that we included all the small nuances Monday has. You are not supposed to find any differences! 
-
-## Technologies
-
-The technology stack we used was MERN - MongoDB, Express, React, Node.js.
-The app uses webSockets to update the board in real-time.
-The API calls to the backend are done with the REST API method.
-
-We have used many thirs side libraries for many goals like google-login, lodash, D&D and more.
-The layout and pixel-perfect were made with Sass (functions, mixins, variables).
-
-**Testing & Quality Assurance:**
-- **Playwright** - End-to-end testing framework for comprehensive UI testing
-- **ESLint** - Code linting and quality enforcement
-- Automated testing coverage for critical user workflows 
-
-## Getting started
-
-Head to the repository on top and clone the project or download the files.
-
-```
-git clone https://github.com/idandavid1/My-Day
-
-```
-
-Enter the backend folder and make sure you have node_modules installed. After that we will initiate the server with 'npm start':
-
-```
+```bash
 cd backend
-npm i 
-npm start
+npm install
+npm start          # http://127.0.0.1:3030
 ```
 
-You shuold get a console ouput that the server is up and running at port 3030.
-Enter the frontend folder and repeat the same process.
-
-```
+```bash
 cd frontend
-npm i 
-npm start
+npm install
+npm start          # http://localhost:3000
 ```
 
-You shuold get a console ouput that the server is up and running at localhost:3000.
+Then open http://localhost:3000. Vite proxies `/api` and `/socket.io` to port
+3030 so the browser only ever talks to one origin. That saves us CORS
+exceptions and cross-site cookie problems, and relative paths behave the same
+in dev as in production.
 
-That's it! The App should be opened automatically, enjoy!
+By default the server expects a local MongoDB. If you want MariaDB instead,
+read [DATENBANK.md](DATENBANK.md). It also covers moving existing data over.
 
-## Showcase
+You'll need an account before anything is useful:
 
-### Homepage
-The landing page in which the user can sign up / login, or press the call to action button to start demo if the are limited with time.
+```bash
+cd backend
+ADMIN_USER=alex ADMIN_PASS='...' ADMIN_NAME='Alex' npm run seed:admin
+```
 
-![Homepage image](frontend/src/assets/img/readme/home-page.png "Home-page")
+Same command resets a password you've forgotten.
 
-### Board
-All the functionality that you have in Monday. D&D, live-updates, editing tasks to the deepest level, side-menu, editing board members and much more - just [check it out...!](https://monday-8oy3.onrender.com/ "Skello link")
+### Production
 
-![Main board image](frontend/src/assets/img/readme/table.png "Board-main-page")
+Build the frontend, then run the server with `NODE_ENV=production`. It serves
+the build as static files, so there's only one port to expose.
 
-### Signup
-We created an e2e authentication flow, including encrypting the users' details, midelwears and ****Google Login***.
+```bash
+cd frontend && npm run build
+cd ../backend && npm run server:prod:mac
+```
 
-![Login image](frontend/src/assets/img/readme/login.png "login-page")
+One catch: `backend/public` still holds an old react-scripts build from before
+we moved to Vite. No calendar, no admin page, no route guards, no
+translations. Replace it before you deploy anything.
 
-### Task details
-Here the members can add messages and to follow after the activity for every task and to watch it happens live
+## Configuration
 
-![Task details image](frontend/src/assets/img/readme/activity.png "task-details")
-![Task details image](frontend/src/assets/img/readme/chat.png "task-details")
+Environment variables, all of them. In dev a `.env` file in `backend/` is read
+as well. It's not in the repo and shouldn't be.
 
-### Some mobile!
-Just a taste of the mobile experience. We used different **mixins**, **conditional rendering**, and the **"mobile first"** approach. 
-The layout we have built from the very first moment enabled us to make the website responsive without a lot of effort.
+| Variable | Default | Notes |
+|---|---|---|
+| `PORT` | `3030` | |
+| `DB_DRIVER` | `mongo` | `mongo` or `mariadb` |
+| `MONGO_URL` | `mongodb://127.0.0.1:27017` | |
+| `MONGO_DB` | `monday_DB` | |
+| `MYSQL_*` | see `config/dev.js` | host, port, user, password, db |
+| `ALLOWED_ORIGINS` | three localhost variants | comma separated. Applies to the API and the socket both. |
+| `ALLOW_SIGNUP` | `true` | set `false` on anything reachable, or strangers will sign themselves up and see every board |
+| `GUEST_MODE` | `false` | turns authentication off entirely. Debugging only. |
+| `SECRET1` | none | encrypts the login cookie. **Required in production**, the server refuses to start without it. `openssl rand -hex 32` |
+| `TRUST_PROXY` | `false` | set `true` behind a reverse proxy, otherwise every request looks like it comes from the proxy and the login limit treats the world as one visitor |
+| `NODE_ENV` | | `production` serves the static build and marks the cookie secure |
 
-<img src="frontend/src/assets/img/readme/phone-board.png" width="25%" style="float: left"/><img src="frontend/src/assets/img/readme/chat-phone.png" width="25%" style="float: left;"/><img src="frontend/src/assets/img/readme/favorite-phone.png" width="25%" style="float: left;"/><img src="frontend/src/assets/img/readme/activity-phone.png" width="25%" style="float: left;"/>
+The login cookie isn't a session id you look up in a table. It's the user
+record itself, encrypted with `SECRET1`. Anyone holding that key can write
+themselves an admin cookie without going near the database, which is why there
+is no default value any more and why production won't boot without one. In
+development you get a fallback named `insecure-development-key-do-not-use-in-production`
+and a warning in the log.
 
-### Authors
- - [Idan David](https://github.com/idandavid1)
- - [Ofer Gavrilov](https://github.com/oferGavrilov)
- - [Ofek Abramovitch](https://github.com/ofekAbramovitch)
+## What it does
+
+Boards with drag and drop for groups and tasks. Columns are per board, and
+each status-style column keeps its own label list, so the priority menu
+doesn't offer you "Done" any more.
+
+Three views: table, kanban, and a statistics page with charts by label and by
+member. Tasks open into a detail modal with comments (one level of replies),
+file attachments and an activity log, all updating live while someone else
+edits.
+
+There's a calendar for scheduling tasks into time slots per person, month and
+week grids. Uploads go to disk under `backend/uploads/` with metadata in the
+database; we keep the original filename around so downloads arrive as
+`offer.pdf` and not `a1b2f9.pdf`.
+
+Login is username and password (bcrypt) or Google. Sessions live in an
+httpOnly cookie. Boards have owners and members, and there's an admin page for
+user management. Failed logins are counted per address and per account, ten
+against one account or thirty across all of them inside fifteen minutes and
+you get a `429` until the window passes. Note that this bites even if you then
+remember the right password, since the limit is checked before the password
+is.
+
+Interface is German by default, English available. Everything user-facing sits
+in `frontend/src/i18n/`. We didn't pull in an i18n library: one JSON file per
+language and a `t()` function covers what fifteen people need.
+
+## Code layout
+
+```
+backend/
+  api/<area>/          controller | service | repo
+    board/             boards, groups, tasks, activities
+    user/  auth/       accounts and login
+    schedule/          calendar
+    upload/            files
+  db/migrations/       MariaDB schema, numbered, additive
+  middlewares/         auth, logging, async local storage
+  services/            socket, files, logging, db connection
+  test/                node:test
+  scripts/             seeding, admin, mongo -> mariadb import
+
+frontend/src/
+  cmps/                components by area
+  pages/               one per route
+  services/            http calls, helpers
+  store/               redux
+  i18n/                de.json | en.json | t()
+  assets/styles/       sass, one partial per component
+```
+
+Every backend area is the same three layers. Controller turns HTTP into a
+call, service holds the rules and the permission checks, repo talks to the
+database. The repos exist twice, once per database, and `DB_DRIVER` picks one
+at startup.
+
+## Tests
+
+```bash
+cd backend  && npm test
+cd frontend && npm test
+```
+
+Coverage is thin, and it's worth saying which parts are covered rather than
+implying the rest is.
+
+`repo-parity.test.js` checks that the Mongo and SQL repositories still export
+the same functions. Adding a method to one and forgetting the other is the
+easiest way to break this codebase and it stays invisible until someone
+switches drivers, which is why it's tested at all.
+
+`board-access.test.js` covers who can see and administer a board, including
+the old boards that carry a single `ownerId` instead of an `ownerIds` array.
+`socket.service.test.js` covers pulling the login cookie out of a handshake.
+On the frontend there's the statistics module and the user reducer.
+
+No end-to-end tests. An older version of this file claimed Playwright
+coverage. There has never been a Playwright config in this repo.
+
+## What changed from the original
+
+The big one is that writes are targeted now. Every change used to send the
+whole board document back, so if two people had the same board open, whoever
+saved second wiped out the first one's work. Now a change sends only what
+changed. The three old whole-document `PUT` routes answer `410` and tell you
+what to call instead.
+
+Storage is pluggable, Mongo or MariaDB, one environment variable. Frontend
+moved from react-scripts to Vite, React 19, Vitest. Boards got owners and
+members with actual enforcement on the server, not just hidden buttons.
+
+The socket used to trust whatever a client told it. It announced a user id and
+joined any room it named, so anyone who guessed a board id got that board's
+contents pushed to them, logged in or not. Identity now comes from the login
+cookie and joining a board's room takes the same permission the REST API asks
+for.
+
+New since the original: calendar, admin page, file uploads with metadata,
+threaded comments, translations.
+
+## Rough edges
+
+Listed here because they're easier to find in a README than in the code.
+
+`backend/public` is a stale build, see above.
+
+The login rate limit lives in memory. A restart clears it and a second process
+would count separately. Fine for us, not fine for anything public.
+
+Uploaded files are only checked for "are you logged in", not for "is this file
+from a board you're on". The ids are 32 hex characters so nobody is guessing
+one, but anyone who learns an id can fetch it.
+
+Reading one board is seven queries on MariaDB, and the board overview loads
+every task of every board while it's at it. Fine at our size. It's the first
+place to look when the overview gets slow.
+
+`board-send-update` relays a board object that the *browser* assembled. The
+server doesn't inspect it. The fix is to emit from the service layer after
+each write instead of relaying between browsers, which nobody has done yet.
+
+No version number per task, so two people typing a task title at the same
+moment still clobber each other, just field by field now instead of the whole
+board.
+
+## Conventions
+
+English everywhere. Names, comments, docs, commit messages.
+
+Comments say why, not what. If a comment restates the line below it, delete
+it.
+
+User-facing text goes in `frontend/src/i18n/`, never inline in JSX.
+
+If you touch a `*.repo.mongo.js` you touch its `*.repo.sql.js` in the same
+commit. `npm test` will catch you if you don't.
+
+Migrations are additive and numbered. Don't edit one that has already run.
+
+## Credits
+
+MyDay was built by [Idan David](https://github.com/idandavid1),
+[Ofer Gavrilov](https://github.com/oferGavrilov) and
+[Ofek Abramovitch](https://github.com/ofekAbramovitch).

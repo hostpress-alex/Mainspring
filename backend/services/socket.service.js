@@ -1,116 +1,280 @@
+/**
+ * Real-time layer.
+ *
+ * Two things happen here, and until now neither of them was checked.
+ *
+ *   1. Identity. A socket used to announce who it was — it emitted
+ *      'set-user-socket' with a user id and the server believed it. Identity
+ *      now comes from the same httpOnly `loginToken` cookie the REST API
+ *      uses, read once during the handshake. A client can no longer claim to
+ *      be somebody else.
+ *
+ *   2. Rooms. A socket used to join any room it named, so anyone — logged in
+ *      or not — could listen to any board by guessing its id and receive the
+ *      full board contents. Joining a board room now needs the same access
+ *      the REST API demands.
+ *
+ * The wire protocol is unchanged. Clients still emit 'chat-set-topic' with a
+ * board id or a task id; only the server's answer to "are you allowed?" is
+ * new. One socket is in at most one room at a time, exactly as before.
+ *
+ * Known limitation, deliberately left alone for now: 'board-send-update'
+ * relays a board that the *client* composed. The server does not verify its
+ * contents, so a member of a board can still push a fabricated board to the
+ * other members of that same board. Closing that means emitting from the
+ * service layer after every write instead of relaying between clients — a
+ * larger change that touches board.service.js. The room checks below limit
+ * the blast radius to people who are members of that board anyway.
+ */
+const config = require('../config')
 const logger = require('./logger.service')
+const authService = require('../api/auth/auth.service')
+const boardService = require('../api/board/board.service')
+const boardRepo = require('../api/board/board.repo')
 
-var gIo = null
+const COOKIE_NAME = 'loginToken'
+
+/** Room prefixes. Task rooms carry the board id as well, so two boards that
+ *  happen to use the same task id can never share a room. */
+const BOARD_ROOM = 'board:'
+const TASK_ROOM = 'task:'
+
+let gIo = null
+
+/* ------------------------------------------------------------- handshake -- */
+
+/** Read one cookie out of a raw Cookie header. Needs no dependency. */
+function readCookie(header, name) {
+    if (!header) return null
+    for (const part of String(header).split(';')) {
+        const eq = part.indexOf('=')
+        if (eq < 0) continue
+        if (part.slice(0, eq).trim() !== name) continue
+        const raw = part.slice(eq + 1).trim()
+        try {
+            return decodeURIComponent(raw)
+        } catch (err) {
+            return raw
+        }
+    }
+    return null
+}
+
+/**
+ * Who is on the other end of this socket?
+ *
+ * Returns null for anonymous sockets. Anonymous sockets are still allowed to
+ * connect — the client opens its socket while the login page is on screen,
+ * and refusing the connection there would put socket.io into a retry loop —
+ * but they cannot join a room, send a message or push a board update.
+ */
+function identify(handshake) {
+    const header = handshake && handshake.headers && handshake.headers.cookie
+    const token = readCookie(header, COOKIE_NAME)
+    if (!token) return null
+    return authService.validateToken(token) || null
+}
+
+/* ------------------------------------------------------------ permission -- */
+
+/** The board, if this user may see it. Null in every other case. */
+async function boardIfPermitted(boardId, user) {
+    if (!boardId || !user) return null
+    let board
+    try {
+        board = await boardRepo.findById(boardId)
+    } catch (err) {
+        // A malformed id makes the repo throw a 404 — same answer as "no".
+        return null
+    }
+    if (!board) return null
+    return boardService.hasAccess(board, user) ? board : null
+}
+
+function boardHasTask(board, taskId) {
+    const id = String(taskId)
+    for (const group of (board && board.groups) || []) {
+        for (const task of group.tasks || []) {
+            if (String(task.id) === id) return true
+        }
+    }
+    return false
+}
+
+/**
+ * Turn the topic a client asked for into the room it is actually allowed to
+ * join. Returns null when it may not join anything.
+ *
+ * A topic is either a board id (board-details.jsx) or a task id
+ * (task-modal.jsx). A task modal is only ever opened from inside a board the
+ * client already had open, so a task topic is resolved against the board this
+ * socket was last authorised for. That keeps the lookup exact — (board_id, id)
+ * is the primary key of a task — and avoids scanning for a task id that is
+ * only unique within its own board.
+ */
+async function resolveRoom(socket, topic) {
+    const id = String(topic || '').trim()
+    if (!id) return null
+
+    // Guest mode switches authentication off for the whole application (see
+    // requireAuth.middleware.js). Debug only; keep the behaviour aligned.
+    if (config.isGuestMode) return BOARD_ROOM + id
+
+    const user = socket.data.user
+    if (!user) return null
+
+    const board = await boardIfPermitted(id, user)
+    if (board) {
+        socket.data.boardId = id
+        return BOARD_ROOM + id
+    }
+
+    const openBoardId = socket.data.boardId
+    if (!openBoardId) return null
+    const parent = await boardIfPermitted(openBoardId, user)
+    if (!parent || !boardHasTask(parent, id)) return null
+    return TASK_ROOM + openBoardId + ':' + id
+}
+
+/* ---------------------------------------------------------------- set-up -- */
 
 function setupSocketAPI(http) {
     gIo = require('socket.io')(http, {
+        // The same list the REST API uses. In production the frontend is
+        // served by this very server, so same-origin is enough and the list
+        // is empty.
         cors: {
-            origin: '*',
-        }
+            origin: config.allowedOrigins && config.allowedOrigins.length
+                ? config.allowedOrigins
+                : false,
+            credentials: true,
+        },
     })
+
+    gIo.use((socket, next) => {
+        socket.data.user = identify(socket.handshake)
+        socket.data.room = null
+        socket.data.boardId = null
+        next()
+    })
+
     gIo.on('connection', socket => {
-        logger.info(`New connected socket [id: ${socket.id}]`)
-        socket.on('disconnect', socket => {
+        const who = () => (socket.data.user ? socket.data.user.fullname : 'anonymous')
+        logger.info(`Socket connected [id: ${socket.id}, user: ${who()}]`)
+
+        socket.on('disconnect', () => {
             logger.info(`Socket disconnected [id: ${socket.id}]`)
         })
-        socket.on('chat-set-topic', topic => {
-            if (socket.myTopic === topic) return
-            if (socket.myTopic) {
-                socket.leave(socket.myTopic)
-                logger.info(`Socket is leaving topic ${socket.myTopic} [id: ${socket.id}]`)
+
+        socket.on('chat-set-topic', async topic => {
+            let room = null
+            try {
+                room = await resolveRoom(socket, topic)
+            } catch (err) {
+                logger.error(`Could not resolve topic ${topic}`, err)
             }
-            socket.join(topic)
-            socket.myTopic = topic
-        })
-        socket.on('chat-send-msg', msg => {
-            console.log('msg:', msg)
-            logger.info(`New chat msg from socket [id: ${socket.id}], emitting to topic ${socket.myTopic}`)
-            socket.broadcast.to(socket.myTopic).emit('chat-add-msg', msg)
-        })
-        socket.on('board-send-update', ({filteredBoard, board}) => {
-            logger.info(`New task update from socket [id: ${socket.id}], emitting to topic ${socket.myTopic}`)
-            socket.broadcast.to(socket.myTopic).emit('board-add-update', filteredBoard, board)
-        })
-        socket.on('set-user-socket', userId => {
-            logger.info(`Setting socket.userId = ${userId} for socket [id: ${socket.id}]`)
-            socket.userId = userId
-        })
-        socket.on('unset-user-socket', () => {
-            logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
-            delete socket.userId
+
+            if (!room) {
+                logger.warn(`Socket [id: ${socket.id}, user: ${who()}] refused topic ${topic}`)
+                // Say so instead of going quiet. A refused socket otherwise
+                // looks exactly like a working one that nobody is posting to,
+                // which is miserable to debug.
+                socket.emit('socket-denied', { topic: String(topic || '') })
+                return
+            }
+
+            if (socket.data.room === room) return
+            if (socket.data.room) socket.leave(socket.data.room)
+            socket.join(room)
+            socket.data.room = room
+            logger.info(`Socket [id: ${socket.id}] joined ${room}`)
         })
 
+        socket.on('chat-send-msg', msg => {
+            const room = socket.data.room
+            if (!room) return refuse(socket, 'chat-send-msg')
+            socket.broadcast.to(room).emit('chat-add-msg', msg)
+        })
+
+        socket.on('board-send-update', ({ filteredBoard, board } = {}) => {
+            const room = socket.data.room
+            if (!room || !room.startsWith(BOARD_ROOM)) return refuse(socket, 'board-send-update')
+            socket.broadcast.to(room).emit('board-add-update', filteredBoard, board)
+        })
+
+        // Kept for the existing client. The id it sends is ignored — the
+        // cookie decides. A mismatch is worth a line in the log.
+        socket.on('set-user-socket', claimedId => {
+            const user = socket.data.user
+            if (!user) {
+                // This socket was opened before the login cookie existed. The
+                // client has to reconnect before the new cookie is seen; see
+                // HANDOVER.md for the three lines that do it.
+                socket.emit('auth-stale')
+                return
+            }
+            if (claimedId && String(claimedId) !== String(user._id)) {
+                logger.warn(`Socket [id: ${socket.id}] claimed user ${claimedId}, cookie says ${user._id}`)
+            }
+        })
+
+        socket.on('unset-user-socket', () => {
+            if (socket.data.room) socket.leave(socket.data.room)
+            socket.data.room = null
+            socket.data.boardId = null
+            socket.data.user = null
+        })
     })
 }
 
-function emitTo({ type, data, label }) {
-    if (label) gIo.to('watching:' + label.toString()).emit(type, data)
-    else gIo.emit(type, data)
+function refuse(socket, event) {
+    logger.warn(`Socket [id: ${socket.id}] sent ${event} without an authorised room`)
+    socket.emit('socket-denied', { event })
 }
 
+/* --------------------------------------------------------------- sending -- */
+
+/** Send to one user, if that user currently has a socket open. */
 async function emitToUser({ type, data, userId }) {
-    userId = userId.toString()
-    const socket = await _getUserSocket(userId)
-
-    if (socket) {
-        logger.info(`Emiting event: ${type} to user: ${userId} socket [id: ${socket.id}]`)
-        socket.emit(type, data)
-    }else {
-        logger.info(`No active socket for user: ${userId}`)
-        // _printSockets()
+    const id = String(userId)
+    const socket = await findUserSocket(id)
+    if (!socket) {
+        logger.info(`No active socket for user: ${id}`)
+        return
     }
+    logger.info(`Emitting ${type} to user ${id} [socket: ${socket.id}]`)
+    socket.emit(type, data)
 }
 
-// If possible, send to all sockets BUT not the current socket 
-// Optionally, broadcast to a room / to all
+/**
+ * Send to everyone but the given user — in one room, or everywhere.
+ *
+ * Unused today. It is the way out of the client-to-client relay described at
+ * the top of this file: the service layer emits after a write, instead of one
+ * browser telling the others what it thinks happened.
+ */
 async function broadcast({ type, data, room = null, userId }) {
-    userId = userId.toString()
-    
-    logger.info(`Broadcasting event: ${type}`)
-    const excludedSocket = await _getUserSocket(userId)
-    if (room && excludedSocket) {
-        logger.info(`Broadcast to room ${room} excluding user: ${userId}`)
-        excludedSocket.broadcast.to(room).emit(type, data)
-    } else if (excludedSocket) {
-        logger.info(`Broadcast to all excluding user: ${userId}`)
-        excludedSocket.broadcast.emit(type, data)
-    } else if (room) {
-        logger.info(`Emit to room: ${room}`)
-        gIo.to(room).emit(type, data)
-    } else {
-        logger.info(`Emit to all`)
-        gIo.emit(type, data)
-    }
+    const id = String(userId)
+    const exclude = await findUserSocket(id)
+
+    if (room && exclude) return exclude.broadcast.to(room).emit(type, data)
+    if (exclude) return exclude.broadcast.emit(type, data)
+    if (room) return gIo.to(room).emit(type, data)
+    return gIo.emit(type, data)
 }
 
-async function _getUserSocket(userId) {
-    const sockets = await _getAllSockets()
-    const socket = sockets.find(s => s.userId === userId)
-    return socket
-}
-async function _getAllSockets() {
-    // return all Socket instances
+async function findUserSocket(userId) {
     const sockets = await gIo.fetchSockets()
-    return sockets
-}
-
-async function _printSockets() {
-    const sockets = await _getAllSockets()
-    console.log(`Sockets: (count: ${sockets.length}):`)
-    sockets.forEach(_printSocket)
-}
-function _printSocket(socket) {
-    console.log(`Socket - socketId: ${socket.id} userId: ${socket.userId}`)
+    return sockets.find(s => s.data && s.data.user && String(s.data.user._id) === userId)
 }
 
 module.exports = {
-    // set up the sockets service and define the API
     setupSocketAPI,
-    // emit to everyone / everyone in a specific room (label)
-    emitTo, 
-    // emit to a specific user (if currently active in system)
-    emitToUser, 
-    // Send to all sockets BUT not the current socket - if found
-    // (otherwise broadcast to a room / to all)
+    emitToUser,
     broadcast,
+    // Exported so the tests can reach the pure parts without a live server.
+    readCookie,
+    boardHasTask,
+    BOARD_ROOM,
+    TASK_ROOM,
 }

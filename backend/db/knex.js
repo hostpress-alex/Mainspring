@@ -1,9 +1,9 @@
 /**
- * Verbindung zur MariaDB.
+ * Connection to MariaDB.
  *
- * Die Verbindung wird erst beim ersten Zugriff aufgebaut. Laeuft der Server
- * mit DB_DRIVER=mongo, wird diese Datei zwar geladen, aber nie verbunden —
- * MariaDB muss dann gar nicht laufen.
+ * The connection is opened on first use. When the server runs with
+ * DB_DRIVER=mongo this file is still loaded but never connects — MariaDB does
+ * not even have to be running.
  */
 const config = require('../config')
 
@@ -13,7 +13,7 @@ function db() {
     if (instance) return instance
     const cfg = config.mysql || {}
     if (!cfg.host || !cfg.user || !cfg.database) {
-        throw new Error('MariaDB ist nicht konfiguriert: MYSQL_HOST, MYSQL_USER und MYSQL_DB setzen')
+        throw new Error('MariaDB is not configured: set MYSQL_HOST, MYSQL_USER and MYSQL_DB')
     }
     instance = require('knex')({
         client: 'mysql2',
@@ -41,15 +41,15 @@ async function destroy() {
 }
 
 /**
- * MariaDB legt JSON als LONGTEXT ab. Je nach Version und Treiber kommt der
- * Wert als Zeichenkette oder bereits ausgepackt zurueck — deshalb hier
- * einmal zentral abfangen statt an dreissig Stellen.
+ * MariaDB stores JSON as LONGTEXT. Depending on the version and the driver
+ * the value comes back either as a string or already unpacked — so it is
+ * caught here once instead of in thirty different places.
  *
- * Wichtig: mysql2 packt JSON-Spalten selbst aus. Steht in der Spalte der
- * JSON-Wert "Progress", kommt hier die fertige Zeichenkette Progress an —
- * und die ist ihrerseits kein gueltiges JSON. Frueher landete sie deshalb
- * im Fallback und war weg. Schlaegt das Auspacken fehl, war der Wert also
- * schon ausgepackt und wird unveraendert durchgereicht.
+ * Worth knowing: mysql2 unpacks JSON columns by itself. If a column holds the
+ * JSON value "Progress", what arrives here is the finished string Progress —
+ * which is not valid JSON in its own right. That used to fall through to the
+ * fallback and get lost. So if unpacking fails, the value was already
+ * unpacked and is passed through untouched.
  */
 function parseJson(value, fallback = null) {
     if (value === null || value === undefined) return fallback
@@ -61,26 +61,26 @@ function parseJson(value, fallback = null) {
     }
 }
 
-/** Gegenstueck zu parseJson: null bleibt null, alles andere wird verpackt. */
+/** Counterpart to parseJson: null stays null, everything else gets packed. */
 function toJson(value) {
     if (value === undefined || value === null) return null
     return JSON.stringify(value)
 }
 
 /**
- * Beim Start pruefen, ob alle Migrationen gelaufen sind.
+ * Check at start-up whether every migration has run.
  *
- * Ohne diese Pruefung startet der Server mit einem halben Schema: Lesen geht,
- * Schreiben faellt an genau einer Stelle auf die Nase, und in der Oberflaeche
- * sieht es aus, als waere ein Knopf kaputt. Lieber laut abbrechen.
+ * Without this check the server comes up on half a schema: reading works,
+ * writing falls over in exactly one place, and in the interface it looks as
+ * if a single button is broken. Better to stop loudly.
  */
 async function assertMigrated() {
     const [, pending] = await db().migrate.list()
     if (!pending.length) return
-    const namen = pending.map(p => (typeof p === 'string' ? p : p.file || p.name)).join(', ')
+    const names = pending.map(p => (typeof p === 'string' ? p : p.file || p.name)).join(', ')
     const err = new Error(
-        `Es fehlen ${pending.length} Datenbank-Migration(en): ${namen}\n` +
-        '   Bitte im Ordner backend ausfuehren:  npm run db:migrate')
+        `${pending.length} database migration(s) are missing: ${names}\n` +
+        '   Please run this in the backend folder:  npm run db:migrate')
     err.code = 'MIGRATIONS_PENDING'
     throw err
 }

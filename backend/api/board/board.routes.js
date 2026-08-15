@@ -1,15 +1,16 @@
 const express = require('express')
-const { getBoards, getBoardById, addBoard, updateBoard, removeBoard, updateTask, updateGroup } = require('./board.controller')
+const { getBoards, getBoardById, addBoard, removeBoard } = require('./board.controller')
 const { requireAuth } = require('../../middlewares/requireAuth.middleware')
+const logger = require('../../services/logger.service')
 const g = require('./board.controller.granular')
 const router = express.Router()
 
-// Alle Board-Routen erfordern einen eingeloggten Benutzer.
+// Every board route needs a logged-in user.
 router.use(requireAuth)
 
-// --- Gezielte Schreibvorgaenge -------------------------------------------
-// Reihenfolge beachten: die spezifischen Pfade muessen VOR den allgemeinen
-// stehen, sonst schluckt PUT /:boardId alles.
+// --- Targeted writes ------------------------------------------------------
+// Mind the order: the specific paths have to come BEFORE the general ones,
+// otherwise /:boardId swallows everything.
 router.patch('/:boardId', g.patchBoard)
 router.put('/:boardId/columns', g.putColumns)
 router.put('/:boardId/members', g.putMembers)
@@ -27,19 +28,42 @@ router.delete('/:boardId/group/:groupId/task/:taskId', g.deleteTask)
 router.post('/:boardId/task/:taskId/move', g.postTaskMove)
 router.post('/:boardId/activity', g.postActivity)
 
-// --- Altbestand ----------------------------------------------------------
-// Die drei PUT-Routen weiter unten schreiben ganze Dokumente und koennen
-// damit die Aenderungen anderer ueberschreiben. Das Frontend benutzt sie
-// nicht mehr — bitte auch nicht wieder darauf zurueckgreifen.
+// --- Reads and lifecycle --------------------------------------------------
 router.get('/', getBoards)
 router.get('/:boardId', getBoardById)
 router.post('/', addBoard)
-router.put('/:boardId/:groupId/:taskId', updateTask)
-router.put('/:boardId/:groupId', updateGroup)
-router.put('/:boardId', updateBoard)
 router.delete('/:boardId', removeBoard)
 
-// router.post('/:id/msg', requireAuth, addBoardMsg)
-// router.delete('/:id/msg/:msgId', requireAuth, removeBoardMsg)
+/* --- Retired whole-document writes ---------------------------------------
+ *
+ * Three PUT routes used to live here:
+ *
+ *     PUT /:boardId                        the entire board
+ *     PUT /:boardId/:groupId               an entire group
+ *     PUT /:boardId/:groupId/:taskId       an entire task
+ *
+ * They wrote back a whole document that the client had assembled, so two
+ * people editing one board at the same time meant the later write silently
+ * threw away everything the earlier one had done. Every one of them has a
+ * targeted equivalent above.
+ *
+ * They answer 410 instead of disappearing. A 404 would look like a typo in
+ * the path; this way anything still calling them says so plainly, in the
+ * response and in the log.
+ */
+const RETIRED = {
+    board: 'PUT /api/board/:boardId is retired. Use PATCH /api/board/:boardId for the header fields, or one of the targeted group/task routes.',
+    group: 'PUT /api/board/:boardId/:groupId is retired. Use PATCH or PUT /api/board/:boardId/group/:groupId.',
+    task: 'PUT /api/board/:boardId/:groupId/:taskId is retired. Use PATCH or PUT /api/board/:boardId/group/:groupId/task/:taskId.',
+}
+
+const retired = which => (req, res) => {
+    logger.warn(`Retired route called: ${req.method} ${req.originalUrl}`)
+    res.status(410).send({ err: RETIRED[which] })
+}
+
+router.put('/:boardId/:groupId/:taskId', retired('task'))
+router.put('/:boardId/:groupId', retired('group'))
+router.put('/:boardId', retired('board'))
 
 module.exports = router

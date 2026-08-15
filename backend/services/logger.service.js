@@ -37,7 +37,8 @@ function doLog(level, ...args) {
 
 module.exports = {
     debug(...args) {
-        if (process.env.NODE_NEV === 'production') return
+        // Read NODE_NEV for a long time, so debug logging ran in production too.
+        if (process.env.NODE_ENV === 'production') return
         doLog('DEBUG', ...args)
     },
     info(...args) {

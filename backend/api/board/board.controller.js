@@ -1,10 +1,18 @@
+/**
+ * Reads and lifecycle for boards.
+ *
+ * Every write that changes a part of a board lives in
+ * board.controller.granular.js. This file used to carry updateBoard,
+ * updateTask and updateGroup as well; they wrote back whole documents and
+ * were retired together with their routes. See board.routes.js.
+ */
 const boardService = require('./board.service.js')
 
 const logger = require('../../services/logger.service')
 
 async function getBoards(req, res) {
   try {
-    logger.debug('Getting Boars')
+    logger.debug('Getting boards')
     const filterBy = {
       title: req.query.title || '',
     }
@@ -40,19 +48,6 @@ async function addBoard(req, res) {
   }
 }
 
-
-async function updateBoard(req, res) {
-  try {
-    const board = req.body
-    const updatedBoard = await boardService.update(board)
-    res.json(updatedBoard)
-  } catch (err) {
-    logger.error('Failed to update board', err)
-    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update board' })
-
-  }
-}
-
 async function removeBoard(req, res) {
   try {
     const boardId = req.params.boardId
@@ -64,68 +59,9 @@ async function removeBoard(req, res) {
   }
 }
 
-async function updateTask(req, res) {
-  try {
-    const task = req.body
-    const {boardId, groupId, taskId} = req.params
-    const taskToSend = await boardService.updateTask(boardId, groupId, taskId, task)
-    res.send(taskToSend)
-  } catch (err) {
-    logger.error('Failed to update task', err)
-    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update task' })
-  }
-}
-
-async function updateGroup(req, res) {
-  try {
-    const group = req.body
-    const {boardId, groupId} = req.params
-    const groupToSend = await boardService.updateGroup(boardId, groupId, group)
-    res.send(groupToSend)
-  } catch (err) {
-    logger.error('Failed to update group', err)
-    res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update group' })
-  }
-}
-
-// async function addCarMsg(req, res) {
-//   const {loggedinUser} = req
-//   try {
-//     const carId = req.params.id
-//     const msg = {
-//       txt: req.body.txt,
-//       by: loggedinUser
-//     }
-//     const savedMsg = await carService.addCarMsg(carId, msg)
-//     res.json(savedMsg)
-//   } catch (err) {
-//     logger.error('Failed to update car', err)
-//     res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to update car' })
-
-//   }
-// }
-
-// async function removeCarMsg(req, res) {
-//   const {loggedinUser} = req
-//   try {
-//     const carId = req.params.id
-//     const {msgId} = req.params
-
-//     const removedId = await carService.removeCarMsg(carId, msgId)
-//     res.send(removedId)
-//   } catch (err) {
-//     logger.error('Failed to remove car msg', err)
-//     res.status(err.status || 500).send({ err: err.status ? err.message : 'Failed to remove car msg' })
-
-//   }
-// }
-
 module.exports = {
   getBoards,
   getBoardById,
   addBoard,
-  updateBoard,
   removeBoard,
-  updateTask,
-  updateGroup
 }

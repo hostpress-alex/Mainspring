@@ -16,7 +16,8 @@
         "db:status": "knex migrate:status",
         "db:import": "node scripts/migrate-to-mariadb.js",
         "db:import:dry": "node scripts/migrate-to-mariadb.js --dry",
-        "start:mariadb": "DB_DRIVER=mariadb nodemon server.js"
+        "start:mariadb": "DB_DRIVER=mariadb nodemon server.js",
+        "test": "node --test test/*.test.js"
     },
     "author": "Me",
     "license": "ISC",
@@ -35,5 +36,9 @@
     },
     "devDependencies": {
         "nodemon": "^3.1.14"
+    },
+    "allowScripts": {
+        "bcrypt@6.0.0": true,
+        "fsevents@2.3.3": true
     }
 }

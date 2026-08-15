@@ -14,7 +14,7 @@ package-lock.json
 */_to_delete
 */node_modules
 */logs
-uploads
+*/uploads/*
 
 # production
 /build
@@ -33,5 +33,6 @@ yarn-debug.log*
 yarn-error.log*
 
 todo.txt
+HANDOVER.md
 
 .DS_Store
