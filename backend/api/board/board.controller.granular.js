@@ -64,6 +64,10 @@ module.exports = {
         boardService.setTaskParent(req.params.boardId, req.params.groupId, req.params.taskId,
             req.body.parentId ?? null, req.body.index ?? null), 'Task konnte nicht umgehaengt werden'),
 
+    putMemberRole: handler(req =>
+        boardService.setMemberRole(req.params.boardId, req.params.userId, req.body.role),
+        'Rolle konnte nicht geaendert werden'),
+
     putSubtaskOrder: handler(req =>
         boardService.reorderSubtasks(req.params.boardId, req.params.groupId, req.params.taskId,
             req.body.taskIds), 'Reihenfolge konnte nicht gespeichert werden'),

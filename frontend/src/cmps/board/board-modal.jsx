@@ -34,19 +34,40 @@ export function BoardModal(){
     const startRef = useRef({x: 0, width: 0})
 
     /**
+     * Find the task the URL names, and the group it is really in.
+     *
+     * The group in the URL is a hint, not the answer. A link can be older than
+     * the board it points into — a notification written this morning still
+     * carries the group the task was in at the time, and moving that task since
+     * is enough to make the link dead. It used to look in that one group and
+     * give up, so clicking the notification changed the address bar and opened
+     * nothing at all, which reads as a broken button.
+     *
+     * So: try the named group first, then the rest of the board. And return
+     * the group it was actually found in — the dialog writes through that id,
+     * and a write into the wrong group is worse than not opening.
+     *
      * A subtask opens the same dialog a task does — it is a task, it is only
-     * listed under another one. So the lookup goes one level down as well.
+     * listed under another one. Hence the second level.
      */
-    const currTask = useMemo(() => {
-        if(!board || !groupId || !taskId) return null
-        const group = (board.groups || []).find(group => group.id === groupId)
-        for(const task of group?.tasks || []){
-            if(task.id === taskId) return task
-            const child = (task.subtasks || []).find(t => t.id === taskId)
-            if(child) return child
+    const found = useMemo(() => {
+        if(!board || !taskId) return null
+        const groups = board.groups || []
+        const ordered = [
+            ...groups.filter(group => group.id === groupId),
+            ...groups.filter(group => group.id !== groupId)
+        ]
+        for(const group of ordered){
+            for(const task of group.tasks || []){
+                if(task.id === taskId) return {task, groupId: group.id}
+                const child = (task.subtasks || []).find(sub => sub.id === taskId)
+                if(child) return {task: child, groupId: group.id}
+            }
         }
         return null
     }, [board, groupId, taskId])
+
+    const currTask = found?.task || null
 
     useEffect(() => {
         setModalOpen(isOpen)
@@ -116,7 +137,7 @@ export function BoardModal(){
             )}
             <section className={`board-modal ${isOpen?'open':''}`} style={{'--panel-width': `${width}px`}}>
                 {!activityLog && (
-                    <TaskModal key={currTask.id} task={currTask} board={board} groupId={groupId} setModalCurrTask={() => {
+                    <TaskModal key={currTask.id} task={currTask} board={board} groupId={found.groupId} setModalCurrTask={() => {
                     }}/>
                 )}
                 {activityLog && (

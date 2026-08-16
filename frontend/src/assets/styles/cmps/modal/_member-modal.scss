@@ -163,3 +163,79 @@
         }
     }
 }
+/* The member list with its roles. One row per person: picture, name, the role
+   as a select, and a remove button that only appears where it can succeed. */
+.member-role-list {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+}
+
+.member-role-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f2f6;
+
+    img, .avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+    }
+}
+
+.member-role-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.member-role-select,
+.invite-role select {
+    flex: 0 0 auto;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 5px;
+    padding: 3px 6px;
+    font: inherit;
+    font-size: 12px;
+    background: variables.$app-bg;
+}
+
+/* Disabled means the last owner. It stays readable rather than fading out —
+   the reason is in the tooltip and the row still has to be legible. */
+.member-role-select:disabled {
+    color: variables.$workspace-icon-color;
+    cursor: not-allowed;
+}
+
+.member-role-static {
+    flex: 0 0 auto;
+    color: variables.$workspace-icon-color;
+    font-size: 12px;
+}
+
+.member-role-remove {
+    flex: 0 0 auto;
+    border: 0;
+    background: none;
+    padding: 0 4px;
+    color: variables.$workspace-icon-color;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover { color: #e2445c; }
+}
+
+.invite-role {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: variables.$workspace-icon-color;
+}

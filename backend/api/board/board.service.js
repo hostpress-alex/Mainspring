@@ -1,6 +1,7 @@
 const logger = require('../../services/logger.service')
 const asyncLocalStorage = require('../../services/als.service')
 const boardRepo = require('./board.repo')
+const roles = require('./board.roles')
 
 /**
  * Loaded on use, not at the top.
@@ -39,23 +40,13 @@ function memberIdsOf(board){
     return board.members.filter(Boolean).map(m => sid(m._id))
 }
 
-/** Sehen und inhaltlich bearbeiten darf: Owner, Mitglied, Admin. */
-function hasAccess(board, user){
-    if(!user || !board) return false
-    if(user.isAdmin) return true
-    const uid = sid(user._id)
-    return ownerIdsOf(board).includes(uid) || memberIdsOf(board).includes(uid)
-}
-
 /**
- * Verwalten darf: Owner und Admin. Verwalten heisst Mitglieder und Owner
- * aendern sowie das Board loeschen.
+ * Permissions live in board.roles.js — all of them, in one readable file.
+ * These two stay as names because the REST layer, the socket layer and the
+ * tests all ask for them, but they no longer decide anything themselves.
  */
-function isOwner(board, user){
-    if(!user || !board) return false
-    if(user.isAdmin) return true
-    return ownerIdsOf(board).includes(sid(user._id))
-}
+const hasAccess = (board, user) => roles.canView(board, user)
+const isOwner = (board, user) => roles.isOwner(board, user)
 
 /**
  * board.members speichert Name und Bild redundant aus dem Moment der Einladung.
@@ -252,12 +243,24 @@ async function add(board){
  * ==================================================================== */
 
 /** Board laden und Rechte pruefen. `owner: true` verlangt Owner oder Admin. */
-async function _requireBoard(boardId, {owner = false} = {}){
+/**
+ * Load a board and check what this person may do with it.
+ *
+ * `owner` is the frame of the board, `editor` is task work. Neither flag means
+ * "anybody who can see it", which is what a viewer gets and is enough for
+ * reading and for writing a reply — those check per comment further down.
+ */
+async function _requireBoard(boardId, {owner = false, editor = false} = {}){
     const user = getLoggedinUser()
     const board = await _getByIdRaw(boardId)
     if(!board) throw httpError(404, 'Board nicht gefunden')
-    if(!hasAccess(board, user)) throw httpError(403, 'Kein Zugriff auf dieses Board')
-    if(owner && !isOwner(board, user)) throw httpError(403, 'Das darf nur ein Owner dieses Boards')
+    if(!roles.canView(board, user)) throw httpError(403, 'Kein Zugriff auf dieses Board')
+    if(owner && !roles.isOwner(board, user)){
+        throw httpError(403, 'Das darf nur ein Owner dieses Boards')
+    }
+    if(editor && !roles.isEditor(board, user)){
+        throw httpError(403, 'Dafuer werden Bearbeitungsrechte gebraucht')
+    }
     return board
 }
 
@@ -275,6 +278,82 @@ function _findGroup(board, groupId){
  * same permission check, instead of a second set that would have to be kept in
  * step with the first one forever.
  */
+/**
+ * May this person change this group?
+ *
+ * An owner always may. An editor may if it is a group they created — which is
+ * what `board_group.created_by` is for. Anything the migration could not
+ * attribute counts as not theirs and stays with the owners.
+ */
+/**
+ * What a viewer is allowed to change on a task: comments, and only their own.
+ *
+ * This is the expensive rule of the whole role system and it cannot be made
+ * cheaper. Comments live inside the task and travel in the same patch as the
+ * status and the due date, so "may change the task" is not a question that can
+ * be answered once per request — it has to be answered per FIELD, and inside
+ * the comments per COMMENT.
+ *
+ * Compared against what is stored rather than trusting what arrives: a client
+ * that says "this comment is mine" is a client, not a source of truth.
+ *
+ * Throws, never filters. Quietly dropping the parts somebody may not change
+ * and saving the rest means their screen shows something the database does not
+ * hold, and they find out much later.
+ */
+function _requireTaskWrite(board, oldTask, patch){
+    const user = getLoggedinUser()
+    if(roles.isEditor(board, user)) return
+
+    // A viewer. Nothing but comments may be touched at all.
+    const fields = Object.keys(patch || {}).filter(key => key !== 'id')
+    const other = fields.filter(key => key !== 'comments')
+    if(other.length){
+        throw httpError(403, 'Nur Kommentare duerfen geaendert werden')
+    }
+    if(!fields.includes('comments')) return
+
+    const before = new Map((oldTask.comments || []).filter(Boolean).map(c => [sid(c.id), c]))
+    const after = (patch.comments || []).filter(Boolean)
+    const afterIds = new Set(after.map(c => sid(c.id)))
+
+    for(const comment of after){
+        const stored = before.get(sid(comment.id))
+        if(!stored){
+            // New. A viewer may reply, not open a thread — and may only write
+            // in their own name.
+            if(!roles.canWriteComment(board, user, comment, {isNew: true})){
+                throw httpError(403, 'Ein neues Update darf hier nicht angelegt werden')
+            }
+            const author = comment.byMember && comment.byMember._id
+            if(!author || sid(author) !== sid(user._id)){
+                throw httpError(403, 'Ein Kommentar kann nur im eigenen Namen geschrieben werden')
+            }
+            continue
+        }
+        // Changed. Compared field by field so an untouched comment travelling
+        // along in the list is not read as an edit — the client sends the whole
+        // list every time.
+        const isChanged = JSON.stringify({txt: stored.txt, attachments: stored.attachments})
+            !== JSON.stringify({txt: comment.txt, attachments: comment.attachments})
+        if(isChanged && !roles.canWriteComment(board, user, stored)){
+            throw httpError(403, 'Nur eigene Kommentare duerfen geaendert werden')
+        }
+    }
+
+    for(const [id, stored] of before){
+        if(afterIds.has(id)) continue
+        if(!roles.canWriteComment(board, user, stored)){
+            throw httpError(403, 'Nur eigene Kommentare duerfen geloescht werden')
+        }
+    }
+}
+
+function _requireGroupRights(board, group){
+    if(roles.canManageGroup(board, getLoggedinUser(), group)) return group
+    throw httpError(403, 'Diese Gruppe darf nur ihr Ersteller oder ein Owner aendern')
+}
+
 function _findTask(group, taskId){
     for(const task of group.tasks || []){
         if(task.id === taskId) return task
@@ -290,7 +369,7 @@ function _findParent(group, taskId){
 }
 
 async function updateMeta(boardId, patch){
-    await _requireBoard(boardId)
+    await _requireBoard(boardId, {owner: true})
     await boardRepo.updateMeta(boardId, patch)
     return await getById(boardId)
 }
@@ -298,13 +377,15 @@ async function updateMeta(boardId, patch){
 /**
  * Spaltenliste des Boards.
  *
- * Bewusst fuer alle Mitglieder erlaubt, nicht nur fuer Owner — Spalten
- * anlegen und umbenennen war bisher jedem moeglich, und ein 403 an dieser
- * Stelle wuerde das fuer die meisten Leute kaputt machen. Das Sortieren der
+ * Owner only. This used to be open to every member with a note saying a 403
+ * here would break it for most people — which was true while every board had
+ * exactly one member who was also its owner. A column is part of the frame:
+ * removing one takes its values out of every task on the board, for everybody.
+ * Das Sortieren der
  * Spalten ist in der Oberflaeche weiterhin auf Owner beschraenkt.
  */
 async function setColumns(boardId, columns){
-    await _requireBoard(boardId)
+    await _requireBoard(boardId, {owner: true})
     if(!Array.isArray(columns)) throw httpError(400, 'columns muss eine Liste sein')
     await boardRepo.setColumns(boardId, columns)
     return await getById(boardId)
@@ -321,6 +402,30 @@ async function setMembers(boardId, members){
     return await getById(boardId)
 }
 
+/**
+ * One person's role.
+ *
+ * Owner only, and a board may not be left without one: the last owner
+ * demoting themselves would produce a board nobody can administer, and the
+ * only way back is the database.
+ */
+async function setMemberRole(boardId, userId, role){
+    const board = await _requireBoard(boardId, {owner: true})
+    if(!roles.ROLES.includes(role)) throw httpError(400, 'Unbekannte Rolle')
+
+    const target = sid(userId)
+    if(!(board.members || []).some(m => sid(m._id) === target)){
+        throw httpError(404, 'Diese Person ist kein Mitglied dieses Boards')
+    }
+    const owners = ownerIdsOf(board)
+    if(role !== roles.OWNER && owners.length === 1 && owners[0] === target){
+        throw httpError(400, 'Ein Board braucht mindestens einen Owner')
+    }
+
+    await boardRepo.setMemberRole(boardId, target, role)
+    return await getById(boardId)
+}
+
 async function setOwners(boardId, ownerIds){
     const board = await _requireBoard(boardId, {owner: true})
     const wanted = (ownerIds || []).map(sid)
@@ -333,36 +438,65 @@ async function setOwners(boardId, ownerIds){
     return await getById(boardId)
 }
 
+/** An editor may add a group, and what they add is theirs. */
 async function addGroup(boardId, group, index = null){
-    await _requireBoard(boardId)
+    await _requireBoard(boardId, {editor: true})
     if(!group || !group.id) throw httpError(400, 'group.id fehlt')
-    await boardRepo.addGroup(boardId, group, index)
+    const user = getLoggedinUser()
+    // Decided here, never taken from the request: a client that may name its
+    // own group's creator may name anyone's.
+    await boardRepo.addGroup(boardId, {...group, createdBy: user?sid(user._id):null}, index)
     return await getById(boardId)
 }
 
 async function removeGroup(boardId, groupId){
     const board = await _requireBoard(boardId)
-    _findGroup(board, groupId)
+    _requireGroupRights(board, _findGroup(board, groupId))
     await boardRepo.removeGroup(boardId, groupId)
     return await getById(boardId)
 }
 
 async function updateGroupMeta(boardId, groupId, patch){
     const board = await _requireBoard(boardId)
-    _findGroup(board, groupId)
+    _requireGroupRights(board, _findGroup(board, groupId))
     await boardRepo.updateGroupMeta(boardId, groupId, patch)
     return await getById(boardId)
 }
 
+/**
+ * Write a whole group.
+ *
+ * The only place where the check depends on what is being written, and it has
+ * to be: the frontend falls back to this route whenever a change to the task
+ * list is more complicated than "one added" or "one removed". Making it plain
+ * owner-only would have locked members out of ordinary task work through a
+ * back door — the request looks like a group write and is a task write.
+ *
+ * So the head of the group is compared. Title, colour, symbol or archiving
+ * changed means structure and needs an owner; anything else is the task list
+ * and is open to every member.
+ */
+const GROUP_META = ['title', 'color', 'icon', 'archivedAt']
+
 async function replaceGroup(boardId, groupId, group){
     const board = await _requireBoard(boardId)
-    _findGroup(board, groupId)
-    await boardRepo.replaceGroup(boardId, groupId, group)
+    const before = _findGroup(board, groupId)
+
+    const touchesMeta = GROUP_META.some(key =>
+        group && group[key] !== undefined && String(group[key] ?? '') !== String(before[key] ?? ''))
+    if(touchesMeta) _requireGroupRights(board, before)
+    else if(!roles.isEditor(board, getLoggedinUser())){
+        throw httpError(403, 'Dafuer werden Bearbeitungsrechte gebraucht')
+    }
+
+    // The creator is decided once, when the group is created, and carried
+    // along from the stored group here — never taken from the payload.
+    await boardRepo.replaceGroup(boardId, groupId, {...group, createdBy: before.createdBy || null})
     return await getById(boardId)
 }
 
 async function reorderGroups(boardId, groupIds){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {owner: true})
     const byId = new Map((board.groups || []).map(g => [g.id, g]))
     const next = (groupIds || []).map(id => byId.get(id)).filter(Boolean)
     if(next.length !== (board.groups || []).length){
@@ -373,7 +507,7 @@ async function reorderGroups(boardId, groupIds){
 }
 
 async function addTask(boardId, groupId, task, index = null){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {editor: true})
     _findGroup(board, groupId)
     if(!task || !task.id) throw httpError(400, 'task.id fehlt')
     await boardRepo.addTask(boardId, groupId, task, index)
@@ -382,7 +516,7 @@ async function addTask(boardId, groupId, task, index = null){
 }
 
 async function removeTask(boardId, groupId, taskId){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {editor: true})
     _findTask(_findGroup(board, groupId), taskId)
     await boardRepo.removeTask(boardId, groupId, taskId)
     return await getById(boardId)
@@ -397,6 +531,7 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
     const oldTask = _findTask(group, taskId)
     const parent = _findParent(group, taskId)
     if(!patch || typeof patch !== 'object') throw httpError(400, 'Keine Aenderungen uebergeben')
+    _requireTaskWrite(board, oldTask, patch)
     await boardRepo.updateTaskFields(boardId, groupId, taskId, patch)
     await notifications().taskPatched({
         board, groupId, oldTask, patch, parentId: parent?parent.id:null, actor: getLoggedinUser()})
@@ -408,6 +543,8 @@ async function replaceTask(boardId, groupId, taskId, task){
     const group = _findGroup(board, groupId)
     const oldTask = _findTask(group, taskId)
     const parent = _findParent(group, taskId)
+    // A whole-task write is a patch of everything, so it is checked as one.
+    _requireTaskWrite(board, oldTask, task || {})
     await boardRepo.replaceTask(boardId, groupId, taskId, {...task, id: taskId})
     // A whole-task write is a patch of everything, so the same comparison
     // works — otherwise this path would silently notify nobody.
@@ -424,7 +561,7 @@ async function replaceTask(boardId, groupId, taskId, task){
  * constraint violation.
  */
 async function addSubtask(boardId, groupId, parentId, subtask, index = null){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {editor: true})
     const group = _findGroup(board, groupId)
     const parent = _findTask(group, parentId)
     if(!parent.subtasks) throw httpError(400, 'Ein Subtask kann keine Subtasks haben')
@@ -435,7 +572,7 @@ async function addSubtask(boardId, groupId, parentId, subtask, index = null){
 }
 
 async function reorderSubtasks(boardId, groupId, parentId, taskIds){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {editor: true})
     const parent = _findTask(_findGroup(board, groupId), parentId)
     const byId = new Map((parent.subtasks || []).map(t => [t.id, t]))
     const next = (taskIds || []).map(id => byId.get(id)).filter(Boolean)
@@ -462,7 +599,7 @@ async function reorderSubtasks(boardId, groupId, parentId, taskIds){
  * it should be a second, named action.
  */
 async function setTaskParent(boardId, groupId, taskId, parentId = null, index = null){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {editor: true})
     const group = _findGroup(board, groupId)
     const task = _findTask(group, taskId)
 
@@ -486,7 +623,7 @@ async function setTaskParent(boardId, groupId, taskId, parentId = null, index = 
 }
 
 async function reorderTasks(boardId, groupId, taskIds){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {editor: true})
     const group = _findGroup(board, groupId)
     const byId = new Map((group.tasks || []).map(t => [t.id, t]))
     const next = (taskIds || []).map(id => byId.get(id)).filter(Boolean)
@@ -498,7 +635,7 @@ async function reorderTasks(boardId, groupId, taskIds){
 }
 
 async function moveTask(boardId, fromGroupId, toGroupId, taskId, index = null){
-    const board = await _requireBoard(boardId)
+    const board = await _requireBoard(boardId, {editor: true})
     const from = _findGroup(board, fromGroupId)
     const task = _findTask(from, taskId)
     _findGroup(board, toGroupId)
@@ -511,7 +648,7 @@ async function moveTask(boardId, fromGroupId, toGroupId, taskId, index = null){
 }
 
 async function addActivity(boardId, activity){
-    await _requireBoard(boardId)
+    await _requireBoard(boardId, {editor: true})
     await boardRepo.addActivity(boardId, activity)
     return await getById(boardId)
 }
@@ -530,6 +667,7 @@ module.exports = {
     updateMeta,
     setColumns,
     setMembers,
+    setMemberRole,
     setOwners,
     addGroup,
     removeGroup,

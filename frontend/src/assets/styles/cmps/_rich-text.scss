@@ -1,0 +1,276 @@
+@use "../setup/variables";
+
+/* Rich text: the editor, and the same text once it is stored.
+
+   `.rich-text` is shared by both on purpose. A comment that looks one way
+   while it is being written and another once it is posted is the oldest
+   complaint about editors of this kind. */
+
+.rich-text {
+    line-height: 1.55;
+    word-break: break-word;
+
+    > :first-child { margin-top: 0; }
+    > :last-child  { margin-bottom: 0; }
+
+    p { margin: 0 0 .5em; }
+
+    h1, h2, h3 {
+        margin: .8em 0 .4em;
+        line-height: 1.25;
+        font-weight: 600;
+    }
+
+    h1 { font-size: 1.35em; }
+    h2 { font-size: 1.2em; }
+    h3 { font-size: 1.05em; }
+
+    ul, ol { margin: 0 0 .5em; padding-left: 1.4em; }
+    li { margin: .15em 0; }
+    li > p { margin: 0; }
+
+    blockquote {
+        margin: .5em 0;
+        padding: .1em 0 .1em .8em;
+        border-left: 3px solid variables.$layout-border-color;
+        color: variables.$workspace-icon-color;
+    }
+
+    code {
+        padding: .1em .3em;
+        border-radius: 3px;
+        background: #f1f2f6;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: .92em;
+    }
+
+    pre {
+        margin: .5em 0;
+        padding: .6em .8em;
+        border-radius: 6px;
+        background: #f1f2f6;
+        overflow-x: auto;
+
+        code { padding: 0; background: none; }
+    }
+
+    hr {
+        margin: .9em 0;
+        border: 0;
+        border-top: 1px solid variables.$layout-border-color;
+    }
+
+    a {
+        color: variables.$board-btn;
+        text-decoration: underline;
+    }
+
+    /* The checklist, in tiptap's markup. The list marker has to go or every
+       item shows a bullet AND a box. */
+    ul[data-type="taskList"] {
+        padding-left: 0;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: flex-start;
+            gap: .5em;
+        }
+
+        label { flex: 0 0 auto; margin-top: .15em; }
+        div { flex: 1 1 auto; min-width: 0; }
+
+        li[data-checked="true"] > div {
+            color: variables.$workspace-icon-color;
+            text-decoration: line-through;
+        }
+    }
+
+    /* An image in the text. Never wider than the column it sits in, and
+       never stretched past its own size — an upscaled screenshot is worse
+       than a small one. */
+    img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: .6em 0;
+        border-radius: 6px;
+    }
+
+    /* A mention keeps the look it had in the plain textarea. Not a link: it
+       points at a person, and there is no page for a person. */
+    span[data-type="mention"] {
+        padding: 0 2px;
+        border-radius: 3px;
+        background: #eaf3ff;
+        color: variables.$board-btn;
+        font-weight: 600;
+    }
+}
+
+/* ------------------------------------------------------------- editor -- */
+
+.rich-text-editor {
+    position: relative;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+    background: variables.$app-bg;
+}
+
+.rich-text-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1px;
+    padding: 4px 6px;
+    border-bottom: 1px solid variables.$layout-border-color;
+}
+
+.rich-text-tool {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 5px;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: variables.$workspace-icon-color;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover { background: #f1f2f6; color: variables.$primary-text-color; }
+    &.is-on { background: #eaf3ff; color: variables.$board-btn; }
+}
+
+.rich-text-tool-label {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.rich-text-sep {
+    width: 1px;
+    height: 16px;
+    margin: 0 4px;
+    background: variables.$layout-border-color;
+}
+
+.rich-text-input {
+    min-height: 84px;
+    padding: 10px 12px;
+
+    &:focus-visible { outline: 0; }
+
+    /* The placeholder is drawn rather than being an attribute: a
+       contenteditable has none. Only on the first paragraph, and only while
+       the document is empty. */
+    p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        color: variables.$workspace-icon-color;
+        pointer-events: none;
+    }
+}
+
+/* The drop area is the text itself. The outline only appears while something
+   is being dragged over it — a dashed box sitting there permanently reads as
+   "not filled in yet". */
+.rich-text-drop {
+    position: relative;
+}
+
+.rich-text-drop.is-over::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 2px dashed variables.$board-btn;
+    border-radius: 6px;
+    background: rgb(0 115 234 / 6%);
+    pointer-events: none;
+}
+
+.rich-text-drop-hint {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: variables.$board-btn;
+    color: variables.$app-bg;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.rich-text-link {
+    display: flex;
+    gap: 6px;
+    padding: 6px 8px;
+    border-bottom: 1px solid variables.$layout-border-color;
+
+    input {
+        flex: 1 1 auto;
+        min-width: 0;
+        border: 1px solid variables.$layout-border-color;
+        border-radius: 5px;
+        padding: 4px 7px;
+        font: inherit;
+        font-size: 13px;
+    }
+
+    input:focus-visible { outline: 0; border-color: variables.$board-btn; }
+
+    button {
+        border: 0;
+        border-radius: 5px;
+        padding: 4px 9px;
+        background: #f1f2f6;
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    /* By class, not by type: every button in here is type="button" because
+       this sits inside another form — see the component. */
+    button.is-primary { background: variables.$board-btn; color: variables.$app-bg; }
+}
+
+/* The @-list. In a portal, so it takes the popover step of the scale and is
+   positioned in page coordinates. */
+.rich-text-mentions {
+    position: fixed;
+    z-index: var(--z-popover);
+    width: min(280px, 90vw);
+    max-height: 240px;
+    margin: 0;
+    padding: 4px;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+    background: variables.$app-bg;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 16%);
+    list-style: none;
+    overflow-y: auto;
+}
+
+.rich-text-mention-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &.is-active { background: #eaf3ff; }
+}
+
+.rich-text-mention-avatar {
+    width: 24px;
+    height: 24px;
+}

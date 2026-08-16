@@ -11,6 +11,7 @@ import {GroupListKanban} from '../cmps/kanban/group-list-kanban'
 import {BoardDescription} from '../cmps/board/board-description'
 import {MainSidebar} from '../cmps/sidebar/main-sidebar'
 import {DynamicModal} from '../cmps/modal/dynamic-modal'
+import {useWorkspaceOpen} from '../customHooks/useWorkspaceOpen'
 import {boardService} from '../services/board.service'
 import {CreateBoard} from '../cmps/modal/create-board'
 import {BoardHeader} from '../cmps/board/board-header'
@@ -32,7 +33,9 @@ export function BoardDetails(){
     const [isStarredOpen, setIsStarredOpen] = useState(false)
     const [boardType, setBoardType] = useState('table')
 
-    const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false)
+    // Not local state: the column stays as the user left it, whichever page
+    // they came from. See customHooks/useWorkspaceOpen.
+    const [isWorkspaceOpen, setIsWorkspaceOpen] = useWorkspaceOpen()
     const [workspaceDisplay, setWorkspaceDisplay] = useState('board')
 
     const {boardId} = useParams()

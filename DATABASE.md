@@ -106,9 +106,11 @@ and keep `127.0.0.1` as the host.
 ## 4. How the data is laid out
 
 ```
-user            users (password as a bcrypt hash)
+user            users (password as a bcrypt hash), language = the
+                interface language, '' = whatever the browser says
 board           a board's header data
-board_member    who belongs to it, is_owner = may administer
+board_member    who belongs to it, role = owner/editor/viewer
+                (is_owner is kept in step and is on its way out)
 board_column    a board's columns, in their order
 board_group     a board's groups
 task            one task; title and order as real columns,
@@ -133,6 +135,10 @@ Migrations, in order:
 | `20260815_000004_file_name.js` | `file.original_name` — the name as uploaded |
 | `20260815_000005_drop_cmps_columns.js` | drops `board.cmps_order` and `board.cmps_option` |
 | `20260815_000006_notifications.js` | `notification` and `task_subscription` |
+| `20260816_000007_subtasks.js` | `task.parent_id` — a task below a task |
+| `20260816_000008_group_icon.js` | `board_group.icon` — one emoji before the title |
+| `20260816_000009_roles.js` | `board_member.role` and `board_group.created_by` |
+| `20260816_000010_user_language.js` | `user.language` — the interface language of an account |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -158,6 +164,12 @@ read state per person — which the other way round cannot have without storing
 **A subscription can be muted rather than deleted.** A deleted row cannot be
 told apart from never having subscribed, so the next assignment would sign the
 user up again to the thing they just switched off.
+
+**The language belongs to the account, not the browser.** localStorage still
+holds a copy, because the interface has to choose a language before React
+renders and before any request has come back — without the copy every page
+would appear in the wrong language first and correct itself. The column is the
+truth, the copy is written at login and whenever the profile is saved.
 
 **Uploaded files keep two names.** On disk a file is named after its id, which
 is unique; `original_name` holds what it was called when it was uploaded, so a

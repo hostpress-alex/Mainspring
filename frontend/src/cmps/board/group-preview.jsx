@@ -11,6 +11,7 @@ import {
     loadBoard
 } from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
+import * as boardRoles from '../../services/board-roles'
 
 import {TaskToolsModal} from '../modal/task-tools-modal'
 import {TitleGroupPreview} from './title-group-preview'
@@ -42,6 +43,15 @@ export function GroupPreview({group, board, idx}){
     // task, so the board coming back from the server never closes a row the
     // person just opened.
     const [openSubtasks, setOpenSubtasks] = useState(() => new Set())
+
+    /*
+     * Three different questions, and they really are three — an editor may add
+     * a group and change the ones they made, but not this one unless it is
+     * theirs, and may work on every task in it either way.
+     */
+    const me = useSelector(storeState => storeState.userModule.user)
+    const canManage = boardRoles.canManageGroup(board, me, group)
+    const canWork = boardRoles.canEdit(board, me)
 
     function onToggleSubtasks(taskId){
         setOpenSubtasks(prev => {
@@ -272,8 +282,11 @@ export function GroupPreview({group, board, idx}){
                                 <Icon name='chevron-right' className="arrow-icon" onClick={onToggleCollapse} title={t('group.expand')}/>
                                 :
                                 <Icon name='chevron-down' className="arrow-icon" onClick={onToggleCollapse} title={t('group.collapse')}/>}
+                            {/* The whole menu is colour, symbol, duplicate and
+                                delete — all of it the frame of the board. A
+                                member has nothing to do in there. */}
                             <div className="group-menu" ref={elMainGroup}>
-                                <Icon name='ellipsis' className="icon" onClick={onToggleMenuModal}/>
+                                {canManage && <Icon name='ellipsis' className="icon" onClick={onToggleMenuModal}/>}
                             </div>
                             {/* Shown, not operated. Colour and symbol are both
                                 changed from the group menu — a heading whose
@@ -281,7 +294,7 @@ export function GroupPreview({group, board, idx}){
                                 you cannot click to rename. */}
                             <div className={`group-title-info flex align-center ${isTitleFocused?'showBorder':''} `} onFocus={() => setIsTitleFocused(true)} onBlur={() => setIsTitleFocused(false)}>
                                 {group.icon && <span className="group-icon-static">{group.icon}</span>}
-                                <blockquote ref={elTitle} className="group-title" contentEditable={isEditingTitle} suppressContentEditableWarning={true} onClick={() => setIsEditingTitle(true)} onBlur={(ev) => onSave(ev)}
+                                <blockquote ref={elTitle} className="group-title" contentEditable={canManage && isEditingTitle} suppressContentEditableWarning={true} onClick={() => canManage && setIsEditingTitle(true)} onBlur={(ev) => onSave(ev)}
                                             {...singleLineEditable({onFocus: () => setIsTyping(true)})}>
                                     <h4>{group.title}</h4>
                                 </blockquote>
@@ -323,11 +336,15 @@ export function GroupPreview({group, board, idx}){
                                                 )}
                                             </Draggable>
                                         )}
-                                        <div ref={elAddColumn} className="add-picker-task flex align-items" onClick={toggleColumnModal}>
-                                            <span className={`add-btn ${getAddColumnClassName()?'active':''}`}>
-                                                <Icon name='plus' className={`${getAddColumnClassName()?'plus':'close'}`}/>
-                                            </span>
-                                        </div>
+                                        {/* Columns are the frame of the board,
+                                            so this one really is owner-only. */}
+                                        {boardRoles.isOwner(board, me) && (
+                                            <div ref={elAddColumn} className="add-picker-task flex align-items" onClick={toggleColumnModal}>
+                                                <span className={`add-btn ${getAddColumnClassName()?'active':''}`}>
+                                                    <Icon name='plus' className={`${getAddColumnClassName()?'plus':'close'}`}/>
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                 }}
                             </Droppable>
@@ -363,7 +380,7 @@ export function GroupPreview({group, board, idx}){
                                         )
                                     })}
                                     {droppableProvided.placeholder}
-                                    <div className="add-task flex">
+                                    {canWork && <div className="add-task flex">
                                         <div className="sticky-div" style={{'--group-color': group.color}}>
                                             <div className="check-box add-task">
                                                 <input type="checkbox" disabled/>
@@ -373,13 +390,23 @@ export function GroupPreview({group, board, idx}){
                                             </form>
                                         </div>
                                         <div className="empty-div"></div>
-                                    </div>
+                                    </div>}
                                 </div>
                             )}
                         </Droppable>
                         <div className="statistic flex">
-                            <div className="sticky-container">
+                            {/* Built from the same pieces as the header row and
+                                with the same width, not from a number. It used
+                                to be a `min-width: 375px` in the stylesheet
+                                while everything above it followed the column
+                                the person can drag — so the summary row lined
+                                up only at the default width and slid out of
+                                true the moment anybody resized the task
+                                column. */}
+                            <div className="sticky-div flex" style={{'--group-color': group.color}}>
                                 <div className="hidden"></div>
+                                <div className="check-box"></div>
+                                <div className="task title" style={widthStyle(widthOf(widths, TASK_COLUMN))}></div>
                             </div>
                             <div className="statistic-container flex">
                                 {columns.map((column, idx) => (

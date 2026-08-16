@@ -49,20 +49,30 @@ function sectionOf(createdAt, now){
 /**
  * Where a click on an entry goes.
  *
- * A notification about a task should open that task, not the board it happens
- * to live in — arriving on a board of eighty rows and being left to find the
- * one that was meant is barely better than no link at all. The task route is
- * `/board/:boardId/:groupId/:taskId`, so the group has to be known; the
- * server puts it into `detail` when it writes the notification.
+ * A notification about a task opens that task, not the board it happens to
+ * live in — arriving on a board of eighty rows and being left to find the one
+ * that was meant is barely better than no link at all. Only entries about a
+ * board itself, which have no task, lead to the board.
  *
- * Entries written before that existed carry no groupId, and neither do the
- * ones about a board itself. Both fall back to the board.
+ * The route is `/board/:boardId/:groupId/:taskId`. The server puts the group
+ * into `detail` when it writes the notification, but the link does not depend
+ * on it: see UNKNOWN_GROUP below and the lookup in board-modal.jsx.
  */
+
+/**
+ * The group segment of the route when the notification does not know one.
+ *
+ * Only rows written before the group travelled along are missing it. The
+ * dialog looks the task up across the whole board and treats the group in the
+ * URL as a hint, so a placeholder still opens the right task — where sending
+ * the person to the board and letting them search would not.
+ */
+const UNKNOWN_GROUP = '-'
+
 function targetOf(item){
-    const groupId = item.detail && item.detail.groupId
-    return item.taskId && groupId
-        ?`/board/${item.boardId}/${groupId}/${item.taskId}`
-        :`/board/${item.boardId}`
+    if(!item.taskId) return `/board/${item.boardId}`
+    const groupId = (item.detail && item.detail.groupId) || UNKNOWN_GROUP
+    return `/board/${item.boardId}/${groupId}/${item.taskId}`
 }
 
 /** The sentence shown for one entry. Every kind has its own key. */

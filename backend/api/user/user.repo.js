@@ -18,6 +18,8 @@ function out(row){
         fullname: row.fullname,
         imgUrl: row.img_url || '',
         isAdmin: !!row.is_admin,
+        // '' means the person never chose one — the browser decides.
+        language: row.language || '',
         createdAt: row.created_at
     }
 }
@@ -27,7 +29,8 @@ const COLUMNS = {
     password: 'password',
     fullname: 'fullname',
     imgUrl: 'img_url',
-    isAdmin: 'is_admin'
+    isAdmin: 'is_admin',
+    language: 'language'
 }
 
 function toRow(user){

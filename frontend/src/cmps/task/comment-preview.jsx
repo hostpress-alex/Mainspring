@@ -1,13 +1,15 @@
 import {useState} from 'react'
+import {useSelector} from 'react-redux'
 
 import { Icon } from '../icon'
 import {CommentMenuModal} from '../modal/modal-comment'
 import {utilService} from '../../services/util.service'
 import { Avatar } from '../avatar'
 import {AttachmentStrip} from './attachment-strip'
-import {MentionTextarea} from '../mention/mention-textarea'
-import {MentionText} from '../mention/mention-text'
-import {toStorage} from '../../services/mention'
+import {RichTextEditor} from '../rich-text/rich-text-editor'
+import {RichTextView} from '../rich-text/rich-text-view'
+import {isEmpty as isRichEmpty} from '../../services/rich-text'
+import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
 
 /**
@@ -28,15 +30,13 @@ export function CommentPreview({
 }){
     const [isMenuModalOpen, setIsMenuModalOpen] = useState(false)
     const [isEditOpen, setIsEditOpen] = useState(false)
+    const board = useSelector(storeState => storeState.boardModule.filteredBoard)
+    const me = useSelector(storeState => storeState.userModule.user)
+    const canWriteThis = boardRoles.canWriteComment(board, me, comment)
     const [editComment, setEditComment] = useState({...comment})
     const [isReplyOpen, setIsReplyOpen] = useState(false)
     const [replyTxt, setReplyTxt] = useState('')
     const [isSendingReply, setIsSendingReply] = useState(false)
-
-    function handleChange({target}){
-        let {value, name: field} = target
-        setEditComment((prevComment) => ({...prevComment, [field]: value}))
-    }
 
     function onCancelEdit(){
         setEditComment({...comment})
@@ -44,16 +44,18 @@ export function CommentPreview({
     }
 
     function onSaveEdit(){
-        onEditComment({...editComment, txt: toStorage(editComment.txt, members)}, taskId)
+        onEditComment({...editComment}, taskId)
         setIsEditOpen(false)
     }
 
     async function onSendReply(ev){
-        ev.preventDefault()
-        if(!replyTxt.trim() || isSendingReply) return
+        // Called both from the form's submit and from Ctrl+Enter inside the
+        // editor, which has no event to hand over.
+        ev?.preventDefault?.()
+        if(isRichEmpty(replyTxt) || isSendingReply) return
         setIsSendingReply(true)
         try {
-            await onReply(comment.id, toStorage(replyTxt, members))
+            await onReply(comment.id, replyTxt)
             setReplyTxt('')
             setIsReplyOpen(false)
         } finally {
@@ -61,27 +63,6 @@ export function CommentPreview({
         }
     }
 
-    function onChangeTextStyle(ev, styleKey, align){
-        ev.preventDefault()
-        const style = {...editComment.style}
-        switch(styleKey) {
-            case 'fontStyle':
-                style.fontStyle = style.fontStyle === 'normal'?'italic':'normal'
-                break;
-            case 'fontWeight':
-                style.fontWeight = style[styleKey] === 'normal'?'bold':'normal'
-                break;
-            case 'textDecoration':
-                style[styleKey] = style[styleKey] === 'none'?'underline':'none'
-                break;
-            case 'textAlign':
-                style[styleKey] = align
-                break;
-            default:
-                return
-        }
-        setEditComment((prevComment) => ({...prevComment, style}))
-    }
 
     return (
         <section className={`comment-preview${isReply?' is-reply':''}`}>
@@ -95,27 +76,30 @@ export function CommentPreview({
                         <Icon name='clock' variant='fa-regular'/>
                         <span>{utilService.calculateTime(comment.archivedAt)}</span>
                     </div>
+                    {/* Edit and delete. A viewer sees it on their own comment
+                        and on nobody else's — the server says the same. */}
                     <div className={`menu-icon-container ${isMenuModalOpen?' active':''}`}>
-                        <Icon name='ellipsis' onClick={() => setIsMenuModalOpen(!isMenuModalOpen)}/>
+                        {canWriteThis && <Icon name='ellipsis' onClick={() => setIsMenuModalOpen(!isMenuModalOpen)}/>}
                         {isMenuModalOpen &&
                             <CommentMenuModal onRemoveComment={onRemoveComment} commentId={comment.id} onOpenEdit={setIsEditOpen} setIsMenuModalOpen={setIsMenuModalOpen} taskId={taskId} isReply={isReply}/>}
                     </div>
                 </div>
             </div>
             {!isEditOpen && <>
-                {comment.txt && <MentionText text={comment.txt} members={members} style={comment.style}/>}
+                {/* No `style` any more: it carried the whole-comment
+                    formatting that this round replaced. Old comments still
+                    hold it in the database and it is simply not read. */}
+                <RichTextView value={comment.txt}/>
                 <AttachmentStrip attachments={comment.attachments}/>
             </>}
             {isEditOpen && <form className="input-container">
-                <div className="style-txt">
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontWeight')}><Icon name='bold'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textDecoration')}><Icon name='underline'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontStyle')}>/</span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><Icon name='align-left'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><Icon name='align-center'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><Icon name='align-right'/></span>
-                </div>
-                <MentionTextarea name="txt" members={members} style={editComment.style} value={editComment.txt} onChange={handleChange}/>
+                <RichTextEditor
+                    value={editComment.txt}
+                    members={members}
+                    autoFocus
+                    onChange={txt => setEditComment(prev => ({...prev, txt}))}
+                    onSubmit={onSaveEdit}
+                />
             </form>}
             {isEditOpen && <div className="button-container">
                 <button className="save" onMouseDown={onSaveEdit}>{t('common.save')}</button>
@@ -143,16 +127,19 @@ export function CommentPreview({
 
                     {isReplyOpen && (
                         <form className="reply-form" onSubmit={onSendReply}>
-                            <MentionTextarea autoFocus rows={2} members={members} value={replyTxt} placeholder={t('update.replyPlaceholder')} onChange={ev => setReplyTxt(ev.target.value)} onKeyDown={ev => {
-                                // Enter sends, Shift+Enter starts a new line.
-                                if(ev.key === 'Enter' && !ev.shiftKey) onSendReply(ev)
-                                if(ev.key === 'Escape'){
-                                    setIsReplyOpen(false);
-                                    setReplyTxt('')
-                                }
-                            }}/>
+                            {/* Ctrl+Enter sends rather than Enter: a reply can
+                                have paragraphs and a list now, so Enter has to
+                                mean "new line". */}
+                            <RichTextEditor
+                                value={replyTxt}
+                                members={members}
+                                placeholder={t('update.replyPlaceholder')}
+                                autoFocus
+                                onChange={setReplyTxt}
+                                onSubmit={() => onSendReply()}
+                            />
                             <div className="reply-actions">
-                                <button type="submit" className="save" disabled={!replyTxt.trim() || isSendingReply}>
+                                <button type="submit" className="save" disabled={isRichEmpty(replyTxt) || isSendingReply}>
                                     {isSendingReply?'Sendet…':t('update.replies')}
                                 </button>
                                 <button type="button" className="cancel" onClick={() => {

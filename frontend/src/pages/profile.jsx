@@ -6,7 +6,7 @@ import {updateProfile} from '../store/user.actions'
 import {uploadAvatar, imagesFromClipboard} from '../services/upload.service'
 import {GUEST_IMG} from '../services/avatar'
 import { Avatar } from '../cmps/avatar'
-import {t} from '../i18n'
+import {availableLanguages, getLanguage, languageName, setLanguage, t} from '../i18n'
 
 const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
 
@@ -17,6 +17,12 @@ export function ProfilePage(){
 
     const [fullname, setFullname] = useState(user?.fullname || '')
     const [pw, setPw] = useState({current: '', next: '', repeat: ''})
+    // What the account says, and only what the page happens to be showing if
+    // the account says nothing yet. Not the other way round: somebody whose
+    // browser already shows German still has to be able to pin German to the
+    // account, and a selector that starts on the displayed language would
+    // make that save look like a no-op.
+    const [language, setLanguageChoice] = useState(user?.language || getLanguage())
     const [preview, setPreview] = useState(null)
     const [busy, setBusy] = useState(false)
     const [msg, setMsg] = useState(null)
@@ -108,6 +114,30 @@ export function ProfilePage(){
         }
     }
 
+    /**
+     * Save the language to the account, then switch the page over.
+     *
+     * In that order, and nothing after it: setLanguage loads the page again
+     * whenever the choice is not what is already on screen, so anything
+     * written below it may never run. The one case where it returns — the
+     * account was blank and the pick matches what the browser was showing
+     * anyway — is the case that needs the confirmation.
+     */
+    async function onSaveLanguage(ev){
+        ev.preventDefault();
+        setErr(null);
+        setBusy(true)
+        try {
+            await updateProfile(user._id, {language})
+            setLanguage(language)
+            flash(t('language.saved'))
+        } catch(e) {
+            setErr(readErr(e))
+        } finally {
+            setBusy(false)
+        }
+    }
+
     async function onChangePassword(ev){
         ev.preventDefault();
         setErr(null)
@@ -174,6 +204,22 @@ export function ProfilePage(){
                             <input className="profile-input is-locked" value={user.username || '—'} disabled/>
                         </div>
                         <button className="profile-btn" type="submit" disabled={busy || !fullname.trim()}>{t('profile.saveName')}</button>
+                    </form>
+                </div>
+
+                <div className="profile-card">
+                    <h2 className="profile-section-title">{t('language.title')}</h2>
+                    <p className="profile-hint">{t('language.hint')}</p>
+                    <form onSubmit={onSaveLanguage}>
+                        <div className="profile-row">
+                            <span className="profile-label">{t('language.select')}</span>
+                            <select className="profile-input profile-select" value={language}
+                                onChange={e => setLanguageChoice(e.target.value)}>
+                                {availableLanguages().map(code =>
+                                    <option key={code} value={code}>{languageName(code)}</option>)}
+                            </select>
+                        </div>
+                        <button className="profile-btn" type="submit" disabled={busy}>{t('common.save')}</button>
                     </form>
                 </div>
 

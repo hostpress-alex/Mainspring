@@ -1,4 +1,5 @@
 import {httpService} from './http.service.js'
+import * as boardRoles from './board-roles'
 import {userService} from './user.service.js'
 import {utilService} from './util.service.js'
 import {makeColumnId} from './column.service.js'
@@ -11,6 +12,8 @@ export const boardService = {
     ownerIdsOf,
     isBoardOwner,
     canManageMembers,
+    canManageBoard,
+    setMemberRole,
     getById,
     getFilteredBoard,
     save,
@@ -61,11 +64,27 @@ function isBoardOwner(board, user){
     return ownerIdsOf(board).includes(sid(user._id))
 }
 
-/** Only board owners and admins may change members and owners. */
+/**
+ * All of these live in services/board-roles.js now, next to each other, and
+ * are re-exported here because that is where the rest of the application has
+ * always asked. The rules themselves are a copy of the server's — see the note
+ * at the top of that file for why the copy is deliberate.
+ */
+/*
+ * Function declarations, not `const` arrows — and this is not style. The
+ * exported `boardService` object at the top of this file names them, and that
+ * object is built the moment the module is evaluated. A declaration is
+ * hoisted; a `const` is not, so writing these as arrows made the import throw
+ * "cannot access before initialization" and the whole application rendered a
+ * white page. Everything else in that object is a declaration for the same
+ * reason.
+ */
 function canManageMembers(board, user){
-    if(!user) return false
-    if(user.isAdmin) return true
-    return isBoardOwner(board, user)
+    return boardRoles.isOwner(board, user)
+}
+
+function canManageBoard(board, user){
+    return boardRoles.isOwner(board, user)
 }
 
 function query(filter = getDefaultFilterBoards()){
@@ -225,6 +244,11 @@ function addSubtask(boardId, groupId, parentId, task, index = null){
 }
 
 /** Hang a task under another one; parentId null takes it back out. */
+/** One person's role on this board. */
+function setMemberRole(boardId, userId, role){
+    return httpService.put(`${BASE_URL}${boardId}/member/${userId}/role`, {role})
+}
+
 function setTaskParent(boardId, groupId, taskId, parentId, index = null){
     return httpService.put(`${BASE_URL}${boardId}/group/${groupId}/task/${taskId}/parent`, {parentId, index})
 }

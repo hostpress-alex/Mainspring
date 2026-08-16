@@ -26,25 +26,12 @@
         }
     }
 
-    .sticky-container {
-        min-width: 375px;
-        position: sticky;
-        left: 40px;
-        z-index: 1;
-        background-color: white;
-
-        .hidden {
-            width: 46px;
-            top: -3px;
-        }
-
-        @include mixins.for-mobile-layout {
-            & {
-                min-width: 240px;
-                left: 0;
-            }
-        }
-    }
+    /* Nothing here any more. The summary row uses `.sticky-div`, the same
+       class as the header and every task row, so it gets the same sticky
+       behaviour, the same background AND the same 6px colour bar on its left
+       edge. That bar was the last of the difference: a rule of its own can
+       reproduce a width, but it reproduces it as a second number that has to
+       be kept in step. */
 
     .statistic-number {
         font-size: functions.rem(14px);

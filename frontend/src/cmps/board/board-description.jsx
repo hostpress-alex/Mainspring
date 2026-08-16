@@ -1,11 +1,36 @@
+import {useEffect, useState} from 'react'
+
 import { Icon } from '../icon'
 import {loadBoards, updateBoardMeta} from '../../store/board.actions';
 import {utilService} from '../../services/util.service';
 import { Avatar } from '../avatar'
 import {singleLineEditable} from '../../services/editable'
+import {RichTextEditor} from '../rich-text/rich-text-editor'
 import {t} from '../../i18n'
 
 export function BoardDescription({setIsShowDescription, board}){
+    const [description, setDescription] = useState(board.description || '')
+
+    // Another board opened behind this dialog — follow it rather than keep
+    // showing the previous text.
+    useEffect(() => {
+        setDescription(board.description || '')
+    }, [board._id])
+
+    /**
+     * The description is saved when the editor loses focus, not on every
+     * keystroke. Saving per keystroke would be one request per letter, and
+     * the board answer would arrive back mid-typing.
+     */
+    async function onSaveDescription(){
+        if(description === (board.description || '')) return
+        try {
+            await updateBoardMeta(board._id, {description})
+            loadBoards()
+        } catch(err) {
+            console.error('saving the description failed', err)
+        }
+    }
 
     async function onSave(ev){
         let value = ev.target.innerText
@@ -34,10 +59,13 @@ export function BoardDescription({setIsShowDescription, board}){
                         <h1>{board.title}</h1>
                     </blockquote>
                 </div>
-                <div className="board-edit-description">
-                    <blockquote onBlur={onSave} id="description" contentEditable suppressContentEditableWarning={true}>
-                        <p>{board.description || ' '}</p>
-                    </blockquote>
+                <div className="board-edit-description" onBlur={onSaveDescription}>
+                    <RichTextEditor
+                        value={description}
+                        members={board.members}
+                        placeholder={t('board.descriptionPlaceholder')}
+                        onChange={setDescription}
+                    />
                 </div>
             </div>
             <div className="board-info flex column">

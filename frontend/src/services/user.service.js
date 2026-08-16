@@ -1,6 +1,7 @@
 // import { storageService } from './async-storage.service'
 import {httpService} from './http.service'
 import {socketService} from './socket.service'
+import {rememberLanguage} from '../i18n'
 
 const STORAGE_KEY_LOGGEDIN_USER = 'loggedinUser'
 const BASE_URL = 'user/'
@@ -74,9 +75,14 @@ function saveLocalUser(user){
         username: user.username,
         fullname: user.fullname,
         imgUrl: user.imgUrl,
-        isAdmin: user.isAdmin === true
+        isAdmin: user.isAdmin === true,
+        language: user.language || ''
     }
     sessionStorage.setItem(STORAGE_KEY_LOGGEDIN_USER, JSON.stringify(user))
+    // The account decides the language; this browser keeps a copy so that the
+    // next load has one before anything is fetched. Nothing switches here —
+    // whoever wants the page to change says so.
+    rememberLanguage(user.language)
     return user
 }
 

@@ -161,6 +161,16 @@
         margin-bottom: 0;
     }
 
+    // a select is not an input: without this it keeps the browser's own font
+    // and height and sits a few pixels off every field above it
+    .profile-select {
+        appearance: none;
+        background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23676879' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
+        padding-right: 32px;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
     // the username cannot be changed and should not look as if it could
     .profile-input.is-locked {
         background: #f6f7fb;

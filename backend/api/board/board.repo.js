@@ -44,6 +44,8 @@ const COLUMN_OWN = new Set(['id', 'type', 'title', 'field'])
 // else lands in the col_values JSON — which is why `subtasks` has to be listed
 // here: without it the children would be serialised into their parent's JSON
 // as well as being rows, and the two copies would drift apart within a day.
+const ROLE_NAMES = new Set(['owner', 'editor', 'viewer'])
+
 const TASK_OWN = new Set(['id', 'title', 'memberIds', 'comments', 'subtasks'])
 
 function buildColumn(row){
@@ -168,14 +170,21 @@ async function assemble(k, boardRows){
                 imgUrl: row.created_by_img || ''
             },
             labels: parseJson(row.labels, []) || [],
-            members: mem.map(m => ({_id: m.user_id, fullname: m.fullname, imgUrl: m.img_url})),
-            ownerIds: mem.filter(m => m.is_owner).map(m => m.user_id),
+            members: mem.map(m => ({
+                _id: m.user_id, fullname: m.fullname, imgUrl: m.img_url,
+                // The role travels with the member rather than in a list of
+                // its own — a second list would have to be kept in step, and
+                // the one place that forgets is a permission hole.
+                role: m.role || (m.is_owner?'owner':'editor')
+            })),
+            ownerIds: mem.filter(m => m.is_owner || m.role === 'owner').map(m => m.user_id),
             columns: (columnsByBoard.get(row.id) || []).map(buildColumn),
             groups: (groupsByBoard.get(row.id) || []).map(g => ({
                 id: g.id,
                 title: g.title === null?'':g.title,
                 color: g.color || '',
                 icon: g.icon || '',
+                createdBy: g.created_by || null,
                 archivedAt: g.archived_at === null?null:Number(g.archived_at),
                 tasks: (tasksOfBoard.get(g.id) || []).map(t => toTask(t, true))
             })),
@@ -378,6 +387,7 @@ async function writeGroup(trx, boardId, group, position){
         title: (group && group.title) || '',
         color: (group && group.color) || '',
         icon: sanitizeIcon(group && group.icon),
+        created_by: (group && group.createdBy)?sid(group.createdBy):null,
         archived_at: Number.isFinite(Number(group && group.archivedAt))?Number(group.archivedAt):null
     }).onConflict(['board_id', 'id']).merge()
     return id
@@ -411,9 +421,14 @@ async function writeMembers(trx, boardId, members, ownerIds){
         const userId = sid(m._id)
         if(seen.has(userId)) return
         seen.add(userId)
+        // The role is the truth; is_owner is written alongside it because the
+        // socket layer and a few queries still read the boolean. One of them
+        // being stale is a permission hole, so they are set together, here,
+        // and nowhere else.
+        const role = ROLE_NAMES.has(m.role)?m.role:(owners.has(userId)?'owner':'editor')
         rows.push({
             board_id: boardId, user_id: userId, position: i,
-            is_owner: owners.has(userId),
+            role, is_owner: role === 'owner',
             fullname: m.fullname || '', img_url: m.imgUrl || ''
         })
     })
@@ -490,22 +505,53 @@ async function setColumns(boardId, columns){
     })
 }
 
+/**
+ * The member list, with roles.
+ *
+ * A member arriving without a role keeps the one they had — an invite dialog
+ * that only sends names must not silently demote everybody to editor. Somebody
+ * genuinely new and unnamed becomes an editor.
+ */
 async function setMembers(boardId, members){
     await tx(async trx => {
         const id = await requireBoardRow(trx, boardId)
-        const current = await trx('board_member').where({board_id: id}).select('user_id', 'is_owner')
-        const owners = current.filter(r => r.is_owner).map(r => r.user_id)
-        await writeMembers(trx, id, members, owners)
+        const current = await trx('board_member').where({board_id: id}).select('user_id', 'is_owner', 'role')
+        const before = new Map(current.map(r => [r.user_id, r.role || (r.is_owner?'owner':'editor')]))
+
+        const withRoles = (members || []).filter(m => m && m._id).map(m => ({
+            ...m,
+            role: ROLE_NAMES.has(m.role)?m.role:(before.get(sid(m._id)) || 'editor')
+        }))
+        await writeMembers(trx, id, withRoles, [])
     })
 }
 
+/** One person's role. The only way to change a role on its own. */
+async function setMemberRole(boardId, userId, role){
+    if(!ROLE_NAMES.has(role)) throw httpError(400, 'Unbekannte Rolle')
+    const id = checkBoardId(boardId)
+    const count = await db()('board_member')
+        .where({board_id: id, user_id: sid(userId)})
+        .update({role, is_owner: role === 'owner'})
+    if(!count) throw httpError(404, 'Mitglied nicht gefunden')
+}
+
+/**
+ * Who the owners are. Everyone else keeps the role they had, except that
+ * somebody who WAS an owner and is no longer one becomes an editor — there is
+ * no earlier role to fall back to, and dropping them to viewer would lock them
+ * out of work they were doing a second ago.
+ */
 async function setOwners(boardId, ownerIds){
     await tx(async trx => {
         const id = await requireBoardRow(trx, boardId)
         const wanted = (ownerIds || []).map(sid)
-        await trx('board_member').where({board_id: id}).update({is_owner: false})
+
+        await trx('board_member').where({board_id: id}).where('role', 'owner')
+            .update({role: 'editor', is_owner: false})
         if(wanted.length){
-            await trx('board_member').where({board_id: id}).whereIn('user_id', wanted).update({is_owner: true})
+            await trx('board_member').where({board_id: id}).whereIn('user_id', wanted)
+                .update({role: 'owner', is_owner: true})
         }
     })
 }
@@ -821,7 +867,7 @@ async function addActivity(boardId, activity){
 
 module.exports = {
     findById, findForUser, insert, deleteById,
-    updateMeta, setColumns, setMembers, setOwners,
+    updateMeta, setColumns, setMembers, setMemberRole, setOwners,
     addGroup, removeGroup, updateGroupMeta, replaceGroup, reorderGroups,
     addTask, addSubtask, setSubtasks, setTaskParent, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,
     addActivity,

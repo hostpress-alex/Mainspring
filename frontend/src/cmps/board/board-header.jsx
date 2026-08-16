@@ -7,6 +7,8 @@ import {useNavigate} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 import {Tooltip} from '@mui/material'
 import {singleLineEditable} from '../../services/editable'
+import {RichTextView} from '../rich-text/rich-text-view'
+import {boardService} from '../../services/board.service'
 import {t} from '../../i18n'
 
 export function BoardHeader({
@@ -46,17 +48,28 @@ export function BoardHeader({
         closeDynamicModal()
     }
 
+    const me = useSelector(storeState => storeState.userModule.user)
+    // The board's own name and description are the frame — owner only.
+    const canManage = boardService.canManageBoard(board, me)
+
     if(!board.members) return <div></div>
     return (
         <header className="board-header">
             <section className="board-title flex align-center space-around">
                 <div className="board-info flex">
-                    <Tooltip title={t('board.clickToEdit')} arrow>
-                        <blockquote contentEditable onBlur={onSave} suppressContentEditableWarning={true}
-                                    {...singleLineEditable()}>
-                            <h1>{board.title}</h1>
-                        </blockquote>
-                    </Tooltip>
+                    {/* Editable only for whoever may actually save it. A
+                        contentEditable that quietly loses the change on blur is
+                        worse than a heading that is plainly not editable. */}
+                    {canManage?(
+                        <Tooltip title={t('board.clickToEdit')} arrow>
+                            <blockquote contentEditable onBlur={onSave} suppressContentEditableWarning={true}
+                                        {...singleLineEditable()}>
+                                <h1>{board.title}</h1>
+                            </blockquote>
+                        </Tooltip>
+                    ):(
+                        <blockquote><h1>{board.title}</h1></blockquote>
+                    )}
                     <Tooltip title={t('board.showDescription')} arrow>
                         <div className="info-btn icon" onClick={() => setIsShowDescription(true)}>
                             <Icon name='circle-exclamation'/>
@@ -70,8 +83,15 @@ export function BoardHeader({
                 </div>
             </section>
             <div className="board-description flex">
-                {board.description && <p className="board-description-link">{board.description}
-                    <span onClick={() => setIsShowDescription(true)}>{t('board.more')}</span></p>}
+                {board.description && (
+                    <div className="board-description-link">
+                        {/* Rendered, not printed. It used to be dropped into a
+                            <p> as a string, which was fine while it WAS a
+                            string and shows the tags now that it is markup. */}
+                        <RichTextView value={board.description}/>
+                        <span onClick={() => setIsShowDescription(true)}>{t('board.more')}</span>
+                    </div>
+                )}
             </div>
             <div className="board-display-btns flex">
                 <Tooltip title={t('board.table')} arrow>

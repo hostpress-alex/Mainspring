@@ -502,6 +502,17 @@ export async function setTaskParentAction(filteredBoard, groupId, taskId, parent
     _applyBoard(await boardService.setTaskParent(filteredBoard._id, groupId, taskId, parentId, index))
 }
 
+/**
+ * Change one person's role on a board.
+ *
+ * The server answers with the whole board, so the member list, everyone's
+ * rights and every control that depends on them update in one go — there is no
+ * moment where the screen shows the old role and the new rules.
+ */
+export async function setMemberRoleAction(boardId, userId, role){
+    _applyBoard(await boardService.setMemberRole(boardId, userId, role))
+}
+
 export async function updateTaskAction(filteredBoard, groupId, saveTask, activity){
     try {
         const boardId = filteredBoard._id

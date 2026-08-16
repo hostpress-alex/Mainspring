@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from 'react'
 import {toLocalInput, fromLocalInput, fmtDuration, MS_MIN} from '../../services/date.util'
 import {confirmDelete} from '../confirm-dialog'
+import {RichTextEditor} from '../rich-text/rich-text-editor'
 import {t} from '../../i18n'
 
 const PRESETS = [30, 60, 90, 120, 240, 480]
@@ -167,7 +168,15 @@ export function EntryDialog({draft, tasks, onSave, onDelete, onClose, busy}){
 
                     <div className="cal-field">
                         <label htmlFor="cal-note">{t('calendar.note')}</label>
-                        <textarea id="cal-note" rows={2} maxLength={500} value={note} onChange={e => setNote(e.target.value)}/>
+                        {/* No maxLength any more: it counted characters of
+                            plain text and would now count markup, so a note
+                            with a list would be cut off mid-tag. The column
+                            is the limit that matters and it is checked there. */}
+                        <RichTextEditor
+                            value={note}
+                            placeholder={t('calendar.note')}
+                            onChange={setNote}
+                        />
                     </div>
                 </div>
 

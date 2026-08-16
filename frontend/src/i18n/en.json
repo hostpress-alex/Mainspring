@@ -57,6 +57,7 @@
         "delete":          "Delete board",
         "deleteName":      "The board “{title}”",
         "deleteNote":      "All groups, tasks, updates and calendar entries of this board go with it.",
+        "descriptionPlaceholder": "What is this board about?",
         "duplicate":       "Duplicate board",
         "empty":           "Nothing here yet.",
         "emptyHint":       "Create your first board — or wait for an owner to invite you to one.",
@@ -249,6 +250,13 @@
             "other": "{n} tasks use this label"
         }
     },
+    "language": {
+        "hint":   "Applies to your account, so the interface follows you into every browser you log in from.",
+        "name":   "English",
+        "saved":  "Language saved.",
+        "select": "Interface language",
+        "title":  "Language"
+    },
     "login":    {
         "fullName":     "Full name",
         "haveAccount":  "Already have an account?",
@@ -264,6 +272,7 @@
         "username":     "Username"
     },
     "member":   {
+        "ownerOnly":   "Only owners of this board can change members and roles.",
         "removeNote":  "The person loses access to the board and is removed from all tasks.",
         "removed":     "Member removed.",
         "search":      "Search names",
@@ -345,6 +354,29 @@
         "uploadPicture":    "Upload profile picture",
         "usernameFixed":    "Username (cannot be changed)"
     },
+    "richtext": {
+        "toolbar":     "Text formatting",
+        "bold":        "Bold",
+        "italic":      "Italic",
+        "strike":      "Strikethrough",
+        "heading":     "Heading {n}",
+        "bulletList":  "Bullet list",
+        "orderedList": "Numbered list",
+        "taskList":    "Checklist",
+        "quote":       "Quote",
+        "code":        "Code",
+        "codeBlock":   "Code block",
+        "rule":        "Divider",
+        "link":        "Link"
+    },
+    "role":     {
+        "owner":        "Owner",
+        "editor":       "Editor",
+        "viewer":       "Viewer",
+        "forNew":       "Role for new members",
+        "lastOwner":    "A board needs at least one owner",
+        "changeFailed": "The role could not be changed"
+    },
     "task":     {
         "add":            "+ Add task",
         "addSubtask":     "+ Add a subtask",
@@ -397,6 +429,7 @@
         "deleteNote":       "The replies to it go with it.",
         "deleteReply":      "Delete reply",
         "discard":          "Discard",
+        "dropFiles":        "Drop files here",
         "none":             "No updates on this task yet",
         "placeholder":      "Write an update — you can paste images with Ctrl+V",
         "replies":          "Replies",

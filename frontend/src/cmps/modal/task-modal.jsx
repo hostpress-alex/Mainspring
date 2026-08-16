@@ -9,8 +9,6 @@ import {boardService} from '../../services/board.service'
 import {singleLineEditable} from '../../services/editable'
 import {utilService} from '../../services/util.service'
 import {CommentPreview} from '../task/comment-preview'
-import {MentionTextarea} from '../mention/mention-textarea'
-import {toStorage} from '../../services/mention'
 import {ActivityPreview} from '../activity-preview'
 import {ErrorBoundary} from '../error-boundary'
 import {
@@ -20,8 +18,11 @@ import {
     SOCKET_EVENT_ADD_MSG
 } from '../../services/socket.service'
 import noUpdate from '../../assets/img/empty-update.png'
-import {uploadFile, imagesFromClipboard} from '../../services/upload.service'
+import {uploadFile} from '../../services/upload.service'
 import {AttachmentStrip} from '../task/attachment-strip'
+import {RichTextEditor} from '../rich-text/rich-text-editor'
+import {isEmpty as isRichEmpty} from '../../services/rich-text'
+import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
 
 export function TaskModal({task, board, groupId, setModalCurrTask}){
@@ -33,8 +34,6 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
     const [currTask, setCurrTask] = useState(task)
     const [isUploading, setIsUploading] = useState(false)
     const [uploadErr, setUploadErr] = useState(null)
-    const elFileInput = useRef()
-    const elTextarea = useRef()
     const navigate = useNavigate()
 
     // When switching to another task the local state has to follow —
@@ -45,11 +44,6 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         setIsWriteNewUpdate(false)
     }, [task])
 
-    // Whoever clicks "Write an update" wants to write — not click into the
-    // einmal ins Feld klicken muessen.
-    useEffect(() => {
-        if(isWriteNewUpdate) elTextarea.current?.focus()
-    }, [isWriteNewUpdate])
 
     useEffect(() => {
         loadTaskActivity()
@@ -137,12 +131,13 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
 
     async function onAddComment(){
         if(isUploading) return
-        if(!comment.txt.trim() && !(comment.attachments || []).length) return
+        if(isRichEmpty(comment.txt) && !(comment.attachments || []).length) return
         try {
             comment.id = utilService.makeId()
-            // Shown form -> stored form, at the last possible moment. Up to
-            // here the text is what the user sees; from here it carries ids.
-            comment.txt = toStorage(comment.txt, board.members)
+            // No conversion step any more. The editor writes a mention as a
+            // node with the id already in it, so there is no "shown form" that
+            // has to be matched against the member list at the last moment —
+            // and with it goes the case of two members with the same name.
             if(user){
                 comment.byMember.fullname = user.fullname
                 comment.byMember.imgUrl = user.imgUrl
@@ -179,52 +174,35 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         setComment(boardService.getEmptyComment())
     }
 
-    async function addFiles(files){
-        const list = Array.from(files || [])
-        if(!list.length) return
+    /**
+     * Store one file and hand it back.
+     *
+     * Only stores. Whether the result belongs in the text or under it is the
+     * editor's decision — it knows where the cursor was, and it is the one
+     * that can tell an image from a spreadsheet without this component
+     * learning about MIME types.
+     */
+    async function onUploadFile(file){
         setUploadErr(null)
         setIsUploading(true)
         try {
-            for(const file of list){
-                const saved = await uploadFile(file, {scope: 'task', taskId: currTask.id, name: file.name})
-                setComment(prev => ({
-                    ...prev,
-                    attachments: [...(prev.attachments || []), {
-                        ...saved,
-                        name: saved.name || file.name || t('file.file')
-                    }]
-                }))
-            }
+            const saved = await uploadFile(file, {scope: 'task', taskId: currTask.id, name: file.name})
+            return {...saved, name: saved.name || file.name || t('file.file')}
         } catch(err) {
             setUploadErr(err.message || t('file.uploadFailed'))
+            return null
         } finally {
             setIsUploading(false)
         }
     }
 
-    /** Ctrl+V in the update area: attach images from the clipboard. */
-    async function onPasteUpdate(ev){
-        const blobs = imagesFromClipboard(ev)
-        if(!blobs.length) return
-        ev.preventDefault()
-        await addFiles(blobs)
+    /** Everything that is not an image is listed under the comment. */
+    function onAttachFile(saved){
+        setComment(prev => ({...prev, attachments: [...(prev.attachments || []), saved]}))
     }
 
-    async function onPickFiles(ev){
-        const input = ev.target
-        const files = input.files
-        if(!files || !files.length) return
-        try {
-            await addFiles(files)
-        } finally {
-        // Only after the work is done. Clearing the input detaches the File
-        // from the data behind it — the object is still there, what it points
-        // at is not — and the read then fails with InvalidStateError.
-        // Clearing at all is on purpose: without it, picking the same file
-        // twice in a row fires no change event.
-            input.value = ''
-        }
-    }
+    /** Ctrl+V in the update area: attach images from the clipboard. */
+
 
     function onRemoveAttachment(id){
         setComment(prev => ({...prev, attachments: (prev.attachments || []).filter(a => a._id !== id)}))
@@ -244,27 +222,6 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         }
     }
 
-    function onChangeTextStyle(ev, styleKey, align){
-        ev.preventDefault()
-        const style = {...comment.style}
-        switch(styleKey) {
-            case 'fontStyle':
-                style.fontStyle = style.fontStyle === 'normal'?'italic':'normal'
-                break;
-            case 'fontWeight':
-                style.fontWeight = style[styleKey] === 'normal'?'bold':'normal'
-                break;
-            case 'textDecoration':
-                style[styleKey] = style[styleKey] === 'none'?'underline':'none'
-                break;
-            case 'textAlign':
-                style[styleKey] = align
-                break;
-            default:
-                return
-        }
-        setComment((prevComment) => ({...prevComment, style}))
-    }
 
     function handleChange({target}){
         let {value, name: field} = target
@@ -310,26 +267,26 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
             </ul>
         </ErrorBoundary>}
         {isShowUpdate && <section className="update">
-            {!isWriteNewUpdate &&
+            {/* A viewer may reply to an update but not start one — that is the
+                rule, and a box they cannot post from would only be a trap. */}
+            {!isWriteNewUpdate && boardRoles.canStartThread(board, user) &&
                 <span className="close-input-container flex align-center" onClick={() => setIsWriteNewUpdate(true)}>{t('update.write')}</span>}
-            {isWriteNewUpdate && <form className="input-container" onPaste={onPasteUpdate}>
-                <div className="style-txt">
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontWeight')}><Icon name='bold'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textDecoration')}><Icon name='underline'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontStyle')}>/</span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><Icon name='align-left'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><Icon name='align-center'/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><Icon name='align-right'/></span>
-                    <span title={t('update.attach')} className="update-attach-btn" onMouseDown={(ev) => {
-                        ev.preventDefault();
-                        elFileInput.current?.click()
-                    }}>
-                        <Icon name='paperclip'/>
-                    </span>
-                </div>
-                <MentionTextarea ref={elTextarea} name="txt" members={board.members} style={comment.style} value={comment.txt} placeholder={t('update.placeholder')} onBlur={close} onChange={handleChange}/>
-
-                <input ref={elFileInput} type="file" multiple accept="image/*,.pdf,.doc,.docx,.odt,.rtf,.xls,.xlsx,.ods,.csv,.ppt,.pptx,.odp,.txt,.md,.json,.xml,.zip,.7z" onChange={onPickFiles} className="update-file-input"/>
+            {isWriteNewUpdate && <form className="input-container" onSubmit={ev => ev.preventDefault()}>
+                {/* No paperclip. A file is dropped into the text or pasted.
+                    An image lands where it was dropped; everything else is
+                    listed under the comment as an attachment — a screenshot
+                    belongs next to the sentence it explains, a spreadsheet
+                    does not belong inside a paragraph. */}
+                <RichTextEditor
+                    value={comment.txt}
+                    members={board.members}
+                    placeholder={t('update.placeholder')}
+                    autoFocus
+                    onChange={txt => setComment(prev => ({...prev, txt}))}
+                    onSubmit={() => onAddComment()}
+                    onUpload={onUploadFile}
+                    onAttach={onAttachFile}
+                />
 
                 <AttachmentStrip attachments={comment.attachments} onRemove={onRemoveAttachment}/>
 
@@ -337,7 +294,7 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
                 {uploadErr && <p className="update-note is-error">{uploadErr}</p>}
             </form>}
             {isWriteNewUpdate && <div className="button-container">
-                <button className="save" onMouseDown={onAddComment} disabled={isUploading || (!comment.txt.trim() && !(comment.attachments || []).length)}>{t('update.update')}</button>
+                <button className="save" onMouseDown={onAddComment} disabled={isUploading || (isRichEmpty(comment.txt) && !(comment.attachments || []).length)}>{t('update.update')}</button>
                 <button className="cancel" onMouseDown={onDiscard}>{t('update.discard')}</button>
             </div>}
             <ErrorBoundary label={t('update.area')}>

@@ -7,7 +7,7 @@ import {useSelector} from 'react-redux'
 import {loadUsers, login, signup} from '../store/user.actions'
 import {loadBoards} from '../store/board.actions'
 import {useGoogleLogin} from '@react-oauth/google'
-import {t} from '../i18n'
+import {rememberLanguage, t} from '../i18n'
 
 export function LoginSignup(){
     const [credentials, setCredentials] = useState({username: '', password: '', fullname: ''})
@@ -63,19 +63,25 @@ export function LoginSignup(){
         ev.preventDefault()
         setErr(null)
         if(!credentials.username || !credentials.password) return
+        let user
         try {
             if(isSignup){
                 if(!credentials.fullname) return
-                await signup(credentials)
+                user = await signup(credentials)
             } else {
-                await login(credentials)
+                user = await login(credentials)
             }
         } catch(error) {
             setErr(readError(error, isSignup))
             return
         }
         // boards can still be empty on submit -> boards[0]._id used to throw here
-        navigate(from || '/', {replace: true})
+        const target = from || '/'
+        // An account whose language is not the one this browser was last used
+        // in needs the app built again, not a route change: every string was
+        // read when the modules were imported. Rare, and worth a full load.
+        if(rememberLanguage(user?.language)) window.location.assign(target)
+        else navigate(target, {replace: true})
     }
 
     function toggleSignup(){

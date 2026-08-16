@@ -157,44 +157,13 @@
             }
         }
 
+        /* Only the spacing is left. The blue outline, the fixed height, the
+           style bar and the textarea rules all described a plain textarea with
+           a formatting strip above it — the editor brings its own frame, and
+           the two together were the doubled border. */
         .input-container {
             margin-bottom: variables.$spacing-small;
-            outline: 1px solid variables.$board-btn;
-            border-radius: 4px;
             width: 100%;
-            height: 145px;
-
-            .style-txt {
-                width: 100%;
-                display: flex;
-                border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-
-                > * {
-                    @include mixins.center-flex();
-                    padding: variables.$spacing-xs variables.$spacing-small;
-                    cursor: pointer;
-                    border-radius: 4px;
-                    font-size: functions.rem(14px);
-                    text-align: center;
-                    margin: variables.$spacing-xs 2px variables.$spacing-xs variables.$spacing-xs;
-
-                    &:hover {
-                        background-color: variables.$workspace-hover;
-                    }
-                }
-            }
-
-            textarea {
-                width: 100%;
-                height: 75px;
-                padding: 0 18px;
-                border: 0;
-                resize: none;
-
-                &:focus-visible {
-                    outline: 0;
-                }
-            }
         }
 
         .no-updates {

@@ -99,6 +99,17 @@ async function update(user, requester){
             userToSave.imgUrl = user.imgUrl
         }
 
+        // Interface language. Checked for shape, not against a list of the
+        // languages that exist: the list of languages IS the set of files in
+        // frontend/src/i18n, and a second copy of it here would be a second
+        // place to forget. An unknown code is harmless — the frontend falls
+        // back to English for anything it cannot load. '' means "not chosen".
+        if(typeof user.language === 'string'){
+            const code = user.language.trim()
+            if(code && !/^[a-z]{2}(-[A-Z]{2})?$/.test(code)) throw httpError(400, 'Not a language code')
+            userToSave.language = code
+        }
+
         // Passwoerter werden IMMER gehasht. Vorher landete der Klartext in der DB.
         if(user.password){
             if(String(user.password).length < 8) throw httpError(400, 'Passwort muss mindestens 8 Zeichen haben')

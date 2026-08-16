@@ -44,18 +44,57 @@ const COMMENT_PREVIEW = 140
  */
 const MENTION_TOKEN = /@\[([^\]\n]+)\]\(([^)\s]+)\)/g
 
-/** The ids mentioned in a comment, each once. */
+/**
+ * A mention as the editor writes it: `<span data-type="mention" data-id="...">`.
+ * The attribute order is tiptap's and is stable, but the pattern does not rely
+ * on it — `data-id` is looked for anywhere inside the tag.
+ */
+const MENTION_NODE = /<span[^>]*\bdata-type="mention"[^>]*>/g
+const NODE_ID = /\bdata-id="([^"]+)"/
+
+/**
+ * The ids mentioned in a comment, each once.
+ *
+ * Both shapes, because both are in the database: the node the editor writes
+ * since rich text arrived, and the `@[Name](id)` token every comment written
+ * before that still carries. No migration ran, so this has to read both for
+ * as long as the old comments exist — which is forever.
+ */
 function mentionedIds(text){
+    const s = String(text || '')
     const out = new Set()
+
     MENTION_TOKEN.lastIndex = 0
     let match
-    while((match = MENTION_TOKEN.exec(String(text || ''))) !== null) out.add(match[2])
+    while((match = MENTION_TOKEN.exec(s)) !== null) out.add(match[2])
+
+    MENTION_NODE.lastIndex = 0
+    while((match = MENTION_NODE.exec(s)) !== null){
+        const id = NODE_ID.exec(match[0])
+        if(id) out.add(id[1])
+    }
     return [...out]
 }
 
-/** Stored form -> readable text, so a preview does not show the markup. */
+/**
+ * Stored form -> readable text, so a preview does not show the markup.
+ *
+ * Tags are stripped with a regular expression here, and that is safe for
+ * exactly one reason: the result is never put into a page. It goes into a
+ * notification row and is rendered as text. The frontend has a DOM-based
+ * version for anything that reaches the screen — stripping tags with a regex
+ * and then displaying the result is how the sanitizer gets bypassed.
+ */
 function toPlain(text){
-    return String(text || '').replace(MENTION_TOKEN, (_, name) => '@' + name)
+    return String(text || '')
+        .replace(MENTION_TOKEN, (_, name) => '@' + name)
+        // Block ends first, or "one</p><p>two" reads as "onetwo".
+        .replace(/<\/(p|div|li|h[1-6]|blockquote|pre)>/gi, ' ')
+        .replace(/<br\s*\/?>/gi, ' ')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+        .replace(/&quot;/gi, '"').replace(/&#39;/g, "'")
 }
 
 /* ------------------------------------------------------------ pure bits -- */

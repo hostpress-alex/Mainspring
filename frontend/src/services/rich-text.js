@@ -15,10 +15,15 @@ import DOMPurify from 'dompurify'
  * anything and the screen still cannot be attacked.
  *
  * The allowlist is deliberately small. It is exactly what the toolbar can
- * produce plus what pasting from Word survives as. Everything else is dropped:
- * no images (files go through the upload path, which checks types), no tables,
- * no styles and no classes — a `style` attribute is enough to cover the page
- * with an invisible clickable layer.
+ * produce plus what pasting from Word survives as. No tables, no styles and no
+ * classes — a `style` attribute is enough to cover the page with an invisible
+ * clickable layer.
+ *
+ * Images are allowed, but only OUR images. `src` has to point at this
+ * application's upload endpoint; anything else loses the tag. An `<img>` with
+ * a foreign address is a tracking pixel: it hands the reader's IP address and
+ * the moment they opened the comment to whoever wrote it, without asking. The
+ * upload path is also the only place a file's type is checked.
  */
 
 const ALLOWED_TAGS = [
@@ -27,32 +32,71 @@ const ALLOWED_TAGS = [
     'h1', 'h2', 'h3',
     'ul', 'ol', 'li',
     'blockquote', 'code', 'pre', 'hr',
-    'a',
+    'a', 'img',
     // The checklist, as tiptap writes it.
     'label', 'input', 'div', 'span'
 ]
 
 const ALLOWED_ATTR = [
     'href', 'target', 'rel',
+    'src', 'alt',
     // Checklist state and the mention, both read back when editing again.
-    'type', 'checked', 'disabled',
+    'type', 'checked', 'disabled', 'loading',
     'data-type', 'data-checked',
-    'data-mention-id', 'data-mention-label'
+    // A mention, in tiptap's own attribute names. Renaming these to something
+    // more readable breaks the extension's parser, which is what reads them
+    // back when a comment is edited again.
+    'data-id', 'data-label', 'data-mention-suggestion-char'
 ]
 
+/** Protocols a link may use. Everything else loses its href. */
+const SAFE_PROTOCOL = /^(?:https?:|mailto:|tel:|#|\/)/i
+
 /**
- * `javascript:` is the obvious one and DOMPurify already refuses it. This adds
- * the two things a project tool wants anyway: links always open in a new tab,
- * and always with `rel=noopener`, or the opened page can navigate the one it
- * came from through `window.opener`.
+ * The only address an image may have: a file this application stores.
+ *
+ * Deliberately the exact shape the upload endpoint hands out and not "anything
+ * relative" — a relative path can still be `/api/board/...`, and an `<img>`
+ * pointing at an endpoint that changes something is a way to make a reader
+ * perform it just by opening the comment.
+ */
+const OWN_UPLOAD = /^\/api\/upload\/[a-f0-9]{32}$/i
+
+/**
+ * What DOMPurify does not do by itself.
+ *
+ * The protocol check lives HERE and not in `ALLOWED_URI_REGEXP`, and that is
+ * not a matter of taste. That option is not applied to URLs — it is applied to
+ * every attribute value that is not on DOMPurify's internal list of harmless
+ * attribute names. Setting it deleted `data-type="taskList"`, `data-id="u1"`
+ * and `checked`, because none of those look like a URL. The result was an
+ * editor that saved a mention and read back "@null", and a checklist whose
+ * ticks were gone — no error, just quietly emptied attributes. Found by a test
+ * that put a comment through the whole loop, not by looking at the screen.
+ *
+ * The rest is what a project tool wants anyway: links open in a new tab, and
+ * always with `rel=noopener`, or the opened page can navigate the one it came
+ * from through `window.opener`.
  */
 let isHooked = false
 function ensureHooks(){
     if(isHooked) return
     DOMPurify.addHook('afterSanitizeAttributes', node => {
         if(node.tagName === 'A' && node.hasAttribute('href')){
-            node.setAttribute('target', '_blank')
-            node.setAttribute('rel', 'noopener noreferrer nofollow')
+            const href = node.getAttribute('href').replace(/[\u0000-\u0020]/g, '')
+            if(!SAFE_PROTOCOL.test(href)){
+                node.removeAttribute('href')
+            } else {
+                node.setAttribute('target', '_blank')
+                node.setAttribute('rel', 'noopener noreferrer nofollow')
+            }
+        }
+        if(node.tagName === 'IMG'){
+            const src = (node.getAttribute('src') || '').replace(/[\u0000-\u0020]/g, '')
+            // The whole tag goes, not just the src: an <img> without one draws
+            // a broken-image icon and says nothing about why.
+            if(!OWN_UPLOAD.test(src)) node.remove()
+            else node.setAttribute('loading', 'lazy')
         }
         // A checkbox in a stored comment is a picture of a state, not a
         // control. Editing happens in the editor, where tiptap owns it.
@@ -70,10 +114,10 @@ export function sanitize(html){
     return DOMPurify.sanitize(String(html || ''), {
         ALLOWED_TAGS,
         ALLOWED_ATTR,
-        ALLOW_DATA_ATTR: false,
-        // Keeps `javascript:`/`data:` out of href without an allowlist of
-        // protocols that forgets one.
-        ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:|#|\/)/i
+        // Left at the default on purpose — see the hook above for why
+        // narrowing it is a trap. `data-` attributes are listed one by one in
+        // ALLOWED_ATTR rather than opened up wholesale.
+        ALLOW_DATA_ATTR: false
     })
 }
 
@@ -107,12 +151,33 @@ export function fromLegacy(text){
     if(HTML_LIKE.test(s)) return s
 
     const withMentions = escapeHtml(s).replace(MENTION_TOKEN,
-        (_, name, id) => `<span data-mention-id="${escapeHtml(id)}" data-mention-label="${escapeHtml(name)}">@${escapeHtml(name)}</span>`)
+        (_, name, id) => `<span data-type="mention" data-id="${escapeHtml(id)}" data-label="${escapeHtml(name)}">@${escapeHtml(name)}</span>`)
 
     return withMentions
         .split(/\n{2,}/)
         .map(block => `<p>${block.replace(/\n/g, '<br>')}</p>`)
         .join('')
+}
+
+/**
+ * Drop the empty paragraphs a document ends with.
+ *
+ * ProseMirror keeps a trailing empty paragraph so there is always somewhere to
+ * put the cursor below the last block. That is right in the editor and wrong
+ * in the database: every comment would carry a `<p></p>` and every one of them
+ * is a blank line under the text when it is read back.
+ *
+ * Only at the END. An empty paragraph in the middle is a blank line somebody
+ * typed on purpose.
+ */
+export function trimTrailingEmpty(html){
+    let out = String(html || '')
+    let before
+    do {
+        before = out
+        out = out.replace(/(?:<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>)+$/i, '')
+    } while(out !== before)
+    return out
 }
 
 /** Stored value -> what may be put on screen. The only path to the DOM. */
@@ -167,7 +232,7 @@ export function mentionedIds(value){
 
     // The stored form of a mention, in both shapes: the node the editor writes
     // and the token older comments carry.
-    for(const match of html.matchAll(/data-mention-id="([^"]+)"/g)) ids.add(match[1])
+    for(const match of html.matchAll(/data-type="mention"[^>]*?data-id="([^"]+)"/g)) ids.add(match[1])
     for(const match of String(value || '').matchAll(MENTION_TOKEN)) ids.add(match[2])
     return [...ids]
 }

@@ -55,18 +55,51 @@ export function availableLanguages(){
 }
 
 /**
+ * What a language calls itself.
+ *
+ * Read out of the language's own file, so German is offered as "Deutsch" and
+ * not as "German" — somebody who needs to switch to German is, by definition,
+ * not reading the current language comfortably. It also means a new language
+ * brings its own name along and no map here has to be extended.
+ */
+export function languageName(code){
+    return lookUp(LANGUAGES[code], 'language.name') || code
+}
+
+/**
+ * Note the language of the account in this browser, without switching now.
+ *
+ * The account is where the choice is kept; localStorage is a copy of it. The
+ * copy has to exist because a language must be picked before React renders
+ * and before any request has come back — reading it from the account at that
+ * moment would show every page in the wrong language first.
+ *
+ * Returns true if what is on screen is now out of date, which is the caller's
+ * cue to load the page again rather than navigate within it.
+ */
+export function rememberLanguage(code){
+    if(!code || !LANGUAGES[code]) return false
+    try {
+        localStorage.setItem(STORAGE_KEY, code)
+    } catch(err) { /* never mind */
+    }
+    return code !== current
+}
+
+/**
  * Switch language.
  *
  * Reloads the page instead of threading a provider through the whole tree.
  * Switching happens once a year — that does not justify a rebuild in which
  * every component hangs off a context.
+ *
+ * Does nothing when the page is already in that language. Saving the choice
+ * to the account is the caller's job and has to happen first — this call may
+ * not return.
  */
 export function setLanguage(code){
     if(!LANGUAGES[code] || code === current) return
-    try {
-        localStorage.setItem(STORAGE_KEY, code)
-    } catch(err) { /* never mind */
-    }
+    rememberLanguage(code)
     window.location.reload()
 }
 

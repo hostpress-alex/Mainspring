@@ -57,6 +57,7 @@
         "delete":          "Board löschen",
         "deleteName":      "Das Board „{title}“",
         "deleteNote":      "Alle Gruppen, Tasks, Updates und Kalendereinträge dieses Boards gehen mit.",
+        "descriptionPlaceholder": "Worum geht es in diesem Board?",
         "duplicate":       "Board duplizieren",
         "empty":           "Hier ist noch nichts.",
         "emptyHint":       "Leg dein erstes Board an — oder lass dich von einem Owner zu einem bestehenden einladen.",
@@ -249,6 +250,13 @@
             "other": "{n} Tasks benutzen dieses Label"
         }
     },
+    "language": {
+        "hint":   "Gilt für dein Konto — die Oberfläche folgt dir in jeden Browser, in dem du dich anmeldest.",
+        "name":   "Deutsch",
+        "saved":  "Sprache gespeichert.",
+        "select": "Sprache der Oberfläche",
+        "title":  "Sprache"
+    },
     "login":    {
         "fullName":     "Vollständiger Name",
         "haveAccount":  "Du hast schon ein Konto?",
@@ -264,6 +272,7 @@
         "username":     "Benutzername"
     },
     "member":   {
+        "ownerOnly":   "Nur Owner dieses Boards können Mitglieder und Rollen ändern.",
         "removeNote":  "Die Person verliert den Zugriff auf das Board und wird aus allen Tasks ausgetragen.",
         "removed":     "Mitglied entfernt.",
         "search":      "Namen suchen",
@@ -345,6 +354,29 @@
         "uploadPicture":    "Profilbild hochladen",
         "usernameFixed":    "Benutzername (nicht änderbar)"
     },
+    "richtext": {
+        "toolbar":     "Textformatierung",
+        "bold":        "Fett",
+        "italic":      "Kursiv",
+        "strike":      "Durchgestrichen",
+        "heading":     "Überschrift {n}",
+        "bulletList":  "Aufzählung",
+        "orderedList": "Nummerierte Liste",
+        "taskList":    "Checkliste",
+        "quote":       "Zitat",
+        "code":        "Code",
+        "codeBlock":   "Code-Block",
+        "rule":        "Trennlinie",
+        "link":        "Link"
+    },
+    "role":     {
+        "owner":        "Owner",
+        "editor":       "Editor",
+        "viewer":       "Viewer",
+        "forNew":       "Rolle für neue Mitglieder",
+        "lastOwner":    "Ein Board braucht mindestens einen Owner",
+        "changeFailed": "Die Rolle konnte nicht geändert werden"
+    },
     "task":     {
         "add":            "+ Task hinzufügen",
         "addSubtask":     "+ Subtask hinzufügen",
@@ -397,6 +429,7 @@
         "deleteNote":       "Die Antworten darauf verschwinden mit.",
         "deleteReply":      "Antwort löschen",
         "discard":          "Verwerfen",
+        "dropFiles":        "Dateien hier ablegen",
         "none":             "Noch keine Updates zu diesem Task",
         "placeholder":      "Update schreiben — Bilder kannst du mit Strg+V einfügen",
         "replies":          "Antworten",

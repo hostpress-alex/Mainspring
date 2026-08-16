@@ -72,8 +72,41 @@
         color: variables.$workspace-icon-color;
 
         &-link {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            min-width: 0;
             font-weight: 400;
             font-size: functions.rem(14px);
+
+            /* Two lines and no more. The description belongs to the board and
+               may be long; the header is a strip. Everything past the second
+               line is behind "Mehr", which opens the whole thing.
+
+               line-clamp needs a block box, so the flow rules the rich text
+               brings elsewhere are turned off here rather than fought with. */
+            .rich-text {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                min-width: 0;
+            }
+
+            /* Inside two lines a heading is a heading in name only, and the
+               spacing between blocks would eat one of the two lines. */
+            .rich-text :is(p, h1, h2, h3, ul, ol, blockquote, pre) {
+                display: inline;
+                margin: 0;
+                padding: 0;
+                border: 0;
+                font-size: inherit;
+                font-weight: inherit;
+            }
+
+            .rich-text li::after { content: ' '; }
+            .rich-text hr { display: none; }
         }
 
         span {

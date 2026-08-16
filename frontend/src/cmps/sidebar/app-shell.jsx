@@ -1,9 +1,10 @@
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {MainSidebar} from './main-sidebar'
 import {WorkspaceSidebar} from './workspace-sidebar'
 import {LoginLogoutModal} from '../modal/login-logout-modal'
 import {CreateBoard} from '../modal/create-board'
 import {DynamicModal} from '../modal/dynamic-modal'
+import {useWorkspaceOpen} from '../../customHooks/useWorkspaceOpen'
 
 /**
  * Frame for all pages outside the board view: main bar, below it the board
@@ -16,13 +17,7 @@ import {DynamicModal} from '../modal/dynamic-modal'
 export function AppShell({children, showBoards = true}){
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-    const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(
-        () => localStorage.getItem('workspaceOpen') !== 'false'
-    )
-
-    useEffect(() => {
-        localStorage.setItem('workspaceOpen', String(isWorkspaceOpen))
-    }, [isWorkspaceOpen])
+    const [isWorkspaceOpen, setIsWorkspaceOpen] = useWorkspaceOpen()
 
     return (
         <div className="app-shell">

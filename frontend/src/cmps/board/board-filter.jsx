@@ -8,6 +8,7 @@ import { Icon } from '../icon'
 import {useSelector} from 'react-redux'
 import {Tooltip} from '@mui/material'
 import { Avatar } from '../avatar'
+import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
 
 /** How many faces fit before it turns into a "+3". */
@@ -49,6 +50,11 @@ export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
         navigate(`/board/${board._id}/${type}`)
     }
 
+    // Adding a group and adding a task are both editor work — see
+    // services/board-roles.js.
+    const me = useSelector(storeState => storeState.userModule.user)
+    const canManage = boardRoles.canEdit(board, me)
+
     function onToggleMenuModal(){
         const isOpen = dynamicModalObj?.type === 'add-group'?!dynamicModalObj.isOpen:true
         const {x, y, height} = elBoardFilter.current.getClientRects()[0]
@@ -75,14 +81,17 @@ export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
 
     return (
         <section ref={elBoardFilter} className="board-filter flex align-center">
-            <Tooltip title={t('task.createNew')} arrow>
+            {canManage && <Tooltip title={t('task.createNew')} arrow>
                 <div className="add-btn">
                     <span className="new-task-btn" onClick={() => addTaskOnFirstGroup(board)}>{t('task.new')}</span>
-                    <div className="drop-down-btn" onClick={onToggleMenuModal}>
-                        <Icon name='angle-down' className="icon"/>
-                    </div>
+                    {/* The arrow is only "add a group", which is structure. */}
+                    {canManage && (
+                        <div className="drop-down-btn" onClick={onToggleMenuModal}>
+                            <Icon name='angle-down' className="icon"/>
+                        </div>
+                    )}
                 </div>
-            </Tooltip>
+            </Tooltip>}
             <div className="board-tools flex align-center">
                 <Tooltip title={t('common.search')} arrow>
                     <div className="search-task">
