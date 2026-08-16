@@ -33,7 +33,7 @@
     // The editor floats over the row below, hence the shadow and the z-index.
     .longtext-box {
         position: absolute;
-        z-index: 40;
+        z-index: var(--z-popover);
         top: 100%;
         left: 0;
         width: 280px;

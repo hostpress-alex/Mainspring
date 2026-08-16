@@ -31,6 +31,7 @@ const userRoutes = require('./api/user/user.routes')
 const boardRoutes = require('./api/board/board.routes')
 const uploadRoutes = require('./api/upload/upload.routes')
 const scheduleRoutes = require('./api/schedule/schedule.routes')
+const notificationRoutes = require('./api/notification/notification.routes')
 const {setupSocketAPI} = require('./services/socket.service')
 
 // routes
@@ -42,6 +43,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/board', boardRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/schedule', scheduleRoutes)
+app.use('/api/notification', notificationRoutes)
 setupSocketAPI(http)
 
 app.get('/*splat', (req, res) => {

@@ -1,6 +1,17 @@
 const logger = require('../../services/logger.service')
 const asyncLocalStorage = require('../../services/als.service')
 const boardRepo = require('./board.repo')
+
+/**
+ * Loaded on use, not at the top.
+ *
+ * notification.service reaches socket.service, which reaches this file. A
+ * plain require at the top would hand socket.service the exports object as it
+ * looks halfway through loading — which is to say empty, because
+ * module.exports is assigned at the bottom. require caches, so this costs a
+ * lookup and nothing else.
+ */
+const notifications = () => require('../notification/notification.service')
 const userRepo = require('../user/user.repo')
 
 /** Wirft einen Fehler, den der Controller auf einen HTTP-Status abbilden kann. */
@@ -17,15 +28,10 @@ function getLoggedinUser(){
 
 const sid = v => (v === undefined || v === null)?'':String(v)
 
-/**
- * Owner-Liste eines Boards. Faellt auf das alte Einzelfeld ownerId zurueck,
- * damit Boards aus der Zeit vor der Mehr-Owner-Umstellung weiter funktionieren.
- */
+/** Who owns a board. Ownership itself lives in board_member.is_owner. */
 function ownerIdsOf(board){
-    if(!board) return []
-    if(Array.isArray(board.ownerIds)) return board.ownerIds.map(sid)
-    if(board.ownerId) return [sid(board.ownerId)]
-    return []
+    if(!board || !Array.isArray(board.ownerIds)) return []
+    return board.ownerIds.map(sid)
 }
 
 function memberIdsOf(board){
@@ -76,32 +82,7 @@ async function enrichMembers(boards){
     return boards
 }
 
-/**
- * Spaltenmigration: board.cmpsOrder (feste Typliste) -> board.columns
- * ([{id, type, title, field}]). Idempotent, laeuft bei jedem Lesen und wird
- * beim naechsten Speichern mitgeschrieben.
- *
- * Migrierte Spalten behalten ihr angestammtes Task-Feld, damit Statistik,
- * Kanban und Filter unveraendert weiterlaufen. Neue Spalten legen ihren Wert
- * unter ihrer eigenen id ab — dadurch sind mehrere Spalten gleichen Typs moeglich.
- */
-const LEGACY_COLUMNS = {
-    'status-picker': {type: 'status', field: 'status', title: 'Status'},
-    'priority-picker': {type: 'priority', field: 'priority', title: 'Priority'},
-    'member-picker': {type: 'person', field: 'memberIds', title: 'Person'},
-    'date-picker': {type: 'date', field: 'dueDate', title: 'Date'},
-    'number-picker': {type: 'number', field: 'number', title: 'Zahlen'},
-    'file-picker': {type: 'file', field: 'file', title: 'Datei'},
-    'updated-picker': {type: 'updated', field: 'updatedBy', title: 'Zuletzt aktualisiert'}
-}
-
 const COL_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789'
-
-function makeColumnId(){
-    let id = 'c_'
-    for(let i = 0; i < 8; i++) id += COL_CHARS[Math.floor(Math.random() * COL_CHARS.length)]
-    return id
-}
 
 /* ----------------------------------------------------------------------
  * Label-Listen pro Spalte
@@ -189,25 +170,10 @@ function ensureColumnLabels(board){
     return board
 }
 
-function ensureColumns(board){
-    if(!board) return board
-    if(Array.isArray(board.columns) && board.columns.length) return board
-    const order = Array.isArray(board.cmpsOrder)?board.cmpsOrder:[]
-    board.columns = order.map(cmp => {
-        const key = String(cmp).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-        const legacy = LEGACY_COLUMNS[key]
-        if(legacy) return {id: makeColumnId(), ...legacy}
-        const id = makeColumnId()
-        return {id, type: 'text', title: String(cmp), field: id}
-    })
-    return board
-}
-
 async function query(filterBy = {}){
     const user = getLoggedinUser()
     try {
         const boards = await boardRepo.findForUser(user, filterBy)
-        boards.forEach(ensureColumns)
         boards.forEach(ensureColumnLabels)
         return await enrichMembers(boards)
     } catch(err) {
@@ -227,7 +193,6 @@ async function getById(boardId){
         const board = await _getByIdRaw(boardId)
         if(!board) throw httpError(404, 'Board not found')
         if(!hasAccess(board, user)) throw httpError(403, 'Kein Zugriff auf dieses Board')
-        ensureColumns(board)
         ensureColumnLabels(board)
         return await enrichMembers(board)
     } catch(err) {
@@ -256,13 +221,11 @@ async function add(board){
     try {
         if(!user) throw httpError(401, 'Not Authenticated')
         delete board._id
-        delete board.ownerId
         const uid = sid(user._id)
         board.ownerIds = [uid]
 
         // Der Ersteller muss auch Mitglied sein, sonst taucht er nicht in der
         // Mitgliederliste des Boards auf.
-        ensureColumns(board)
         if(!Array.isArray(board.members)) board.members = []
         if(!memberIdsOf(board).includes(uid)){
             board.members.push({_id: uid, fullname: user.fullname, imgUrl: user.imgUrl || ''})
@@ -338,6 +301,7 @@ async function setMembers(boardId, members){
     const orphanOwners = ownerIdsOf(board).filter(id => !memberIds.includes(id))
     if(orphanOwners.length) throw httpError(400, 'Owner koennen nicht als Mitglied entfernt werden')
     await boardRepo.setMembers(boardId, members)
+    await notifications().boardMembersChanged({board, members, actor: getLoggedinUser()})
     return await getById(boardId)
 }
 
@@ -397,6 +361,7 @@ async function addTask(boardId, groupId, task, index = null){
     _findGroup(board, groupId)
     if(!task || !task.id) throw httpError(400, 'task.id fehlt')
     await boardRepo.addTask(boardId, groupId, task, index)
+    await notifications().taskAdded({board, task, actor: getLoggedinUser()})
     return await getById(boardId)
 }
 
@@ -410,16 +375,22 @@ async function removeTask(boardId, groupId, taskId){
 /** Der haeufigste Schreibvorgang ueberhaupt: einzelne Felder eines Tasks. */
 async function updateTaskFields(boardId, groupId, taskId, patch){
     const board = await _requireBoard(boardId)
-    _findTask(_findGroup(board, groupId), taskId)
+    // Kept rather than discarded: the state before the write is what tells a
+    // real change from a resend of the same value.
+    const oldTask = _findTask(_findGroup(board, groupId), taskId)
     if(!patch || typeof patch !== 'object') throw httpError(400, 'Keine Aenderungen uebergeben')
     await boardRepo.updateTaskFields(boardId, groupId, taskId, patch)
+    await notifications().taskPatched({board, oldTask, patch, actor: getLoggedinUser()})
     return await getById(boardId)
 }
 
 async function replaceTask(boardId, groupId, taskId, task){
     const board = await _requireBoard(boardId)
-    _findTask(_findGroup(board, groupId), taskId)
+    const oldTask = _findTask(_findGroup(board, groupId), taskId)
     await boardRepo.replaceTask(boardId, groupId, taskId, {...task, id: taskId})
+    // A whole-task write is a patch of everything, so the same comparison
+    // works — otherwise this path would silently notify nobody.
+    await notifications().taskPatched({board, oldTask, patch: task || {}, actor: getLoggedinUser()})
     return await getById(boardId)
 }
 
@@ -463,7 +434,6 @@ module.exports = {
     isOwner,
     ownerIdsOf,
     enrichMembers,
-    ensureColumns,
     ensureColumnLabels,
 
     updateMeta,

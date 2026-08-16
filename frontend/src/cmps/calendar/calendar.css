@@ -500,7 +500,7 @@
     position: fixed;
     inset: 0;
     background: rgba(32, 34, 44, .45);
-    z-index: 1000;
+    z-index: var(--z-backdrop);
     display: flex;
     align-items: center;
     justify-content: center;

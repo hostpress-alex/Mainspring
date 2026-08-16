@@ -1,6 +1,6 @@
 import {useEffect} from 'react'
 import {useState} from 'react'
-import {CgClose} from 'react-icons/cg'
+import { Icon } from '../icon'
 import {useNavigate} from 'react-router-dom'
 import {toggleModal, updateTaskAction} from '../../store/board.actions'
 import {ActivityPreview} from '../activity-preview'
@@ -79,7 +79,7 @@ export function BoardActivityModal({board, activityLog}){
     return (
         <section className="board-activity-modal">
             <div className="board-activity-header">
-                <CgClose className="close-btn" onClick={onCloseModal}/>
+                <Icon name='xmark' className="close-btn" onClick={onCloseModal}/>
                 <h3 className="board-title">{board.title} <span>{t('activity.activity')}</span></h3>
                 <div className="views flex">
                     <span className={view === 'activity'?'active':''} onClick={() => setView('activity')}>{t('activity.activity')}</span>

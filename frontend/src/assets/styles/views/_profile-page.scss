@@ -82,8 +82,18 @@
         border: 1px solid #c3c6d4;
         border-radius: 6px;
         background: #fff;
+        color: #323338;
         cursor: pointer;
         font-size: 14px;
+
+        &:hover:not(:disabled) {
+            background: #f5f6f8;
+        }
+
+        &:disabled {
+            color: #a1a3ad;
+            cursor: default;
+        }
     }
 
     .profile-avatar-row {

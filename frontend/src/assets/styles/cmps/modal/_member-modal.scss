@@ -124,7 +124,7 @@
 
     &.invite {
         @include mixins.center-absolute();
-        z-index: 100;
+        z-index: var(--z-popover);
         background-color: variables.$app-bg;
         border-radius: variables.$spacing-small;
         font-size: functions.rem(14px);

@@ -69,7 +69,7 @@
     position: fixed;
     left: 70px;
     bottom: 16px;
-    z-index: 900;
+    z-index: calc(var(--z-popover) + 20);   /* over the anchored menus, under the dynamic host */
 }
 
 .kanban-task-list {

@@ -21,6 +21,9 @@
         .btn-start {
             @include mixins.center-flex();
             background-color: variables.$home-btn-bg;
+            // Was living off the global `button { color: whitesmoke }`, which
+            // is gone — a dark button says so itself now.
+            color: #fff;
             height: 40px;
             width: 130px;
             font-size: functions.rem(13px);
@@ -30,7 +33,7 @@
             &:hover {
                 background-color: #5151d5;
 
-                .arrow svg {
+                .arrow i {
                     transition: 0.4s;
                     transform: translateX(4px);
                 }

@@ -6,7 +6,7 @@ import {removeBoard, saveBoard, loadBoard, setDynamicModalObj} from '../../store
 import {confirmDelete} from '../confirm-dialog'
 import {boardService} from '../../services/board.service'
 
-import {BiDotsHorizontalRounded} from 'react-icons/bi'
+import { Icon } from '../icon'
 import {t} from '../../i18n'
 
 /**
@@ -74,7 +74,7 @@ export function BoardPreview({board, sectionId = null, isActive = null}){
                 <span>{board.title}</span>
             </div>
             <div className="menu-icon-container">
-                <BiDotsHorizontalRounded className="icon" onClick={onToggleMemberFilterModal}/>
+                <Icon name='ellipsis' className="icon" onClick={onToggleMemberFilterModal}/>
             </div>
         </section>
     )

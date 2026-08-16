@@ -2,8 +2,7 @@ import {useRef} from 'react'
 import {useSelector} from 'react-redux'
 import {useNavigate} from 'react-router-dom'
 
-import {BiDotsHorizontalRounded, BiMessageRoundedAdd} from 'react-icons/bi'
-import {HiOutlineChatBubbleOvalLeft} from 'react-icons/hi2'
+import { Icon } from '../icon'
 import {setDynamicModalObj, toggleModal, updateTaskAction} from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
 import {singleLineEditable} from '../../services/editable'
@@ -48,13 +47,13 @@ export function TaskTitleKanban({task, group, board}){
             </blockquote>
             <div onClick={() => onOpenModal(task)} className="chat-icon">
                 {task.comments.length > 0 && <div>
-                    <HiOutlineChatBubbleOvalLeft className="comment-chat"/>
+                    <Icon name='comment' style='fa-regular' className="comment-chat"/>
                     <div className="count-comment">{task.comments.length}</div>
                 </div>}
-                {task.comments.length === 0 && <BiMessageRoundedAdd className="icon"/>}
+                {task.comments.length === 0 && <Icon name='comment-medical' className="icon"/>}
             </div>
             <div className="task-menu" ref={elTaskModalBtn}>
-                <BiDotsHorizontalRounded className="icon" onClick={() => onToggleTaskModal(task)}/>
+                <Icon name='ellipsis' className="icon" onClick={() => onToggleTaskModal(task)}/>
             </div>
         </section>
     )

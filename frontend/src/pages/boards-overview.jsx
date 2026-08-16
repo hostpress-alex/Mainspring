@@ -6,7 +6,7 @@ import {loadBoards, saveBoard} from '../store/board.actions'
 import {boardService} from '../services/board.service'
 import {logout} from '../store/user.actions'
 import {Loader} from '../cmps/loader'
-import {GUEST_IMG} from '../services/avatar'
+import { Avatar } from '../cmps/avatar'
 import {t} from '../i18n'
 
 function initials(name = ''){
@@ -58,7 +58,7 @@ export function BoardsOverview(){
             <div className="overview-bar">
                 <div className="overview-bar-user">
                     <Link to="/profil" className="overview-link overview-user">
-                        <img src={user?.imgUrl || GUEST_IMG} alt="" className="overview-user-img"/>
+                        <Avatar src={user?.imgUrl} className="overview-user-img"/>
                         {user?.fullname}
                     </Link>
                     <span onClick={onLogout} className="overview-link overview-logout">{t('nav.logout')}</span>
@@ -115,7 +115,7 @@ export function BoardsOverview(){
                                         {members.slice(0, 5).map(m => (
                                             <span key={m._id} className="overview-avatar" title={m.fullname}>
                                                 {m.imgUrl
-                                                    ?<img src={m.imgUrl} alt=""/>
+                                                    ?<Avatar src={m.imgUrl}/>
                                                     :initials(m.fullname)}
                                             </span>
                                         ))}

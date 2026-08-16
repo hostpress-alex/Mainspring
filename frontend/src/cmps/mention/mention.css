@@ -1,0 +1,59 @@
+.mention-field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The list hangs below the field. It is a popover anchored to an element, so
+   it takes that step — see setup/_layers.scss. */
+.mention-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--z-popover);
+    width: min(280px, 100%);
+    max-height: 240px;
+    margin: 4px 0 0;
+    padding: 4px;
+    border: 1px solid #d0d4e4;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .16);
+    list-style: none;
+    overflow-y: auto;
+}
+
+.mention-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* One highlight for both hover and keyboard, so the list never shows two
+   different "this one" at the same time. */
+.mention-option.is-active {
+    background: #eaf3ff;
+}
+
+.mention-avatar {
+    width: 24px;
+    height: 24px;
+}
+
+/* The mention inside a posted comment. Not a link: it points at a person, and
+   there is no page for a person to go to. */
+.mention {
+    padding: 0 2px;
+    border-radius: 3px;
+    background: #eaf3ff;
+    color: #0073ea;
+    font-weight: 600;
+}

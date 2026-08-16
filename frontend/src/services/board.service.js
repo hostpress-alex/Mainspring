@@ -47,12 +47,10 @@ export const boardService = {
 
 const sid = v => (v === undefined || v === null)?'':String(v)
 
-/** Owner list of a board, with a fallback to the old single field ownerId. */
+/** Owner list of a board. The server builds it from board_member.is_owner. */
 function ownerIdsOf(board){
-    if(!board) return []
-    if(Array.isArray(board.ownerIds)) return board.ownerIds.map(sid)
-    if(board.ownerId) return [sid(board.ownerId)]
-    return []
+    if(!board || !Array.isArray(board.ownerIds)) return []
+    return board.ownerIds.map(sid)
 }
 
 function isBoardOwner(board, user){
@@ -371,9 +369,7 @@ function getEmptyBoard(){
             {id: makeColumnId(), type: 'priority', title: 'Priority', field: 'priority'},
             {id: makeColumnId(), type: 'updated', title: 'Zuletzt aktualisiert', field: 'updatedBy'}
         ],
-        'cmpsOrder': ['status-picker', 'member-picker', 'date-picker', 'priority-picker', 'updated-picker'],
-        'description': '',
-        'cmpsOption': ['status-picker', 'member-picker', 'date-picker', 'priority-picker', 'number-picker', 'file-picker', 'updated-picker']
+        'description': ''
     }
 }
 

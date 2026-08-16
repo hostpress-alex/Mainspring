@@ -1,10 +1,12 @@
+@use "variables";
+
 // REM Functions
 @function rem($size) {
-    $remSize: calc($size / 16);
+    $remSize: calc($size / variables.$body-rem);
     @return calc($remSize * 1rem);
 }
 
 // EM Functions
-@function em($pixels, $context: 16px) {
+@function em($pixels, $context: variables.$body-rem) {
     @return calc(($pixels / $context) * 1em);
 }

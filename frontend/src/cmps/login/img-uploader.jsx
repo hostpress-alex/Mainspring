@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import {uploadService} from '../../services/upload.service'
 import {GUEST_IMG} from '../../services/avatar'
+import { Avatar } from '../avatar'
 import {t} from '../../i18n'
 
 export function ImgUploader({onUploaded = null}){
@@ -31,9 +32,9 @@ export function ImgUploader({onUploaded = null}){
                 {getUploadLabel()}
                 <label htmlFor="imgUpload">
                     {!imgData.imgUrl &&
-                        <img className="GUEST_IMG-img" src={GUEST_IMG} className="img-uploader-preview is-large" alt=""/>}
+                        <img src={GUEST_IMG} className="img-uploader-preview is-large" alt=""/>}
                     {imgData.imgUrl &&
-                        <img className="user-img" src={imgData.imgUrl} className="img-uploader-preview" alt=""/>}
+                        <Avatar src={imgData.imgUrl} className="img-uploader-preview"/>}
                 </label>
             </div>
             <input type="file" onChange={uploadImg} accept="img/*" id="imgUpload"/>

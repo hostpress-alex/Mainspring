@@ -3,8 +3,7 @@ import {useSelector} from 'react-redux'
 import {setDynamicModalObj, updateGroups} from '../store/board.actions'
 import {utilService} from '../services/util.service'
 
-import {BsFillCircleFill} from 'react-icons/bs'
-
+import { Icon } from './icon'
 export function ColorPalette({dynamicModalObj}){
     const colors = utilService.getColors()
     const board = useSelector(storeState => storeState.boardModule.filteredBoard)
@@ -22,7 +21,7 @@ export function ColorPalette({dynamicModalObj}){
     return (
         <div className="color-palette">
             {colors.map((color, idx) => (
-                <BsFillCircleFill className="color-icon" onClick={() => onChangeGroupColor(color)} key={idx} style={{'--label-color': color}}/>
+                <Icon name='circle' className="color-icon" onClick={() => onChangeGroupColor(color)} key={idx} style={{'--label-color': color}}/>
             ))}
         </div>
     )

@@ -1,14 +1,9 @@
 import {utilService} from '../services/util.service'
 
-import {IoTimeOutline} from 'react-icons/io5'
-import {IoIosArrowForward, IoIosCheckboxOutline} from 'react-icons/io'
-import {CiCalendarDate} from 'react-icons/ci'
-import {BsPlusCircle, BsPersonPlus} from 'react-icons/bs'
-import {FcCheckmark} from 'react-icons/fc'
-import {TbNumbers} from 'react-icons/tb'
-import {RxPencil1} from 'react-icons/rx'
+import { Icon } from './icon'
 import statusImg from '../assets/img/status.png'
 import {GUEST_IMG} from '../services/avatar'
+import { Avatar } from './avatar'
 import {t} from '../i18n'
 
 /**
@@ -72,17 +67,17 @@ export function ActivityPreview({activity, taskTitle = null}){
             case 'priority':
                 return <img src={statusImg} alt=""/>
             case 'date':
-                return <CiCalendarDate className="icon"/>
+                return <Icon name='calendar-days' style='fa-regular' className="icon"/>
             case 'create':
-                return <BsPlusCircle className="icon"/>
+                return <Icon name='circle-plus' className="icon"/>
             case 'person':
-                return <BsPersonPlus className="icon"/>
+                return <Icon name='user-plus' className="icon"/>
             case 'check':
-                return <IoIosCheckboxOutline className="icon"/>
+                return <Icon name='square-check' style='fa-regular' className="icon"/>
             case 'number':
-                return <TbNumbers className="icon"/>
+                return <Icon name='hashtag' className="icon"/>
             case 'title':
-                return <RxPencil1 className="icon"/>
+                return <Icon name='pencil' className="icon"/>
             default:
                 return null
         }
@@ -114,12 +109,12 @@ export function ActivityPreview({activity, taskTitle = null}){
         <section className={`activity-preview${taskTitle?' with-task':''}`}>
             <div className="time-title flex align-center">
                 <div className="time flex align-center">
-                    <IoTimeOutline/>
+                    <Icon name='clock' style='fa-regular'/>
                     <span>{activity.createdAt?utilService.calculateTime(activity.createdAt):''}</span>
                 </div>
                 <div className="who-what">
                     <div className="title flex align-center">
-                        <img src={imgOf(byMember.imgUrl)} alt=""/>
+                        <Avatar src={imgOf(byMember.imgUrl)}/>
                         <span>{text(byMember.fullname)}</span>
                     </div>
                     {taskTitle && <div className="activity-task" title={taskTitle}>{taskTitle}</div>}
@@ -138,7 +133,7 @@ function FromToStatusPriority({activity}){
     return (
         <div className="from-to label-container flex align-center">
             <span className="label" style={{'--label-color': colorOf(activity.from)}}>{text(activity.from)}</span>
-            <IoIosArrowForward className="icon"/>
+            <Icon name='chevron-right' className="icon"/>
             <span className="label" style={{'--label-color': colorOf(activity.to)}}>{text(activity.to)}</span>
         </div>
     )
@@ -159,7 +154,7 @@ function FromToDueDate({activity}){
     return (
         <div className="from-to date-container">
             <span className="date">{fmt(from)}</span>
-            <IoIosArrowForward className="icon"/>
+            <Icon name='chevron-right' className="icon"/>
             <span className="date">{fmt(to)}</span>
         </div>
     )
@@ -188,8 +183,8 @@ function FromToCheck({activity}){
     const on = value => value === true || value === 'true' || value === 1
     return (
         <div className="from-to check-container">
-            <span>{on(activity.from)?<FcCheckmark/>:'    '}</span>
-            <span>{on(activity.to)?<FcCheckmark/>:'    '}</span>
+            <span>{on(activity.from)?<Icon name='check'/>:'    '}</span>
+            <span>{on(activity.to)?<Icon name='check'/>:'    '}</span>
         </div>
     )
 }
@@ -198,7 +193,7 @@ function FromToTitle({activity}){
     return (
         <div className="from-to number-container">
             <span className="number">{text(activity.from) || '—'}</span>
-            <IoIosArrowForward className="icon"/>
+            <Icon name='chevron-right' className="icon"/>
             <span className="number">{text(activity.to)}</span>
         </div>
     )
@@ -208,7 +203,7 @@ function FromToNumber({activity}){
     return (
         <div className="from-to number-container">
             <span className="number">{text(activity.from)}</span>
-            <IoIosArrowForward className="icon"/>
+            <Icon name='chevron-right' className="icon"/>
             <span className="number">{text(activity.to)}</span>
         </div>
     )

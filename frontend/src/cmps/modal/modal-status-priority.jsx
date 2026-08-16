@@ -3,8 +3,7 @@ import {useSelector} from 'react-redux'
 
 import {setDynamicModalObj, closeDynamicModal, saveColumnLabels} from '../../store/board.actions'
 import {LabelEditor} from './label-editor'
-import {RxPencil1} from 'react-icons/rx'
-import {VscTriangleUp} from 'react-icons/vsc'
+import { Icon } from '../icon'
 import {t} from '../../i18n'
 
 /**
@@ -55,7 +54,7 @@ export function ModalStatusPriority({dynamicModalObj}){
 
     return (
         <section className="modal-status-priority">
-            <VscTriangleUp className="triangle-icon"/>
+            <Icon name='caret-up' className="triangle-icon"/>
             <section className="modal-status-priority-content">
                 <ul>
                     {labels.map((label, idx) =>
@@ -65,7 +64,7 @@ export function ModalStatusPriority({dynamicModalObj}){
                 </ul>
                 <div className="edit-labels-btn">
                     <button type="button" title={column?t('label.editTitle'):t('label.notAvailable')} disabled={!column} onClick={() => setIsEditOpen(true)}>
-                        <RxPencil1 className="icon"/>
+                        <Icon name='pencil' className="icon"/>
                         <span>{t('label.edit')}</span>
                     </button>
                 </div>

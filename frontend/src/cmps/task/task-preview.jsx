@@ -14,9 +14,7 @@ import {NumberPicker} from './number-picker'
 import {FilePicker} from './file-picker'
 import {TextPicker, LongTextPicker, CheckboxPicker, LinkPicker, DropdownPicker} from './simple-pickers'
 
-import {TbArrowsDiagonal} from 'react-icons/tb'
-import {BiDotsHorizontalRounded, BiMessageRoundedAdd} from 'react-icons/bi'
-import {HiOutlineChatBubbleOvalLeft} from 'react-icons/hi2'
+import { Icon } from '../icon'
 import {GUEST_IMG} from '../../services/avatar'
 import {widthOf, widthStyle, TASK_COLUMN} from '../board/column-width'
 import '../board/board-columns.css'
@@ -90,7 +88,7 @@ export function TaskPreview({task, group, board, handleCheckboxChange, isMainChe
         <section className={'task-preview flex'} ref={elTaskPreview}>
             <div ref={elMenuTask} className="sticky-div" style={{'--group-color': group.color}}>
                 <div className="task-menu">
-                    <BiDotsHorizontalRounded className="icon" onClick={onToggleTaskModal}/>
+                    <Icon name='ellipsis' className="icon" onClick={onToggleTaskModal}/>
                 </div>
                 <div className="check-box">
                     <input type="checkbox" checked={isClick} onChange={onCheckBoxChange}/>
@@ -101,15 +99,15 @@ export function TaskPreview({task, group, board, handleCheckboxChange, isMainChe
                         <span>{task.title}</span>
                     </blockquote>
                     <div className="open-task-details " onClick={onOpenModal}>
-                        <TbArrowsDiagonal/>
+                        <Icon name='expand'/>
                         <span className="open-btn">{t('common.open')}</span>
                     </div>
                     <div onClick={onOpenModal} className="chat-icon">
                         {updateCount > 0 && <div>
-                            <HiOutlineChatBubbleOvalLeft className="comment-chat"/>
+                            <Icon name='comment' style='fa-regular' className="comment-chat"/>
                             <div className="count-comment">{updateCount}</div>
                         </div>}
-                        {updateCount === 0 && <BiMessageRoundedAdd className="icon"/>}
+                        {updateCount === 0 && <Icon name='comment-medical' className="icon"/>}
                     </div>
                 </div>
             </div>

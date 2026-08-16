@@ -4,8 +4,7 @@ import {useEffect, useState} from 'react'
 import {loadBoards} from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
 
-import {MdKeyboardArrowRight} from 'react-icons/md'
-import {MdKeyboardArrowLeft} from 'react-icons/md'
+import { Icon } from '../icon'
 import WorkspaceBoard from './workspace/workspace-board'
 import {useCallback} from 'react'
 import {Tooltip} from '@mui/material'
@@ -38,8 +37,8 @@ export function WorkspaceSidebar({
         <section className={`workspace-sidebar ${isWorkspaceOpen?'open':'close'}`}>
             <Tooltip title={isWorkspaceOpen?t('nav.collapse'):t('nav.expand')} arrow>
                 <div onClick={onToggleWorkspace} className="toggle-workspace ">
-                    {isWorkspaceOpen && <MdKeyboardArrowLeft/>}
-                    {!isWorkspaceOpen && <MdKeyboardArrowRight/>}
+                    {isWorkspaceOpen && <Icon name='chevron-left'/>}
+                    {!isWorkspaceOpen && <Icon name='chevron-right'/>}
                 </div>
             </Tooltip>
             <WorkspaceBoard handleChange={handleChange} filterByToEdit={filterByToEdit} boards={boards} setIsCreateModalOpen={setIsCreateModalOpen}/>

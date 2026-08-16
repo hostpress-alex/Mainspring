@@ -37,17 +37,6 @@ export const COLUMN_CATALOG = [
 // Order of the headings in the add-column dialog.
 export const COLUMN_CATEGORIES = [OVERVIEW, USEFUL]
 
-/** Altes cmpsOrder-Kuerzel -> neue Spaltendefinition. */
-const LEGACY = {
-    'status-picker': {type: 'status', field: 'status', title: 'Status'},
-    'priority-picker': {type: 'priority', field: 'priority', title: 'Priority'},
-    'member-picker': {type: 'person', field: 'memberIds', title: 'Person'},
-    'date-picker': {type: 'date', field: 'dueDate', title: 'Date'},
-    'number-picker': {type: 'number', field: 'number', title: 'Zahlen'},
-    'file-picker': {type: 'file', field: 'file', title: 'Datei'},
-    'updated-picker': {type: 'updated', field: 'updatedBy', title: 'Zuletzt aktualisiert'}
-}
-
 const CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789'
 
 export function makeColumnId(){
@@ -65,29 +54,6 @@ export function makeColumn(type, title){
     const entry = catalogEntry(type)
     const id = makeColumnId()
     return {id, type, title: title || (entry?entry.label:type), field: id}
-}
-
-/** Normalises `cmpOrder` entries to kebab-case (older data was inconsistent). */
-function normalizeLegacy(value){
-    return String(value).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-}
-
-/**
- * Makes sure board.columns exists. Idempotent — runs on every read and leaves
- * boards that have already been migrated alone.
- */
-export function ensureColumns(board){
-    if(!board) return board
-    if(Array.isArray(board.columns) && board.columns.length) return board
-
-    const order = Array.isArray(board.cmpsOrder)?board.cmpsOrder:[]
-    board.columns = order.map(cmp => {
-        const legacy = LEGACY[normalizeLegacy(cmp)]
-        if(legacy) return {id: makeColumnId(), ...legacy}
-        // Unbekanntes Kuerzel: als Textspalte retten statt zu verlieren
-        return {id: makeColumnId(), type: 'text', title: String(cmp), field: makeColumnId()}
-    })
-    return board
 }
 
 /** Read the value of a column on a task. */

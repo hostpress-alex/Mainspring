@@ -75,32 +75,85 @@ export function imagesFromClipboard(ev){
     return blobs
 }
 
-function resizeToSquare(file, side, quality){
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onerror = () => reject(new Error(t('file.readFailed')))
-        reader.onload = () => {
-            const img = new Image()
-            img.onerror = () => reject(new Error(t('file.imageReadFailed')))
-            img.onload = () => {
-                const src = Math.min(img.width, img.height)
-                const sx = (img.width - src) / 2
-                const sy = (img.height - src) / 2
-                const canvas = document.createElement('canvas')
-                canvas.width = side
-                canvas.height = side
-                const ctx = canvas.getContext('2d')
-                ctx.imageSmoothingQuality = 'high'
-                ctx.drawImage(img, sx, sy, src, src, 0, 0, side, side)
-                canvas.toBlob(
-                    blob => blob?resolve(blob):reject(new Error(t('file.imageFailed'))),
-                    'image/jpeg',
-                    quality
-                )
+/**
+ * Decode an image file into something drawable.
+ *
+ * The first attempt used FileReader + a data URL, and it failed on ordinary
+ * JPEGs with nothing but "could not be read". Two reasons to stop doing that:
+ *
+ *   - It reads the whole file into a base64 string first, roughly 1.3x the
+ *     file size, before anything is decoded. A photo straight from a phone is
+ *     a lot of string.
+ *   - When it does fail, the reason is in `reader.error.name` — NotReadableError
+ *     for a file that is on iCloud Drive and not downloaded, NotFoundError for
+ *     one that moved after being picked — and that name was thrown away.
+ *
+ * createImageBitmap decodes from the file directly. `imageOrientation` makes
+ * it honour the EXIF rotation, which is why portrait photos from a phone no
+ * longer end up sideways in the avatar.
+ */
+async function decodeImage(file){
+    if(typeof createImageBitmap === 'function'){
+        try {
+            return await createImageBitmap(file, {imageOrientation: 'from-image'})
+        } catch(err){
+            // Older browsers reject the options object rather than ignoring
+            // it. Worth one more go without it before falling back.
+            try {
+                return await createImageBitmap(file)
+            } catch(err2){
+                throw readError(err2)
             }
-            img.src = reader.result
         }
-        reader.readAsDataURL(file)
+    }
+
+    // Fallback: an object URL, still without turning the file into a string.
+    const url = URL.createObjectURL(file)
+    try {
+        return await new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => resolve(img)
+            img.onerror = () => reject(new Error(t('file.imageReadFailed')))
+            img.src = url
+        })
+    } finally {
+        URL.revokeObjectURL(url)
+    }
+}
+
+/** Say what actually went wrong, not just that something did. */
+function readError(err){
+    const reason = err && err.name?err.name:null
+    return new Error(reason?t('file.readFailedWhy', {reason}):t('file.readFailed'))
+}
+
+async function resizeToSquare(file, side, quality){
+    const img = await decodeImage(file)
+    const width = img.width, height = img.height
+    if(!width || !height) throw new Error(t('file.imageReadFailed'))
+
+    // Centre crop to a square, then scale to the target side.
+    const src = Math.min(width, height)
+    const sx = (width - src) / 2
+    const sy = (height - src) / 2
+
+    const canvas = document.createElement('canvas')
+    canvas.width = side
+    canvas.height = side
+    const ctx = canvas.getContext('2d')
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(img, sx, sy, src, src, 0, 0, side, side)
+
+    // An ImageBitmap holds decoded pixels until it is closed. Without this the
+    // memory stays taken for as long as the page is open.
+    if(typeof img.close === 'function') img.close()
+
+    return await new Promise((resolve, reject) => {
+        canvas.toBlob(
+            blob => blob?resolve(blob):reject(new Error(t('file.imageFailed'))),
+            'image/jpeg',
+            quality
+        )
     })
 }
 

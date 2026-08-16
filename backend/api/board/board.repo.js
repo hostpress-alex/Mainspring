@@ -145,8 +145,6 @@ async function assemble(k, boardRows){
                 imgUrl: row.created_by_img || ''
             },
             labels: parseJson(row.labels, []) || [],
-            cmpsOrder: parseJson(row.cmps_order, []) || [],
-            cmpsOption: parseJson(row.cmps_option, []) || [],
             members: mem.map(m => ({_id: m.user_id, fullname: m.fullname, imgUrl: m.img_url})),
             ownerIds: mem.filter(m => m.is_owner).map(m => m.user_id),
             columns: (columnsByBoard.get(row.id) || []).map(buildColumn),
@@ -361,9 +359,7 @@ function boardMetaRow(board){
         created_by_name: createdBy.fullname || '',
         created_by_img: createdBy.imgUrl || '',
         archived_at: Number.isFinite(Number(board.archivedAt))?Number(board.archivedAt):null,
-        labels: toJson(board.labels || []),
-        cmps_order: toJson(board.cmpsOrder || []),
-        cmps_option: toJson(board.cmpsOption || [])
+        labels: toJson(board.labels || [])
     }
 }
 

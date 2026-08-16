@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 
 import {scheduleService} from '../services/schedule.service'
 import {boardService} from '../services/board.service'
-import {GUEST_IMG} from '../services/avatar'
+import { Avatar } from '../cmps/avatar'
 import {TimeGrid} from '../cmps/calendar/time-grid'
 import {MonthGrid} from '../cmps/calendar/month-grid'
 import {EntryDialog} from '../cmps/calendar/entry-dialog'
@@ -141,7 +141,7 @@ export function CalendarPage(){
                         ))}
                     </div>
                     <Link to="/profil" title={t('nav.profile')}>
-                        <img src={user?.imgUrl || GUEST_IMG} alt="" className="cal-avatar"/>
+                        <Avatar src={user?.imgUrl} className="cal-avatar"/>
                     </Link>
                 </div>
             </div>

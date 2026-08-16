@@ -1,0 +1,183 @@
+.notification-bell {
+    position: relative;
+}
+
+/* The count sits on the bell rather than beside it, so the sidebar keeps its
+   width whether there is something to report or not. */
+.notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #e2445c;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* Anchored to the sidebar, so it has to cover it. See setup/_layers.scss. */
+.notification-panel {
+    position: fixed;
+    top: 12px;
+    left: 60px;
+    z-index: var(--z-panel);
+    display: flex;
+    flex-direction: column;
+    width: min(420px, calc(100vw - 80px));
+    max-height: calc(100vh - 24px);
+    border: 1px solid #d0d4e4;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+    overflow: hidden;
+}
+
+.notification-panel-head {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #e6e9ef;
+}
+
+.notification-panel-head h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.notification-panel-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.notification-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.notification-mark-all {
+    border: 0;
+    background: none;
+    color: #0073ea;
+    cursor: pointer;
+    font: inherit;
+}
+
+.notification-mark-all:disabled {
+    color: #9699a6;
+    cursor: default;
+}
+
+.notification-list {
+    overflow-y: auto;
+}
+
+.notification-section h3 {
+    position: sticky;
+    top: 0;
+    margin: 0;
+    padding: 8px 16px 4px;
+    background: #fff;
+    color: #676879;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* A button rather than a div: the whole row is clickable, and this is the one
+   element that gets keyboard focus and Enter for free. */
+.notification-item {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border: 0;
+    border-top: 1px solid #f0f1f4;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background: #f5f6f8;
+}
+
+.notification-item.is-unread {
+    background: #eaf3ff;
+}
+
+.notification-item.is-unread:hover {
+    background: #dfecff;
+}
+
+.notification-avatar {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+}
+
+.notification-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.notification-text {
+    font-size: 14px;
+}
+
+.notification-subject,
+.notification-detail,
+.notification-board {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notification-subject {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.notification-detail {
+    color: #676879;
+    font-size: 13px;
+}
+
+.notification-board {
+    color: #9699a6;
+    font-size: 12px;
+}
+
+.notification-when {
+    flex: 0 0 auto;
+    color: #9699a6;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.notification-dot {
+    flex: 0 0 auto;
+    align-self: center;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #0073ea;
+}
+
+.notification-empty {
+    padding: 24px 16px;
+    color: #676879;
+    text-align: center;
+}

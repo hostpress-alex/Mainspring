@@ -1,10 +1,10 @@
 import {useRef, useState} from 'react'
 import {useSelector} from 'react-redux'
 
-import {BsPersonCircle} from 'react-icons/bs'
+import { Icon } from '../icon'
 import {boardService} from '../../services/board.service'
 import {setDynamicModalObj} from '../../store/board.actions'
-import {GUEST_IMG} from '../../services/avatar'
+import { Avatar } from '../avatar'
 
 export function MemberPicker({info, onUpdate, field = 'memberIds'}){
     const board = useSelector(storeState => storeState.boardModule.board)
@@ -40,11 +40,11 @@ export function MemberPicker({info, onUpdate, field = 'memberIds'}){
     return (
         <section className="task-person" ref={elMemberSection} onClick={onToggleMenuModal}>
             <div className="members-imgs">
-                {members.length === 0 && <BsPersonCircle className="icon-person"/>}
+                {members.length === 0 && <Icon name='circle-user' className="icon-person"/>}
                 {members.length > 0 &&
-                    <img className="member-img1" src={members[0]?.imgUrl || GUEST_IMG} alt="member" onClick={() => setIsModalOpen(!isModalOpen)}/>}
+                    <Avatar className="member-img1" src={members[0]?.imgUrl} alt="member" onClick={() => setIsModalOpen(!isModalOpen)}/>}
                 {members.length === 2 &&
-                    <img className="member-img2" src={members[1]?.imgUrl || GUEST_IMG} alt="member" onClick={() => setIsModalOpen(!isModalOpen)}/>}
+                    <Avatar className="member-img2" src={members[1]?.imgUrl} alt="member" onClick={() => setIsModalOpen(!isModalOpen)}/>}
                 {members.length > 2 && <div className="show-more-members">
                     <span className="show-more-count">+{members.length - 1}</span>
                 </div>}

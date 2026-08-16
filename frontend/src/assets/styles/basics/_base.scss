@@ -26,7 +26,7 @@
 
 .dark-screen {
     position: fixed;
-    z-index: 50;
+    z-index: var(--z-backdrop);
     background-color: variables.$react-modal-background;
     width: 100vw;
     height: 100vh;
@@ -52,7 +52,7 @@ h6 {
 }
 
 body {
-    font-size: functions.rem(18px);
+    font-size: variables.$body-rem;
     margin: 0;
     padding: 0;
     font-family: variables.$font-family;
@@ -85,10 +85,17 @@ input[type=number]::-webkit-inner-spin-button {
     -webkit-appearance: none;
 }
 
+// No colour here.
+//
+// This rule used to say `color: whitesmoke`, on the assumption that every
+// button in the app is a filled blue one. Any button on a light background
+// then had near-white text on white — on the profile page "Bild wählen" and
+// "Entfernen" were literally unreadable, and nothing about it looked broken
+// enough to be noticed. A button states its own colour, right where its
+// background is decided.
 button {
     cursor: pointer;
     border: none;
-    color: whitesmoke;
 }
 
 .board-main {

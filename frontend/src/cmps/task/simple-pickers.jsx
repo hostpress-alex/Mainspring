@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from 'react'
-import {BsCheckSquare, BsSquare} from 'react-icons/bs'
-import {FiExternalLink} from 'react-icons/fi'
+import { Icon } from '../icon'
 import {t} from '../../i18n'
 
 /**
@@ -70,8 +69,8 @@ export function CheckboxPicker({info, field, onUpdate}){
     return (
         <section className="picker checkbox-picker" onClick={() => onUpdate(field, !checked)} title={checked?t('common.done'):t('common.open2')}>
             {checked
-                ?<BsCheckSquare className="checkbox-on"/>
-                :<BsSquare className="checkbox-off"/>}
+                ?<Icon name='square-check' style='fa-regular' className="checkbox-on"/>
+                :<Icon name='square' style='fa-regular' className="checkbox-off"/>}
         </section>
     )
 }
@@ -107,7 +106,7 @@ export function LinkPicker({info, field, onUpdate}){
                     <a href={value} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>
                         {value.replace(/^https?:\/\//, '')}
                     </a>
-                    <FiExternalLink className="link-icon"/>
+                    <Icon name='arrow-up-right-from-square' className="link-icon"/>
                 </>
                 :<span className="link-empty">—</span>}
         </section>

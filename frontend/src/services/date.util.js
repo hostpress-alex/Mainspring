@@ -68,6 +68,33 @@ export const isToday = d => isSameDay(d, new Date())
 
 export const pad = n => String(n).padStart(2, '0')
 
+/**
+ * "2 days ago", in whatever language the interface is in.
+ *
+ * Intl does the wording, so this needs no list of German month names and no
+ * second list for English — the mistake the weekday and month names above used
+ * to make.
+ */
+export function fmtRelative(value, now = Date.now()){
+    const then = value instanceof Date?value.getTime():Number(value)
+    if(!Number.isFinite(then)) return ''
+    const seconds = Math.round((then - now) / 1000)
+    const steps = [
+        [60, 'second', 1],
+        [3600, 'minute', 60],
+        [86400, 'hour', 3600],
+        [604800, 'day', 86400],
+        [2629800, 'week', 604800],
+        [31557600, 'month', 2629800]
+    ]
+    const fmt = new Intl.RelativeTimeFormat(getLanguage(), {numeric: 'auto'})
+    const abs = Math.abs(seconds)
+    for(const [limit, unit, divisor] of steps){
+        if(abs < limit) return fmt.format(Math.round(seconds / divisor), unit)
+    }
+    return fmt.format(Math.round(seconds / 31557600), 'year')
+}
+
 export const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`
 export const fmtDate = d => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`
 export const fmtMonthYear = d => `${MONTHS[d.getMonth()]} ${d.getFullYear()}`

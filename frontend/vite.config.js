@@ -2,6 +2,7 @@ import {existsSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 import {defineConfig} from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import {reportIcons} from './scripts/check-icons.mjs'
 
 /**
  * Icons: Pro if it is here, free otherwise.
@@ -23,11 +24,37 @@ function resolveIcons(){
     return {label: 'none — run `npm install`', path: iconsPath('./src/assets/styles/icons-missing.css')}
 }
 
+// Which set was picked, and whether any icon in the code needs Pro. Pro and
+// Free share the class names, so a Pro-only icon looks correct on the machine
+// that has the licence and stays empty everywhere else. reportIcons() lives in
+// scripts/check-icons.mjs and reads the free package's own metadata.
+//
+// NOTE: this used to be replaced here by `what => console.log(...)`, which
+// printed the label but ran no check at all. If the start-up line does not end
+// in "... icons also exist in the free set", the import above is gone again.
+
 const icons = resolveIcons()
-console.log(`[icons] Font Awesome ${icons.label}`)
+
+/**
+ * Vite clears the screen and draws its banner after the config has been read,
+ * which swallowed anything printed here. The report therefore waits until the
+ * server is listening.
+ */
+const iconReport = {
+    name: 'icon-report',
+    configureServer (server) {
+        server.httpServer?.once('listening', () => {
+            setTimeout(() => reportIcons(`Font Awesome ${icons.label}`), 100)
+        })
+    },
+    buildStart () {
+        if (this.meta.watchMode) return
+        reportIcons(`Font Awesome ${icons.label}`)
+    },
+}
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [react(), iconReport],
     resolve: {
         alias: {
             'app-icons': icons.path

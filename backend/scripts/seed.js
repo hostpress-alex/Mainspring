@@ -28,8 +28,6 @@ const MEMBERS = [
     {_id: 'm103', fullname: 'Tim Berger', imgUrl: ''}
 ]
 
-const CMPS_ORDER = ['status-picker', 'member-picker', 'date-picker', 'priority-picker', 'updated-picker']
-const CMPS_OPTION = ['status-picker', 'member-picker', 'date-picker', 'priority-picker', 'number-picker', 'file-picker', 'updated-picker']
 
 function task(title, status, priority, memberIds = [], dueDate = ''){
     return {
@@ -60,9 +58,7 @@ function board(title, isStarred, groups, folder = ''){
         members: MEMBERS,
         groups,
         activities: [],
-        cmpsOrder: CMPS_ORDER,
-        description: '',
-        cmpsOption: CMPS_OPTION
+        description: ''
     }
 }
 

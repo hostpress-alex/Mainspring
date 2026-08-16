@@ -5,6 +5,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import {updateProfile} from '../store/user.actions'
 import {uploadAvatar, imagesFromClipboard} from '../services/upload.service'
 import {GUEST_IMG} from '../services/avatar'
+import { Avatar } from '../cmps/avatar'
 import {t} from '../i18n'
 
 const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
@@ -133,7 +134,7 @@ export function ProfilePage(){
                     <h2 className="profile-section-title">{t('profile.picture')}</h2>
                     <p className="profile-hint">{t('profile.pictureHint')}</p>
                     <div className="profile-avatar-row">
-                        <img src={shown} alt="" className="profile-avatar"/>
+                        <Avatar src={shown} className="profile-avatar"/>
                         <div className="profile-avatar-actions">
                             <button className="profile-btn-ghost" onClick={() => fileInput.current.click()} disabled={busy}>
                                 {t('profile.choosePicture')}

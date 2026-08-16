@@ -1,0 +1,47 @@
+/**
+ * What sits on top of what.
+ *
+ * Before this file there were 21 different z-index values in the project,
+ * from 1 to 9999, with nothing connecting them. That is not untidiness, it is
+ * a dead end: somebody building a new floating thing has no way to pick a
+ * number except to try one, see that it looks right on their screen, and find
+ * out three weeks later that it disappeared behind something else.
+ *
+ * Custom properties rather than Sass variables, because half the styling in
+ * this project is plain `.css` files next to their components, and those
+ * cannot read a Sass variable. `var(--z-modal)` works in both.
+ *
+ * The steps are 50 or 100 apart so a one-off neighbour can be expressed as
+ * `calc(var(--z-popover) + 1)` without needing a new step of its own.
+ *
+ * Only add a step when something genuinely does not fit between two existing
+ * ones. Seven layers is a lot for one application already.
+ */
+:root {
+    /** Table and group headers that stay put while their content scrolls. */
+    --z-sticky: 10;
+
+    /** The bars and their controls. Everything floating goes above them. */
+    --z-nav: 50;
+
+    /** Anchored to an element: menus, pickers, the dynamic modal host. */
+    --z-popover: 100;
+
+    /** The dim layer under a dialog. Covers popovers, hence above them. */
+    --z-backdrop: 200;
+
+    /** Anchored to a bar rather than to the middle: notifications. */
+    --z-panel: 300;
+
+    /** Dialogs, above their own backdrop. */
+    --z-modal: 400;
+
+    /** Full-screen media. Above dialogs, because it is opened from one. */
+    --z-lightbox: 500;
+
+    /**
+     * The confirmation. Nothing may ever cover it — it is the layer that asks
+     * "are you sure" and a buried question is an unanswerable one.
+     */
+    --z-confirm: 600;
+}

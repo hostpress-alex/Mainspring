@@ -74,8 +74,7 @@ const mockBoard = {
         'color': '#66ccff'
     }
     ],
-    'activities': [],
-    'cmpsOrder': ['member-picker', 'status-picker', 'date-picker', 'priority-picker']
+    'activities': []
 }
 
 describe('statistics context', () => {

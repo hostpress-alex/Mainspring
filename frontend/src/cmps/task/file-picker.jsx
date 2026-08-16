@@ -1,5 +1,6 @@
 import {useRef, useState} from 'react'
-import {AiOutlineFileAdd} from 'react-icons/ai'
+import { Icon } from '../icon'
+import {fileType, fileSize} from './file-type'
 import {uploadFile} from '../../services/upload.service'
 import {t} from '../../i18n'
 
@@ -13,6 +14,10 @@ import {t} from '../../i18n'
  *
  * The stored value is an object { url, name, mime, size }. Older data is a
  * bare URL and is still understood.
+ *
+ * The cell shows one icon per file type, not the file name: a name never fits
+ * into a column, gets cut off after fourteen characters and says less at a
+ * glance than a red PDF sheet. Name, type and size are in the tooltip.
  */
 
 const ACCEPT = [
@@ -30,20 +35,20 @@ function asFile(value){
     return null
 }
 
-function shortName(name){
-    const clean = String(name || '')
-    if(clean.length <= 18) return clean
-    const dot = clean.lastIndexOf('.')
-    const ext = dot > 0?clean.slice(dot):''
-    return clean.slice(0, 14 - ext.length) + '…' + ext
-}
-
 export function FilePicker({info, onUpdate, field = 'file'}){
     const [isBusy, setIsBusy] = useState(false)
     const [err, setErr] = useState(null)
     const elInput = useRef()
     const file = asFile(info[field])
-    const isImage = file && (file.mime?file.mime.startsWith('image/'):/\.(png|jpe?g|gif|webp|bmp)$/i.test(file.url))
+    const type = file?fileType(file):null
+    const isImage = type?.key === 'image'
+
+    /** Everything the icon cannot show: name, type, size. */
+    function describe(){
+        if(err) return err
+        if(!file) return t('file.attach')
+        return [file.name || t('file.file'), fileSize(file.size)].filter(Boolean).join(' · ')
+    }
 
     async function onPick(ev){
         const picked = ev.target.files && ev.target.files[0]
@@ -73,24 +78,20 @@ export function FilePicker({info, onUpdate, field = 'file'}){
     }
 
     return (
-        <section className="file-picker picker" title={err || (file?(file.name || t('file.file')):t('file.attach'))}>
+        <section className="file-picker picker" title={describe()}>
             {!file && (
                 <label htmlFor={'file-upload' + info.id} className="file-picker-add">
-                    {isBusy?<span className="file-picker-busy">…</span>:<AiOutlineFileAdd className="icon"/>}
+                    {isBusy?<span className="file-picker-busy">…</span>:<Icon name='file-circle-plus' className="icon"/>}
                 </label>
             )}
 
             {file && (
                 <span className="file-picker-body">
-                    <a href={file.url} target="_blank" rel="noreferrer" className="file-picker-link" onClick={ev => ev.stopPropagation()}>
+                    <a href={file.url} target="_blank" rel="noreferrer" className="file-picker-link"
+                        aria-label={describe()} onClick={ev => ev.stopPropagation()}>
                         {isImage
                             ?<img className="file-img" src={file.url} alt=""/>
-                            :<AiOutlineFileAdd className="icon"/>}
-                        {!isImage && file.name && (
-                            <span className="file-picker-name">
-                                {shortName(file.name)}
-                            </span>
-                        )}
+                            :<Icon name={type.faIcon} className={`file-icon is-${type.key}`}/>}
                     </a>
                     <button type="button" title={t('file.remove')} onClick={onClear} className="file-picker-clear">
                         ×

@@ -6,7 +6,6 @@ import {TaskPreview} from '../task/task-preview'
 import {
     addTask,
     updateGroupAction,
-    updatePickerCmpsOrder,
     setDynamicModalObj,
     updateBoardColumns,
     loadBoard
@@ -31,10 +30,7 @@ import {isCollapsed, toggleCollapsed} from './group-collapse'
 import './board-columns.css'
 import {StatisticGroup} from './statistics-group'
 
-import {MdKeyboardArrowDown, MdKeyboardArrowRight} from 'react-icons/md'
-import {BsFillCircleFill} from 'react-icons/bs'
-import {BiDotsHorizontalRounded} from 'react-icons/bi'
-import {AiOutlinePlus} from 'react-icons/ai'
+import { Icon } from '../icon'
 import {GUEST_IMG} from '../../services/avatar'
 import {t} from '../../i18n'
 
@@ -243,14 +239,14 @@ export function GroupPreview({group, board, idx}){
                         <div className="group-header-title flex align-center">
                             {collapsed
                                 ?
-                                <MdKeyboardArrowRight className="arrow-icon" onClick={onToggleCollapse} title={t('group.expand')}/>
+                                <Icon name='chevron-right' className="arrow-icon" onClick={onToggleCollapse} title={t('group.expand')}/>
                                 :
-                                <MdKeyboardArrowDown className="arrow-icon" onClick={onToggleCollapse} title={t('group.collapse')}/>}
+                                <Icon name='chevron-down' className="arrow-icon" onClick={onToggleCollapse} title={t('group.collapse')}/>}
                             <div className="group-menu" ref={elMainGroup}>
-                                <BiDotsHorizontalRounded className="icon" onClick={onToggleMenuModal}/>
+                                <Icon name='ellipsis' className="icon" onClick={onToggleMenuModal}/>
                             </div>
                             <div className={`group-title-info flex align-center ${isShowColorPicker?'showBorder':''} `} onFocus={() => setIsShowColorPicker(true)}>
-                                {isShowColorPicker && <BsFillCircleFill onClick={onTogglePalette}/>}
+                                {isShowColorPicker && <Icon name='circle' onClick={onTogglePalette}/>}
                                 <blockquote ref={elTitle} className="group-title" contentEditable={isEditingTitle} suppressContentEditableWarning={true} onClick={() => setIsEditingTitle(true)} onBlur={(ev) => onSave(ev)}
                                             {...singleLineEditable({onFocus: () => setIsTyping(true)})}>
                                     <h4>{group.title}</h4>
@@ -295,7 +291,7 @@ export function GroupPreview({group, board, idx}){
                                         )}
                                         <div ref={elAddColumn} className="add-picker-task flex align-items" onClick={toggleColumnModal}>
                                             <span className={`add-btn ${getAddColumnClassName()?'active':''}`}>
-                                                <AiOutlinePlus className={`${getAddColumnClassName()?'plus':'close'}`}/>
+                                                <Icon name='plus' className={`${getAddColumnClassName()?'plus':'close'}`}/>
                                             </span>
                                         </div>
                                     </div>

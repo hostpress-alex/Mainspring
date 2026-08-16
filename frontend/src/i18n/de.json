@@ -203,6 +203,7 @@
         "noneSelected":    "Keine Datei ausgewählt",
         "notAnImage":      "Das ist kein Bild",
         "readFailed":      "Datei konnte nicht gelesen werden",
+        "readFailedWhy":   "Datei konnte nicht gelesen werden ({reason})",
         "remove":          "Datei entfernen",
         "uploadFailed":    "Upload fehlgeschlagen"
     },
@@ -274,6 +275,32 @@
         "profile":        "Mein Profil",
         "profileTooltip": "{name} — Profil und Abmelden",
         "workspaces":     "Bereiche"
+    },
+    "notification": {
+        "assigned":    "{actor} hat dir etwas zugewiesen",
+        "comment":     "{actor} hat einen Kommentar geschrieben",
+        "empty":       "Keine Benachrichtigungen.",
+        "emptyUnread": "Nichts Ungelesenes.",
+        "generic":     "{actor} hat etwas geändert",
+        "invited":     "{actor} hat dich zu einem Board hinzugefügt",
+        "markAllRead": "Alle als gelesen markieren",
+        "mention":     "{actor} hat dich erwähnt",
+        "onlyUnread":  "Nur ungelesen",
+        "section":     {
+            "older":  "Älter",
+            "today":  "Heute",
+            "week":   "Letzte 7 Tage"
+        },
+        "someone":     "Jemand",
+        "title":       "Benachrichtigungen",
+        "unreadCount": {
+            "one":   "1 ungelesene Benachrichtigung",
+            "other": "{n} ungelesene Benachrichtigungen"
+        },
+        "value":       "{actor} hat {column} geändert"
+    },
+    "mention": {
+        "suggestions": "Personen vorschlagen"
     },
     "panel":    {
         "width": "Breite ziehen — Doppelklick setzt zurück"

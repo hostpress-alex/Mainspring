@@ -1,4 +1,5 @@
 // Setup
+@use "setup/layers";
 @use "setup/variables";
 @use "setup/functions";
 @use "setup/fonts";
@@ -8,6 +9,7 @@
 @use "basics/helpers";
 @use "basics/layout";
 @use "basics/base";
+@use "basics/icons";
 
 // Views
 @use "views/home-page";

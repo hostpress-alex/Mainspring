@@ -1,7 +1,6 @@
 import {useMemo, useState} from 'react'
 import {useLocation, useParams} from 'react-router-dom'
-import {AiOutlinePlus, AiOutlineSearch, AiOutlineStar} from 'react-icons/ai'
-import {MdKeyboardArrowDown, MdKeyboardArrowRight} from 'react-icons/md'
+import { Icon } from '../../icon'
 import {BoardPreview} from '../../board/board-preview'
 import {t} from '../../../i18n'
 
@@ -63,7 +62,7 @@ export default function WorkspaceBoard({handleChange, filterByToEdit, setIsCreat
         return (
             <li className="workspace-section">
                 <div className="workspace-section-head" onClick={() => toggle(id)}>
-                    {isCollapsed?<MdKeyboardArrowRight/>:<MdKeyboardArrowDown/>}
+                    {isCollapsed?<Icon name='chevron-right'/>:<Icon name='chevron-down'/>}
                     {icon}
                     <span className="workspace-section-name">
                         {title}
@@ -96,12 +95,12 @@ export default function WorkspaceBoard({handleChange, filterByToEdit, setIsCreat
                 </div>
                 <div className="workspace-btns">
                     <div onClick={() => setIsCreateModalOpen((prev) => !prev)}>
-                        <AiOutlinePlus className="icon"/>
+                        <Icon name='plus' className="icon"/>
                         <span>{t('common.add')}</span>
                     </div>
                     <div className="search-board">
                         <div className="flex">
-                            <AiOutlineSearch className="icon"/>
+                            <Icon name='magnifying-glass' className="icon"/>
                             <input type="text" name="title" className="search-input" value={filterByToEdit.title} placeholder={t('common.search')} onChange={handleChange}/>
                         </div>
                     </div>
@@ -110,7 +109,7 @@ export default function WorkspaceBoard({handleChange, filterByToEdit, setIsCreat
 
             <ul className="board-list-container flex column">
                 <Section id={FAVOURITES} title={t('board.favorites')} list={starred} icon={
-                    <AiOutlineStar className="workspace-star"/>}/>
+                    <Icon name='star' style='fa-regular' className="workspace-star"/>}/>
                 {folders.map(([name, list]) => (
                     <Section key={name} id={name} title={name} list={list} icon={null}/>
                 ))}

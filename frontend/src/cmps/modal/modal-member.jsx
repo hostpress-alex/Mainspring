@@ -2,9 +2,8 @@ import {useEffect, useState} from 'react'
 import {useSelector} from 'react-redux'
 
 import {setDynamicModalObj} from '../../store/board.actions'
-import {CiSearch} from 'react-icons/ci'
-import {VscTriangleUp} from 'react-icons/vsc'
-import {GUEST_IMG} from '../../services/avatar'
+import { Icon } from '../icon'
+import { Avatar } from '../avatar'
 import {t} from '../../i18n'
 
 export function ModalMember({dynamicModalObj}){
@@ -58,13 +57,13 @@ export function ModalMember({dynamicModalObj}){
 
     return (
         <section className="modal-member">
-            <VscTriangleUp className="triangle-icon"/>
+            <Icon name='caret-up' className="triangle-icon"/>
             <section className="modal-member-content">
                 <ul className="taskMembers">
                     {
                         taskMembers.map(taskMember => {
                             return <li key={taskMember._id}>
-                                <img src={taskMember.imgUrl || GUEST_IMG} alt="member-img"/>
+                                <Avatar src={taskMember.imgUrl} alt="member-img"/>
                                 <span>{taskMember.fullname}</span>
                                 <span onClick={() => onRemoveMember(taskMember)} className="remove">x</span>
                             </li>
@@ -74,14 +73,14 @@ export function ModalMember({dynamicModalObj}){
                 <div className="outTaskMembers">
                     <form className="search-div flex space-between" onSubmit={onSubmit}>
                         <input type="text" placeholder={t('member.search')} name="txt" value={filter.txt} onChange={handleChange}/>
-                        <button className="icon-container"><CiSearch className="icon"/></button>
+                        <button className="icon-container"><Icon name='magnifying-glass' className="icon"/></button>
                     </form>
                     <span>{t('member.suggestions')}</span>
                     {outTaskMembers.length > 0 && <ul className="out-member-list">
                         {
                             outTaskMembers.map(taskMember => {
                                 return <li key={taskMember._id} onClick={() => onAddMember(taskMember)}>
-                                    <img src={taskMember.imgUrl || GUEST_IMG} alt="member-img"/>
+                                    <Avatar src={taskMember.imgUrl} alt="member-img"/>
                                     <span>{taskMember.fullname}</span>
                                 </li>
                             })

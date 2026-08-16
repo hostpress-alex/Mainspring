@@ -19,7 +19,7 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     transform: translateX(100%);
-    z-index: 100;
+    z-index: var(--z-popover);
     transition: transform .6s, box-shadow .6s;
 
     @include mixins.for-mobile-layout() {
@@ -237,7 +237,7 @@
     bottom: 0;
     width: 9px;
     margin-right: -4px;
-    z-index: 101;
+    z-index: calc(var(--z-popover) + 1);
     cursor: col-resize;
     background: transparent;
     transition: background-color .15s;

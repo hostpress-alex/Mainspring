@@ -5,10 +5,8 @@ import {loadBoard, updateBoardMembers, removeBoardMember} from '../../store/boar
 import {confirmDelete} from '../confirm-dialog'
 import {boardService} from '../../services/board.service'
 
-import {VscTriangleUp} from 'react-icons/vsc'
-import {CiSearch} from 'react-icons/ci'
-import {CgClose} from 'react-icons/cg'
-import {GUEST_IMG} from '../../services/avatar'
+import { Icon } from '../icon'
+import { Avatar } from '../avatar'
 import {t} from '../../i18n'
 
 export function ModalMemberInvite({board, setIsInviteModalOpen}){
@@ -68,14 +66,14 @@ export function ModalMemberInvite({board, setIsInviteModalOpen}){
 
     return (
         <section className="modal-member invite">
-            <CgClose className="close-btn" onClick={() => setIsInviteModalOpen(false)}/>
-            <VscTriangleUp className="triangle-icon"/>
+            <Icon name='xmark' className="close-btn" onClick={() => setIsInviteModalOpen(false)}/>
+            <Icon name='caret-up' className="triangle-icon"/>
             <section className="modal-member-content">
                 <ul className="taskMembers flex">
                     {
                         board.members.map(member => {
                             return <li key={member._id}>
-                                <img src={member.imgUrl || GUEST_IMG} alt="member-img"/>
+                                <Avatar src={member.imgUrl} alt="member-img"/>
                                 <span>{member.fullname}</span>
                                 {canManage &&
                                     <span onClick={() => onRemoveMember(member._id)} className="remove">x</span>}
@@ -88,14 +86,14 @@ export function ModalMemberInvite({board, setIsInviteModalOpen}){
                 {canManage && <div className="outTaskMembers">
                     <form className="search-div flex space-between" onSubmit={onSubmit}>
                         <input type="text" placeholder={t('member.search')} name="txt" value={filter.txt} onChange={handleChange}/>
-                        <button className="icon-container"><CiSearch className="icon"/></button>
+                        <button className="icon-container"><Icon name='magnifying-glass' className="icon"/></button>
                     </form>
                     <span>{t('member.suggestions')}</span>
                     {outBoardMembers.length > 0 && <ul className="out-member-list">
                         {
                             outBoardMembers.map(member => {
                                 return <li key={member._id} onClick={() => onAddMember(member)}>
-                                    <img src={member.imgUrl || GUEST_IMG} alt="member-img"/>
+                                    <Avatar src={member.imgUrl} alt="member-img"/>
                                     <span>{member.fullname}</span>
                                 </li>
                             })

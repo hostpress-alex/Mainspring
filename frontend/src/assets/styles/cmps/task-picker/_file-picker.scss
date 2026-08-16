@@ -47,8 +47,10 @@
     .file-picker-body {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 4px;
         max-width: 100%;
+        width: 100%;
     }
 
     .file-picker-link {
@@ -66,13 +68,25 @@
         display: block;
     }
 
-    .file-picker-name {
-        font-size: 12px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    // One icon per file type instead of the name. The colours are the ones
+    // everybody already reads without thinking: red PDF, blue Word, green
+    // spreadsheet. Everything unknown stays grey and does not shout.
+    .file-icon {
+        font-size: functions.rem(17px);
+        color: #676879;
+
+        &.is-pdf        { color: #d32b2b; }
+        &.is-word       { color: #2b579a; }
+        &.is-excel      { color: #217346; }
+        &.is-powerpoint { color: #c43e1c; }
+        &.is-archive    { color: #b28900; }
+        &.is-code       { color: #0073ea; }
+        &.is-audio      { color: #a25ddc; }
+        &.is-video      { color: #7f5347; }
     }
 
+    // The cross only on hover — otherwise every filled cell carries a delete
+    // button around with it and the eye reads it before the file itself.
     .file-picker-clear {
         border: none;
         background: transparent;
@@ -81,6 +95,13 @@
         padding: 0;
         line-height: 1;
         font-size: 13px;
+        opacity: 0;
+        transition: opacity .12s;
+    }
+
+    &:hover .file-picker-clear,
+    .file-picker-clear:focus-visible {
+        opacity: 1;
     }
 
     .file-picker-input {

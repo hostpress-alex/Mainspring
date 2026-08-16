@@ -4,11 +4,7 @@ import {useSelector} from 'react-redux'
 import {duplicateTask, updateGroupAction, moveTasksToGroup, loadBoard} from '../../store/board.actions'
 import {confirmDelete} from '../confirm-dialog'
 
-import {HiOutlineDocumentDuplicate} from 'react-icons/hi'
-import {FiTrash} from 'react-icons/fi'
-import {IoCloseOutline} from 'react-icons/io5'
-import {BsArrowRightCircle} from 'react-icons/bs'
-import {BsFillCircleFill} from 'react-icons/bs'
+import { Icon } from '../icon'
 import _ from 'lodash'
 import {t} from '../../i18n'
 
@@ -94,27 +90,27 @@ export function TaskToolsModal({tasks, group, board, setSelectedTasks, setIsMain
                         <span>{t('task.selectedLabel', {n: tasks.length})}</span>
                         <div className="group-color flex">
                             {_.times(tasks.length, () =>
-                                <BsFillCircleFill key={_.uniqueId('KEY_')} className="icon" style={{'--group-color': group.color}}/>)}
+                                <Icon name='circle' key={_.uniqueId('KEY_')} className="icon" style={{'--group-color': group.color}}/>)}
                         </div>
                     </div>
                     <div className="task-btns flex">
                         <div onClick={onDuplicateTasks}>
-                            <HiOutlineDocumentDuplicate className="icon"/>
+                            <Icon name='clone' style='fa-regular' className="icon"/>
                             {t('common.duplicate')}
                         </div>
                         <div onClick={onRemoveTasks}>
-                            <FiTrash className="icon"/>
+                            <Icon name='trash-can' style='fa-regular' className="icon"/>
                             {t('common.delete')}
                         </div>
                         <div ref={elMove} className={`move-to${targets.length?'':' is-disabled'}`} onClick={() => targets.length && setIsMoveOpen(open => !open)} title={targets.length?t('task.moveToTitle'):t('task.noOtherGroup')}>
-                            <BsArrowRightCircle className="icon"/>
+                            <Icon name='circle-arrow-right' className="icon"/>
                             {t('task.moveTo')}
                             {isMoveOpen && (
                                 <ul className="move-to-list" onClick={ev => ev.stopPropagation()}>
                                     <li className="move-to-head">{t('task.moveTo')}</li>
                                     {targets.map(g => (
                                         <li key={g.id} className="move-to-item" onClick={() => onMoveTo(g.id)}>
-                                            <BsFillCircleFill className="move-to-dot" style={{'--group-color': g.color}}/>
+                                            <Icon name='circle' className="move-to-dot" style={{'--group-color': g.color}}/>
                                             <span className="move-to-name">{g.title}</span>
                                             <span className="move-to-count">{(g.tasks || []).length}</span>
                                         </li>
@@ -124,7 +120,7 @@ export function TaskToolsModal({tasks, group, board, setSelectedTasks, setIsMain
                         </div>
                     </div>
                     <div className="close-btn" onClick={reset}>
-                        <IoCloseOutline className="icon"/>
+                        <Icon name='xmark' className="icon"/>
                     </div>
                 </div>
             </div>

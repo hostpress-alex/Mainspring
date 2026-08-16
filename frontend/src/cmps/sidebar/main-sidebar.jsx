@@ -2,14 +2,13 @@ import {Link, useLocation, useNavigate} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 import {useState} from 'react'
 
-import {AiOutlineMenu} from 'react-icons/ai'
-import {VscTriangleLeft} from 'react-icons/vsc'
-import {MdCalendarMonth, MdOutlineAdminPanelSettings} from 'react-icons/md'
+import { Icon } from '../icon'
 import {closeDynamicModal} from '../../store/board.actions'
 import WorkspaceIcon from './workspace-icon'
 import {Tooltip} from '@mui/material'
 import {LogoMark} from '../logo-mark'
-import {GUEST_IMG} from '../../services/avatar'
+import { Avatar } from '../avatar'
+import {NotificationBell} from '../notification/notification-bell'
 import {t} from '../../i18n'
 
 /**
@@ -45,7 +44,7 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
     return (
         <section className="main-sidebar flex">
             <span className="open-workspace-btn">
-                <AiOutlineMenu onClick={() => setIsWorkspaceOpen && setIsWorkspaceOpen(prev => !prev)}/>
+                <Icon name='bars' onClick={() => setIsWorkspaceOpen && setIsWorkspaceOpen(prev => !prev)}/>
             </span>
 
             <Link to={'/'} className="icon-link">
@@ -58,22 +57,24 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
                 <Tooltip title={t('nav.workspaces')} arrow placement="right">
                     <div className="icon-container" onClick={() => onChooseIcon('board')}>
                         <WorkspaceIcon/>
-                        {active('board') && <VscTriangleLeft className="triangle-icon"/>}
+                        {active('board') && <Icon name='caret-left' className="triangle-icon"/>}
                     </div>
                 </Tooltip>
 
+                <NotificationBell/>
+
                 <Tooltip title={t('nav.calendar')} arrow placement="right">
                     <Link to="/kalender" className={`icon-container nav-link${location.pathname === '/kalender'?' is-active':''}`}>
-                        <MdCalendarMonth/>
-                        {location.pathname === '/kalender' && <VscTriangleLeft className="triangle-icon"/>}
+                        <Icon name='calendar-days'/>
+                        {location.pathname === '/kalender' && <Icon name='caret-left' className="triangle-icon"/>}
                     </Link>
                 </Tooltip>
 
                 {user?.isAdmin && (
                     <Tooltip title={t('nav.administration')} arrow placement="right">
                         <Link to="/admin" className={`icon-container nav-link${location.pathname === '/admin'?' is-active':''}`}>
-                            <MdOutlineAdminPanelSettings/>
-                            {location.pathname === '/admin' && <VscTriangleLeft className="triangle-icon"/>}
+                            <Icon name='user-shield'/>
+                            {location.pathname === '/admin' && <Icon name='caret-left' className="triangle-icon"/>}
                         </Link>
                     </Tooltip>
                 )}
@@ -81,7 +82,7 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
 
             <div className="bottom">
                 <Tooltip title={user?t('nav.profileTooltip', {name: user.fullname}):t('nav.login')} arrow placement="right">
-                    <img className="logged-user-img" src={(user && user.imgUrl)?user.imgUrl:GUEST_IMG} alt="" onClick={() => setIsLoginModalOpen && setIsLoginModalOpen(prev => !prev)}/>
+                    <Avatar className="logged-user-img" src={user?.imgUrl} onClick={() => setIsLoginModalOpen && setIsLoginModalOpen(prev => !prev)}/>
                 </Tooltip>
             </div>
         </section>

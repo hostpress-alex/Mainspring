@@ -23,7 +23,7 @@
 }
 
 @mixin for-wide-layout {
-    @media (min-width: calc(variables.$normal-breakpoint + 40px)) {
+    @media (min-width: calc(variables.$narrow-breakpoint + 40px)) {
         @content;
     }
 }

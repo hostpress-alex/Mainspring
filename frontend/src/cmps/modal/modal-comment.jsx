@@ -1,6 +1,4 @@
-import {BsPinAngle} from 'react-icons/bs'
-import {AiOutlineDelete} from 'react-icons/ai'
-import {FiEdit2} from 'react-icons/fi'
+import { Icon } from '../icon'
 import {confirmDelete} from '../confirm-dialog'
 import {t} from '../../i18n'
 
@@ -25,15 +23,15 @@ export function CommentMenuModal({commentId, onRemoveComment, onOpenEdit, setIsM
     return (
         <section className="comment-modal">
             <div className="pin">
-                <BsPinAngle/>
+                <Icon name='thumbtack'/>
                 <span>{t('common.pin')}</span>
             </div>
             <div className="edit" onClick={onEdit}>
-                <FiEdit2/>
+                <Icon name='pen'/>
                 <span>{t('common.edit')}</span>
             </div>
             <div className="delete" onClick={() => onRemove(commentId, taskId)}>
-                <AiOutlineDelete/>
+                <Icon name='trash-can' style='fa-regular'/>
                 <span>{isReply?t('update.deleteReply'):t('update.delete')}</span>
             </div>
         </section>

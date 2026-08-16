@@ -1,8 +1,7 @@
-import {BsFillLightningFill} from 'react-icons/bs';
-import {CgClose} from 'react-icons/cg';
+import { Icon } from '../icon'
 import {loadBoards, updateBoardMeta} from '../../store/board.actions';
 import {utilService} from '../../services/util.service';
-import {GUEST_IMG} from '../../services/avatar'
+import { Avatar } from '../avatar'
 import {singleLineEditable} from '../../services/editable'
 import {t} from '../../i18n'
 
@@ -26,7 +25,7 @@ export function BoardDescription({setIsShowDescription, board}){
     return (
         <section className="board-description-modal flex">
             <div className="close-btn">
-                <CgClose onClick={() => setIsShowDescription(false)}/>
+                <Icon name='xmark' onClick={() => setIsShowDescription(false)}/>
             </div>
             <div className="board-edit flex column">
                 <div className="board-edit-title">
@@ -47,7 +46,7 @@ export function BoardDescription({setIsShowDescription, board}){
                     <span className="header">{t('board.workspace')}</span>
                     <div className="workspace-details flex">
                         <span className="lightning-container">
-                            <BsFillLightningFill/>
+                            <Icon name='bolt'/>
                         </span>
                         <span className="workspace-name">{t('board.workspaceName')}</span>
                     </div>
@@ -55,14 +54,14 @@ export function BoardDescription({setIsShowDescription, board}){
                 <div className="created-by">
                     <span className="header">{t('board.createdAt')}</span>
                     <div className="created-by-details flex">
-                        <img src={board.createdBy.imgUrl || GUEST_IMG} alt=""/>
+                        <Avatar src={board.createdBy.imgUrl} alt=""/>
                         <span className="date">{utilService.getFormattedDate(board.archivedAt)}</span>
                     </div>
                 </div>
                 <div className="owners">
                     <span className="header">{t('board.owner')}</span>
                     <div className="owners-details">
-                        <img src={board.createdBy.imgUrl || GUEST_IMG} alt=""/>
+                        <Avatar src={board.createdBy.imgUrl} alt=""/>
                         <span className="owner-name">{board.createdBy.fullname}</span>
                     </div>
                 </div>

@@ -4,15 +4,10 @@ import {useNavigate} from 'react-router-dom'
 import {useEffectUpdate} from '../../customHooks/useEffectUpdate'
 import {utilService} from '../../services/util.service'
 
-import {FaAngleDown} from 'react-icons/fa'
-import {TfiSearch} from 'react-icons/tfi'
-import {BsPersonCircle} from 'react-icons/bs'
-import {AiFillCloseCircle} from 'react-icons/ai'
-import {FiActivity} from 'react-icons/fi'
-import {RiUserAddLine} from 'react-icons/ri'
+import { Icon } from '../icon'
 import {useSelector} from 'react-redux'
 import {Tooltip} from '@mui/material'
-import {GUEST_IMG} from '../../services/avatar'
+import { Avatar } from '../avatar'
 import {t} from '../../i18n'
 
 /** How many faces fit before it turns into a "+3". */
@@ -84,23 +79,23 @@ export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
                 <div className="add-btn">
                     <span className="new-task-btn" onClick={() => addTaskOnFirstGroup(board)}>{t('task.new')}</span>
                     <div className="drop-down-btn" onClick={onToggleMenuModal}>
-                        <FaAngleDown className="icon"/>
+                        <Icon name='angle-down' className="icon"/>
                     </div>
                 </div>
             </Tooltip>
             <div className="board-tools flex align-center">
                 <Tooltip title={t('common.search')} arrow>
                     <div className="search-task">
-                        <TfiSearch className="icon"/>
+                        <Icon name='magnifying-glass' className="icon"/>
                         <input type="text" name="title" value={filterBy.title} placeholder={t('common.search')} onChange={handleChange}/>
                     </div>
                 </Tooltip>
                 <Tooltip title={t('task.filterByPerson')} arrow>
                     <div ref={elMemberFilter} onClick={onToggleMemberFilterModal} className={`person-filter ${(isMemberModalOpen() || filterBy.memberId)?' active':''}`}>
-                        {!memberFilter && <BsPersonCircle className="icon"/>}
-                        {memberFilter && <img className="member-img" src={memberFilter.imgUrl || GUEST_IMG} alt=""/>}
+                        {!memberFilter && <Icon name='circle-user' className="icon"/>}
+                        {memberFilter && <Avatar className="member-img" src={memberFilter.imgUrl}/>}
                         <span>{t('common.person')}</span>
-                        {filterBy.memberId && <AiFillCloseCircle onClick={onRemovePersonFilter}/>}
+                        {filterBy.memberId && <Icon name='circle-xmark' onClick={onRemovePersonFilter}/>}
                     </div>
                 </Tooltip>
             </div>
@@ -111,14 +106,14 @@ export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
                 the whole tool rather than into one board. */}
             <div className="board-members flex align-center">
                 <Tooltip title={t('board.showActivity')} arrow>
-                    <div className="activity" onClick={() => openBoardPanel('activity')}><FiActivity/></div>
+                    <div className="activity" onClick={() => openBoardPanel('activity')}><Icon name='clock-rotate-left'/></div>
                 </Tooltip>
                 <Tooltip title={t('board.showMembers')} arrow>
                     <div className="members-last-seen flex" onClick={() => openBoardPanel('last-viewed')}>
                         <span className="last-seen-title">{t('activity.lastSeen')}</span>
                         <div className="flex members-imgs">
                             {members.slice(0, SHOWN_MEMBERS).map(member => (
-                                <img key={member._id} className="member-img" src={member.imgUrl || GUEST_IMG} alt="" title={member.fullname}/>
+                                <Avatar key={member._id} className="member-img" src={member.imgUrl} alt="" title={member.fullname}/>
                             ))}
                             {members.length > SHOWN_MEMBERS && (
                                 <div className="show-more-members">
@@ -130,7 +125,7 @@ export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
                 </Tooltip>
                 <Tooltip title={t('board.invite')} arrow>
                     <div className="invite" onClick={() => setIsInviteModalOpen(true)}>
-                        <RiUserAddLine className="invite-icon"/>
+                        <Icon name='user-plus' className="invite-icon"/>
                         <span className="invite-title">{t('board.inviteWithCount', {n: members.length})}</span>
                     </div>
                 </Tooltip>

@@ -1,7 +1,5 @@
 import {useState} from 'react'
-import {HiOutlineDocumentDuplicate} from 'react-icons/hi'
-import {FiTrash} from 'react-icons/fi'
-import {MdOutlineFolder} from 'react-icons/md'
+import { Icon } from '../icon'
 import {updateBoardMeta, loadBoards, setDynamicModalObj} from '../../store/board.actions'
 import {t} from '../../i18n'
 
@@ -47,15 +45,15 @@ export function BoardMenuModal({dynamicModalObj}){
             {!isFolderOpen && (
                 <>
                     <div className="folder" onClick={() => setIsFolderOpen(true)}>
-                        <MdOutlineFolder/>
+                        <Icon name='folder' style='fa-regular'/>
                         <span>{t('board.changeFolder')}</span>
                     </div>
                     <div className="duplicate" onClick={onDuplicateBoard}>
-                        <HiOutlineDocumentDuplicate/>
+                        <Icon name='clone' style='fa-regular'/>
                         <span>{t('board.duplicate')}</span>
                     </div>
                     <div className="delete" onClick={onRemoveBoard}>
-                        <FiTrash/>
+                        <Icon name='trash-can' style='fa-regular'/>
                         <span>{t('common.delete')}</span>
                     </div>
                 </>

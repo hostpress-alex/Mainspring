@@ -117,6 +117,8 @@ task_member     who the task is assigned to
 task_comment    updates/comments on a task, parent_id = a reply
 activity        history, capped at 40 entries per board
 schedule        users' calendar entries
+notification    one row per recipient per event, with a read state
+task_subscription  who wants to hear about a task; muted = the explicit no
 file            upload metadata; the files themselves still live
                 under backend/uploads/ on disk
 ```
@@ -129,6 +131,8 @@ Migrations, in order:
 | `20260814_000002_file.js` | `file` — metadata for uploads |
 | `20260815_000003_comment_parent.js` | `task_comment.parent_id` — replies to updates |
 | `20260815_000004_file_name.js` | `file.original_name` — the name as uploaded |
+| `20260815_000005_drop_cmps_columns.js` | drops `board.cmps_order` and `board.cmps_option` |
+| `20260815_000006_notifications.js` | `notification` and `task_subscription` |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -145,6 +149,15 @@ the comment with that id. Deliberately not deeper — nobody reads replies to
 replies afterwards. There is no foreign key onto itself, because the comments
 of a task are written in one go (delete all, insert all) and the order within
 that transaction must not matter.
+
+**Notifications are fanned out on write.** One row per recipient, rather than
+working out on read who should see an activity. It costs a few rows and buys a
+read state per person — which the other way round cannot have without storing
+"seen up to here" per user and giving up marking a single entry read.
+
+**A subscription can be muted rather than deleted.** A deleted row cannot be
+told apart from never having subscribed, so the next assignment would sign the
+user up again to the thing they just switched off.
 
 **Uploaded files keep two names.** On disk a file is named after its id, which
 is unique; `original_name` holds what it was called when it was uploaded, so a
@@ -227,9 +240,9 @@ ORDER BY week DESC, u.fullname;
 ## 6. Who is allowed to read what
 
 Access control lives in `api/board/board.service.js`: `hasAccess` (owner,
-member or admin) and `isOwner` (owner or admin). Both are covered by
-`test/board-access.test.js`, including boards from before the multi-owner
-change, which carry a single `ownerId` field instead of an `ownerIds` array.
+member or admin) and `isOwner` (owner or admin), both covered by
+`test/board-access.test.js`. Ownership itself is a row in `board_member` with
+`is_owner = 1` — there is no owner field on the board.
 
 The real-time layer asks those same two functions. Until recently it asked
 nobody at all: a socket named the room it wanted and got it, so anyone who

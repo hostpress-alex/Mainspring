@@ -1,26 +1,22 @@
 import {useEffect, useMemo, useRef, useState} from 'react'
-import {
-    MdOutlineViewWeek, MdArrowDropDownCircle, MdOutlineTextFields, MdOutlineCalendarMonth,
-    MdOutlinePerson, MdOutlineNumbers, MdOutlineInsertDriveFile, MdOutlineCheckBox,
-    MdOutlineLink, MdOutlineFlag, MdOutlineNotes, MdOutlineUpdate
-} from 'react-icons/md'
+import { Icon } from '../icon'
 import {COLUMN_CATALOG, COLUMN_CATEGORIES, makeColumn} from '../../services/column.service'
 import './add-column-dialog.css'
 import {t} from '../../i18n'
 
 const ICONS = {
-    status: {el: <MdOutlineViewWeek/>, bg: '#00c875'},
-    dropdown: {el: <MdArrowDropDownCircle/>, bg: '#00a9a5'},
-    text: {el: <MdOutlineTextFields/>, bg: '#fdab3d'},
-    date: {el: <MdOutlineCalendarMonth/>, bg: '#a25ddc'},
-    person: {el: <MdOutlinePerson/>, bg: '#41b0f5'},
-    number: {el: <MdOutlineNumbers/>, bg: '#ffcb00'},
-    file: {el: <MdOutlineInsertDriveFile/>, bg: '#e2445c'},
-    checkbox: {el: <MdOutlineCheckBox/>, bg: '#fdab3d'},
-    link: {el: <MdOutlineLink/>, bg: '#0073ea'},
-    priority: {el: <MdOutlineFlag/>, bg: '#ffcb00'},
-    longtext: {el: <MdOutlineNotes/>, bg: '#7f5347'},
-    updated: {el: <MdOutlineUpdate/>, bg: '#9d99b9'}
+    status: {el: <Icon name='table-columns'/>, bg: '#00c875'},
+    dropdown: {el: <Icon name='circle-chevron-down'/>, bg: '#00a9a5'},
+    text: {el: <Icon name='font'/>, bg: '#fdab3d'},
+    date: {el: <Icon name='calendar-days' style='fa-regular'/>, bg: '#a25ddc'},
+    person: {el: <Icon name='user' style='fa-regular'/>, bg: '#41b0f5'},
+    number: {el: <Icon name='hashtag'/>, bg: '#ffcb00'},
+    file: {el: <Icon name='file' style='fa-regular'/>, bg: '#e2445c'},
+    checkbox: {el: <Icon name='square-check' style='fa-regular'/>, bg: '#fdab3d'},
+    link: {el: <Icon name='link'/>, bg: '#0073ea'},
+    priority: {el: <Icon name='flag' style='fa-regular'/>, bg: '#ffcb00'},
+    longtext: {el: <Icon name='align-left'/>, bg: '#7f5347'},
+    updated: {el: <Icon name='clock-rotate-left'/>, bg: '#9d99b9'}
 }
 
 /**
@@ -49,7 +45,7 @@ export function AddColumnDialog({onAdd, onClose, existingTitles = []}){
             c.label.toLowerCase().includes(q) || c.type.includes(q))
     }, [filter])
 
-    /** Doppelte Titel vermeiden: "Text", "Text 2", "Text 3" … */
+    /** Avoid duplicate titles: "Text", "Text 2", "Text 3" … */
     function uniqueTitle(base){
         if(!existingTitles.includes(base)) return base
         let n = 2

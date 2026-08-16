@@ -203,6 +203,7 @@
         "noneSelected":    "No file selected",
         "notAnImage":      "That is not an image",
         "readFailed":      "File could not be read",
+        "readFailedWhy":   "Could not read the file ({reason})",
         "remove":          "Remove file",
         "uploadFailed":    "Upload failed"
     },
@@ -274,6 +275,32 @@
         "profile":        "My profile",
         "profileTooltip": "{name} — profile and log out",
         "workspaces":     "Workspaces"
+    },
+    "notification": {
+        "assigned":    "{actor} assigned something to you",
+        "comment":     "{actor} wrote an update",
+        "empty":       "No notifications.",
+        "emptyUnread": "Nothing unread.",
+        "generic":     "{actor} changed something",
+        "invited":     "{actor} added you to a board",
+        "markAllRead": "Mark all as read",
+        "mention":     "{actor} mentioned you",
+        "onlyUnread":  "Unread only",
+        "section":     {
+            "older":  "Older",
+            "today":  "Today",
+            "week":   "Last 7 days"
+        },
+        "someone":     "Someone",
+        "title":       "Notifications",
+        "unreadCount": {
+            "one":   "1 unread notification",
+            "other": "{n} unread notifications"
+        },
+        "value":       "{actor} changed {column}"
+    },
+    "mention": {
+        "suggestions": "People suggestions"
     },
     "panel":    {
         "width": "Drag to resize — double-click resets"

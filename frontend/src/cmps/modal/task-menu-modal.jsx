@@ -1,7 +1,4 @@
-import {AiOutlinePlus} from 'react-icons/ai';
-import {FiTrash} from 'react-icons/fi';
-import {HiOutlineDocumentDuplicate} from 'react-icons/hi';
-import {TbArrowsDiagonal} from 'react-icons/tb';
+import { Icon } from '../icon'
 import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {boardService} from '../../services/board.service';
@@ -61,19 +58,19 @@ export function TaskMenuModal({dynamicModalObj}){
     return (
         <section className="task-menu-modal">
             <div onClick={onOpenModal}>
-                <TbArrowsDiagonal/>
+                <Icon name='expand'/>
                 <span>{t('common.open')}</span>
             </div>
             <div onClick={onDuplicateTask}>
-                <HiOutlineDocumentDuplicate/>
+                <Icon name='clone' style='fa-regular'/>
                 <span>{t('common.duplicate')}</span>
             </div>
             <div onClick={() => onRemoveTask()}>
-                <FiTrash/>
+                <Icon name='trash-can' style='fa-regular'/>
                 <span>{t('common.delete')}</span>
             </div>
             <div onClick={onCreateNewTaskBelow}>
-                <AiOutlinePlus/>
+                <Icon name='plus'/>
                 <span>{t('task.newBelow')}</span>
             </div>
         </section>

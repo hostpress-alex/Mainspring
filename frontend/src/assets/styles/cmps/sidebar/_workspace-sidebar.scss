@@ -202,7 +202,7 @@
         border-radius: 20px;
         border: 1px solid #c3c6d4;
         background-color: #fff;
-        z-index: 50;
+        z-index: var(--z-nav);
         cursor: pointer;
         transition: .2s;
 

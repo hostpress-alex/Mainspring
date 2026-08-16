@@ -280,13 +280,6 @@ export async function saveColumnLabels(board, column, labels, renames = {}, remo
     }
 }
 
-export async function updatePickerCmpsOrder(filteredBoard, cmpsOrders){
-    try {
-        return _applyBoard(await boardService.updateMeta(filteredBoard._id, {cmpsOrder: cmpsOrders}))
-    } catch(err) {
-        throw err
-    }
-}
 
 export async function addGroup(filteredBoard){
     try {

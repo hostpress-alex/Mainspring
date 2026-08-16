@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux'
 
 import {setDynamicModalObj} from '../../store/board.actions'
 
-import {BiDotsHorizontalRounded} from 'react-icons/bi'
+import { Icon } from '../icon'
 import {t} from '../../i18n'
 
 /**
@@ -56,7 +56,7 @@ export function TitleGroupPreview({column, group, isKanban, onRename}){
                 {column.title}
             </span>
             <span ref={elRemoveColumn} className="open-modal-icon">
-                {!isKanban && <BiDotsHorizontalRounded onClick={onToggleMenuModal}/>}
+                {!isKanban && <Icon name='ellipsis' onClick={onToggleMenuModal}/>}
             </span>
         </>
     )

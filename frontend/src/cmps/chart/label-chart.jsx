@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement} from 'chart.js';
 import {Bar, Doughnut, Pie} from 'react-chartjs-2';
-import {BiDotsHorizontalRounded} from 'react-icons/bi';
+import { Icon } from '../icon'
 import {setDynamicModalObj} from '../../store/board.actions';
 import {t} from '../../i18n'
 
@@ -102,7 +102,7 @@ export function LabelChart({board, dynamicModalObj}){
                 <div className="header-content">
                     <h2>{t('chart.labels')}</h2>
                     <span className="icon-container" ref={elModalBtn} onClick={onToggleTypeModal}>
-                <BiDotsHorizontalRounded/>
+                <Icon name='ellipsis'/>
               </span>
                 </div>
             </div>

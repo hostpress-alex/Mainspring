@@ -4,17 +4,13 @@ import {useSelector} from 'react-redux'
 
 import {toggleModal, updateTaskAction} from '../../store/board.actions'
 
-import {CgClose} from 'react-icons/cg'
-import {MdAttachFile} from 'react-icons/md'
-import {GrHomeRounded} from 'react-icons/gr'
-import {AiOutlineBold} from 'react-icons/ai'
-import {RxUnderline} from 'react-icons/rx'
-import {TbAlignRight, TbAlignCenter, TbAlignLeft} from 'react-icons/tb'
-
+import { Icon } from '../icon'
 import {boardService} from '../../services/board.service'
 import {singleLineEditable} from '../../services/editable'
 import {utilService} from '../../services/util.service'
 import {CommentPreview} from '../task/comment-preview'
+import {MentionTextarea} from '../mention/mention-textarea'
+import {toStorage} from '../../services/mention'
 import {ActivityPreview} from '../activity-preview'
 import {ErrorBoundary} from '../error-boundary'
 import {
@@ -144,6 +140,9 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         if(!comment.txt.trim() && !(comment.attachments || []).length) return
         try {
             comment.id = utilService.makeId()
+            // Shown form -> stored form, at the last possible moment. Up to
+            // here the text is what the user sees; from here it carries ids.
+            comment.txt = toStorage(comment.txt, board.members)
             if(user){
                 comment.byMember.fullname = user.fullname
                 comment.byMember.imgUrl = user.imgUrl
@@ -274,7 +273,7 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
 
     return <section className="task-modal">
         <div className="task-modal-header flex align-center">
-            <CgClose className="close-btn" onClick={onCloseModal}/>
+            <Icon name='xmark' className="close-btn" onClick={onCloseModal}/>
             <div className="title">
                 <blockquote contentEditable onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
                             {...singleLineEditable()}>
@@ -284,7 +283,7 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         </div>
         <div className="task-modal-type flex">
             <div onClick={() => setIsShowUpdate(!isShowUpdate)} className={`updates-btn ${isShowUpdate?'active':''}`}>
-                <GrHomeRounded/>
+                <Icon name='house'/>
                 <span>{t('update.updates')}</span>
             </div>
             <div onClick={() => setIsShowUpdate(!isShowUpdate)} className={`activity-btn ${!isShowUpdate?'active':''}`}>
@@ -305,20 +304,20 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
                 <span className="close-input-container flex align-center" onClick={() => setIsWriteNewUpdate(true)}>{t('update.write')}</span>}
             {isWriteNewUpdate && <form className="input-container" onPaste={onPasteUpdate}>
                 <div className="style-txt">
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontWeight')}><AiOutlineBold/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textDecoration')}><RxUnderline/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontWeight')}><Icon name='bold'/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textDecoration')}><Icon name='underline'/></span>
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontStyle')}>/</span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><TbAlignLeft/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><TbAlignCenter/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><TbAlignRight/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><Icon name='align-left'/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><Icon name='align-center'/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><Icon name='align-right'/></span>
                     <span title={t('update.attach')} className="update-attach-btn" onMouseDown={(ev) => {
                         ev.preventDefault();
                         elFileInput.current?.click()
                     }}>
-                        <MdAttachFile/>
+                        <Icon name='paperclip'/>
                     </span>
                 </div>
-                <textarea ref={elTextarea} name="txt" style={comment.style} value={comment.txt} placeholder={t('update.placeholder')} onBlur={close} onChange={handleChange}></textarea>
+                <MentionTextarea ref={elTextarea} name="txt" members={board.members} style={comment.style} value={comment.txt} placeholder={t('update.placeholder')} onBlur={close} onChange={handleChange}/>
 
                 <input ref={elFileInput} type="file" multiple accept="image/*,.pdf,.doc,.docx,.odt,.rtf,.xls,.xlsx,.ods,.csv,.ppt,.pptx,.odp,.txt,.md,.json,.xml,.zip,.7z" onChange={onPickFiles} className="update-file-input"/>
 
@@ -337,7 +336,7 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
                         threads.map(({comment, replies}) => {
                             return (
                                 <li key={comment.id}>
-                                    <CommentPreview onRemoveComment={onRemoveComment} comment={comment} replies={replies} onReply={onAddReply} onEditComment={onEditComment}/>
+                                    <CommentPreview onRemoveComment={onRemoveComment} comment={comment} replies={replies} onReply={onAddReply} onEditComment={onEditComment} members={board.members}/>
                                 </li>
                             )
                         })

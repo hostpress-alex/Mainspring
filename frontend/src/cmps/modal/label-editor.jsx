@@ -1,6 +1,5 @@
 import {useMemo, useState} from 'react'
-import {FiTrash} from 'react-icons/fi'
-import {AiOutlinePlus} from 'react-icons/ai'
+import { Icon } from '../icon'
 import './label-editor.css'
 import {t} from '../../i18n'
 
@@ -137,7 +136,7 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
                                     <button type="button" className="label-editor-remove" title={used
                                         ?t('label.removeUsed', {n: used})
                                         :t('label.remove')} onClick={() => onRemove(row.id)}>
-                                        <FiTrash/>
+                                        <Icon name='trash-can' style='fa-regular'/>
                                     </button>
                                 </div>
                                 {/* The palette deliberately sits IN the flow below the row.
@@ -162,7 +161,7 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
             </div>
 
             <button type="button" className="label-editor-add" onClick={onAdd}>
-                <AiOutlinePlus/> Label hinzufügen
+                <Icon name='plus'/> Label hinzufügen
             </button>
 
             {message && <p className="label-editor-err">{message}</p>}

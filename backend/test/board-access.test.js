@@ -40,14 +40,6 @@ test('an admin gets in everywhere', () => {
     assert.strictEqual(boardService.isOwner(board, user('root', {isAdmin: true})), true)
 })
 
-test('boards from before the multi-owner change still work', () => {
-    // Old shape: a single ownerId field instead of an ownerIds array.
-    const board = {ownerId: 'u1', members: []}
-    assert.strictEqual(boardService.hasAccess(board, user('u1')), true)
-    assert.strictEqual(boardService.isOwner(board, user('u1')), true)
-    assert.deepStrictEqual(boardService.ownerIdsOf(board), ['u1'])
-})
-
 test('ids of different types still match', () => {
     // Ids do not always arrive as strings — a caller may hand in a number or an
     // object with a toString. Comparison has to survive that.

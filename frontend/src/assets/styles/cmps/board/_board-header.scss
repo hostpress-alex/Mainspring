@@ -9,7 +9,7 @@
     left: 0;
     top: 0;
     background-color: white;
-    z-index: 30;
+    z-index: var(--z-sticky);
 
     .board-title {
         color: variables.$workspace-icon-color;
@@ -102,7 +102,7 @@
                 border-bottom: 2px solid variables.$board-btn;
             }
 
-            svg {
+            i {
                 font-size: functions.rem(12px);
             }
 

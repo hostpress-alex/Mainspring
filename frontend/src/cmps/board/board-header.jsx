@@ -2,10 +2,7 @@ import {BoardFilter} from '../board/board-filter'
 import {closeDynamicModal, updateBoardMeta, toggleModal, toggleStarred} from '../../store/board.actions'
 import {loadBoards} from '../../store/board.actions'
 
-import {RiErrorWarningLine} from 'react-icons/ri'
-import {BsBarChart, BsKanban, BsStar} from 'react-icons/bs'
-import {BsStarFill} from 'react-icons/bs'
-import {GrHomeRounded} from 'react-icons/gr'
+import { Icon } from '../icon'
 import {useNavigate} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 import {Tooltip} from '@mui/material'
@@ -62,12 +59,12 @@ export function BoardHeader({
                     </Tooltip>
                     <Tooltip title={t('board.showDescription')} arrow>
                         <div className="info-btn icon" onClick={() => setIsShowDescription(true)}>
-                            <RiErrorWarningLine/>
+                            <Icon name='circle-exclamation'/>
                         </div>
                     </Tooltip>
                     <Tooltip title={t('board.addFavorite')} arrow>
                         <div className="star-btn icon " onClick={onToggleStarred}>
-                            {!board.isStarred?<BsStar className="star"/>:<BsStarFill className="star star-full"/>}
+                            {!board.isStarred?<Icon name='star' style='fa-regular' className="star"/>:<Icon name='star' className="star star-full"/>}
                         </div>
                     </Tooltip>
                 </div>
@@ -79,21 +76,21 @@ export function BoardHeader({
             <div className="board-display-btns flex">
                 <Tooltip title={t('board.table')} arrow>
                     <div className={`type-btn ${boardType === 'table'?' active':''}`} onClick={() => onSetBoardType('table')}>
-                        <GrHomeRounded className="icon"/>
+                        <Icon name='house' className="icon"/>
                         <span className="wide" onClick={() => onSetBoardType('table')}>{t('board.table')}</span>
                         <span className="mobile">{t('board.table')}</span>
                     </div>
                 </Tooltip>
                 <Tooltip title={t('board.kanban')} arrow>
                     <div className={`type-btn ${boardType === 'kanban'?' active':''}`} onClick={() => onSetBoardType('kanban')}>
-                        <BsKanban/>
+                        <Icon name='table-columns'/>
                         <span className="wide">{t('board.kanban')}</span>
                         <span className="mobile" onClick={() => onSetBoardType('kanban')}>{t('board.kanban')}</span>
                     </div>
                 </Tooltip>
                 <Tooltip title={t('board.dashboard')} arrow>
                     <div className={`type-btn ${boardType === 'dashboard'?' active':''}`} onClick={() => onSetBoardType('dashboard')}>
-                        <BsBarChart/>
+                        <Icon name='chart-column'/>
                         <span className="wide">{t('board.dashboard')}</span>
                         <span className="mobile" onClick={() => onSetBoardType('dashboard')}>{t('board.dashboard')}</span>
                     </div>

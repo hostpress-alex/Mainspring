@@ -1,5 +1,5 @@
 import {useSelector} from 'react-redux'
-import {FiTrash} from 'react-icons/fi'
+import { Icon } from '../icon'
 import {loadBoard, setDynamicModalObj, updateBoardColumns} from '../../store/board.actions'
 import {confirmDelete} from '../confirm-dialog'
 import {t} from '../../i18n'
@@ -28,7 +28,7 @@ export function RemoveColumnModal({dynamicModalObj}){
     return (
         <ul className="remove-column-modal">
             <li onClick={onRemoveColumn}>
-                <FiTrash className="icon"/> {t('column.delete')}
+                <Icon name='trash-can' style='fa-regular' className="icon"/> {t('column.delete')}
             </li>
         </ul>
     )

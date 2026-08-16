@@ -1,6 +1,4 @@
-import {HiOutlineDocumentDuplicate} from 'react-icons/hi'
-import {RiDeleteBinLine} from 'react-icons/ri'
-import {BsFillCircleFill} from 'react-icons/bs'
+import { Icon } from '../icon'
 import {duplicateGroup, setDynamicModalObj, updateGroups} from '../../store/board.actions'
 import {confirmDelete} from '../confirm-dialog'
 import {useSelector} from 'react-redux'
@@ -43,15 +41,15 @@ export function GroupMenuModal({dynamicModalObj}){
     return (
         <section className="group-menu-modal">
             <div className="color" onClick={openPaletteModal}>
-                <BsFillCircleFill className="group-color-dot"/>
+                <Icon name='circle' className="group-color-dot"/>
                 <span>{t('group.changeColor')}</span>
             </div>
             <div className="duplicate" onClick={onDuplicateGroup}>
-                <HiOutlineDocumentDuplicate/>
+                <Icon name='clone' style='fa-regular'/>
                 <span>{t('group.duplicate')}</span>
             </div>
             <div className="delete" onClick={onRemoveGroup}>
-                <RiDeleteBinLine/>
+                <Icon name='trash-can' style='fa-regular'/>
                 <span>{t('common.delete')}</span>
             </div>
         </section>

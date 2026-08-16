@@ -1,4 +1,4 @@
-import {FcPieChart, FcDoughnutChart, FcBarChart} from 'react-icons/fc'
+import { Icon } from '../icon'
 import {setDynamicModalObj} from '../../store/board.actions'
 import {t} from '../../i18n'
 
@@ -12,15 +12,15 @@ export function ChartTypeModal({dynamicModalObj}){
     return (
         <section className="chart-type-modal">
             <div onClick={() => onSetChartType('pie')}>
-                <FcPieChart/>
+                <Icon name='chart-pie'/>
                 <span>{t('chart.pie')}</span>
             </div>
             <div onClick={() => onSetChartType('doughnut')}>
-                <FcDoughnutChart/>
+                <Icon name='chart-pie'/>
                 <span>{t('chart.donut')}</span>
             </div>
             <div onClick={() => onSetChartType('bar')}>
-                <FcBarChart/>
+                <Icon name='chart-column'/>
                 <span>{t('chart.bars')}</span>
             </div>
         </section>

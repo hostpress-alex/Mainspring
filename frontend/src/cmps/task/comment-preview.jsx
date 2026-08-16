@@ -1,16 +1,13 @@
 import {useState} from 'react'
 
-import {IoTimeOutline} from 'react-icons/io5'
-import {BiDotsHorizontalRounded} from 'react-icons/bi'
-import {AiOutlineBold} from 'react-icons/ai'
-import {RxUnderline} from 'react-icons/rx'
-import {TbAlignRight, TbAlignCenter, TbAlignLeft} from 'react-icons/tb'
-import {BsReply} from 'react-icons/bs'
-
+import { Icon } from '../icon'
 import {CommentMenuModal} from '../modal/modal-comment'
 import {utilService} from '../../services/util.service'
-import {GUEST_IMG} from '../../services/avatar'
+import { Avatar } from '../avatar'
 import {AttachmentStrip} from './attachment-strip'
+import {MentionTextarea} from '../mention/mention-textarea'
+import {MentionText} from '../mention/mention-text'
+import {toStorage} from '../../services/mention'
 import './comment-replies.css'
 import {t} from '../../i18n'
 
@@ -27,7 +24,8 @@ export function CommentPreview({
     onEditComment,
     replies = [],
     onReply,
-    isReply = false
+    isReply = false,
+    members = []
 }){
     const [isMenuModalOpen, setIsMenuModalOpen] = useState(false)
     const [isEditOpen, setIsEditOpen] = useState(false)
@@ -47,7 +45,7 @@ export function CommentPreview({
     }
 
     function onSaveEdit(){
-        onEditComment(editComment, taskId)
+        onEditComment({...editComment, txt: toStorage(editComment.txt, members)}, taskId)
         setIsEditOpen(false)
     }
 
@@ -56,7 +54,7 @@ export function CommentPreview({
         if(!replyTxt.trim() || isSendingReply) return
         setIsSendingReply(true)
         try {
-            await onReply(comment.id, replyTxt)
+            await onReply(comment.id, toStorage(replyTxt, members))
             setReplyTxt('')
             setIsReplyOpen(false)
         } finally {
@@ -90,35 +88,35 @@ export function CommentPreview({
         <section className={`comment-preview${isReply?' is-reply':''}`}>
             <div className="header-comment flex space-between">
                 <div className="left flex align-center">
-                    <img src={comment.byMember?.imgUrl || GUEST_IMG} alt=""/>
+                    <Avatar src={comment.byMember?.imgUrl} alt=""/>
                     <span>{comment.byMember?.fullname}</span>
                 </div>
                 <div className="right flex align-center">
                     <div className="time flex align-center">
-                        <IoTimeOutline/>
+                        <Icon name='clock' style='fa-regular'/>
                         <span>{utilService.calculateTime(comment.archivedAt)}</span>
                     </div>
                     <div className={`menu-icon-container ${isMenuModalOpen?' active':''}`}>
-                        <BiDotsHorizontalRounded onClick={() => setIsMenuModalOpen(!isMenuModalOpen)}/>
+                        <Icon name='ellipsis' onClick={() => setIsMenuModalOpen(!isMenuModalOpen)}/>
                         {isMenuModalOpen &&
                             <CommentMenuModal onRemoveComment={onRemoveComment} commentId={comment.id} onOpenEdit={setIsEditOpen} setIsMenuModalOpen={setIsMenuModalOpen} taskId={taskId} isReply={isReply}/>}
                     </div>
                 </div>
             </div>
             {!isEditOpen && <>
-                {comment.txt && <p style={comment.style}>{comment.txt}</p>}
+                {comment.txt && <MentionText text={comment.txt} members={members} style={comment.style}/>}
                 <AttachmentStrip attachments={comment.attachments}/>
             </>}
             {isEditOpen && <form className="input-container">
                 <div className="style-txt">
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontWeight')}><AiOutlineBold/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textDecoration')}><RxUnderline/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontWeight')}><Icon name='bold'/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textDecoration')}><Icon name='underline'/></span>
                     <span onMouseDown={(ev) => onChangeTextStyle(ev, 'fontStyle')}>/</span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><TbAlignLeft/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><TbAlignCenter/></span>
-                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><TbAlignRight/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Left')}><Icon name='align-left'/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Center')}><Icon name='align-center'/></span>
+                    <span onMouseDown={(ev) => onChangeTextStyle(ev, 'textAlign', 'Right')}><Icon name='align-right'/></span>
                 </div>
-                <textarea name="txt" style={editComment.style} value={editComment.txt} onChange={handleChange}></textarea>
+                <MentionTextarea name="txt" members={members} style={editComment.style} value={editComment.txt} onChange={handleChange}/>
             </form>}
             {isEditOpen && <div className="button-container">
                 <button className="save" onMouseDown={onSaveEdit}>{t('common.save')}</button>
@@ -131,7 +129,7 @@ export function CommentPreview({
                         <ul className="reply-list">
                             {replies.map(reply => (
                                 <li key={reply.id}>
-                                    <CommentPreview comment={reply} taskId={taskId} isReply onRemoveComment={onRemoveComment} onEditComment={onEditComment}/>
+                                    <CommentPreview comment={reply} taskId={taskId} isReply onRemoveComment={onRemoveComment} onEditComment={onEditComment} members={members}/>
                                 </li>
                             ))}
                         </ul>
@@ -139,14 +137,14 @@ export function CommentPreview({
 
                     {!isReplyOpen && (
                         <button type="button" className="reply-btn" onClick={() => setIsReplyOpen(true)}>
-                            <BsReply/>
+                            <Icon name='reply'/>
                             <span>{replies.length?t('update.repliesCount', {n: replies.length}):t('update.replies')}</span>
                         </button>
                     )}
 
                     {isReplyOpen && (
                         <form className="reply-form" onSubmit={onSendReply}>
-                            <textarea autoFocus rows={2} value={replyTxt} placeholder={t('update.replyPlaceholder')} onChange={ev => setReplyTxt(ev.target.value)} onKeyDown={ev => {
+                            <MentionTextarea autoFocus rows={2} members={members} value={replyTxt} placeholder={t('update.replyPlaceholder')} onChange={ev => setReplyTxt(ev.target.value)} onKeyDown={ev => {
                                 // Enter sends, Shift+Enter starts a new line.
                                 if(ev.key === 'Enter' && !ev.shiftKey) onSendReply(ev)
                                 if(ev.key === 'Escape'){
