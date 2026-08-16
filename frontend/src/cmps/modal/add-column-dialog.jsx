@@ -1,7 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react'
 import { Icon } from '../icon'
 import {COLUMN_CATALOG, COLUMN_CATEGORIES, makeColumn} from '../../services/column.service'
-import './add-column-dialog.css'
 import {t} from '../../i18n'
 
 const ICONS = {

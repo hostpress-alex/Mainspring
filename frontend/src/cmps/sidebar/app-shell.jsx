@@ -4,7 +4,6 @@ import {WorkspaceSidebar} from './workspace-sidebar'
 import {LoginLogoutModal} from '../modal/login-logout-modal'
 import {CreateBoard} from '../modal/create-board'
 import {DynamicModal} from '../modal/dynamic-modal'
-import './app-shell.css'
 
 /**
  * Frame for all pages outside the board view: main bar, below it the board

@@ -1,5 +1,257 @@
-// see label-editor.css — this file only carries the colours that come from
-// the data, so the rules do not have to live in the JSX.
+@use "../../setup/variables";
+
+/*
+ * The editor hangs inside .dynamic-modal, where different rules apply
+ * depending on the type of popup. So it sets everything it relies on itself —
+ * and uses class names of its own throughout rather than bare elements.
+ */
+.label-editor {
+    width: 296px;
+    box-sizing: border-box;
+    padding: 4px 4px 2px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: variables.$primary-text-color;
+    text-align: left;
+}
+
+.label-editor * {
+    box-sizing: border-box;
+}
+
+.label-editor-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.label-editor-title {
+    font-weight: 600;
+    color: variables.$primary-text-color;
+}
+
+.label-editor-col {
+    font-size: 12px;
+    color: variables.$workspace-icon-color;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Scrolling happens here, not on the list — that way the colour palette can
+   grow with it without being cut off. */
+.label-editor-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 0 -4px;
+    padding: 0 4px;
+}
+
+.label-editor-list {
+    list-style: none;
+    display: block;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    color: variables.$primary-text-color;
+    font-size: 14px;
+}
+
+.label-editor-row {
+    display: block;
+    min-width: 0;
+    height: auto;
+    margin: 0 0 6px;
+    padding: 0;
+    cursor: default;
+    color: variables.$primary-text-color;
+}
+
+.label-editor-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.label-editor-swatch {
+    width: 26px;
+    height: 30px;
+    flex: 0 0 26px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.label-editor-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 30px;
+    padding: 4px 8px;
+    border: 1px solid #c3c6d4;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 14px;
+    color: variables.$primary-text-color;
+    background: variables.$app-bg;
+}
+
+.label-editor-input:focus {
+    outline: none;
+    border-color: variables.$board-btn;
+}
+
+.label-editor-usage {
+    flex: 0 0 auto;
+    min-width: 20px;
+    padding: 1px 6px;
+    border-radius: 9px;
+    background: #e6e9ef;
+    color: variables.$workspace-icon-color;
+    font-size: 11px;
+    text-align: center;
+}
+
+.label-editor-remove {
+    flex: 0 0 26px;
+    width: 26px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: variables.$workspace-icon-color;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0;
+}
+
+.label-editor-remove:hover {
+    background: #ffe6e9;
+    color: #a3283a;
+}
+
+.label-editor-palette {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+    margin: 6px 0 8px 32px;
+    padding: 8px;
+    background: variables.$sidebar-workspace-bg;
+    border: 1px solid #e6e9ef;
+    border-radius: 6px;
+}
+
+.label-editor-palette button {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.label-editor-palette button.is-active {
+    border-color: variables.$primary-text-color;
+}
+
+.label-editor-empty {
+    margin: 4px 0 8px;
+    font-size: 13px;
+    color: variables.$workspace-icon-color;
+}
+
+.label-editor-add {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    margin: 4px 0 0;
+    border: none;
+    background: transparent;
+    color: variables.$board-btn;
+    cursor: pointer;
+    padding: 4px 0;
+    font: inherit;
+    font-size: 14px;
+}
+
+.label-editor-add:hover {
+    text-decoration: underline;
+}
+
+.label-editor-err {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #a3283a;
+}
+
+.label-editor-hint {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: variables.$workspace-icon-color;
+    line-height: 1.4;
+}
+
+.label-editor-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.label-editor-save {
+    flex: 1 1 auto;
+    height: 34px;
+    border: none;
+    border-radius: 4px;
+    background: variables.$board-btn;
+    color: variables.$app-bg;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+}
+
+.label-editor-save:hover {
+    background: variables.$primary-hover-color;
+}
+
+.label-editor-save:disabled {
+    background: #c3c6d4;
+    cursor: default;
+}
+
+.label-editor-cancel {
+    flex: 0 0 auto;
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid #c3c6d4;
+    border-radius: 4px;
+    background: variables.$app-bg;
+    color: variables.$primary-text-color;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+}
+
+.label-editor-cancel:hover {
+    background: variables.$workspace-hover;
+}
+
+.label-editor-cancel:disabled {
+    color: #a0a3b1;
+    cursor: default;
+}
+
+/* These two used to sit in a `_label-editor.scss` of their own beside the .css
+   file: the colour arrives from the data through a custom property, and a
+   plain .css file could hold it while the rest of the rules could not reach a
+   Sass variable. With everything in one partial that split has no reason left.
+   They are also the reason this conversion nearly lost something — the .css
+   and the .scss had the same name and different contents. */
 .label-editor-swatch {
     background-color: var(--label-color);
 }

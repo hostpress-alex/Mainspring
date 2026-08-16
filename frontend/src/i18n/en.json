@@ -223,6 +223,9 @@
         "duplicate":   "Duplicate group",
         "expand":      "Unfold group",
         "group":       "Group",
+        "icon":        "Group symbol",
+        "iconNone":    "No symbol",
+        "iconOwn":     "Your own emoji",
         "new":         "New group",
         "none":        "No folder",
         "thisGroup":   "This group"
@@ -310,6 +313,15 @@
     "panel":    {
         "width": "Drag to resize — double-click resets"
     },
+    "preview":  {
+        "download":      "Download",
+        "empty":         "The file is empty",
+        "failed":        "The file could not be loaded",
+        "noPreview":     "No preview for this file type. Download it and open it locally.",
+        "tooBig":        "The file is too large to preview",
+        "truncatedRows": "Showing the first {n} rows. Download the file for the rest.",
+        "truncatedText": "Shortened. Download the file for the full contents."
+    },
     "profile":  {
         "changePassword":   "Change password",
         "choosePicture":    "Choose picture",
@@ -356,6 +368,7 @@
         "moveToTitle":    "Move to another group",
         "new":            "New task",
         "newBelow":       "New task below",
+        "newSubtask":     "New subtask",
         "noOtherGroup":   "There is no other group",
         "noTarget":       "No other task on this board",
         "none":           "No tasks",

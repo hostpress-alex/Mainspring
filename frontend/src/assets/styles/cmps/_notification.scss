@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 .notification-bell {
     position: relative;
 }
@@ -13,7 +15,7 @@
     padding: 0 4px;
     border-radius: 8px;
     background: #e2445c;
-    color: #fff;
+    color: variables.$app-bg;
     font-size: 10px;
     font-weight: 700;
     line-height: 16px;
@@ -39,9 +41,9 @@
     flex-direction: column;
     width: min(420px, calc(100vw - 80px));
     max-height: calc(100vh - 24px);
-    border: 1px solid #d0d4e4;
+    border: 1px solid variables.$layout-border-color;
     border-radius: 8px;
-    background: #fff;
+    background: variables.$app-bg;
     box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
     overflow: hidden;
 }
@@ -74,7 +76,7 @@
 .notification-mark-all {
     border: 0;
     background: none;
-    color: #0073ea;
+    color: variables.$board-btn;
     cursor: pointer;
     font: inherit;
 }
@@ -93,8 +95,8 @@
     top: 0;
     margin: 0;
     padding: 8px 16px 4px;
-    background: #fff;
-    color: #676879;
+    background: variables.$app-bg;
+    color: variables.$workspace-icon-color;
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -116,7 +118,7 @@
 }
 
 .notification-item:hover {
-    background: #f5f6f8;
+    background: variables.$board-description-bg;
 }
 
 .notification-item.is-unread {
@@ -159,7 +161,7 @@
 }
 
 .notification-detail {
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
 }
 
@@ -181,11 +183,11 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #0073ea;
+    background: variables.$board-btn;
 }
 
 .notification-empty {
     padding: 24px 16px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     text-align: center;
 }

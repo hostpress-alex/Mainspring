@@ -2,6 +2,8 @@ import {useRef, useState} from 'react'
 import { Icon } from '../icon'
 import {fileType, fileSize} from './file-type'
 import {uploadFile} from '../../services/upload.service'
+import {canPreview} from '../../services/preview'
+import {FilePreview} from '../file-preview'
 import {t} from '../../i18n'
 
 /**
@@ -38,6 +40,7 @@ function asFile(value){
 export function FilePicker({info, onUpdate, field = 'file'}){
     const [isBusy, setIsBusy] = useState(false)
     const [err, setErr] = useState(null)
+    const [preview, setPreview] = useState(null)
     const elInput = useRef()
     const file = asFile(info[field])
     const type = file?fileType(file):null
@@ -83,6 +86,7 @@ export function FilePicker({info, onUpdate, field = 'file'}){
 
     return (
         <section className="file-picker picker" title={describe()}>
+            {preview && <FilePreview file={preview} onClose={() => setPreview(null)}/>}
             {!file && (
                 <label htmlFor={'file-upload' + info.id} className="file-picker-add">
                     {isBusy?<span className="file-picker-busy">…</span>:<Icon name='file-circle-plus' className="icon"/>}
@@ -91,12 +95,27 @@ export function FilePicker({info, onUpdate, field = 'file'}){
 
             {file && (
                 <span className="file-picker-body">
-                    <a href={file.url} target="_blank" rel="noreferrer" className="file-picker-link"
-                        aria-label={describe()} onClick={ev => ev.stopPropagation()}>
-                        {isImage
-                            ?<img className="file-img" src={file.url} alt=""/>
-                            :<Icon name={type.faIcon} className={`file-icon is-${type.key}`}/>}
-                    </a>
+                    {/* Previewable files open the overlay; the rest keep the
+                        link that downloads them. Which is which comes from
+                        services/preview.js, the same source the attachment
+                        strip asks — two places deciding that separately would
+                        drift within a release. */}
+                    {canPreview(file)?(
+                        <button type="button" className="file-picker-link"
+                                aria-label={describe()} onClick={ev => {
+                                    ev.stopPropagation()
+                                    setPreview(file)
+                                }}>
+                            {isImage
+                                ?<img className="file-img" src={file.url} alt=""/>
+                                :<Icon name={type.faIcon} className={`file-icon is-${type.key}`}/>}
+                        </button>
+                    ):(
+                        <a href={file.url} target="_blank" rel="noreferrer" className="file-picker-link"
+                            aria-label={describe()} onClick={ev => ev.stopPropagation()}>
+                            <Icon name={type.faIcon} className={`file-icon is-${type.key}`}/>
+                        </a>
+                    )}
                     <button type="button" title={t('file.remove')} onClick={onClear} className="file-picker-clear">
                         ×
                     </button>

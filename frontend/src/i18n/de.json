@@ -223,6 +223,9 @@
         "duplicate":   "Gruppe duplizieren",
         "expand":      "Gruppe ausklappen",
         "group":       "Gruppe",
+        "icon":        "Symbol der Gruppe",
+        "iconNone":    "Kein Symbol",
+        "iconOwn":     "Eigenes Emoji",
         "new":         "Neue Gruppe",
         "none":        "Ohne Gruppe",
         "thisGroup":   "Diese Gruppe"
@@ -310,6 +313,15 @@
     "panel":    {
         "width": "Breite ziehen — Doppelklick setzt zurück"
     },
+    "preview":  {
+        "download":      "Herunterladen",
+        "empty":         "Die Datei ist leer",
+        "failed":        "Die Datei konnte nicht geladen werden",
+        "noPreview":     "Für diesen Dateityp gibt es keine Vorschau. Herunterladen und lokal öffnen.",
+        "tooBig":        "Die Datei ist zu groß für eine Vorschau",
+        "truncatedRows": "Es werden die ersten {n} Zeilen gezeigt. Für alles Weitere die Datei herunterladen.",
+        "truncatedText": "Gekürzt. Für den vollständigen Inhalt die Datei herunterladen."
+    },
     "profile":  {
         "changePassword":   "Passwort ändern",
         "choosePicture":    "Bild wählen",
@@ -356,6 +368,7 @@
         "moveToTitle":    "In eine andere Gruppe verschieben",
         "new":            "Neuer Task",
         "newBelow":       "Neuen Task darunter",
+        "newSubtask":     "Neuer Subtask",
         "noOtherGroup":   "Es gibt keine andere Gruppe",
         "noTarget":       "Kein anderer Task auf diesem Board",
         "none":           "Keine Tasks",

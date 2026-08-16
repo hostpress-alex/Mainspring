@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 .mention-field {
     position: relative;
     display: flex;
@@ -15,9 +17,9 @@
     max-height: 240px;
     margin: 4px 0 0;
     padding: 4px;
-    border: 1px solid #d0d4e4;
+    border: 1px solid variables.$layout-border-color;
     border-radius: 8px;
-    background: #fff;
+    background: variables.$app-bg;
     box-shadow: 0 6px 18px rgba(0, 0, 0, .16);
     list-style: none;
     overflow-y: auto;
@@ -54,6 +56,6 @@
     padding: 0 2px;
     border-radius: 3px;
     background: #eaf3ff;
-    color: #0073ea;
+    color: variables.$board-btn;
     font-weight: 600;
 }

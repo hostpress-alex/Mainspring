@@ -49,35 +49,3 @@ export function hasValue(column, task){
 export function filledColumns(board, task){
     return (board?.columns || []).filter(column => hasValue(column, task))
 }
-
-/* ------------------------------------------------------------ subtasks -- */
-
-/**
- * How far the children of a task have got, as the short string on the row.
- *
- * "Done" is not guessed. A board like "wtf / yea / lol" has no label that
- * looks finished, and picking the last one or matching the word "done" would
- * be right on some boards and quietly wrong on others. A label says so itself:
- * `done: true`, set in the label editor.
- *
- * With no label marked, the counter falls back to the plain number of
- * children. That is honest — it shows what is actually known — and it is why
- * this returns a string rather than a pair of numbers.
- *
- * Returns null when there is nothing to say, so the caller can leave the
- * counter off entirely rather than print a zero.
- */
-export function subtaskProgress(board, task){
-    const subtasks = task && task.subtasks
-    if(!Array.isArray(subtasks) || !subtasks.length) return null
-
-    const doneByColumn = (board?.columns || [])
-        .map(column => [column, new Set((column.labels || []).filter(l => l && l.done).map(l => l.title))])
-        .filter(([, titles]) => titles.size)
-
-    if(!doneByColumn.length) return String(subtasks.length)
-
-    const done = subtasks.filter(sub =>
-        doneByColumn.some(([column, titles]) => titles.has(sub[fieldOf(column)]))).length
-    return `${done}/${subtasks.length}`
-}

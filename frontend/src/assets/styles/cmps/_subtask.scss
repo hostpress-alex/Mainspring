@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 /* Subtask rows.
 
    There is almost nothing here, and that is the point: a subtask row is a
@@ -33,7 +35,7 @@
     top: 0;
     bottom: 0;
     width: 2px;
-    background: var(--group-color, #d0d4e4);
+    background: var(--group-color, variables.$layout-border-color);
     opacity: .45;
 }
 
@@ -61,12 +63,12 @@
     padding: 6px 0;
     font: inherit;
     font-size: 13px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
 .subtask-add input[type="text"]:focus-visible {
     outline: 0;
-    color: #323338;
+    color: variables.$primary-text-color;
 }
 
 /* The toggle and the counter on the parent row. */
@@ -79,7 +81,7 @@
     border-radius: 4px;
     background: none;
     padding: 2px 5px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font: inherit;
     font-size: 11px;
     cursor: pointer;
@@ -87,7 +89,25 @@
 
 .subtask-toggle:hover {
     background: #eaf3ff;
-    color: #0073ea;
+    color: variables.$board-btn;
+}
+
+/* A row without children keeps the arrow's width but not its ink, so the
+   titles of neighbouring rows still start at the same place. It appears when
+   the row is under the cursor, or when it is focused by keyboard — otherwise
+   the only way to create a first subtask would be a mouse. */
+.subtask-toggle.is-empty {
+    opacity: 0;
+    transition: opacity .12s;
+}
+
+.task-preview:hover .subtask-toggle.is-empty,
+.subtask-toggle.is-empty:focus-visible {
+    opacity: .55;
+}
+
+.task-preview:hover .subtask-toggle.is-empty:hover {
+    opacity: 1;
 }
 
 .subtask-toggle .fa-chevron-down,
@@ -95,6 +115,3 @@
     font-size: 10px;
 }
 
-.subtask-count {
-    font-variant-numeric: tabular-nums;
-}

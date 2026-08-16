@@ -59,7 +59,12 @@ export function BoardPreview({board, sectionId = null, isActive = null}){
         }
     }
 
-    function onToggleMemberFilterModal(){
+    function onToggleMemberFilterModal(ev){
+        // The whole row navigates to the board. Without this the click on the
+        // menu travels up to it, so opening the menu also opened the board —
+        // and a menu whose first entry is "delete" must not be reachable only
+        // by going somewhere first.
+        ev.stopPropagation()
         const isOpen = dynamicModalObj?.type === 'board-menu' && dynamicModalObj?.board?._id === board._id?!dynamicModalObj.isOpen:true
         const {x, y} = elBoardPreview.current.getClientRects()[0]
         setDynamicModalObj({isOpen, pos: {x: (x + 190), y: (y + 35)}, type: 'board-menu', board, onRemove, onDuplicate})

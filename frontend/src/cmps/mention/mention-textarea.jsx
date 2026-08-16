@@ -3,7 +3,6 @@ import {useEffect, useRef, useState, forwardRef, useImperativeHandle} from 'reac
 import {Avatar} from '../avatar'
 import {activeQuery, matchMembers, insertMention} from '../../services/mention'
 import {t} from '../../i18n'
-import './mention.css'
 
 /**
  * A textarea that suggests people after an `@`.

@@ -1,5 +1,4 @@
 import {useEffect, useRef, useState} from 'react'
-import './confirm-dialog.css'
 import {t} from '../i18n'
 
 /**

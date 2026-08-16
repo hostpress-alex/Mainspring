@@ -17,9 +17,6 @@ import {TextPicker, LongTextPicker, CheckboxPicker, LinkPicker, DropdownPicker} 
 import { Icon } from '../icon'
 import {GUEST_IMG} from '../../services/avatar'
 import {widthOf, widthStyle, TASK_COLUMN} from '../board/column-width'
-import {subtaskProgress} from '../board/column-value'
-import './subtask.css'
-import '../board/board-columns.css'
 import {t} from '../../i18n'
 
 /**
@@ -51,7 +48,7 @@ export function TaskPreview({
     // Only standalone updates count — replies hang off them and would otherwise
     // inflate the number in the row.
     const updateCount = (task.comments || []).filter(c => c && !c.parentId).length
-    const progress = subtaskProgress(board, task)
+    const hasSubtasks = (task.subtasks || []).length > 0
 
     async function updateTask(cmpType, data, activity){
         const taskToUpdate = structuredClone(task)
@@ -118,17 +115,19 @@ export function TaskPreview({
                     <input type="checkbox" checked={isSelected} onChange={onCheckBoxChange}/>
                 </div>
                 <div className="task-title picker flex align-center space-between" style={widthStyle(widthOf(widths, TASK_COLUMN))}>
-                    {/* Always offered, not only when children exist — otherwise
-                        there is no way to create the first one from the table. */}
+                    {/* Always in the DOM, but only visible on a row that has
+                        children — on the others it appears on hover. It cannot
+                        simply be left out: an arrow that is not rendered takes
+                        its width with it, and the title of a row with subtasks
+                        would then sit further right than the one below it. */}
                     {onToggleSubtasks && !isSubtask && (
-                        <button type="button" className="subtask-toggle"
+                        <button type="button" className={`subtask-toggle${hasSubtasks?'':' is-empty'}`}
                                 title={isSubtasksOpen?t('task.hideSubtasks'):t('task.showSubtasks')}
                                 onClick={ev => {
                                     ev.stopPropagation()
                                     onToggleSubtasks()
                                 }}>
                             <Icon name={isSubtasksOpen?'chevron-down':'chevron-right'}/>
-                            {progress && <span className="subtask-count">{progress}</span>}
                         </button>
                     )}
                     <blockquote contentEditable onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}

@@ -1,6 +1,5 @@
 import {useMemo, useState} from 'react'
 import { Icon } from '../icon'
-import './label-editor.css'
 import {t} from '../../i18n'
 
 /**

@@ -4,8 +4,12 @@
 @use "../../setup/variables";
 
 .group-preview {
-    margin-bottom: variables.$spacing-xxxl;
+    margin-bottom: 2.5rem;
     position: relative;
+
+    &.is-collapsed {
+        margin-bottom: 1.5rem;
+    }
 
     .hidden {
         position: absolute;
@@ -63,9 +67,9 @@
         .add-picker-task {
             border-top: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
             border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-            width: 100%;
+            width: fit-content;
             transition: transform .2s, color .1s ease;
-            padding-right: 150px;
+            padding-right: .5rem;
 
             .add-btn {
                 display: flex;
@@ -142,8 +146,6 @@
         }
 
         .group-title-info {
-            margin-bottom: variables.$spacing-small;
-
             &:hover {
                 .task-count {
                     opacity: 1;
@@ -256,8 +258,16 @@
     .add-task {
         width: 100%;
 
+        /* As narrow as the "+" column above it, exactly like the task rows.
+           It was `width: 100%`, so the last row of a group drew an empty box
+           across whatever space was left to the right of the table. The task
+           rows were given this treatment at some point and this one was
+           missed — the numbers are the same on purpose, so the two lines end
+           in the same place. */
         .empty-div {
-            width: 100%;
+            width: fit-content;
+            flex-grow: 0;
+            padding-right: calc(.5rem + 28px);
             border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         }
 
@@ -323,6 +333,11 @@
         border-bottom-left-radius: 6px;
         opacity: .6;
     }
+
+    .arrow-icon {
+        cursor: pointer;
+        transition: transform .15s;
+    }
 }
 
 /**
@@ -350,15 +365,6 @@
  * Only the header stays, with the number of tasks next to it — so it is clear
  * what is hidden away in there without having to unfold it first.
  */
-.group-preview .arrow-icon {
-    cursor: pointer;
-    transition: transform .15s;
-}
-
-// A folded group needs no room for a table that is not there.
-.group-preview.is-collapsed {
-    margin-bottom: 12px;
-}
 
 .group-collapsed-bar {
     position: sticky;

@@ -12,6 +12,7 @@ package-lock.json
 # testing
 /coverage
 */_to_delete
+**/_to_delete
 */node_modules
 */logs
 */uploads/*

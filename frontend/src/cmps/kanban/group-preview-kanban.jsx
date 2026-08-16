@@ -26,7 +26,10 @@ export function GroupPreviewKanban({group, board, index}){
                     <blockquote className="group-title" contentEditable onBlur={onSave} suppressContentEditableWarning={true}
                                 {...singleLineEditable()}>
                         <Tooltip title={group.title} arrow>
-                            <span>{group.title}</span>
+                            <span>
+                                {group.icon && <span className="group-icon-static">{group.icon}</span>}
+                                {group.title}
+                            </span>
                         </Tooltip>
                     </blockquote>
                 </div>

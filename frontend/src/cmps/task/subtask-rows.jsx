@@ -6,7 +6,6 @@ import {widthOf, widthStyle, TASK_COLUMN} from '../board/column-width'
 import {boardService} from '../../services/board.service'
 import {utilService} from '../../services/util.service'
 import {t} from '../../i18n'
-import './subtask.css'
 
 /**
  * The children of one task, as rows underneath it.

@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 .confirm-overlay {
     position: fixed;
     inset: 0;
@@ -13,12 +15,12 @@
     width: 100%;
     max-width: 380px;
     box-sizing: border-box;
-    background: #fff;
+    background: variables.$app-bg;
     border-radius: 10px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, .28);
     padding: 22px 22px 18px;
     font-family: inherit;
-    color: #323338;
+    color: variables.$primary-text-color;
 }
 
 .confirm-title {
@@ -31,14 +33,14 @@
     margin: 0;
     font-size: 14px;
     line-height: 1.5;
-    color: #323338;
+    color: variables.$primary-text-color;
 }
 
 .confirm-hint {
     margin: 8px 0 0;
     font-size: 13px;
     line-height: 1.5;
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
 .confirm-actions {
@@ -59,22 +61,22 @@
 
 .confirm-cancel {
     border: 1px solid #c3c6d4;
-    background: #fff;
-    color: #323338;
+    background: variables.$app-bg;
+    color: variables.$primary-text-color;
 }
 
 .confirm-cancel:hover {
-    background: #dcdfec;
+    background: variables.$workspace-hover;
 }
 
 .confirm-ok {
     border: none;
-    background: #0073ea;
-    color: #fff;
+    background: variables.$board-btn;
+    color: variables.$app-bg;
 }
 
 .confirm-ok:hover {
-    background: #0060b9;
+    background: variables.$primary-hover-color;
 }
 
 .confirm-ok.is-danger {
@@ -86,6 +88,6 @@
 }
 
 .confirm-ok:focus-visible {
-    outline: 2px solid #323338;
+    outline: 2px solid variables.$primary-text-color;
     outline-offset: 2px;
 }

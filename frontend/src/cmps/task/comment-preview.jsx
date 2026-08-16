@@ -8,7 +8,6 @@ import {AttachmentStrip} from './attachment-strip'
 import {MentionTextarea} from '../mention/mention-textarea'
 import {MentionText} from '../mention/mention-text'
 import {toStorage} from '../../services/mention'
-import './comment-replies.css'
 import {t} from '../../i18n'
 
 /**

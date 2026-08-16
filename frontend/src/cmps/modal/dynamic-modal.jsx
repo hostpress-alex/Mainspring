@@ -1,6 +1,7 @@
 import React, {useEffect, useRef} from 'react'
 import {useSelector} from 'react-redux'
 import {ColorPalette} from '../color-palette'
+import {GroupIconPicker} from './group-icon-picker'
 import {GroupMenuModal} from './group-menu-modal'
 import {RemoveColumnModal} from './remove-column-modal'
 import {TaskMenuModal} from './task-menu-modal'
@@ -49,6 +50,8 @@ export function DynamicModal(){
                 return <GroupMenuModal dynamicModalObj={dynamicModalObj}/>
             case 'palette-modal':
                 return <ColorPalette dynamicModalObj={dynamicModalObj}/>
+            case 'group-icon':
+                return <GroupIconPicker dynamicModalObj={dynamicModalObj}/>
             case 'remove-column':
                 return <RemoveColumnModal dynamicModalObj={dynamicModalObj}/>
             case 'menu-task':

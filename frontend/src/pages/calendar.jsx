@@ -12,7 +12,6 @@ import {
     addDays, addMonths, startOfDay, startOfWeek, startOfMonth, endOfMonth,
     weekDays, fmtDate, fmtMonthYear, fmtWeekdayLong, isoWeek, MS_MIN
 } from '../services/date.util'
-import '../cmps/calendar/calendar.css'
 import {t} from '../i18n'
 
 const VIEWS = [

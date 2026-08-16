@@ -141,7 +141,7 @@
         width: 200px;
         overflow: hidden;
         white-space: nowrap;
-        margin-left: 36px;
+        margin-left: .25rem;
         cursor: text;
 
         @include mixins.for-mobile-layout() {
@@ -161,7 +161,8 @@
 
     .empty-div {
         border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-        flex-grow: 100%;
-        padding-right: 188px;
+        flex-grow: 0;
+        padding-right: calc(.5rem + 28px);
+        width: fit-content;
     }
 }

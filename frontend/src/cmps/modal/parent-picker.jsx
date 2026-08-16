@@ -2,7 +2,6 @@ import {useMemo, useState} from 'react'
 
 import {Icon} from '../icon'
 import {t} from '../../i18n'
-import './parent-picker.css'
 
 /**
  * Pick the task a selected task should hang under.

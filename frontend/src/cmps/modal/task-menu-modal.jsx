@@ -101,6 +101,23 @@ export function TaskMenuModal({dynamicModalObj}){
         }
     }
 
+    /**
+     * Create the first subtask of a task.
+     *
+     * The row only shows its unfold arrow once it HAS children, so this is the
+     * way in. Named "New Subtask" straight away rather than opening an input,
+     * the same as "Neuen Task darunter" right above it.
+     */
+    async function onAddSubtask(){
+        try {
+            await addSubtaskAction(board, dynamicModalObj.group.id, dynamicModalObj.task.id,
+                {...boardService.getEmptyTask(), id: utilService.makeId(), title: 'New Subtask'})
+            setDynamicModalObj({...dynamicModalObj, isOpen: false})
+        } catch(err) {
+            console.error('cannot add the subtask', err)
+        }
+    }
+
     function onOpenModal(){
         navigate(`/board/${board._id}/${dynamicModalObj.group.id}/${dynamicModalObj.task.id}`)
         setDynamicModalObj({...dynamicModalObj, isOpen: false})
@@ -120,6 +137,12 @@ export function TaskMenuModal({dynamicModalObj}){
                 <Icon name='trash-can' variant='fa-regular'/>
                 <span>{t('common.delete')}</span>
             </div>
+            {!isSubtask && (
+                <div onClick={onAddSubtask}>
+                    <Icon name='diagram-next'/>
+                    <span>{t('task.newSubtask')}</span>
+                </div>
+            )}
             {isSubtask && (
                 <div onClick={onPromote}>
                     <Icon name='arrow-turn-up'/>

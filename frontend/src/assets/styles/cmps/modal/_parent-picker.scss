@@ -1,3 +1,5 @@
+@use "../../setup/variables";
+
 /* The list of tasks a selection can be hung under.
 
    It floats above the toolbar it is opened from, so it takes the panel step of
@@ -14,11 +16,11 @@
     flex-direction: column;
     width: 320px;
     max-height: 380px;
-    border: 1px solid #d0d4e4;
+    border: 1px solid variables.$layout-border-color;
     border-radius: 8px;
-    background: #fff;
+    background: variables.$app-bg;
     box-shadow: 0 8px 24px rgb(0 0 0 / 22%);
-    color: #323338;
+    color: variables.$primary-text-color;
     cursor: default;
 }
 
@@ -36,12 +38,12 @@
     border: 0;
     background: none;
     padding: 2px 4px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     cursor: pointer;
 }
 
 .parent-picker-close:hover {
-    color: #323338;
+    color: variables.$primary-text-color;
 }
 
 .parent-picker-search {
@@ -50,9 +52,9 @@
     gap: 8px;
     margin: 0 12px 8px;
     padding: 0 8px;
-    border: 1px solid #d0d4e4;
+    border: 1px solid variables.$layout-border-color;
     border-radius: 6px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
 .parent-picker-search input {
@@ -63,7 +65,7 @@
     padding: 7px 0;
     font: inherit;
     font-size: 13px;
-    color: #323338;
+    color: variables.$primary-text-color;
 }
 
 .parent-picker-search input:focus-visible {
@@ -77,7 +79,7 @@
 
 .parent-picker-group h4 {
     margin: 8px 4px 4px;
-    color: var(--group-color, #676879);
+    color: var(--group-color, variables.$workspace-icon-color);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -99,7 +101,7 @@
     margin-bottom: 2px;
     padding: 7px 8px;
     border: 0;
-    border-left: 3px solid var(--group-color, #d0d4e4);
+    border-left: 3px solid var(--group-color, variables.$layout-border-color);
     border-radius: 4px;
     background: none;
     font: inherit;
@@ -135,6 +137,6 @@
 
 .parent-picker-empty {
     margin: 12px 4px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
 }

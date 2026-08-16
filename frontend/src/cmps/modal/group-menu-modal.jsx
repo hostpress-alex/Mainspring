@@ -33,16 +33,32 @@ export function GroupMenuModal({dynamicModalObj}){
         }
     }
 
-    function openPaletteModal(){
-        dynamicModalObj.type = 'palette-modal'
-        setDynamicModalObj({...dynamicModalObj})
+    /**
+     * Swap the same popup over to a picker, keeping where it sits.
+     *
+     * A new object, not `dynamicModalObj.type = …` followed by a spread: that
+     * wrote into the object the store holds before handing it back, which
+     * works by accident here and is the exact shape of the bug that cost the
+     * group colour a day.
+     */
+    function openPicker(type){
+        setDynamicModalObj({...dynamicModalObj, type})
     }
 
     return (
         <section className="group-menu-modal">
-            <div className="color" onClick={openPaletteModal}>
+            <div className="color" onClick={() => openPicker('palette-modal')}>
                 <Icon name='circle' className="group-color-dot"/>
                 <span>{t('group.changeColor')}</span>
+            </div>
+            <div className="group-symbol" onClick={() => openPicker('group-icon')}>
+                {/* The current symbol where the colour dot sits above it, so
+                    the entry shows what it changes. A face for a group that
+                    has none yet. */}
+                {dynamicModalObj.group?.icon
+                    ?<span className="group-menu-emoji">{dynamicModalObj.group.icon}</span>
+                    :<Icon name='face-smile'/>}
+                <span>{t('group.icon')}</span>
             </div>
             <div className="duplicate" onClick={onDuplicateGroup}>
                 <Icon name='clone' variant='fa-regular'/>

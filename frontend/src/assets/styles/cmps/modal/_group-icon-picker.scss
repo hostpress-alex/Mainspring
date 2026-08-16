@@ -1,0 +1,152 @@
+@use "../../setup/variables";
+
+/* The emoji picker for a group. Sits inside .dynamic-modal, which already
+   places and closes it. */
+
+.group-icon-picker {
+    width: 236px;
+    padding: 8px;
+}
+
+.group-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+}
+
+.group-icon-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 0;
+    border-radius: 5px;
+    background: none;
+    /* Deliberately not `inherit`: the picker's own font size is small, and an
+       emoji at 12px is a smudge. */
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.group-icon-option:hover {
+    background: #eaf3ff;
+}
+
+.group-icon-option.is-active {
+    background: #d6e9ff;
+    box-shadow: inset 0 0 0 1px variables.$board-btn;
+}
+
+.group-icon-own {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e6e9ef;
+}
+
+.group-icon-own input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 5px;
+    padding: 5px 7px;
+    font: inherit;
+    font-size: 14px;
+}
+
+.group-icon-own input:focus-visible {
+    outline: 0;
+    border-color: variables.$board-btn;
+}
+
+.group-icon-save {
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: 5px;
+    background: variables.$board-btn;
+    padding: 5px 10px;
+    color: variables.$app-bg;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.group-icon-clear {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 6px;
+    border: 0;
+    border-radius: 5px;
+    background: none;
+    padding: 6px 7px;
+    color: variables.$workspace-icon-color;
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.group-icon-clear:hover {
+    background: #f1f2f6;
+    color: variables.$primary-text-color;
+}
+
+/* The symbol where it is shown, in the table header and on a Kanban column. */
+.group-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-width: 20px;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    padding: 0 2px;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.group-icon:hover {
+    background: rgb(0 0 0 / 7%);
+}
+
+/* Nothing chosen yet: a faint outline that only appears on the row, so an
+   unused feature does not sit in every heading shouting for attention. */
+.group-icon.is-empty {
+    opacity: 0;
+    transition: opacity .12s;
+}
+
+.group-header:hover .group-icon.is-empty,
+.group-icon.is-empty:focus-visible {
+    opacity: .5;
+}
+
+.group-icon.is-empty:hover {
+    opacity: 1;
+}
+
+/* The symbol in the group heading. Shown only — colour and symbol are both
+   changed from the group menu, so the heading stays a place where a click
+   means "rename". */
+.group-title-info .group-icon-static {
+    margin-right: 4px;
+    font-size: 15px;
+    line-height: 1;
+}
+
+/* The entry in the group menu, lined up with the colour dot above it. */
+.group-menu-modal .group-menu-emoji {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    font-size: 15px;
+    line-height: 1;
+}

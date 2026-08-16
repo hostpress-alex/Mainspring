@@ -27,8 +27,14 @@
     display: block;
 }
 
+/* Either a link that downloads or a button that opens the preview — the
+   markup differs by what the file can do, the look must not. */
 .attachment-file {
     display: flex;
+    border: 1px solid #e0e3ee;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;

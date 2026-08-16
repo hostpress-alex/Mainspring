@@ -28,7 +28,6 @@ import {
     TASK_COLUMN
 } from './column-width'
 import {isCollapsed, toggleCollapsed} from './group-collapse'
-import './board-columns.css'
 import {StatisticGroup} from './statistics-group'
 
 import { Icon } from '../icon'
@@ -38,7 +37,7 @@ import {t} from '../../i18n'
 export function GroupPreview({group, board, idx}){
     const [taskToEdit, setTaskToEdit] = useState(boardService.getEmptyTask())
     const [isTyping, setIsTyping] = useState(false)
-    const [isShowColorPicker, setIsShowColorPicker] = useState(false)
+    const [isTitleFocused, setIsTitleFocused] = useState(false)
     // Which tasks show their children. Open by id rather than a flag on the
     // task, so the board coming back from the server never closes a row the
     // person just opened.
@@ -160,12 +159,6 @@ export function GroupPreview({group, board, idx}){
         setDynamicModalObj({isOpen, pos: {x: (x + width / 2), y: (y + height)}, type: 'menu-group', group: group})
     }
 
-    function onTogglePalette(){
-        const isOpen = dynamicModalObj?.group?.id === group.id && dynamicModalObj?.type === 'palette-modal'?!dynamicModalObj.isOpen:true
-        const {x, y, height, width} = elMainGroup.current.getClientRects()[0]
-        setDynamicModalObj({isOpen, pos: {x: (x + width / 2), y: (y + height)}, type: 'palette-modal', group: group})
-    }
-
     function toggleColumnModal(){
         setIsAddColumnOpen(open => !open)
     }
@@ -282,8 +275,12 @@ export function GroupPreview({group, board, idx}){
                             <div className="group-menu" ref={elMainGroup}>
                                 <Icon name='ellipsis' className="icon" onClick={onToggleMenuModal}/>
                             </div>
-                            <div className={`group-title-info flex align-center ${isShowColorPicker?'showBorder':''} `} onFocus={() => setIsShowColorPicker(true)}>
-                                {isShowColorPicker && <Icon name='circle' onClick={onTogglePalette}/>}
+                            {/* Shown, not operated. Colour and symbol are both
+                                changed from the group menu — a heading whose
+                                every part does something different is a heading
+                                you cannot click to rename. */}
+                            <div className={`group-title-info flex align-center ${isTitleFocused?'showBorder':''} `} onFocus={() => setIsTitleFocused(true)} onBlur={() => setIsTitleFocused(false)}>
+                                {group.icon && <span className="group-icon-static">{group.icon}</span>}
                                 <blockquote ref={elTitle} className="group-title" contentEditable={isEditingTitle} suppressContentEditableWarning={true} onClick={() => setIsEditingTitle(true)} onBlur={(ev) => onSave(ev)}
                                             {...singleLineEditable({onFocus: () => setIsTyping(true)})}>
                                     <h4>{group.title}</h4>

@@ -175,6 +175,7 @@ async function assemble(k, boardRows){
                 id: g.id,
                 title: g.title === null?'':g.title,
                 color: g.color || '',
+                icon: g.icon || '',
                 archivedAt: g.archived_at === null?null:Number(g.archived_at),
                 tasks: (tasksOfBoard.get(g.id) || []).map(t => toTask(t, true))
             })),
@@ -376,6 +377,7 @@ async function writeGroup(trx, boardId, group, position){
         board_id: boardId, id, position,
         title: (group && group.title) || '',
         color: (group && group.color) || '',
+        icon: sanitizeIcon(group && group.icon),
         archived_at: Number.isFinite(Number(group && group.archivedAt))?Number(group.archivedAt):null
     }).onConflict(['board_id', 'id']).merge()
     return id
@@ -530,13 +532,33 @@ async function removeGroup(boardId, groupId){
     await db()('board_group').where({board_id: id, id: groupId}).del()
 }
 
-const GROUP_META_FIELDS = {title: 'title', color: 'color', archivedAt: 'archived_at'}
+const GROUP_META_FIELDS = {title: 'title', color: 'color', icon: 'icon', archivedAt: 'archived_at'}
+
+/**
+ * An emoji is text, and text from a browser is not to be trusted into a column
+ * that everything reads. Cut to what the column holds, and cut by CODE POINTS
+ * rather than by JavaScript string length: `String.prototype.length` counts
+ * UTF-16 units, so slicing there can cut a surrogate pair in half and store
+ * half a character.
+ *
+ * No check that it IS an emoji. There is no honest way to draw that line —
+ * every list of "emoji ranges" is out of date the year it is written — and the
+ * worst a stray letter can do here is look odd in front of a group name.
+ */
+function sanitizeIcon(value){
+    const text = String(value == null?'':value).replace(/[\r\n\t]/g, '').trim()
+    // Eight code points is at most sixteen UTF-16 units, which is exactly what
+    // the column holds — so no second cut is needed, and a second cut by
+    // string length is what would break a pair.
+    return [...text].slice(0, 8).join('')
+}
 
 async function updateGroupMeta(boardId, groupId, patch){
     const update = {}
     for(const [key, column] of Object.entries(GROUP_META_FIELDS)){
         if(patch[key] === undefined) continue
         if(key === 'archivedAt') update[column] = Number.isFinite(Number(patch[key]))?Number(patch[key]):null
+        else if(key === 'icon') update[column] = sanitizeIcon(patch[key])
         else update[column] = patch[key] === null?'':String(patch[key])
     }
     if(!Object.keys(update).length) return

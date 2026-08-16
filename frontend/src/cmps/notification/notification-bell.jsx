@@ -9,7 +9,6 @@ import {notificationService} from '../../services/notification.service'
 import {socketService} from '../../services/socket.service'
 import {fmtRelative} from '../../services/date.util'
 import {t} from '../../i18n'
-import './notification.css'
 
 /**
  * The bell and its panel.
