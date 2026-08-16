@@ -39,11 +39,31 @@ export function BoardDetails(){
     const [searchParams, setSearchParams] = useSearchParams()
     const queryFilterBy = boardService.getFilterFromSearchParams(searchParams)
 
+    // Once per visit to this page, whichever board it is.
     useEffect(() => {
-        loadBoard(boardId, queryFilterBy)
         loadUsers()
         if(!boards.length) loadBoards()
     }, [])
+
+    /**
+     * The board itself, every time the id in the URL changes.
+     *
+     * This used to run on mount only. All three /board/... routes render the
+     * same element, so React keeps one BoardDetails alive across them and a
+     * mount-only effect never fires again — going from one board to another,
+     * or to a task in another board, changed the URL and the sidebar while the
+     * old board stayed on screen. It was invisible as long as the only way to
+     * switch was the board list, which reloads on click.
+     *
+     * queryFilterBy is left out of the dependencies on purpose: it is rebuilt
+     * from the search params on every render, so a new object each time, and
+     * naming it here would reload the board in a loop. The filter has its own
+     * path in through onSetFilter.
+     */
+    useEffect(() => {
+        loadBoard(boardId, queryFilterBy)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [boardId])
 
     useEffect(() => {
         socketService.emit(SOCKET_EMIT_SET_TOPIC, boardId)
@@ -59,6 +79,11 @@ export function BoardDetails(){
         socketService.emit(SOCKET_EMIT_SET_TOPIC, boardId)
         socketService.on(SOCKET_EVENT_ADD_UPDATE_BOARD, loadSocketBoard)
     }, [boardId, isBoardModalOpen])
+
+    function closeOverlays(){
+        setIsInviteModalOpen(false)
+        setIsCreateModalOpen(false)
+    }
 
     function onSetFilter(filterBy){
         setSearchParams(filterBy)
@@ -85,12 +110,16 @@ export function BoardDetails(){
             </main>
             {isCreateModalOpen && <CreateBoard setIsModalOpen={setIsCreateModalOpen}/>}
             {/* Deliberately without the task dialog: the board stays usable and
-                scrollable while a task is open on the right. */}
-            {(isInviteModalOpen || isCreateModalOpen) && <div className="dark-screen"></div>}
+                scrollable while a task is open on the right.
+                Clicking the dimming closes what it belongs to. Everywhere else
+                in the app a click beside a dialog closes it, and a backdrop
+                that only swallows clicks looks like the page has hung. */}
+            {(isInviteModalOpen || isCreateModalOpen) &&
+                <div className="dark-screen" onClick={closeOverlays}></div>}
             {isShowDescription &&
                 <>
                     <BoardDescription setIsShowDescription={setIsShowDescription} board={board}/>
-                    <div className="dark-screen"></div>
+                    <div className="dark-screen" onClick={() => setIsShowDescription(false)}></div>
                 </>
             }
             {isLoginModalOpen && <LoginLogoutModal setIsLoginModalOpen={setIsLoginModalOpen}/>}

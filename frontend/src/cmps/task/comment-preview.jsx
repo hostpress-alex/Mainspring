@@ -93,7 +93,7 @@ export function CommentPreview({
                 </div>
                 <div className="right flex align-center">
                     <div className="time flex align-center">
-                        <Icon name='clock' style='fa-regular'/>
+                        <Icon name='clock' variant='fa-regular'/>
                         <span>{utilService.calculateTime(comment.archivedAt)}</span>
                     </div>
                     <div className={`menu-icon-container ${isMenuModalOpen?' active':''}`}>

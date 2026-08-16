@@ -33,10 +33,19 @@ export function BoardModal(){
     const [isResizing, setIsResizing] = useState(false)
     const startRef = useRef({x: 0, width: 0})
 
+    /**
+     * A subtask opens the same dialog a task does — it is a task, it is only
+     * listed under another one. So the lookup goes one level down as well.
+     */
     const currTask = useMemo(() => {
         if(!board || !groupId || !taskId) return null
         const group = (board.groups || []).find(group => group.id === groupId)
-        return (group?.tasks || []).find(task => task.id === taskId) || null
+        for(const task of group?.tasks || []){
+            if(task.id === taskId) return task
+            const child = (task.subtasks || []).find(t => t.id === taskId)
+            if(child) return child
+        }
+        return null
     }, [board, groupId, taskId])
 
     useEffect(() => {

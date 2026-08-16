@@ -1,0 +1,100 @@
+/* Subtask rows.
+
+   There is almost nothing here, and that is the point: a subtask row is a
+   `.task-preview` like any other, so it already has the widths, the sticky
+   first part and every picker style. What is left is saying which level it is
+   on. */
+
+.subtask-rows {
+    background: #fbfbfd;
+}
+
+/* `.sticky-div` paints itself white so the first columns stay readable while
+   the table scrolls sideways. A child row has to repeat the tint there, or it
+   ends up striped. */
+.task-preview.is-subtask .sticky-div,
+.subtask-add .sticky-div {
+    background-color: #fbfbfd;
+}
+
+/* The indent sits INSIDE the title cell as padding, not as an element in
+   front of it. An extra element would add width to the sticky part and push
+   every column of the row out of line with the task above — which is exactly
+   what the first attempt did. */
+.task-preview.is-subtask .task-title {
+    padding-left: 26px;
+}
+
+/* The run of children of one task reads as one block. */
+.task-preview.is-subtask .sticky-div::after {
+    content: '';
+    position: absolute;
+    left: 44px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--group-color, #d0d4e4);
+    opacity: .45;
+}
+
+.task-preview.is-subtask .task-title blockquote {
+    font-size: 13px;
+}
+
+/* The row that creates one. Built from the same pieces as a task row so the
+   input ends where the first column begins. */
+.subtask-add {
+    background: #fbfbfd;
+    align-items: stretch;
+}
+
+.subtask-add .subtask-add-title {
+    display: flex;
+    align-items: center;
+    padding-left: 26px;
+}
+
+.subtask-add input[type="text"] {
+    width: 100%;
+    border: 0;
+    background: none;
+    padding: 6px 0;
+    font: inherit;
+    font-size: 13px;
+    color: #676879;
+}
+
+.subtask-add input[type="text"]:focus-visible {
+    outline: 0;
+    color: #323338;
+}
+
+/* The toggle and the counter on the parent row. */
+.subtask-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    padding: 2px 5px;
+    color: #676879;
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.subtask-toggle:hover {
+    background: #eaf3ff;
+    color: #0073ea;
+}
+
+.subtask-toggle .fa-chevron-down,
+.subtask-toggle .fa-chevron-right {
+    font-size: 10px;
+}
+
+.subtask-count {
+    font-variant-numeric: tabular-nums;
+}

@@ -3,13 +3,11 @@ import {useSelector} from 'react-redux'
 import {useNavigate} from 'react-router-dom'
 
 import { Icon } from '../icon'
-import {setDynamicModalObj, toggleModal, updateTaskAction} from '../../store/board.actions'
+import {setDynamicModalObj, updateTaskAction} from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
 import {singleLineEditable} from '../../services/editable'
-import {t} from '../../i18n'
 
 export function TaskTitleKanban({task, group, board}){
-    const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const navigate = useNavigate()
     const elTaskModalBtn = useRef()
@@ -47,7 +45,7 @@ export function TaskTitleKanban({task, group, board}){
             </blockquote>
             <div onClick={() => onOpenModal(task)} className="chat-icon">
                 {task.comments.length > 0 && <div>
-                    <Icon name='comment' style='fa-regular' className="comment-chat"/>
+                    <Icon name='comment' variant='fa-regular' className="comment-chat"/>
                     <div className="count-comment">{task.comments.length}</div>
                 </div>}
                 {task.comments.length === 0 && <Icon name='comment-medical' className="icon"/>}

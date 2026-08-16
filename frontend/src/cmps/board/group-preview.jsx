@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from 'react'
+import {useState, useRef, useEffect, useMemo} from 'react'
 import {useSelector} from 'react-redux'
 import {DragDropContext, Draggable, Droppable} from '@hello-pangea/dnd'
 
@@ -14,6 +14,7 @@ import {boardService} from '../../services/board.service'
 
 import {TaskToolsModal} from '../modal/task-tools-modal'
 import {TitleGroupPreview} from './title-group-preview'
+import {SubtaskRows} from '../task/subtask-rows'
 import {AddColumnDialog} from '../modal/add-column-dialog'
 import {singleLineEditable} from '../../services/editable'
 import {
@@ -38,6 +39,19 @@ export function GroupPreview({group, board, idx}){
     const [taskToEdit, setTaskToEdit] = useState(boardService.getEmptyTask())
     const [isTyping, setIsTyping] = useState(false)
     const [isShowColorPicker, setIsShowColorPicker] = useState(false)
+    // Which tasks show their children. Open by id rather than a flag on the
+    // task, so the board coming back from the server never closes a row the
+    // person just opened.
+    const [openSubtasks, setOpenSubtasks] = useState(() => new Set())
+
+    function onToggleSubtasks(taskId){
+        setOpenSubtasks(prev => {
+            const next = new Set(prev)
+            if(next.has(taskId)) next.delete(taskId)
+            else next.add(taskId)
+            return next
+        })
+    }
     const [isEditingTitle, setIsEditingTitle] = useState(false)
     const [collapsed, setCollapsed] = useState(() => isCollapsed(board._id, group.id))
     const elTitle = useRef()
@@ -200,26 +214,49 @@ export function GroupPreview({group, board, idx}){
         updateBoardColumns(board, next).then(() => loadBoard(board._id))
     }
 
-    async function handleCheckboxChange(task){
-        try {
-            // Deliberately without a history entry: the checkbox marks a task
-            // only for the multi-select and changes nothing on the task itself.
-            if(selectedTasks.includes(task)){
-                selectedTasks.splice(selectedTasks.indexOf(task), 1)
-                setSelectedTasks((selectedTasks) => ([...selectedTasks]))
-            } else {
-                setSelectedTasks((prevTasks) => ([...prevTasks, task]))
-            }
-        } catch(err) {
-            console.log('err:', err)
-        }
+    /**
+     * Tick a task off or on.
+     *
+     * By id, not by object. `includes` compares references and the row is
+     * handed a fresh `{...task}` on every render, so the check never matched:
+     * unticking fell into the "not selected yet" branch and added a SECOND
+     * copy. Hence a toolbar that counted two after one tick and one untick and
+     * never emptied.
+     *
+     * The old version also spliced the state array in place before setting it.
+     * Both halves of the bug are the same mistake — treating a rendered copy
+     * and a piece of state as things you can identify and edit directly.
+     *
+     * No history entry: the checkbox marks a task for the multi-select and
+     * changes nothing on the task itself.
+     */
+    function handleCheckboxChange(task){
+        const id = String(task.id)
+        setSelectedTasks(prev => prev.some(t => String(t.id) === id)
+            ?prev.filter(t => String(t.id) !== id)
+            :[...prev, task])
     }
 
     function onClickMainCheckbox(){
-        if(isMainCheckbox.isActive) setSelectedTasks([])
-        else setSelectedTasks(group.tasks)
-        setIsMainCheckbox({isActive: !isMainCheckbox.isActive})
+        // Decided by what is actually selected, not by a flag remembered here.
+        // The flag could disagree with the rows — tick every row by hand and it
+        // still said "off", so the next click on the header ticked them all
+        // again instead of clearing.
+        const next = !isAllSelected
+        // A copy of the list, never the array from the store: the selection is
+        // filtered and rebuilt, and doing that to the store's array would edit
+        // the board itself.
+        setSelectedTasks(next?[...(group.tasks || [])]:[])
+        setIsMainCheckbox({isActive: next})
     }
+
+    // The header box follows the selection instead of remembering its own
+    // state: ticking every row by hand should fill it, and unticking one
+    // should empty it again.
+    const selectedIds = useMemo(
+        () => new Set(selectedTasks.map(task => String(task.id))), [selectedTasks])
+    const isAllSelected = (group.tasks || []).length > 0
+        && (group.tasks || []).every(task => selectedIds.has(String(task.id)))
 
     function getSumOfTasks(){
         const sum = group.tasks.length
@@ -267,7 +304,7 @@ export function GroupPreview({group, board, idx}){
                                         <div className="sticky-div titles flex" style={{'--group-color': group.color}}>
                                             <div className="hidden"></div>
                                             <div className="check-box">
-                                                <input type="checkbox" checked={isMainCheckbox.isActive} onChange={onClickMainCheckbox}/>
+                                                <input type="checkbox" checked={isAllSelected} onChange={onClickMainCheckbox}/>
                                             </div>
                                             <div className="task title" style={widthStyle(widthOf(widths, TASK_COLUMN))}>
                                                 <span className="col-label">{t('task.task')}</span>
@@ -302,7 +339,10 @@ export function GroupPreview({group, board, idx}){
                             {(droppableProvided) => (
                                 <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps} >
                                     {group.tasks.map((task, idx) => {
-                                        const taskId = task.id || `task-${idx}-${Date.now()}`
+                                        // The fallback used to end in Date.now(), so a task without
+                                        // an id got a different one on every render — a new drag id
+                                        // and a new React key each time.
+                                        const taskId = task.id || `task-${idx}`
                                         return (
                                             <Draggable key={taskId} draggableId={taskId} index={idx}>
                                                 {(provided) => (
@@ -310,7 +350,16 @@ export function GroupPreview({group, board, idx}){
                                                         <TaskPreview task={{
                                                             ...task,
                                                             id: taskId
-                                                        }} group={group} board={board} widths={widths} handleCheckboxChange={handleCheckboxChange} isMainCheckbox={isMainCheckbox}/>
+                                                        }} group={group} board={board} widths={widths} handleCheckboxChange={handleCheckboxChange} isSelected={selectedIds.has(String(taskId))}
+                                                                     isSubtasksOpen={openSubtasks.has(taskId)}
+                                                                     onToggleSubtasks={() => onToggleSubtasks(taskId)}/>
+                                                        {/* Inside the same li as the task: the children move with
+                                                            their parent when the row is dragged, and they cannot
+                                                            end up under a different task. */}
+                                                        {openSubtasks.has(taskId) &&
+                                                            <SubtaskRows task={task} group={group} board={board} widths={widths}
+                                                                         handleCheckboxChange={handleCheckboxChange}
+                                                                         selectedIds={selectedIds}/>}
                                                     </li>
                                                 )}
                                             </Draggable>

@@ -39,6 +39,11 @@ const COOKIE_NAME = 'loginToken'
 const BOARD_ROOM = 'board:'
 const TASK_ROOM = 'task:'
 
+/** Every socket one person has open. A message addressed at a person goes to
+ *  this room, so it reaches all of their tabs and never a socket that has
+ *  already gone away. */
+const USER_ROOM = 'user:'
+
 let gIo = null
 
 /* ------------------------------------------------------------- handshake -- */
@@ -162,6 +167,9 @@ function setupSocketAPI(http){
         const who = () => (socket.data.user?socket.data.user.fullname:'anonymous')
         logger.info(`Socket connected [id: ${socket.id}, user: ${who()}]`)
 
+        // Anything addressed at this person goes here, whichever tab it is.
+        if(socket.data.user) socket.join(USER_ROOM + String(socket.data.user._id))
+
         socket.on('disconnect', () => {
             logger.info(`Socket disconnected [id: ${socket.id}]`)
         })
@@ -219,6 +227,7 @@ function setupSocketAPI(http){
         })
 
         socket.on('unset-user-socket', () => {
+            if(socket.data.user) socket.leave(USER_ROOM + String(socket.data.user._id))
             if(socket.data.room) socket.leave(socket.data.room)
             socket.data.room = null
             socket.data.boardId = null
@@ -234,16 +243,11 @@ function refuse(socket, event){
 
 /* --------------------------------------------------------------- sending -- */
 
-/** Send to one user, if that user currently has a socket open. */
-async function emitToUser({type, data, userId}){
+/** Send to one person — every tab they have open, none if they have none. */
+function emitToUser({type, data, userId}){
     const id = String(userId)
-    const socket = await findUserSocket(id)
-    if(!socket){
-        logger.info(`No active socket for user: ${id}`)
-        return
-    }
-    logger.info(`Emitting ${type} to user ${id} [socket: ${socket.id}]`)
-    socket.emit(type, data)
+    logger.info(`Emitting ${type} to user ${id}`)
+    gIo.to(USER_ROOM + id).emit(type, data)
 }
 
 /**
@@ -272,6 +276,7 @@ module.exports = {
     setupSocketAPI,
     emitToUser,
     broadcast,
+    USER_ROOM,
     // Exported so the tests can reach the pure parts without a live server.
     readCookie,
     boardHasTask,

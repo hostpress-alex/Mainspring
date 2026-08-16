@@ -2,7 +2,7 @@
 @use "../../setup/mixins";
 @use "../../setup/variables";
 
-.task-preview, .task-preview-kanban {
+.task-preview, .kanban-field-value {
     .task-person {
         cursor: pointer;
         height: 36px;

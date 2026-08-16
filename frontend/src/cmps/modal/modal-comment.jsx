@@ -31,7 +31,7 @@ export function CommentMenuModal({commentId, onRemoveComment, onOpenEdit, setIsM
                 <span>{t('common.edit')}</span>
             </div>
             <div className="delete" onClick={() => onRemove(commentId, taskId)}>
-                <Icon name='trash-can' style='fa-regular'/>
+                <Icon name='trash-can' variant='fa-regular'/>
                 <span>{isReply?t('update.deleteReply'):t('update.delete')}</span>
             </div>
         </section>

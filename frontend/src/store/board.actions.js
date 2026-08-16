@@ -360,13 +360,17 @@ export function toggleModal(isOpenModal){
     store.dispatch({type: SET_MODAL, isOpen: !isOpenModal})
 }
 
-/** Delete a group. */
-export async function updateGroups(groupId, filteredBoard){
-    try {
-        _applyBoard(await boardService.deleteGroup(filteredBoard._id, groupId))
-    } catch(err) {
-        throw err
-    }
+/**
+ * Delete a group.
+ *
+ * It was called `updateGroups`, and that name cost the colour palette: it read
+ * like the save function next to it, so the palette called it to store a
+ * colour and deleted the group instead. It survived only because the group was
+ * handed over whole where an id was expected — the object stringified into the
+ * URL, matched nothing, and the request quietly did nothing at all.
+ */
+export async function removeGroupAction(groupId, filteredBoard){
+    _applyBoard(await boardService.deleteGroup(filteredBoard._id, groupId))
 }
 
 /**
@@ -448,6 +452,56 @@ async function _saveGroupSmart(boardId, prev, next){
  * server. That lets two people change different columns of the same task at
  * the same time without overwriting each other.
  */
+/**
+ * A task of this group, top level or one below.
+ *
+ * Without the second level every edit to a subtask would find no previous
+ * state, fall back to "replace the whole task" and send the lot over the wire
+ * — correct, but it throws away the reason the diff exists.
+ */
+function _findTaskDeep(group, taskId){
+    for(const task of group?.tasks || []){
+        if(task.id === taskId) return task
+        const child = (task.subtasks || []).find(t => t.id === taskId)
+        if(child) return child
+    }
+    return null
+}
+
+/**
+ * Add a subtask under a task.
+ *
+ * The server decides the id and the position; the answer is the whole board,
+ * so nothing has to be stitched together here.
+ */
+export async function addSubtaskAction(filteredBoard, groupId, parentId, subtask, index = null){
+    _applyBoard(await boardService.addSubtask(filteredBoard._id, groupId, parentId, subtask, index))
+}
+
+/**
+ * Delete a task or a subtask.
+ *
+ * Deleting a task used to happen by handing `updateGroupAction` a group with
+ * one task missing and letting the diff notice. That works for a task but not
+ * for a subtask: the children are not in `group.tasks`, so the diff sees no
+ * change at all. This goes straight at the task, which the server accepts on
+ * either level.
+ */
+export async function removeTaskAction(filteredBoard, groupId, taskId){
+    _applyBoard(await boardService.deleteTask(filteredBoard._id, groupId, taskId))
+}
+
+/**
+ * Turn a task into a subtask of another, or a subtask back into a task.
+ *
+ * Not expressible as a patch: the task leaves one ordered list and joins
+ * another, and both have to stay gapless. The server does it in one
+ * transaction and answers with the whole board.
+ */
+export async function setTaskParentAction(filteredBoard, groupId, taskId, parentId, index = null){
+    _applyBoard(await boardService.setTaskParent(filteredBoard._id, groupId, taskId, parentId, index))
+}
+
 export async function updateTaskAction(filteredBoard, groupId, saveTask, activity){
     try {
         const boardId = filteredBoard._id
@@ -474,7 +528,7 @@ function _diffTask(boardId, groupId, saveTask){
     const server = _serverStateOf(boardId)
     if(!server) return null
     const group = (server.groups || []).find(g => g.id === groupId)
-    const prev = (group?.tasks || []).find(t => t.id === saveTask.id)
+    const prev = _findTaskDeep(group, saveTask.id)
     if(!prev) return null
     // A field has fallen away — a patch cannot express that.
     for(const key of Object.keys(prev)){

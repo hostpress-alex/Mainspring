@@ -1,0 +1,140 @@
+/* The list of tasks a selection can be hung under.
+
+   It floats above the toolbar it is opened from, so it takes the panel step of
+   the layer scale — see setup/_layers.scss. It is rendered inside the toolbar
+   rather than in a portal because the toolbar is fixed to the viewport itself
+   and opens no stacking context of its own. */
+.parent-picker {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-panel);
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    max-height: 380px;
+    border: 1px solid #d0d4e4;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 22%);
+    color: #323338;
+    cursor: default;
+}
+
+.parent-picker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.parent-picker-close {
+    border: 0;
+    background: none;
+    padding: 2px 4px;
+    color: #676879;
+    cursor: pointer;
+}
+
+.parent-picker-close:hover {
+    color: #323338;
+}
+
+.parent-picker-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 12px 8px;
+    padding: 0 8px;
+    border: 1px solid #d0d4e4;
+    border-radius: 6px;
+    color: #676879;
+}
+
+.parent-picker-search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    background: none;
+    padding: 7px 0;
+    font: inherit;
+    font-size: 13px;
+    color: #323338;
+}
+
+.parent-picker-search input:focus-visible {
+    outline: 0;
+}
+
+.parent-picker-scroll {
+    overflow-y: auto;
+    padding: 0 8px 10px;
+}
+
+.parent-picker-group h4 {
+    margin: 8px 4px 4px;
+    color: var(--group-color, #676879);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.parent-picker-group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.parent-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 2px;
+    padding: 7px 8px;
+    border: 0;
+    border-left: 3px solid var(--group-color, #d0d4e4);
+    border-radius: 4px;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+}
+
+.parent-picker-item:hover:not(:disabled) {
+    background: #eaf3ff;
+}
+
+/* Shown rather than left out: a candidate missing without explanation reads
+   as a bug. */
+.parent-picker-item:disabled {
+    color: #9699a6;
+    cursor: not-allowed;
+}
+
+.parent-picker-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.parent-picker-note {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: #9699a6;
+}
+
+.parent-picker-empty {
+    margin: 12px 4px;
+    color: #676879;
+    font-size: 13px;
+}

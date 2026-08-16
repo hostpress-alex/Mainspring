@@ -43,6 +43,11 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
         id: l.id || makeLabelId(),
         title: l.title,
         color: l.color || '#c4c4c4',
+        // Which label means finished. Boards are named "wtf / yea / lol" as
+        // readily as "Done / Stuck", so nothing can work this out by reading
+        // the word — somebody has to say so. The subtask counter on a task is
+        // what reads it.
+        done: l.done === true,
         original: l.title
     })))
     const [openPalette, setOpenPalette] = useState(null)
@@ -106,7 +111,7 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
         const removed = source.filter(l => l && l.title && !kept.has(l.title)).map(l => l.title)
 
         const labels = [
-            ...cleaned.map(r => ({id: r.id, title: r.title, color: r.color})),
+            ...cleaned.map(r => ({id: r.id, title: r.title, color: r.color, ...(r.done?{done: true}:{})})),
             emptyLabel
         ]
         onSave({labels, renames, removed})
@@ -133,10 +138,18 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
                                             {used}
                                         </span>
                                     )}
+                                    <button
+                                        type="button"
+                                        className={`label-editor-done${row.done?' is-on':''}`}
+                                        aria-pressed={row.done}
+                                        title={t('label.meansDone')}
+                                        onClick={() => setRow(row.id, {done: !row.done})}>
+                                        <Icon name='circle-check' variant={row.done?'fa-solid':'fa-regular'}/>
+                                    </button>
                                     <button type="button" className="label-editor-remove" title={used
                                         ?t('label.removeUsed', {n: used})
                                         :t('label.remove')} onClick={() => onRemove(row.id)}>
-                                        <Icon name='trash-can' style='fa-regular'/>
+                                        <Icon name='trash-can' variant='fa-regular'/>
                                     </button>
                                 </div>
                                 {/* The palette deliberately sits IN the flow below the row.

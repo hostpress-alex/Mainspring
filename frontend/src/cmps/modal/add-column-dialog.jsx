@@ -8,13 +8,13 @@ const ICONS = {
     status: {el: <Icon name='table-columns'/>, bg: '#00c875'},
     dropdown: {el: <Icon name='circle-chevron-down'/>, bg: '#00a9a5'},
     text: {el: <Icon name='font'/>, bg: '#fdab3d'},
-    date: {el: <Icon name='calendar-days' style='fa-regular'/>, bg: '#a25ddc'},
-    person: {el: <Icon name='user' style='fa-regular'/>, bg: '#41b0f5'},
+    date: {el: <Icon name='calendar-days' variant='fa-regular'/>, bg: '#a25ddc'},
+    person: {el: <Icon name='user' variant='fa-regular'/>, bg: '#41b0f5'},
     number: {el: <Icon name='hashtag'/>, bg: '#ffcb00'},
-    file: {el: <Icon name='file' style='fa-regular'/>, bg: '#e2445c'},
-    checkbox: {el: <Icon name='square-check' style='fa-regular'/>, bg: '#fdab3d'},
+    file: {el: <Icon name='file' variant='fa-regular'/>, bg: '#e2445c'},
+    checkbox: {el: <Icon name='square-check' variant='fa-regular'/>, bg: '#fdab3d'},
     link: {el: <Icon name='link'/>, bg: '#0073ea'},
-    priority: {el: <Icon name='flag' style='fa-regular'/>, bg: '#ffcb00'},
+    priority: {el: <Icon name='flag' variant='fa-regular'/>, bg: '#ffcb00'},
     longtext: {el: <Icon name='align-left'/>, bg: '#7f5347'},
     updated: {el: <Icon name='clock-rotate-left'/>, bg: '#9d99b9'}
 }

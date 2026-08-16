@@ -58,9 +58,19 @@ export function ProfilePage(){
     }
 
     async function onPickFile(ev){
-        const file = ev.target.files?.[0]
-        ev.target.value = ''
-        if(file) await handleAvatarFile(file)
+        const input = ev.target
+        const file = input.files?.[0]
+        if(!file) return
+        try {
+            await handleAvatarFile(file)
+        } finally {
+        // Only after the work is done. Clearing the input detaches the File
+        // from the data behind it — the object is still there, what it points
+        // at is not — and the read then fails with InvalidStateError.
+        // Clearing at all is on purpose: without it, picking the same file
+        // twice in a row fires no change event.
+            input.value = ''
+        }
     }
 
     /** Paste an image from the clipboard — Ctrl+V anywhere on the page. */

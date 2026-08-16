@@ -122,8 +122,12 @@ async function deliver(recipients, entry, actor){
     const ids = [...new Set(recipients.map(sid).filter(Boolean))].filter(id => id !== actorId)
     if(!ids.length) return []
 
+    // groupId and parentId are navigation data and belong in detail, not in
+    // columns of their own: they are read to build a link, never searched.
+    const {groupId, parentId, ...rest} = entry
     const rows = await notificationRepo.insertMany(ids.map(userId => ({
-        ...entry, userId, actor, createdAt: Date.now()
+        ...rest, userId, actor, createdAt: Date.now(),
+        detail: {...(entry.detail || {}), ...(groupId?{groupId}:{}), ...(parentId?{parentId}:{})}
     })))
 
     // insertMany keeps the order it was given, so rows[i] belongs to ids[i].
@@ -155,13 +159,24 @@ async function safely(what, fn){
  * `oldTask` is the task as it was before the write; the caller already has it
  * because it had to load the board to check permissions.
  */
-async function taskPatched({board, oldTask, patch, actor}){
+async function taskPatched({board, groupId, oldTask, patch, parentId = null, actor}){
     return await safely('taskPatched', async () => {
         const base = {
             boardId: sid(board._id),
             boardTitle: board.title || '',
             taskId: sid(oldTask.id),
-            subject: oldTask.title || ''
+            subject: oldTask.title || '',
+            // The route to a task is /board/:boardId/:groupId/:taskId, so the
+            // group has to travel with the notification — without it a click
+            // can only reach the board and the person still has to hunt.
+            // It rides in detail rather than a column of its own: it is read
+            // to build a link, never searched.
+            groupId: sid(groupId),
+            // A subtask has no dialog of its own — the task above it opens and
+            // the subtask is in the list there. The subscription still hangs
+            // off the subtask (taskId above), so only the right people hear
+            // about it; parentId is purely how the link is built.
+            parentId: parentId?sid(parentId):null
         }
         const now = Date.now()
         const out = []
@@ -221,7 +236,7 @@ async function taskPatched({board, oldTask, patch, actor}){
 }
 
 /** A task was created. Only interesting if it arrives already assigned. */
-async function taskAdded({board, task, actor}){
+async function taskAdded({board, groupId, task, parentId = null, actor}){
     return await safely('taskAdded', async () => {
         const assigned = addedIds([], task && task.memberIds)
         if(!assigned.length) return []
@@ -229,7 +244,8 @@ async function taskAdded({board, task, actor}){
         const taskId = sid(task.id)
         await notificationRepo.subscribe(boardId, taskId, assigned, Date.now())
         return await deliver(assigned, {
-            boardId, boardTitle: board.title || '', taskId,
+            boardId, boardTitle: board.title || '', taskId, groupId: sid(groupId),
+            parentId: parentId?sid(parentId):null,
             subject: task.title || '', kind: 'assigned', detail: {}
         }, actor)
     })

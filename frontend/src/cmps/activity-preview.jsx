@@ -67,13 +67,13 @@ export function ActivityPreview({activity, taskTitle = null}){
             case 'priority':
                 return <img src={statusImg} alt=""/>
             case 'date':
-                return <Icon name='calendar-days' style='fa-regular' className="icon"/>
+                return <Icon name='calendar-days' variant='fa-regular' className="icon"/>
             case 'create':
                 return <Icon name='circle-plus' className="icon"/>
             case 'person':
                 return <Icon name='user-plus' className="icon"/>
             case 'check':
-                return <Icon name='square-check' style='fa-regular' className="icon"/>
+                return <Icon name='square-check' variant='fa-regular' className="icon"/>
             case 'number':
                 return <Icon name='hashtag' className="icon"/>
             case 'title':
@@ -109,7 +109,7 @@ export function ActivityPreview({activity, taskTitle = null}){
         <section className={`activity-preview${taskTitle?' with-task':''}`}>
             <div className="time-title flex align-center">
                 <div className="time flex align-center">
-                    <Icon name='clock' style='fa-regular'/>
+                    <Icon name='clock' variant='fa-regular'/>
                     <span>{activity.createdAt?utilService.calculateTime(activity.createdAt):''}</span>
                 </div>
                 <div className="who-what">

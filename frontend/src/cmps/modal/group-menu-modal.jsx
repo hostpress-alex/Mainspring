@@ -1,5 +1,5 @@
 import { Icon } from '../icon'
-import {duplicateGroup, setDynamicModalObj, updateGroups} from '../../store/board.actions'
+import {duplicateGroup, setDynamicModalObj, removeGroupAction} from '../../store/board.actions'
 import {confirmDelete} from '../confirm-dialog'
 import {useSelector} from 'react-redux'
 import {t} from '../../i18n'
@@ -17,7 +17,7 @@ export function GroupMenuModal({dynamicModalObj}){
         })
         if(!ok) return
         try {
-            updateGroups(dynamicModalObj.group.id, board)
+            removeGroupAction(dynamicModalObj.group.id, board)
             setDynamicModalObj({...dynamicModalObj, isOpen: false})
         } catch(err) {
             console.log('err:', err)
@@ -45,11 +45,11 @@ export function GroupMenuModal({dynamicModalObj}){
                 <span>{t('group.changeColor')}</span>
             </div>
             <div className="duplicate" onClick={onDuplicateGroup}>
-                <Icon name='clone' style='fa-regular'/>
+                <Icon name='clone' variant='fa-regular'/>
                 <span>{t('group.duplicate')}</span>
             </div>
             <div className="delete" onClick={onRemoveGroup}>
-                <Icon name='trash-can' style='fa-regular'/>
+                <Icon name='trash-can' variant='fa-regular'/>
                 <span>{t('common.delete')}</span>
             </div>
         </section>

@@ -64,7 +64,7 @@ export function BoardHeader({
                     </Tooltip>
                     <Tooltip title={t('board.addFavorite')} arrow>
                         <div className="star-btn icon " onClick={onToggleStarred}>
-                            {!board.isStarred?<Icon name='star' style='fa-regular' className="star"/>:<Icon name='star' className="star star-full"/>}
+                            {!board.isStarred?<Icon name='star' variant='fa-regular' className="star"/>:<Icon name='star' className="star star-full"/>}
                         </div>
                     </Tooltip>
                 </div>

@@ -17,11 +17,31 @@ import {TextPicker, LongTextPicker, CheckboxPicker, LinkPicker, DropdownPicker} 
 import { Icon } from '../icon'
 import {GUEST_IMG} from '../../services/avatar'
 import {widthOf, widthStyle, TASK_COLUMN} from '../board/column-width'
+import {subtaskProgress} from '../board/column-value'
+import './subtask.css'
 import '../board/board-columns.css'
 import {t} from '../../i18n'
 
-export function TaskPreview({task, group, board, handleCheckboxChange, isMainCheckbox, widths = {}}){
-    const [isClick, setIsClick] = useState(false)
+/**
+ * One row of the table — a task or a subtask.
+ *
+ * A subtask renders through here rather than through a component of its own,
+ * and that is the whole point: the first attempt rebuilt the row next to this
+ * one and immediately drifted. Cells were missing, the pickers lost their
+ * styles because `board-columns.css` hangs off `.task-preview`, and the
+ * columns no longer lined up with the row above because the sticky part had a
+ * different width. Same markup, same CSS, same widths — a class marks the
+ * level and nothing else.
+ *
+ * A subtask can be ticked like a task. The toolbar that appears works out per
+ * action what the selection allows and leaves out what does not apply — see
+ * task-tools-modal.
+ */
+export function TaskPreview({
+    task, group, board,
+    handleCheckboxChange = () => {}, isSelected = false,
+    widths = {}, isSubtasksOpen = false, onToggleSubtasks, isSubtask = false
+}){
     const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
     const user = useSelector(storeState => storeState.userModule.user)
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
@@ -31,9 +51,7 @@ export function TaskPreview({task, group, board, handleCheckboxChange, isMainChe
     // Only standalone updates count — replies hang off them and would otherwise
     // inflate the number in the row.
     const updateCount = (task.comments || []).filter(c => c && !c.parentId).length
-    useEffect(() => {
-        setIsClick(isMainCheckbox.isActive)
-    }, [isMainCheckbox])
+    const progress = subtaskProgress(board, task)
 
     async function updateTask(cmpType, data, activity){
         const taskToUpdate = structuredClone(task)
@@ -68,9 +86,15 @@ export function TaskPreview({task, group, board, handleCheckboxChange, isMainChe
         navigate(`/board/${board._id}/${group.id}/${task.id}`)
     }
 
+    /**
+     * Whether the box is ticked comes from the selection above, not from a
+     * copy kept down here. The private flag it replaces had to be nudged back
+     * into line by an effect whenever the header box changed, and any path
+     * that cleared the selection without touching that flag left a row ticked
+     * with nothing selected.
+     */
     function onCheckBoxChange(){
         handleCheckboxChange(task)
-        setIsClick(!isClick)
     }
 
     function onToggleTaskModal(){
@@ -85,15 +109,28 @@ export function TaskPreview({task, group, board, handleCheckboxChange, isMainChe
     }
 
     return (
-        <section className={'task-preview flex'} ref={elTaskPreview}>
+        <section className={`task-preview flex${isSubtask?' is-subtask':''}`} ref={elTaskPreview}>
             <div ref={elMenuTask} className="sticky-div" style={{'--group-color': group.color}}>
                 <div className="task-menu">
                     <Icon name='ellipsis' className="icon" onClick={onToggleTaskModal}/>
                 </div>
                 <div className="check-box">
-                    <input type="checkbox" checked={isClick} onChange={onCheckBoxChange}/>
+                    <input type="checkbox" checked={isSelected} onChange={onCheckBoxChange}/>
                 </div>
                 <div className="task-title picker flex align-center space-between" style={widthStyle(widthOf(widths, TASK_COLUMN))}>
+                    {/* Always offered, not only when children exist — otherwise
+                        there is no way to create the first one from the table. */}
+                    {onToggleSubtasks && !isSubtask && (
+                        <button type="button" className="subtask-toggle"
+                                title={isSubtasksOpen?t('task.hideSubtasks'):t('task.showSubtasks')}
+                                onClick={ev => {
+                                    ev.stopPropagation()
+                                    onToggleSubtasks()
+                                }}>
+                            <Icon name={isSubtasksOpen?'chevron-down':'chevron-right'}/>
+                            {progress && <span className="subtask-count">{progress}</span>}
+                        </button>
+                    )}
                     <blockquote contentEditable onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
                                 {...singleLineEditable({onFocus: toggleOnTyping})}>
                         <span>{task.title}</span>
@@ -104,7 +141,7 @@ export function TaskPreview({task, group, board, handleCheckboxChange, isMainChe
                     </div>
                     <div onClick={onOpenModal} className="chat-icon">
                         {updateCount > 0 && <div>
-                            <Icon name='comment' style='fa-regular' className="comment-chat"/>
+                            <Icon name='comment' variant='fa-regular' className="comment-chat"/>
                             <div className="count-comment">{updateCount}</div>
                         </div>}
                         {updateCount === 0 && <Icon name='comment-medical' className="icon"/>}

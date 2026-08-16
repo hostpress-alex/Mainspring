@@ -45,15 +45,15 @@ export function BoardMenuModal({dynamicModalObj}){
             {!isFolderOpen && (
                 <>
                     <div className="folder" onClick={() => setIsFolderOpen(true)}>
-                        <Icon name='folder' style='fa-regular'/>
+                        <Icon name='folder' variant='fa-regular'/>
                         <span>{t('board.changeFolder')}</span>
                     </div>
                     <div className="duplicate" onClick={onDuplicateBoard}>
-                        <Icon name='clone' style='fa-regular'/>
+                        <Icon name='clone' variant='fa-regular'/>
                         <span>{t('board.duplicate')}</span>
                     </div>
                     <div className="delete" onClick={onRemoveBoard}>
-                        <Icon name='trash-can' style='fa-regular'/>
+                        <Icon name='trash-can' variant='fa-regular'/>
                         <span>{t('common.delete')}</span>
                     </div>
                 </>

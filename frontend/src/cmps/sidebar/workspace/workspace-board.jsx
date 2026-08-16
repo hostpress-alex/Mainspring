@@ -109,7 +109,7 @@ export default function WorkspaceBoard({handleChange, filterByToEdit, setIsCreat
 
             <ul className="board-list-container flex column">
                 <Section id={FAVOURITES} title={t('board.favorites')} list={starred} icon={
-                    <Icon name='star' style='fa-regular' className="workspace-star"/>}/>
+                    <Icon name='star' variant='fa-regular' className="workspace-star"/>}/>
                 {folders.map(([name, list]) => (
                     <Section key={name} id={name} title={name} list={list} icon={null}/>
                 ))}

@@ -210,10 +210,20 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         await addFiles(blobs)
     }
 
-    function onPickFiles(ev){
-        const files = ev.target.files
-        ev.target.value = ''
-        addFiles(files)
+    async function onPickFiles(ev){
+        const input = ev.target
+        const files = input.files
+        if(!files || !files.length) return
+        try {
+            await addFiles(files)
+        } finally {
+        // Only after the work is done. Clearing the input detaches the File
+        // from the data behind it — the object is still there, what it points
+        // at is not — and the read then fails with InvalidStateError.
+        // Clearing at all is on purpose: without it, picking the same file
+        // twice in a row fires no change event.
+            input.value = ''
+        }
     }
 
     function onRemoveAttachment(id){

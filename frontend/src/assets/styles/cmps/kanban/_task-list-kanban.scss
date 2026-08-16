@@ -3,50 +3,61 @@
 @use "../../setup/variables";
 
 .task-list-content-kanban {
-    padding: variables.$spacing-small;
-    min-height: 110px;
+    list-style: none;
     margin: 0;
+    padding: variables.$spacing-small;
 
     .task-container {
-        border-radius: 4px;
-        box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
-        font-size: functions.rem(13px);
-        font-weight: 400;
-        cursor: pointer;
         margin-bottom: variables.$spacing-small;
+    }
+}
 
-        .flex {
-            padding: variables.$spacing-small;
-            gap: variables.$spacing-small;
-        }
+.kanban-card {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing-small;
+    padding: variables.$spacing-small;
+    border-radius: 6px;
+    background-color: variables.$app-bg;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 14%);
+    font-size: functions.rem(13px);
+    cursor: grab;
+
+    &:hover {
+        box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
     }
 
-    .task-content,
+    /* Title row: title, comment bubble, menu. */
     .task-title {
-        width: 100%;
         display: flex;
-    }
-
-    .task-title {
-        @include mixins.center-flex();
-        margin-bottom: variables.$spacing-small;
-        height: 36px;
-        padding: variables.$spacing-small;
-        position: relative;
+        align-items: center;
         gap: variables.$spacing-xs;
+        min-height: 24px;
+
+        blockquote {
+            flex: 1 1 auto;
+            min-width: 0;
+            margin: 0;
+            font-weight: 500;
+            line-height: 1.35;
+
+            &:focus-visible {
+                outline: 2px solid variables.$board-btn;
+                outline-offset: 2px;
+                border-radius: 3px;
+            }
+        }
 
         .chat-icon {
             @include mixins.center-flex();
-            font-size: functions.rem(24px);
-            padding: 0 variables.$spacing-small;
-            height: 100%;
-            margin-left: auto;
-            color: variables.$chat-icon-color;
             position: relative;
+            flex: 0 0 auto;
+            font-size: functions.rem(18px);
+            color: variables.$chat-icon-color;
+            cursor: pointer;
 
             &:hover {
                 color: variables.$board-btn;
-                cursor: pointer;
             }
 
             div {
@@ -54,57 +65,40 @@
                 align-items: center;
             }
 
+            .comment-chat {
+                color: variables.$board-btn;
+            }
+
             .count-comment {
                 @include mixins.center-flex();
                 position: absolute;
-                top: 11px;
-                right: 7px;
-                background-color: variables.$board-btn;
-                color: white;
-                font-size: functions.rem(10px);
-                border-radius: 50%;
+                top: -4px;
+                right: -5px;
                 width: 14px;
-                height: 13px;
-                margin: 0;
-                cursor: pointer;
-            }
-
-            .comment-chat {
-                color: variables.$board-btn;
+                height: 14px;
+                border-radius: 50%;
+                background-color: variables.$board-btn;
+                color: variables.$app-bg;
+                font-size: functions.rem(9px);
             }
         }
 
         .task-menu {
             @include mixins.center-flex();
-            border-radius: 8px;
+            flex: 0 0 auto;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
 
             .icon {
-                cursor: pointer;
-                font-size: functions.rem(22px);
+                font-size: functions.rem(15px);
                 color: variables.$workspace-icon-color;
+                cursor: pointer;
             }
 
             &:hover {
                 background-color: variables.$workspace-hover;
             }
-        }
-    }
-
-    .task-content {
-        .task-titles-container {
-            li {
-                margin-bottom: 8px;
-                height: 36px;
-            }
-        }
-    }
-
-    .title-container {
-        > * {
-            height: 36px;
-            margin-bottom: variables.$spacing-small;
-            display: flex;
-            align-items: center;
         }
     }
 }

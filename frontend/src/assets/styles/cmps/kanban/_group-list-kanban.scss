@@ -1,21 +1,46 @@
+/* Four groups per row at most, and a group is never wider than 400px.
+
+   The width is not set on the column, it falls out of the flex basis: each
+   group asks for a quarter of the row minus its share of the gaps, so a fifth
+   group has nowhere to go but the next line. `flex-grow` lets two or three
+   groups take the space the missing ones left behind, and `max-width` stops
+   them at 400px instead of letting two columns stretch across the screen.
+
+   `min-width` is the other end of it. Below roughly 260px a card is not worth
+   reading, so on a narrow window fewer than four fit and the rest wrap early —
+   which is the right answer there.
+
+   Rows rather than one row that scrolls sideways is a deliberate choice and
+   the one thing to revisit if the board ever grows past a handful of groups:
+   left-to-right is what says "pipeline", and a second line breaks that. To go
+   back, drop `flex-wrap` and put `overflow-x: auto` on the container. */
 .group-list-kanban {
+    --kanban-gap: 20px;
+    --kanban-per-row: 4;
+    --kanban-max-column: 400px;
+
     display: flex;
-    padding-left: 38px;
-    gap: 30px;
-    border-radius: 8px;
-    border-bottom-left-radius: 4px;
-    vertical-align: top;
-    max-height: 410px;
     flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--kanban-gap);
+    padding: 12px 38px 24px;
 
     .group-list-ul {
-        min-height: 110px;
-        max-height: 100%;
-        padding: 0px 4px 0 10px;
-        margin: 8px 4px 0 0;
+        // The share of the gaps one column carries: (n - 1) gaps over n columns.
+        --kanban-gap-share: calc(var(--kanban-gap) * (var(--kanban-per-row) - 1) / var(--kanban-per-row));
 
-        > * li {
-            background-color: #ffffff;
+        flex: 1 1 calc(100% / var(--kanban-per-row) - var(--kanban-gap-share));
+        max-width: var(--kanban-max-column);
+        min-width: 260px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        /* The drag handle @hello-pangea/dnd wraps around the column. It sits
+           between the flex item and the column itself, so it has to pass the
+           width through or the column collapses to its content. */
+        > * {
+            width: 100%;
         }
     }
 }

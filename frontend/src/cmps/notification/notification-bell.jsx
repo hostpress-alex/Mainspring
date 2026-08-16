@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState, useCallback} from 'react'
+import {createPortal} from 'react-dom'
 import {useNavigate} from 'react-router-dom'
 import {Tooltip} from '@mui/material'
 
@@ -24,6 +25,14 @@ import './notification.css'
  * interval would be simpler, but it also means the number is wrong for
  * however long the interval is, which is exactly the moment somebody is
  * waiting to be told something.
+ *
+ * The panel is rendered into document.body through a portal, and that is not
+ * a detail. `.main-sidebar` is `position: sticky`, which opens a stacking
+ * context of its own — so a z-index set on anything inside it is only ever
+ * compared against its siblings in that bar, never against the board list
+ * next to it. The panel sat behind that list no matter what number it was
+ * given. A layer scale is worth nothing if the element is in the wrong
+ * context; the portal is what puts it in the right one.
  */
 
 /** How the list is cut into the sections the panel shows. */
@@ -36,6 +45,25 @@ const SECTIONS = [
 function sectionOf(createdAt, now){
     const days = (now - createdAt) / 86400000
     return (SECTIONS.find(s => days < s.within) || SECTIONS[SECTIONS.length - 1]).key
+}
+
+/**
+ * Where a click on an entry goes.
+ *
+ * A notification about a task should open that task, not the board it happens
+ * to live in — arriving on a board of eighty rows and being left to find the
+ * one that was meant is barely better than no link at all. The task route is
+ * `/board/:boardId/:groupId/:taskId`, so the group has to be known; the
+ * server puts it into `detail` when it writes the notification.
+ *
+ * Entries written before that existed carry no groupId, and neither do the
+ * ones about a board itself. Both fall back to the board.
+ */
+function targetOf(item){
+    const groupId = item.detail && item.detail.groupId
+    return item.taskId && groupId
+        ?`/board/${item.boardId}/${groupId}/${item.taskId}`
+        :`/board/${item.boardId}`
 }
 
 /** The sentence shown for one entry. Every kind has its own key. */
@@ -57,6 +85,8 @@ export function NotificationBell(){
     const [unread, setUnread] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
     const [onlyUnread, setOnlyUnread] = useState(false)
+    const [anchor, setAnchor] = useState(null)
+    const bellRef = useRef(null)
     const panelRef = useRef(null)
     const navigate = useNavigate()
 
@@ -96,7 +126,12 @@ export function NotificationBell(){
     useEffect(() => {
         if(!isOpen) return
         function onDocClick(ev){
-            if(panelRef.current && !panelRef.current.contains(ev.target)) setIsOpen(false)
+            // Two elements now, not one: the panel lives in a portal and is no
+            // longer inside the bell. Checking only the bell would close the
+            // panel on every click inside it.
+            const inBell = bellRef.current && bellRef.current.contains(ev.target)
+            const inPanel = panelRef.current && panelRef.current.contains(ev.target)
+            if(!inBell && !inPanel) setIsOpen(false)
         }
         function onKey(ev){
             if(ev.key === 'Escape') setIsOpen(false)
@@ -111,6 +146,13 @@ export function NotificationBell(){
 
     function onToggle(){
         const next = !isOpen
+        if(next && bellRef.current){
+            // Measured rather than hardcoded: the bar has been 60px wide so
+            // far, and the first thing to change that would push the panel
+            // over it.
+            const rect = bellRef.current.getBoundingClientRect()
+            setAnchor({left: Math.round(rect.right + 8), top: Math.max(12, Math.round(rect.top - 8))})
+        }
         setIsOpen(next)
         if(next) load()
     }
@@ -122,7 +164,7 @@ export function NotificationBell(){
             setUnread(n => Math.max(0, n - 1))
             notificationService.markRead([item.id]).catch(() => {})
         }
-        navigate(item.taskId?`/board/${item.boardId}`:`/board/${item.boardId}`)
+        navigate(targetOf(item))
     }
 
     async function onMarkAll(){
@@ -138,7 +180,7 @@ export function NotificationBell(){
         .filter(s => s.entries.length)
 
     return (
-        <div className="notification-bell" ref={panelRef}>
+        <div className="notification-bell" ref={bellRef}>
             <Tooltip title={t('notification.title')} arrow placement="right">
                 <div className={`icon-container${isOpen?' is-active':''}`} onClick={onToggle}>
                     <Icon name="bell"/>
@@ -150,8 +192,14 @@ export function NotificationBell(){
                 </div>
             </Tooltip>
 
-            {isOpen && (
-                <section className="notification-panel" role="dialog" aria-label={t('notification.title')}>
+            {isOpen && createPortal(
+                <section
+                    className="notification-panel"
+                    ref={panelRef}
+                    role="dialog"
+                    aria-label={t('notification.title')}
+                    style={anchor?{left: anchor.left, top: anchor.top}:undefined}
+                >
                     <header className="notification-panel-head">
                         <h2>{t('notification.title')}</h2>
                         <div className="notification-panel-tools">
@@ -204,7 +252,8 @@ export function NotificationBell(){
                             </div>
                         ))}
                     </div>
-                </section>
+                </section>,
+                document.body
             )}
         </div>
     )

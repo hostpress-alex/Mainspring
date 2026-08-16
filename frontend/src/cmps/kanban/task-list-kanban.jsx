@@ -1,48 +1,39 @@
-import {useState} from 'react'
 import {Draggable, Droppable} from '@hello-pangea/dnd'
 
 import {TaskPreviewKanban} from './task-preview-kanban'
-import {useColumnWidths, widthOf, widthStyle} from '../board/column-width'
-import {TitleGroupPreview} from '../board/title-group-preview'
 import {TaskTitleKanban} from './task-title-kanban'
 
+/**
+ * The cards of one group.
+ *
+ * No column widths here any more. They come from `column-width.js`, are stored
+ * per board and are dragged in the table — a Kanban card is not a table row and
+ * has no business being 87 pixels wide because the Person column in the table
+ * is. The card sets its own width; the fields inside it fill it.
+ */
 export function TaskListKanban({board, group}){
-    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
-    const widths = useColumnWidths(board._id)
-
     return (
         <Droppable droppableId={group.id} type="task">
             {(provided) => (
-                <div ref={provided.innerRef}
-                     {...provided.droppableProps}>
+                <div ref={provided.innerRef} {...provided.droppableProps} className="task-list-kanban">
                     <ul className="task-list-content-kanban">
-                        {group.tasks.map((task, idx) => {
-                            return <li key={task.id} className="task-container" onClick={(ev) => {
-                                ev.stopPropagation()
-                            }}>
+                        {(group.tasks || []).map((task, idx) => (
+                            <li key={task.id} className="task-container">
                                 <Draggable draggableId={task.id} index={idx} key={task.id} type="task">
                                     {(provided) => (
-                                        <div {...provided.draggableProps}{...provided.dragHandleProps} ref={provided.innerRef} className="flex column">
+                                        <article
+                                            className="kanban-card"
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                        >
                                             <TaskTitleKanban task={task} group={group} board={board}/>
-                                            <div className="kanban-task-list">
-                                                <div className="task-content">
-                                                    <ul className="title-container">
-                                                        {(board.columns || []).map(column =>
-                                                            <li className={`${column.type}-picker cmp-order-title title`} key={column.id} style={widthStyle(widthOf(widths, column))}>
-                                                                <TitleGroupPreview column={column} board={board} isKanban={true}/>
-                                                            </li>
-                                                        )}
-                                                    </ul>
-                                                </div>
-                                                <div key={task.id}>
-                                                    <TaskPreviewKanban task={task} group={group} board={board} widths={widths} isTaskModalOpen={isTaskModalOpen} setIsTaskModalOpen={setIsTaskModalOpen}/>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            <TaskPreviewKanban task={task} group={group} board={board}/>
+                                        </article>
                                     )}
                                 </Draggable>
                             </li>
-                        })}
+                        ))}
                         {provided.placeholder}
                     </ul>
                 </div>

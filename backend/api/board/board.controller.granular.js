@@ -52,6 +52,22 @@ module.exports = {
     postTask: handler(req =>
         boardService.addTask(req.params.boardId, req.params.groupId, req.body.task, req.body.index ?? null), 'Task konnte nicht angelegt werden'),
 
+    /* A subtask is a task, so it is only created and reordered through routes
+       of its own. Changing and deleting one goes through the ordinary task
+       routes — the service finds a subtask there as well. */
+    postSubtask: handler(req =>
+        boardService.addSubtask(req.params.boardId, req.params.groupId, req.params.taskId,
+            req.body.task, req.body.index ?? null), 'Subtask konnte nicht angelegt werden'),
+
+    /* Both directions: a body without parentId promotes back to a task. */
+    putTaskParent: handler(req =>
+        boardService.setTaskParent(req.params.boardId, req.params.groupId, req.params.taskId,
+            req.body.parentId ?? null, req.body.index ?? null), 'Task konnte nicht umgehaengt werden'),
+
+    putSubtaskOrder: handler(req =>
+        boardService.reorderSubtasks(req.params.boardId, req.params.groupId, req.params.taskId,
+            req.body.taskIds), 'Reihenfolge konnte nicht gespeichert werden'),
+
     patchTask: handler(req =>
         boardService.updateTaskFields(req.params.boardId, req.params.groupId, req.params.taskId, req.body), 'Task konnte nicht geaendert werden'),
 

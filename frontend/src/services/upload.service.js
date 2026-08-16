@@ -32,6 +32,10 @@ export const uploadService = {
  */
 export async function uploadFile(fileOrBlob, opts = {}){
     if(!fileOrBlob) throw new Error(t('file.noneSelected'))
+    // Attachments go straight into the request body, so an unreadable file
+    // would surface as a failed upload with nothing to act on. Same check,
+    // same message as for avatars.
+    await assertReadable(fileOrBlob)
     const params = new URLSearchParams()
     if(opts.scope) params.set('scope', opts.scope)
     if(opts.taskId) params.set('taskId', opts.taskId)
@@ -93,6 +97,8 @@ export function imagesFromClipboard(ev){
  * longer end up sideways in the avatar.
  */
 async function decodeImage(file){
+    await assertReadable(file)
+
     if(typeof createImageBitmap === 'function'){
         try {
             return await createImageBitmap(file, {imageOrientation: 'from-image'})
@@ -113,7 +119,7 @@ async function decodeImage(file){
         return await new Promise((resolve, reject) => {
             const img = new Image()
             img.onload = () => resolve(img)
-            img.onerror = () => reject(new Error(t('file.imageReadFailed')))
+            img.onerror = () => reject(new Error(t('file.notDecodable')))
             img.src = url
         })
     } finally {
@@ -121,10 +127,48 @@ async function decodeImage(file){
     }
 }
 
-/** Say what actually went wrong, not just that something did. */
+/**
+ * Turn a browser error name into something the person can act on.
+ *
+ * The names are the useful part and the sentence around them is not, so each
+ * known one gets its own text. Anything unknown keeps the name visible rather
+ * than hiding behind "something went wrong" — that is what made this bug take
+ * three attempts to find.
+ */
+const READ_ERRORS = {
+    NotReadableError: 'file.notReadable',
+    NotFoundError: 'file.notFound',
+    SecurityError: 'file.notAllowed',
+    InvalidStateError: 'file.notDecodable'
+}
+
 function readError(err){
-    const reason = err && err.name?err.name:null
-    return new Error(reason?t('file.readFailedWhy', {reason}):t('file.readFailed'))
+    const name = err && err.name
+    const key = name && READ_ERRORS[name]
+    if(key) return new Error(t(key))
+    return new Error(name?t('file.readFailedWhy', {reason: name}):t('file.readFailed'))
+}
+
+/**
+ * Read sixteen bytes before doing anything else.
+ *
+ * Not paranoia — it is what makes the message match the cause. A file that
+ * cannot be read at all (an iCloud placeholder that was never downloaded, a
+ * volume that went away) makes createImageBitmap report InvalidStateError,
+ * "the source image could not be decoded", because from its side that is all
+ * that is true: it got no bytes. The person then hears their picture is
+ * broken when in fact it is simply not there.
+ *
+ * A slice of sixteen bytes costs nothing and surfaces the real
+ * NotReadableError, so the difference between "your file is damaged" and
+ * "your file is not on this computer" can actually be told.
+ */
+async function assertReadable(file){
+    try {
+        await file.slice(0, 16).arrayBuffer()
+    } catch(err){
+        throw readError(err)
+    }
 }
 
 async function resizeToSquare(file, side, quality){

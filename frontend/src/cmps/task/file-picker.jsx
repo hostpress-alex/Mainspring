@@ -51,8 +51,10 @@ export function FilePicker({info, onUpdate, field = 'file'}){
     }
 
     async function onPick(ev){
-        const picked = ev.target.files && ev.target.files[0]
-        ev.target.value = ''
+        const input = ev.target
+        const picked = input.files && input.files[0]
+        // Cleared in the finally at the end, not here: clearing the input
+        // detaches the File from the data behind it and the upload fails.
         if(!picked) return
         setErr(null)
         setIsBusy(true)
@@ -68,6 +70,8 @@ export function FilePicker({info, onUpdate, field = 'file'}){
             setErr(e.message || t('file.uploadFailed'))
         } finally {
             setIsBusy(false)
+            // Only now — see the note where the file is picked up.
+            input.value = ''
         }
     }
 

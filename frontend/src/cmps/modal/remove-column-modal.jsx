@@ -28,7 +28,7 @@ export function RemoveColumnModal({dynamicModalObj}){
     return (
         <ul className="remove-column-modal">
             <li onClick={onRemoveColumn}>
-                <Icon name='trash-can' style='fa-regular' className="icon"/> {t('column.delete')}
+                <Icon name='trash-can' variant='fa-regular' className="icon"/> {t('column.delete')}
             </li>
         </ul>
     )

@@ -72,10 +72,6 @@
     z-index: calc(var(--z-popover) + 20);   /* over the anchored menus, under the dynamic host */
 }
 
-.kanban-task-list {
-    background-color: white;
-}
-
 .invite-hint {
     padding: 8px 4px;
     color: #676879;
@@ -125,4 +121,22 @@
 
 .group-list-inner {
     min-width: var(--cell-width);
+}
+
+/* The "this label means done" switch in the label editor. Off it is a quiet
+   outline, on it is the same green the finished states use. */
+.label-editor-done {
+    border: 0;
+    background: none;
+    padding: 2px 4px;
+    color: #c4c4c4;
+    cursor: pointer;
+}
+
+.label-editor-done:hover {
+    color: #676879;
+}
+
+.label-editor-done.is-on {
+    color: #00c875;
 }

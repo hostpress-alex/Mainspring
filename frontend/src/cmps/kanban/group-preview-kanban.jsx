@@ -1,26 +1,29 @@
 import {Tooltip} from '@mui/material'
+
 import {updateGroupAction} from '../../store/board.actions'
 import {singleLineEditable} from '../../services/editable'
 import {TaskListKanban} from './task-list-kanban'
-import {t} from '../../i18n'
 
 export function GroupPreviewKanban({group, board, index}){
 
     async function onSave(ev){
-        const value = ev.target.innerText
-        group.title = value
+        const title = ev.target.innerText.trim()
+        if(!title || title === group.title) return
         try {
-            await updateGroupAction(board, group)
+            // A new object, not `group.title = title`. updateGroupAction works
+            // out what changed by comparing against the state it holds, and
+            // writing into that state first leaves nothing to find.
+            await updateGroupAction(board, {...group, title})
         } catch(err) {
-            console.log('saving failed')
+            console.error('cannot save the group title', err)
         }
     }
 
     return (
         <section className="group-preview-kanban">
-            <div className={`group-header ${!board.description?' not-des':''}`}>
+            <div className="group-header">
                 <div className="group-title-container" style={{'--group-color': group.color}}>
-                    <blockquote className="group-title" contentEditable onBlur={(ev) => onSave(ev)} suppressContentEditableWarning={true}
+                    <blockquote className="group-title" contentEditable onBlur={onSave} suppressContentEditableWarning={true}
                                 {...singleLineEditable()}>
                         <Tooltip title={group.title} arrow>
                             <span>{group.title}</span>

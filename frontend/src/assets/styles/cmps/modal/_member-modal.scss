@@ -122,9 +122,14 @@
         }
     }
 
+    /* A dialog with a backdrop, so it belongs on the modal step and not on
+       the popover one. It carried z-index 100 against a backdrop of 50 and
+       the mapping onto the named scale turned that round: backdrop 200,
+       dialog 100. The dimming covered the dialog including its close button,
+       which left reloading the page as the only way out. */
     &.invite {
         @include mixins.center-absolute();
-        z-index: var(--z-popover);
+        z-index: var(--z-modal);
         background-color: variables.$app-bg;
         border-radius: variables.$spacing-small;
         font-size: functions.rem(14px);

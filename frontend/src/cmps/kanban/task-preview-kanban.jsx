@@ -1,80 +1,66 @@
-import {useRef, useState} from 'react'
+import {Fragment} from 'react'
 import {useSelector} from 'react-redux'
-import {useNavigate} from 'react-router-dom'
 
-import {duplicateTask, toggleModal, updateGroupAction, updateTaskAction} from '../../store/board.actions'
-import {confirmDelete} from '../confirm-dialog'
-
-import { Icon } from '../icon'
-import {TaskMenuModal} from '../modal/task-menu-modal'
-import {utilService} from '../../services/util.service'
-import {boardService} from '../../services/board.service'
+import {updateTaskAction} from '../../store/board.actions'
 import {GUEST_IMG} from '../../services/avatar'
 import {DynamicCmp} from '../task/task-preview'
-import {widthOf} from '../board/column-width'
-import {t} from '../../i18n'
+import {filledColumns} from '../board/column-value'
 
-export function TaskPreviewKanban({task, group, board, isTaskModalOpen, setIsTaskModalOpen, widths = {}}){
+/**
+ * The body of a Kanban card: the columns that are filled in, as label/value
+ * pairs.
+ *
+ * It used to be the table row turned on its side. `task-list-kanban` rendered
+ * one list of all column *titles* and this component rendered a second list of
+ * all column *values* beside it, both carrying the pixel widths of the table.
+ * Two independent stacks: they only lined up while every label box happened to
+ * be exactly as tall as its value, and the labels were fixed at 36px while the
+ * values were not. The drift added up down the card, which is what it looked
+ * like.
+ *
+ * Both lists are one grid now. Label and value are siblings in the same grid
+ * row, so they cannot come apart no matter how tall a value grows, and the
+ * label column is as wide as the longest label instead of as wide as the
+ * table.
+ *
+ * Empty columns are left out — see column-value.js for why.
+ */
+export function TaskPreviewKanban({task, group, board}){
     const user = useSelector(storeState => storeState.userModule.user)
-    const navigate = useNavigate()
+    const columns = filledColumns(board, task)
 
     async function updateTask(cmpType, data, activity){
-        task[cmpType] = data
-        task.updatedBy.date = Date.now()
-        task.updatedBy.imgUrl = (user && user.imgUrl) || GUEST_IMG
+        // A copy, never the task from the store. updateTaskAction works out
+        // what changed by comparing against the state it holds — writing into
+        // that state first means the comparison finds nothing and the change
+        // is never sent. The table row has always cloned here; the Kanban card
+        // did not, which is why editing a card looked like it worked and was
+        // gone after a reload.
+        const next = structuredClone(task)
+        next[cmpType] = data
+        next.updatedBy = {
+            ...(next.updatedBy || {}),
+            date: Date.now(),
+            imgUrl: (user && user.imgUrl) || GUEST_IMG
+        }
         try {
-            await updateTaskAction(board, group.id, task, activity)
+            await updateTaskAction(board, group.id, next, activity)
         } catch(err) {
-            console.log(err)
+            console.error('cannot save the task', err)
         }
     }
 
-    async function onRemoveTask(taskId){
-        const toDelete = (group.tasks || []).find(x => x.id === taskId)
-        if(!await confirmDelete({what: toDelete?.title?t('task.deleteName', {title: toDelete.title}):t('task.thisTask')})) return
-        try {
-            const tasksToSave = group.tasks.filter(task => task.id !== taskId)
-            group.tasks = tasksToSave
-            await updateGroupAction(board, group)
-            setIsTaskModalOpen(false)
-        } catch(err) {
-            console.log('deleting a task failed', err)
-        }
-    }
-
-    async function onDuplicateTask(){
-        try {
-            duplicateTask(board, group, task)
-            setIsTaskModalOpen(false)
-        } catch(err) {
-            console.log(err)
-        }
-    }
-
-    async function onCreateNewTaskBelow(){
-        try {
-            const newTask = boardService.getEmptyTask()
-            newTask.id = utilService.makeId()
-            newTask.title = 'New Task'
-            const idx = group.tasks.indexOf(task)
-            group.tasks.splice(idx + 1, 0, newTask)
-            updateGroupAction(board, group)
-            setIsTaskModalOpen(false)
-        } catch(err) {
-            console.log(err)
-        }
-    }
-
+    if(!columns.length) return null
     return (
-        <section className={`task-preview-kanban ${isTaskModalOpen?' modal-open':''}`}>
-
-            {isTaskModalOpen &&
-                <TaskMenuModal taskId={task.id} onRemoveTask={onRemoveTask} onDuplicateTask={onDuplicateTask} onCreateNewTaskBelow={onCreateNewTaskBelow}/>}
-
-            {(board.columns || []).map(column => (
-                <DynamicCmp key={column.id} column={column} board={board} info={task} width={widthOf(widths, column)} onUpdate={updateTask}/>
+        <dl className="kanban-fields">
+            {columns.map(column => (
+                <Fragment key={column.id}>
+                    <dt className="kanban-field-label" title={column.title}>{column.title}</dt>
+                    <dd className="kanban-field-value">
+                        <DynamicCmp column={column} board={board} info={task} onUpdate={updateTask}/>
+                    </dd>
+                </Fragment>
             ))}
-            <div className="empty-div"></div>
-        </section>
+        </dl>
     )
 }

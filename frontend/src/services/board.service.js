@@ -37,6 +37,9 @@ export const boardService = {
     deleteGroup,
     reorderGroups,
     addTask,
+    addSubtask,
+    setTaskParent,
+    reorderSubtasks,
     patchTask,
     replaceTask,
     deleteTask,
@@ -210,6 +213,24 @@ function replaceTask(boardId, groupId, taskId, task){
 
 function deleteTask(boardId, groupId, taskId){
     return httpService.delete(`${BASE_URL}${boardId}/group/${groupId}/task/${taskId}`)
+}
+
+/**
+ * A subtask is created and reordered through routes of its own; changing and
+ * deleting one goes through patchTask/deleteTask like any task, because the
+ * server finds a subtask there too.
+ */
+function addSubtask(boardId, groupId, parentId, task, index = null){
+    return httpService.post(`${BASE_URL}${boardId}/group/${groupId}/task/${parentId}/subtask`, {task, index})
+}
+
+/** Hang a task under another one; parentId null takes it back out. */
+function setTaskParent(boardId, groupId, taskId, parentId, index = null){
+    return httpService.put(`${BASE_URL}${boardId}/group/${groupId}/task/${taskId}/parent`, {parentId, index})
+}
+
+function reorderSubtasks(boardId, groupId, parentId, taskIds){
+    return httpService.put(`${BASE_URL}${boardId}/group/${groupId}/task/${parentId}/subtasks/order`, {taskIds})
 }
 
 function reorderTasks(boardId, groupId, taskIds){

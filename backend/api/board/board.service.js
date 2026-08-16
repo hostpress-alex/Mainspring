@@ -267,10 +267,26 @@ function _findGroup(board, groupId){
     return group
 }
 
+/**
+ * A task of this group, top level or one below.
+ *
+ * Subtasks are found here on purpose. It means patching, replacing and
+ * deleting a subtask goes through exactly the same routes as a task, with the
+ * same permission check, instead of a second set that would have to be kept in
+ * step with the first one forever.
+ */
 function _findTask(group, taskId){
-    const task = (group.tasks || []).find(t => t.id === taskId)
-    if(!task) throw httpError(404, 'Task nicht gefunden')
-    return task
+    for(const task of group.tasks || []){
+        if(task.id === taskId) return task
+        const child = (task.subtasks || []).find(t => t.id === taskId)
+        if(child) return child
+    }
+    throw httpError(404, 'Task nicht gefunden')
+}
+
+/** The task a subtask hangs off, or null for a top-level task. */
+function _findParent(group, taskId){
+    return (group.tasks || []).find(t => (t.subtasks || []).some(c => c.id === taskId)) || null
 }
 
 async function updateMeta(boardId, patch){
@@ -361,7 +377,7 @@ async function addTask(boardId, groupId, task, index = null){
     _findGroup(board, groupId)
     if(!task || !task.id) throw httpError(400, 'task.id fehlt')
     await boardRepo.addTask(boardId, groupId, task, index)
-    await notifications().taskAdded({board, task, actor: getLoggedinUser()})
+    await notifications().taskAdded({board, groupId, task, actor: getLoggedinUser()})
     return await getById(boardId)
 }
 
@@ -377,20 +393,95 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
     const board = await _requireBoard(boardId)
     // Kept rather than discarded: the state before the write is what tells a
     // real change from a resend of the same value.
-    const oldTask = _findTask(_findGroup(board, groupId), taskId)
+    const group = _findGroup(board, groupId)
+    const oldTask = _findTask(group, taskId)
+    const parent = _findParent(group, taskId)
     if(!patch || typeof patch !== 'object') throw httpError(400, 'Keine Aenderungen uebergeben')
     await boardRepo.updateTaskFields(boardId, groupId, taskId, patch)
-    await notifications().taskPatched({board, oldTask, patch, actor: getLoggedinUser()})
+    await notifications().taskPatched({
+        board, groupId, oldTask, patch, parentId: parent?parent.id:null, actor: getLoggedinUser()})
     return await getById(boardId)
 }
 
 async function replaceTask(boardId, groupId, taskId, task){
     const board = await _requireBoard(boardId)
-    const oldTask = _findTask(_findGroup(board, groupId), taskId)
+    const group = _findGroup(board, groupId)
+    const oldTask = _findTask(group, taskId)
+    const parent = _findParent(group, taskId)
     await boardRepo.replaceTask(boardId, groupId, taskId, {...task, id: taskId})
     // A whole-task write is a patch of everything, so the same comparison
     // works — otherwise this path would silently notify nobody.
-    await notifications().taskPatched({board, oldTask, patch: task || {}, actor: getLoggedinUser()})
+    await notifications().taskPatched({
+        board, groupId, oldTask, patch: task || {}, parentId: parent?parent.id:null, actor: getLoggedinUser()})
+    return await getById(boardId)
+}
+
+/**
+ * Add a subtask under a task.
+ *
+ * One level: the parent has to be a top-level task. The check lives here
+ * rather than in the schema so this comes back as a readable 400 instead of a
+ * constraint violation.
+ */
+async function addSubtask(boardId, groupId, parentId, subtask, index = null){
+    const board = await _requireBoard(boardId)
+    const group = _findGroup(board, groupId)
+    const parent = _findTask(group, parentId)
+    if(!parent.subtasks) throw httpError(400, 'Ein Subtask kann keine Subtasks haben')
+    if(!subtask || !subtask.id) throw httpError(400, 'task.id fehlt')
+    await boardRepo.addSubtask(boardId, parentId, subtask, index)
+    await notifications().taskAdded({board, groupId, task: subtask, parentId, actor: getLoggedinUser()})
+    return await getById(boardId)
+}
+
+async function reorderSubtasks(boardId, groupId, parentId, taskIds){
+    const board = await _requireBoard(boardId)
+    const parent = _findTask(_findGroup(board, groupId), parentId)
+    const byId = new Map((parent.subtasks || []).map(t => [t.id, t]))
+    const next = (taskIds || []).map(id => byId.get(id)).filter(Boolean)
+    if(next.length !== (parent.subtasks || []).length){
+        throw httpError(400, 'Die Subtaskliste stimmt nicht mit dem Task ueberein')
+    }
+    await boardRepo.setSubtasks(boardId, parentId, next)
+    return await getById(boardId)
+}
+
+/**
+ * Turn a task into a subtask of another, or a subtask back into a task.
+ *
+ * `parentId` null promotes. The rules are all about the one level:
+ *
+ *  - the new parent must itself be a top-level task,
+ *  - a task cannot be put under itself,
+ *  - and a task that has children of its own cannot become a child, because
+ *    that would bury them at the second level.
+ *
+ * The last one is refused rather than quietly solved. Monday moves the
+ * grandchildren up to the parent; doing that silently means somebody converts
+ * one task and finds their structure rearranged. If it turns out to be wanted,
+ * it should be a second, named action.
+ */
+async function setTaskParent(boardId, groupId, taskId, parentId = null, index = null){
+    const board = await _requireBoard(boardId)
+    const group = _findGroup(board, groupId)
+    const task = _findTask(group, taskId)
+
+    if(parentId){
+        if(String(parentId) === String(taskId)){
+            throw httpError(400, 'Ein Task kann nicht sich selbst untergeordnet werden')
+        }
+        if((task.subtasks || []).length){
+            throw httpError(400, 'Dieser Task hat selbst Subtasks und kann keiner werden')
+        }
+        // The new parent may live in any group of this board — the task moves
+        // into that group with it.
+        const parent = (board.groups || [])
+            .flatMap(g => g.tasks || []).find(t => t.id === parentId)
+        if(!parent) throw httpError(404, 'Zieltask nicht gefunden')
+        if(!parent.subtasks) throw httpError(400, 'Ein Subtask kann keine Subtasks haben')
+    }
+
+    await boardRepo.setTaskParent(boardId, taskId, parentId || null, index)
     return await getById(boardId)
 }
 
@@ -446,10 +537,17 @@ module.exports = {
     replaceGroup,
     reorderGroups,
     addTask,
+    addSubtask,
+    reorderSubtasks,
+    setTaskParent,
     removeTask,
     updateTaskFields,
     replaceTask,
     reorderTasks,
     moveTask,
-    addActivity
+    addActivity,
+
+    // Exported so the tests can reach the tree walking without a database.
+    _findTask,
+    _findParent
 }

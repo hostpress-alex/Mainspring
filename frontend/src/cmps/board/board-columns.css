@@ -1,16 +1,13 @@
 /* Column widths are set through an inline style. The cell contents bring their
    own min-width from the SCSS — undone here with higher specificity, so that
    they fit the width that was set. */
-.task-preview .col-cell,
-.task-preview-kanban .col-cell {
+.task-preview .col-cell {
     display: flex;
     overflow: hidden;
 }
 
 .task-preview .col-cell > .picker,
-.task-preview .col-cell > .task-person,
-.task-preview-kanban .col-cell > .picker,
-.task-preview-kanban .col-cell > .task-person {
+.task-preview .col-cell > .task-person {
     min-width: 0;
     width: 100%;
 }

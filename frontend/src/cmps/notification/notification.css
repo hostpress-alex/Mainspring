@@ -21,7 +21,15 @@
     pointer-events: none;
 }
 
-/* Anchored to the sidebar, so it has to cover it. See setup/_layers.scss. */
+/*
+ * Rendered into document.body through a portal, not inside the sidebar — see
+ * the note in notification-bell.jsx. `.main-sidebar` is position: sticky and
+ * therefore opens its own stacking context, so a z-index set on anything
+ * inside it never competes with the board list beside it.
+ *
+ * top/left are only the starting point; the component measures the bell and
+ * overrides them, so the panel follows if the bar ever changes width.
+ */
 .notification-panel {
     position: fixed;
     top: 12px;

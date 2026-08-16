@@ -40,15 +40,27 @@ const tx = fn => db().transaction(fn)
 /* ================================================================ Lesen == */
 
 const COLUMN_OWN = new Set(['id', 'type', 'title', 'field'])
-const TASK_OWN = new Set(['id', 'title', 'memberIds', 'comments'])
+// Fields of a task that have a column or a table of their own. Everything
+// else lands in the col_values JSON — which is why `subtasks` has to be listed
+// here: without it the children would be serialised into their parent's JSON
+// as well as being rows, and the two copies would drift apart within a day.
+const TASK_OWN = new Set(['id', 'title', 'memberIds', 'comments', 'subtasks'])
 
 function buildColumn(row){
     return {id: row.id, type: row.type, title: row.title, field: row.field, ...(parseJson(row.settings, {}) || {})}
 }
 
-function buildTask(row, memberIds, comments){
+/**
+ * `subtasks` is only set on a task that has a parent of its own — that is what
+ * says "one level" in the shape of the data rather than only in a rule
+ * somewhere. A subtask has no `subtasks` key at all, so anything that walks
+ * the tree stops on its own.
+ */
+function buildTask(row, memberIds, comments, subtasks){
     const values = parseJson(row.col_values, {}) || {}
-    return {...values, id: row.id, title: row.title === null?'':row.title, memberIds, comments}
+    const task = {...values, id: row.id, title: row.title === null?'':row.title, memberIds, comments}
+    if(subtasks) task.subtasks = subtasks
+    return task
 }
 
 function buildComment(row){
@@ -130,7 +142,18 @@ async function assemble(k, boardRows){
 
     return boardRows.map(row => {
         const mem = membersByBoard.get(row.id) || []
-        const tasksOfBoard = bucket(tasksByBoard.get(row.id) || [], r => r.group_id)
+        const rowsOfBoard = tasksByBoard.get(row.id) || []
+        // Top level and children are separated once, here. Everything below
+        // reads from these two and never has to ask about parent_id again.
+        const tasksOfBoard = bucket(rowsOfBoard.filter(r => !r.parent_id), r => r.group_id)
+        const childrenOfTask = bucket(rowsOfBoard.filter(r => r.parent_id), r => r.parent_id)
+
+        const toTask = (t, withChildren) => buildTask(
+            t,
+            (membersByTask.get(t.board_id + ' ' + t.id) || []).map(m => m.user_id),
+            (commentsByTask.get(t.board_id + ' ' + t.id) || []).map(buildComment),
+            withChildren?(childrenOfTask.get(t.id) || []).map(c => toTask(c, false)):undefined
+        )
 
         return {
             _id: row.id,
@@ -153,11 +176,7 @@ async function assemble(k, boardRows){
                 title: g.title === null?'':g.title,
                 color: g.color || '',
                 archivedAt: g.archived_at === null?null:Number(g.archived_at),
-                tasks: (tasksOfBoard.get(g.id) || []).map(t => buildTask(
-                    t,
-                    (membersByTask.get(t.board_id + ' ' + t.id) || []).map(m => m.user_id),
-                    (commentsByTask.get(t.board_id + ' ' + t.id) || []).map(buildComment)
-                ))
+                tasks: (tasksOfBoard.get(g.id) || []).map(t => toTask(t, true))
             })),
             activities: (activitiesByBoard.get(row.id) || []).map(buildActivity)
         }
@@ -210,14 +229,34 @@ async function requireGroupRow(trx, boardId, groupId){
     return row
 }
 
+/**
+ * `where` is an object or a function that narrows a query.
+ *
+ * The function form exists for one reason: positions of top-level tasks are
+ * counted among top-level tasks only, and `{parent_id: null}` in knex becomes
+ * `parent_id = NULL`, which matches nothing. That has to be `whereNull`, and a
+ * plain object cannot say it.
+ */
+function narrow(q, where){
+    return typeof where === 'function'?where(q):q.where(where)
+}
+
 async function nextPosition(trx, table, where){
-    const row = await trx(table).where(where).max({m: 'position'}).first()
+    const row = await narrow(trx(table), where).max({m: 'position'}).first()
     return (row && row.m !== null && row.m !== undefined)?Number(row.m) + 1:0
 }
 
 async function shiftPositions(trx, table, where, fromPosition){
-    await trx(table).where(where).where('position', '>=', fromPosition).increment('position', 1)
+    await narrow(trx(table), where).where('position', '>=', fromPosition).increment('position', 1)
 }
+
+/** Top-level tasks of one group — the scope a task position is counted in. */
+const topLevelOf = (boardId, groupId) =>
+    q => q.where({board_id: boardId, group_id: groupId}).whereNull('parent_id')
+
+/** The children of one task — the scope a subtask position is counted in. */
+const childrenOf = (boardId, parentId) =>
+    q => q.where({board_id: boardId, parent_id: parentId})
 
 function splitTask(task){
     const values = {}
@@ -277,24 +316,55 @@ async function syncTaskComments(trx, boardId, taskId, comments){
     await trx('task_comment').insert(rows)
 }
 
-/** Write a whole task (create or replace). */
-async function writeTask(trx, boardId, groupId, task, position){
+/**
+ * Write a whole task (create or replace).
+ *
+ * With `parentId` set this writes a subtask. A subtask keeps the group of its
+ * parent in `group_id` — see the migration for why that redundancy is wanted.
+ *
+ * `task.subtasks` is written along with it, but only one level down: a
+ * subtask's own `subtasks` is ignored rather than followed, so a client that
+ * sends a deeper tree gets it flattened instead of silently stored.
+ */
+async function writeTask(trx, boardId, groupId, task, position, parentId = null){
     const s = splitTask(task)
     const id = sid(task && task.id) || newShortId()
     await trx('task').insert({
-        board_id: boardId, id, group_id: groupId, position,
+        board_id: boardId, id, group_id: groupId, position, parent_id: parentId || null,
         title: s.title, col_values: toJson(s.values),
         updated_at: s.updatedAt, updated_by_id: s.updatedById, updated_by_img: s.updatedByImg
     }).onConflict(['board_id', 'id']).merge()
     await syncTaskMembers(trx, boardId, id, s.memberIds)
     await syncTaskComments(trx, boardId, id, s.comments)
+    if(!parentId) await syncSubtasks(trx, boardId, groupId, id, task && task.subtasks)
     return id
+}
+
+/**
+ * Bring the children of one task to the given list.
+ *
+ * `undefined` means "the caller did not say", and then the children are left
+ * exactly as they are. Only an actual array is taken as the new truth — a
+ * patch that happens not to mention subtasks must not delete them.
+ */
+async function syncSubtasks(trx, boardId, groupId, parentId, subtasks){
+    if(!Array.isArray(subtasks)) return
+    const wanted = subtasks.map(t => sid(t && t.id)).filter(Boolean)
+    const existing = await trx('task').where({board_id: boardId, parent_id: parentId}).select('id')
+    const gone = existing.map(r => r.id).filter(id => !wanted.includes(id))
+    if(gone.length) await trx('task').where({board_id: boardId, parent_id: parentId}).whereIn('id', gone).del()
+    for(let i = 0; i < subtasks.length; i++){
+        await writeTask(trx, boardId, groupId, subtasks[i], i, parentId)
+    }
 }
 
 /** Bring the tasks of a group to the given list. */
 async function syncGroupTasks(trx, boardId, groupId, tasks){
     const wanted = tasks.map(t => sid(t.id)).filter(Boolean)
-    const existing = await trx('task').where({board_id: boardId, group_id: groupId}).select('id')
+    // Top level only. Without whereNull this reads every subtask of the group
+    // as a task that is no longer in the list and deletes the lot.
+    const existing = await trx('task')
+        .where({board_id: boardId, group_id: groupId}).whereNull('parent_id').select('id')
     const gone = existing.map(r => r.id).filter(id => !wanted.includes(id))
     if(gone.length) await trx('task').where({board_id: boardId, group_id: groupId}).whereIn('id', gone).del()
     for(let i = 0; i < tasks.length; i++) await writeTask(trx, boardId, groupId, tasks[i], i)
@@ -502,18 +572,98 @@ async function addTask(boardId, groupId, task, index = null){
         await requireGroupRow(trx, id, groupId)
         let position
         if(index === null || index === undefined){
-            position = await nextPosition(trx, 'task', {board_id: id, group_id: groupId})
+            position = await nextPosition(trx, 'task', topLevelOf(id, groupId))
         } else {
             position = Number(index)
-            await shiftPositions(trx, 'task', {board_id: id, group_id: groupId}, position)
+            await shiftPositions(trx, 'task', topLevelOf(id, groupId), position)
         }
         await writeTask(trx, id, groupId, task, position)
     })
 }
 
+/** Deleting a task takes its subtasks with it — the foreign key does that. */
 async function removeTask(boardId, groupId, taskId){
     const id = checkBoardId(boardId)
     await db()('task').where({board_id: id, group_id: groupId, id: taskId}).del()
+}
+
+/* ------------------------------------------------------------ Subtasks -- */
+
+async function addSubtask(boardId, parentId, subtask, index = null){
+    await tx(async trx => {
+        const id = await requireBoardRow(trx, boardId)
+        const parent = await trx('task').where({board_id: id, id: parentId}).first()
+        if(!parent) throw httpError(404, 'Task nicht gefunden')
+        if(parent.parent_id) throw httpError(400, 'Ein Subtask kann keine Subtasks haben')
+
+        let position
+        if(index === null || index === undefined){
+            position = await nextPosition(trx, 'task', childrenOf(id, parentId))
+        } else {
+            position = Number(index)
+            await shiftPositions(trx, 'task', childrenOf(id, parentId), position)
+        }
+        await writeTask(trx, id, parent.group_id, subtask, position, parentId)
+    })
+}
+
+/**
+ * Hang a task under another one, or take it back out.
+ *
+ * `parentId === null` promotes: the task becomes a top-level task of the group
+ * it is currently in. Otherwise it becomes a child of that task and takes its
+ * group with it — a subtask always sits in its parent's group, see the
+ * migration.
+ *
+ * Positions are the fiddly part and the reason this is one transaction. The
+ * task leaves one ordered list and joins another, and both lists have to stay
+ * gapless: the row is taken out first, then the rest of its old list closes up,
+ * then the new list opens a slot.
+ */
+async function setTaskParent(boardId, taskId, parentId, index = null){
+    await tx(async trx => {
+        const id = await requireBoardRow(trx, boardId)
+        const row = await trx('task').where({board_id: id, id: taskId}).forUpdate().first()
+        if(!row) throw httpError(404, 'Task nicht gefunden')
+
+        let groupId = row.group_id
+        if(parentId){
+            const parent = await trx('task').where({board_id: id, id: parentId}).forUpdate().first()
+            if(!parent) throw httpError(404, 'Zieltask nicht gefunden')
+            if(parent.parent_id) throw httpError(400, 'Ein Subtask kann keine Subtasks haben')
+            if(parent.id === row.id) throw httpError(400, 'Ein Task kann nicht sich selbst untergeordnet werden')
+            const ownChildren = await trx('task').where({board_id: id, parent_id: taskId}).count({n: '*'}).first()
+            if(Number(ownChildren && ownChildren.n)) throw httpError(400, 'Dieser Task hat selbst Subtasks')
+            groupId = parent.group_id
+        }
+
+        // Out of the old list, and close the gap it leaves behind.
+        const oldScope = row.parent_id?childrenOf(id, row.parent_id):topLevelOf(id, row.group_id)
+        await narrow(trx('task'), oldScope)
+            .where('position', '>', row.position).decrement('position', 1)
+
+        const newScope = parentId?childrenOf(id, parentId):topLevelOf(id, groupId)
+        let position
+        if(index === null || index === undefined){
+            position = await nextPosition(trx, 'task', newScope)
+        } else {
+            position = Number(index)
+            await shiftPositions(trx, 'task', newScope, position)
+        }
+
+        await trx('task').where({board_id: id, id: taskId})
+            .update({parent_id: parentId || null, group_id: groupId, position})
+    })
+}
+
+/** The new order of one task's children. */
+async function setSubtasks(boardId, parentId, subtasks){
+    await tx(async trx => {
+        const id = await requireBoardRow(trx, boardId)
+        const parent = await trx('task').where({board_id: id, id: parentId}).first()
+        if(!parent) throw httpError(404, 'Task nicht gefunden')
+        await syncSubtasks(trx, id, parent.group_id, parentId, Array.isArray(subtasks)?subtasks:[])
+    })
 }
 
 /**
@@ -549,6 +699,12 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
                 await syncTaskComments(trx, id, taskId, Array.isArray(value)?value:[])
                 continue
             }
+            if(key === 'subtasks'){
+                // Rows, not JSON. Without this branch the children would fall
+                // through into col_values below and exist twice.
+                await syncSubtasks(trx, id, row.group_id, taskId, value)
+                continue
+            }
             values[key] = value
             touchesValues = true
             if(key === 'updatedBy'){
@@ -568,7 +724,9 @@ async function replaceTask(boardId, groupId, taskId, task){
         const id = await requireBoardRow(trx, boardId)
         const row = await trx('task').where({board_id: id, id: taskId}).forUpdate().first()
         if(!row) throw httpError(404, 'Task nicht gefunden')
-        await writeTask(trx, id, row.group_id, {...task, id: taskId}, row.position)
+        // The parent comes from the row, never from the payload: replacing a
+        // task must not be a way to re-parent it behind the service's back.
+        await writeTask(trx, id, row.group_id, {...task, id: taskId}, row.position, row.parent_id || null)
     })
 }
 
@@ -593,14 +751,20 @@ async function moveTask(boardId, fromGroupId, toGroupId, task, index = null){
         const row = await trx('task').where({board_id: id, id: taskId}).forUpdate().first()
         if(!row) throw httpError(404, 'Task nicht gefunden')
 
+        if(row.parent_id) throw httpError(400, 'Ein Subtask wird mit seinem Task verschoben')
+
         let position
         if(index === null || index === undefined){
-            position = await nextPosition(trx, 'task', {board_id: id, group_id: toGroupId})
+            position = await nextPosition(trx, 'task', topLevelOf(id, toGroupId))
         } else {
             position = Number(index)
-            await shiftPositions(trx, 'task', {board_id: id, group_id: toGroupId}, position)
+            await shiftPositions(trx, 'task', topLevelOf(id, toGroupId), position)
         }
         await trx('task').where({board_id: id, id: taskId}).update({group_id: toGroupId, position})
+        // The children carry the group of their parent. Leaving them behind
+        // would point their foreign key at a group they are no longer under,
+        // and deleting that group would take them with it.
+        await trx('task').where({board_id: id, parent_id: taskId}).update({group_id: toGroupId})
     })
 }
 
@@ -637,7 +801,7 @@ module.exports = {
     findById, findForUser, insert, deleteById,
     updateMeta, setColumns, setMembers, setOwners,
     addGroup, removeGroup, updateGroupMeta, replaceGroup, reorderGroups,
-    addTask, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,
+    addTask, addSubtask, setSubtasks, setTaskParent, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,
     addActivity,
     MAX_ACTIVITIES
 }

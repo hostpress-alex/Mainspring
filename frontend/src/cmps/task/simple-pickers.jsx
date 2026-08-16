@@ -69,8 +69,8 @@ export function CheckboxPicker({info, field, onUpdate}){
     return (
         <section className="picker checkbox-picker" onClick={() => onUpdate(field, !checked)} title={checked?t('common.done'):t('common.open2')}>
             {checked
-                ?<Icon name='square-check' style='fa-regular' className="checkbox-on"/>
-                :<Icon name='square' style='fa-regular' className="checkbox-off"/>}
+                ?<Icon name='square-check' variant='fa-regular' className="checkbox-on"/>
+                :<Icon name='square' variant='fa-regular' className="checkbox-off"/>}
         </section>
     )
 }
