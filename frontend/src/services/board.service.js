@@ -13,6 +13,14 @@ export const boardService = {
     isBoardOwner,
     canManageMembers,
     canManageBoard,
+    setBoardState,
+    setGroupState,
+    setTaskState,
+    getBin,
+    getBoardsInState,
+    purgeBoard,
+    purgeGroup,
+    purgeTask,
     setMemberRole,
     getById,
     getFilteredBoard,
@@ -148,6 +156,56 @@ function getById(boardId){
 
 function remove(boardId){
     return httpService.delete(BASE_URL + boardId)
+}
+
+/* ------------------------------------------ Papierkorb und Archiv -- */
+
+/**
+ * Move a board, a group or a task between active, archived and trashed.
+ *
+ * "Delete" everywhere else in the app already goes here — the server turns it
+ * into `trashed`. These are for the other direction and for the archive.
+ */
+function setBoardState(boardId, state){
+    return httpService.put(`${BASE_URL}${boardId}/state`, {state})
+}
+
+function setGroupState(boardId, groupId, state){
+    return httpService.put(`${BASE_URL}${boardId}/group/${groupId}/state`, {state})
+}
+
+function setTaskState(boardId, taskId, state){
+    return httpService.put(`${BASE_URL}${boardId}/task/${taskId}/state`, {state})
+}
+
+/** The groups and tasks of one board in one of the two bins. */
+function getBin(boardId, state){
+    return httpService.get(`${BASE_URL}${boardId}/bin?state=${state}`)
+}
+
+/** The whole boards in one of the two bins. */
+function getBoardsInState(state){
+    return httpService.get(`${BASE_URL}bin/boards?state=${state}`)
+}
+
+/*
+ * Gone for good. Owner only, and there is no way back from here.
+ *
+ * Declarations, not `const` arrows. The exported object at the top of this
+ * file names these, and a const is not hoisted — the module would throw on
+ * import before a single line of the app had run. That mistake has cost this
+ * project two white pages already.
+ */
+function purgeBoard(boardId){
+    return httpService.delete(`${BASE_URL}${boardId}/purge`)
+}
+
+function purgeGroup(boardId, groupId){
+    return httpService.delete(`${BASE_URL}${boardId}/group/${groupId}/purge`)
+}
+
+function purgeTask(boardId, taskId){
+    return httpService.delete(`${BASE_URL}${boardId}/task/${taskId}/purge`)
 }
 
 function save(board){

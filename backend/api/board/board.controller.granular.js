@@ -22,6 +22,37 @@ const handler = (fn, fallback) => async(req, res) => {
 }
 
 module.exports = {
+    /* ---------------------------------------- Papierkorb und Archiv -- */
+
+    putBoardState: handler(req =>
+        boardService.setBoardState(req.params.boardId, req.body.state),
+        'Zustand konnte nicht geaendert werden'),
+
+    putGroupState: handler(req =>
+        boardService.setGroupState(req.params.boardId, req.params.groupId, req.body.state),
+        'Zustand konnte nicht geaendert werden'),
+
+    putTaskState: handler(req =>
+        boardService.setTaskState(req.params.boardId, req.params.taskId, req.body.state),
+        'Zustand konnte nicht geaendert werden'),
+
+    getBin: handler(req =>
+        boardService.bin(req.params.boardId, req.query.state || 'trashed'),
+        'Papierkorb konnte nicht geladen werden'),
+
+    getBoardsInState: handler(req =>
+        boardService.boardsInState(req.query.state || 'trashed'),
+        'Papierkorb konnte nicht geladen werden'),
+
+    purgeBoard: handler(req =>
+        boardService.purgeBoard(req.params.boardId), 'Board konnte nicht geloescht werden'),
+
+    purgeGroup: handler(req =>
+        boardService.purgeGroup(req.params.boardId, req.params.groupId), 'Gruppe konnte nicht geloescht werden'),
+
+    purgeTask: handler(req =>
+        boardService.purgeTask(req.params.boardId, req.params.taskId), 'Task konnte nicht geloescht werden'),
+
     patchBoard: handler(req =>
         boardService.updateMeta(req.params.boardId, req.body), 'Board konnte nicht geaendert werden'),
 

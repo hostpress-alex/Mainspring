@@ -1,0 +1,160 @@
+@use "../setup/variables";
+
+/**
+ * The bin and the archive.
+ *
+ * Same frame as the automation panel — three quarters of the screen, the
+ * board still visible behind it. Two dialogs that behave the same way are one
+ * thing to learn instead of two.
+ */
+.bin-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-backdrop);
+    background: rgba(0, 0, 0, .4);
+}
+
+.bin-overlay {
+    position: fixed;
+    inset: 12.5%;
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+    background: variables.$app-bg;
+}
+
+.bin-header {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-large;
+    padding: variables.$spacing-medium variables.$spacing-large;
+    border-bottom: 1px solid variables.$layout-border-color;
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        white-space: nowrap;
+    }
+
+    .bin-board {
+        margin-left: variables.$spacing-small;
+        color: #676879;
+        font-weight: 400;
+    }
+
+    .bin-close {
+        margin-left: auto;
+        border: 0;
+        background: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: variables.$primary-text-color;
+    }
+}
+
+.bin-tabs {
+    display: flex;
+
+    button {
+        padding: 6px 14px;
+        border: 1px solid variables.$layout-border-color;
+        background: variables.$app-bg;
+        cursor: pointer;
+        font: inherit;
+
+        &:first-child { border-radius: 6px 0 0 6px; }
+        &:last-child { border-radius: 0 6px 6px 0; }
+
+        &.is-active {
+            background: variables.$board-btn;
+            border-color: variables.$board-btn;
+            color: #fff;
+        }
+    }
+}
+
+.bin-body {
+    flex: 1;
+    overflow: auto;
+    padding: variables.$spacing-large variables.$spacing-xl;
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.bin-error {
+    margin-bottom: variables.$spacing-medium;
+    padding: 10px 14px;
+    border: 1px solid #e2445c;
+    border-radius: 6px;
+    background: #fff0f2;
+    color: #a3283a;
+}
+
+.bin-empty {
+    padding: variables.$spacing-xxl;
+    text-align: center;
+    color: #676879;
+}
+
+/**
+ * One row. The title takes the space that is left; everything else is as wide
+ * as it needs to be, so the two buttons stay in one column down the list.
+ */
+.bin-row {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) auto auto auto auto;
+    align-items: center;
+    gap: variables.$spacing-medium;
+    padding: 10px variables.$spacing-small;
+    border-bottom: 1px solid variables.$border-color;
+}
+
+.bin-row-icon { color: #676879; }
+
+.bin-row-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &[role="button"] {
+        cursor: pointer;
+
+        &:hover { text-decoration: underline; }
+    }
+}
+
+.bin-row-sub,
+.bin-row-at {
+    color: #676879;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.bin-restore {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 6px;
+    background: variables.$app-bg;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover { background: variables.$workspace-hover; }
+}
+
+/* Deliberately quiet. It is the button nobody should reach for by accident. */
+.bin-purge {
+    border: 0;
+    background: none;
+    color: #676879;
+    cursor: pointer;
+
+    &:hover { color: #a3283a; }
+}

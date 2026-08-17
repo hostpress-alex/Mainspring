@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {boardService} from '../../services/board.service';
 import {utilService} from '../../services/util.service';
-import {duplicateTask, setDynamicModalObj, updateGroupAction, setTaskParentAction, removeTaskAction, addSubtaskAction} from '../../store/board.actions';
+import {duplicateTask, setDynamicModalObj, updateGroupAction, setTaskParentAction, removeTaskAction, addSubtaskAction, setTaskStateAction} from '../../store/board.actions';
 import {confirmDelete} from '../confirm-dialog';
 import {t} from '../../i18n'
 
@@ -35,6 +35,21 @@ export function TaskMenuModal({dynamicModalObj}){
             setDynamicModalObj({...dynamicModalObj, isOpen: false})
         } catch(err) {
             console.error('deleting a task failed', err)
+        }
+    }
+
+    /**
+     * Out of the way, kept on purpose.
+     *
+     * No confirmation: nothing is lost and the archive is one click away in
+     * the board header. A question here would be a question about nothing.
+     */
+    async function onArchiveTask(){
+        try {
+            await setTaskStateAction(board, dynamicModalObj.task.id, 'archived')
+            setDynamicModalObj({...dynamicModalObj, isOpen: false})
+        } catch(err) {
+            console.error('archiving the task failed', err)
         }
     }
 
@@ -132,6 +147,10 @@ export function TaskMenuModal({dynamicModalObj}){
             <div onClick={onDuplicateTask}>
                 <Icon name='clone' variant='fa-regular'/>
                 <span>{t('common.duplicate')}</span>
+            </div>
+            <div onClick={onArchiveTask}>
+                <Icon name='box-archive'/>
+                <span>{t('common.archive')}</span>
             </div>
             <div onClick={() => onRemoveTask()}>
                 <Icon name='trash-can' variant='fa-regular'/>

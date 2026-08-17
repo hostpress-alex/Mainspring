@@ -10,6 +10,7 @@ import {Tooltip} from '@mui/material'
 import {singleLineEditable} from '../../services/editable'
 import {RichTextView} from '../rich-text/rich-text-view'
 import {AutomationPanel} from '../automation/automation-panel'
+import {BinPanel} from '../bin/bin-panel'
 import {boardService} from '../../services/board.service'
 import {t} from '../../i18n'
 
@@ -25,6 +26,7 @@ export function BoardHeader({
     const isOpen = useSelector(storeState => storeState.boardModule.isBoardModalOpen)
     const navigate = useNavigate()
     const [isAutomationOpen, setIsAutomationOpen] = useState(false)
+    const [isBinOpen, setIsBinOpen] = useState(false)
 
     async function onSave(ev){
         const value = ev.target.innerText
@@ -76,6 +78,14 @@ export function BoardHeader({
                     <Tooltip title={t('board.showDescription')} arrow>
                         <div className="info-btn icon" onClick={() => setIsShowDescription(true)}>
                             <Icon name='circle-exclamation'/>
+                        </div>
+                    </Tooltip>
+                    {/* Open to everyone who can see the board: knowing what
+                        left it is reading. Putting something back is checked
+                        per row on the server. */}
+                    <Tooltip title={t('bin.open')} arrow>
+                        <div className="bin-btn icon" onClick={() => setIsBinOpen(true)}>
+                            <Icon name='trash-can' variant='fa-regular'/>
                         </div>
                     </Tooltip>
                     {/* Rules change what the board does on its own, which is
@@ -134,6 +144,7 @@ export function BoardHeader({
             {boardType !== 'dashboard' &&
                 <BoardFilter onSetFilter={onSetFilter} board={board} setIsInviteModalOpen={setIsInviteModalOpen}/>}
             {isAutomationOpen && <AutomationPanel board={board} onClose={() => setIsAutomationOpen(false)}/>}
+            {isBinOpen && <BinPanel board={board} onClose={() => setIsBinOpen(false)}/>}
         </header>
     )
 }

@@ -105,6 +105,22 @@
             "assignees": "die zugewiesenen Personen"
         }
     },
+    "bin":      {
+        "archive":      "Archiv",
+        "board":        "Board",
+        "emptyArchive": "Das Archiv ist leer.",
+        "emptyTrash":   "Der Papierkorb ist leer.",
+        "groupWith":    {
+            "one":   "Gruppe mit 1 Task",
+            "other": "Gruppe mit {n} Tasks"
+        },
+        "open":         "Papierkorb und Archiv",
+        "purge":        "Endgültig löschen",
+        "purgeNote":    "Das lässt sich nicht rückgängig machen.",
+        "restore":      "Wiederherstellen",
+        "title":        "Papierkorb und Archiv",
+        "trash":        "Papierkorb"
+    },
     "board":    {
         "addFavorite":     "Zu den Favoriten",
         "board":           "Board",
@@ -219,6 +235,7 @@
     },
     "common":   {
         "add":             "Hinzufügen",
+        "archive":         "Archivieren",
         "areaFailed":      "{area} konnte nicht angezeigt werden.",
         "areaFailedHint":  "Der Rest der Seite funktioniert weiter. Einzelheiten stehen in der Browser-Konsole.",
         "back":            "Zurück",

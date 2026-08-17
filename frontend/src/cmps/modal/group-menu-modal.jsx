@@ -1,5 +1,5 @@
 import { Icon } from '../icon'
-import {duplicateGroup, setDynamicModalObj, removeGroupAction} from '../../store/board.actions'
+import {duplicateGroup, setDynamicModalObj, removeGroupAction, setGroupStateAction} from '../../store/board.actions'
 import {confirmDelete} from '../confirm-dialog'
 import {useSelector} from 'react-redux'
 import {t} from '../../i18n'
@@ -21,6 +21,15 @@ export function GroupMenuModal({dynamicModalObj}){
             setDynamicModalObj({...dynamicModalObj, isOpen: false})
         } catch(err) {
             console.log('err:', err)
+        }
+    }
+
+    async function onArchiveGroup(){
+        try {
+            await setGroupStateAction(board, dynamicModalObj.group.id, 'archived')
+            setDynamicModalObj({...dynamicModalObj, isOpen: false})
+        } catch(err) {
+            console.error('archiving the group failed', err)
         }
     }
 
@@ -63,6 +72,10 @@ export function GroupMenuModal({dynamicModalObj}){
             <div className="duplicate" onClick={onDuplicateGroup}>
                 <Icon name='clone' variant='fa-regular'/>
                 <span>{t('group.duplicate')}</span>
+            </div>
+            <div className="archive" onClick={onArchiveGroup}>
+                <Icon name='box-archive'/>
+                <span>{t('common.archive')}</span>
             </div>
             <div className="delete" onClick={onRemoveGroup}>
                 <Icon name='trash-can' variant='fa-regular'/>

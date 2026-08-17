@@ -201,7 +201,9 @@ async function remove(boardId){
         if(!board) throw httpError(404, 'Board not found')
         if(!isOwner(board, user)) throw httpError(403, 'Nur ein Owner darf dieses Board loeschen')
 
-        await boardRepo.deleteById(boardId)
+        // Not gone — moved. Emptying the bin is its own call, made by a
+        // person who is looking at what they are about to lose.
+        await boardRepo.setBoardState(boardId, boardRepo.TRASHED, user && user._id)
         return String(boardId)
     } catch(err) {
         if(!err.status) logger.error(`cannot remove board ${boardId}`, err)
@@ -252,11 +254,17 @@ async function add(board){
  * "anybody who can see it", which is what a viewer gets and is enough for
  * reading and for writing a reply — those check per comment further down.
  */
-async function _requireBoard(boardId, {owner = false, editor = false} = {}){
+async function _requireBoard(boardId, {owner = false, editor = false, anyState = false} = {}){
     const user = getLoggedinUser()
     const board = await _getByIdRaw(boardId)
     if(!board) throw httpError(404, 'Board nicht gefunden')
     if(!roles.canView(board, user)) throw httpError(403, 'Kein Zugriff auf dieses Board')
+    // A board in the bin is not a board you work on. `anyState` is for the two
+    // calls that are ABOUT its state — putting it back and emptying it — and
+    // for nothing else, which is why it has to be asked for by name.
+    if(!anyState && board.state && board.state !== boardRepo.ACTIVE){
+        throw httpError(410, 'Dieses Board liegt im Papierkorb oder Archiv')
+    }
     if(owner && !roles.isOwner(board, user)){
         throw httpError(403, 'Das darf nur ein Owner dieses Boards')
     }
@@ -264,6 +272,11 @@ async function _requireBoard(boardId, {owner = false, editor = false} = {}){
         throw httpError(403, 'Dafuer werden Bearbeitungsrechte gebraucht')
     }
     return board
+}
+
+const _me = () => {
+    const user = getLoggedinUser()
+    return user?user._id:null
 }
 
 function _findGroup(board, groupId){
@@ -461,7 +474,7 @@ async function addGroup(boardId, group, index = null){
 async function removeGroup(boardId, groupId){
     const board = await _requireBoard(boardId)
     _requireGroupRights(board, _findGroup(board, groupId))
-    await boardRepo.removeGroup(boardId, groupId)
+    await boardRepo.setGroupState(boardId, groupId, boardRepo.TRASHED, _me())
     return await getById(boardId)
 }
 
@@ -559,7 +572,7 @@ async function addTask(boardId, groupId, task, index = null){
 async function removeTask(boardId, groupId, taskId){
     const board = await _requireBoard(boardId, {editor: true})
     _findTask(_findGroup(board, groupId), taskId)
-    await boardRepo.removeTask(boardId, groupId, taskId)
+    await boardRepo.setTaskState(boardId, taskId, boardRepo.TRASHED, _me())
     return await getById(boardId)
 }
 
@@ -700,6 +713,88 @@ async function addActivity(boardId, activity){
     return await getById(boardId)
 }
 
+
+/* ============================================ Papierkorb und Archiv == */
+
+/**
+ * Three lives, and the rules for moving between them.
+ *
+ * Who may is the same question as who may delete, because that is what this
+ * replaced: a board belongs to its owners, a group to whoever made it, a task
+ * to anybody who may edit. Restoring is the same right as throwing away — a
+ * person allowed to make a mistake has to be allowed to undo it, and asking
+ * an owner to put back what an editor dropped is how a bin turns into a
+ * ticket queue.
+ *
+ * Emptying is deliberately NOT the same right. Nothing here is undoable, so it
+ * belongs to the owner of the board and nobody else.
+ */
+function _requireState(state){
+    if(!boardRepo.STATES.includes(state)) throw httpError(400, 'Unbekannter Zustand')
+    return state
+}
+
+async function setBoardState(boardId, state){
+    _requireState(state)
+    // anyState: this call is ABOUT the state, so a board already in the bin
+    // has to be reachable — that is the whole point of restoring it.
+    await _requireBoard(boardId, {owner: true, anyState: true})
+    await boardRepo.setBoardState(boardId, state, _me())
+    return {_id: String(boardId), state}
+}
+
+async function setGroupState(boardId, groupId, state){
+    _requireState(state)
+    const board = await _requireBoard(boardId)
+    const group = await boardRepo.findGroupRow(boardId, groupId)
+    if(!group) throw httpError(404, 'Gruppe nicht gefunden')
+    _requireGroupRights(board, group)
+    await boardRepo.setGroupState(boardId, groupId, state, _me())
+    return await getById(boardId)
+}
+
+async function setTaskState(boardId, taskId, state){
+    _requireState(state)
+    await _requireBoard(boardId, {editor: true})
+    const task = await boardRepo.findTaskRow(boardId, taskId)
+    if(!task) throw httpError(404, 'Task nicht gefunden')
+    await boardRepo.setTaskState(boardId, taskId, state, _me())
+    return await getById(boardId)
+}
+
+/** What is in one bin. Anybody who may see the board may see what left it. */
+async function bin(boardId, state){
+    _requireState(state)
+    await _requireBoard(boardId, {anyState: true})
+    return await boardRepo.findBin(boardId, state)
+}
+
+/** Boards in one bin, for the person asking. */
+async function boardsInState(state){
+    _requireState(state)
+    return await boardRepo.findBoardsByState(getLoggedinUser(), state)
+}
+
+/* ------------------------------------------------------- for good now -- */
+
+async function purgeBoard(boardId){
+    await _requireBoard(boardId, {owner: true, anyState: true})
+    await boardRepo.deleteById(boardId)
+    return String(boardId)
+}
+
+async function purgeGroup(boardId, groupId){
+    await _requireBoard(boardId, {owner: true, anyState: true})
+    await boardRepo.purgeGroup(boardId, groupId)
+    return String(groupId)
+}
+
+async function purgeTask(boardId, taskId){
+    await _requireBoard(boardId, {owner: true, anyState: true})
+    await boardRepo.purgeTask(boardId, taskId)
+    return String(taskId)
+}
+
 module.exports = {
     remove,
     query,
@@ -731,6 +826,10 @@ module.exports = {
     reorderTasks,
     moveTask,
     addActivity,
+
+    setBoardState, setGroupState, setTaskState,
+    bin, boardsInState,
+    purgeBoard, purgeGroup, purgeTask,
 
     // Exported so the tests can reach the tree walking without a database.
     _findTask,

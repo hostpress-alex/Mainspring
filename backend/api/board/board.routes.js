@@ -8,6 +8,18 @@ const router = express.Router()
 // Every board route needs a logged-in user.
 router.use(requireAuth)
 
+// --- Papierkorb und Archiv -------------------------------------------------
+// Before every /:boardId route below: `bin/boards` would otherwise be read as
+// a board with the id "bin".
+router.get('/bin/boards', g.getBoardsInState)
+router.get('/:boardId/bin', g.getBin)
+router.put('/:boardId/state', g.putBoardState)
+router.put('/:boardId/group/:groupId/state', g.putGroupState)
+router.put('/:boardId/task/:taskId/state', g.putTaskState)
+router.delete('/:boardId/purge', g.purgeBoard)
+router.delete('/:boardId/group/:groupId/purge', g.purgeGroup)
+router.delete('/:boardId/task/:taskId/purge', g.purgeTask)
+
 // --- Targeted writes ------------------------------------------------------
 // Mind the order: the specific paths have to come BEFORE the general ones,
 // otherwise /:boardId swallows everything.

@@ -6,6 +6,8 @@ import {loadBoards, saveBoard} from '../store/board.actions'
 import {boardService} from '../services/board.service'
 import {logout} from '../store/user.actions'
 import {Loader} from '../cmps/loader'
+import {BinPanel} from '../cmps/bin/bin-panel'
+import {Icon} from '../cmps/icon'
 import { Avatar } from '../cmps/avatar'
 import {t} from '../i18n'
 
@@ -22,6 +24,7 @@ export function BoardsOverview(){
     const user = useSelector(storeState => storeState.userModule.user)
     const [isLoading, setIsLoading] = useState(true)
     const [filter, setFilter] = useState('')
+    const [isBinOpen, setIsBinOpen] = useState(false)
     const [err, setErr] = useState(null)
     const navigate = useNavigate()
 
@@ -70,6 +73,12 @@ export function BoardsOverview(){
                     <h1 className="overview-title">{t('nav.myBoards')}</h1>
                     <div className="overview-actions">
                         <input className="overview-search" placeholder={t('board.search')} value={filter} onChange={e => setFilter(e.target.value)}/>
+                        {/* Whole boards land here rather than in a board's own
+                            bin — whoever is looking for one is by definition
+                            not inside it any more. */}
+                        <button className="overview-btn is-ghost" onClick={() => setIsBinOpen(true)}>
+                            <Icon name='trash-can' variant='fa-regular'/> {t('bin.title')}
+                        </button>
                         <button className="overview-btn" onClick={onCreateBoard}>{t('board.newButton')}</button>
                     </div>
                 </div>
@@ -133,6 +142,7 @@ export function BoardsOverview(){
                     </div>
                 )}
             </div>
+            {isBinOpen && <BinPanel onClose={() => setIsBinOpen(false)}/>}
         </div>
     )
 }

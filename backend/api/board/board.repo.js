@@ -25,6 +25,12 @@ function httpError(status, msg){
 }
 
 const sid = v => (v === undefined || v === null)?'':String(v)
+
+/** The three lives of a board, a group and a task. See the lifecycle migration. */
+const ACTIVE = 'active'
+const ARCHIVED = 'archived'
+const TRASHED = 'trashed'
+const STATES = [ACTIVE, ARCHIVED, TRASHED]
 const newBoardId = () => crypto.randomBytes(12).toString('hex')
 const newShortId = () => crypto.randomBytes(6).toString('hex')
 
@@ -131,8 +137,13 @@ async function assemble(k, boardRows){
 
     const members = await k('board_member').whereIn('board_id', ids).orderBy('board_id').orderBy('position')
     const columns = await k('board_column').whereIn('board_id', ids).orderBy('board_id').orderBy('position')
-    const groups = await k('board_group').whereIn('board_id', ids).orderBy('board_id').orderBy('position')
-    const tasks = await k('task').whereIn('board_id', ids).orderBy('board_id').orderBy('position')
+    // Only what is on the board. Archived and thrown-away rows stay in the
+    // table and are read by findBin, never by the board itself — see the
+    // lifecycle migration for why there is no cascade to make this simpler.
+    const groups = await k('board_group').whereIn('board_id', ids).where('state', ACTIVE)
+        .orderBy('board_id').orderBy('position')
+    const tasks = await k('task').whereIn('board_id', ids).where('state', ACTIVE)
+        .orderBy('board_id').orderBy('position')
     const taskMembers = await k('task_member').whereIn('board_id', ids).orderBy('position')
     const comments = await k('task_comment').whereIn('board_id', ids).orderBy('position')
     const activities = await k('activity').whereIn('board_id', ids).orderBy('seq', 'desc')
@@ -166,7 +177,12 @@ async function assemble(k, boardRows){
             description: row.description === null?'':row.description,
             folder: row.folder || '',
             isStarred: !!row.is_starred,
+            // Creation time. The name is older than the archive and means the
+            // opposite of what it sounds like — see the lifecycle migration.
             archivedAt: row.archived_at === null?null:Number(row.archived_at),
+            state: row.state || ACTIVE,
+            stateAt: row.state_at === null || row.state_at === undefined?null:Number(row.state_at),
+            stateBy: row.state_by || null,
             createdBy: {
                 _id: row.created_by_id || '',
                 fullname: row.created_by_name || '',
@@ -214,7 +230,9 @@ async function findById(boardId){
 async function findForUser(user, filterBy = {}){
     if(!user) return []
     const k = db()
-    let q = k('board').select('board.*')
+    // The board list is the boards, not the bin. Archived and thrown-away
+    // ones are asked for by name, through findBoardsByState.
+    let q = k('board').select('board.*').where('board.state', ACTIVE)
     if(!user.isAdmin){
         q = q.whereIn('board.id', k('board_member').select('board_id').where('user_id', sid(user._id)))
     }
@@ -364,7 +382,10 @@ async function writeTask(trx, boardId, groupId, task, position, parentId = null)
 async function syncSubtasks(trx, boardId, groupId, parentId, subtasks){
     if(!Array.isArray(subtasks)) return
     const wanted = subtasks.map(t => sid(t && t.id)).filter(Boolean)
-    const existing = await trx('task').where({board_id: boardId, parent_id: parentId}).select('id')
+    // Same reason as in syncGroupTasks: a subtask in the bin is not in the
+    // list and must not be read as one that was removed.
+    const existing = await trx('task')
+        .where({board_id: boardId, parent_id: parentId, state: ACTIVE}).select('id')
     const gone = existing.map(r => r.id).filter(id => !wanted.includes(id))
     if(gone.length) await trx('task').where({board_id: boardId, parent_id: parentId}).whereIn('id', gone).del()
     for(let i = 0; i < subtasks.length; i++){
@@ -377,8 +398,12 @@ async function syncGroupTasks(trx, boardId, groupId, tasks){
     const wanted = tasks.map(t => sid(t.id)).filter(Boolean)
     // Top level only. Without whereNull this reads every subtask of the group
     // as a task that is no longer in the list and deletes the lot.
+    // `state: ACTIVE` is not a nicety. A thrown-away task is not in the list
+    // the client sends, so without this it counts as "no longer there" and is
+    // deleted for real — the bin would empty itself, at unpredictable moments,
+    // with no error anywhere.
     const existing = await trx('task')
-        .where({board_id: boardId, group_id: groupId}).whereNull('parent_id').select('id')
+        .where({board_id: boardId, group_id: groupId, state: ACTIVE}).whereNull('parent_id').select('id')
     const gone = existing.map(r => r.id).filter(id => !wanted.includes(id))
     if(gone.length) await trx('task').where({board_id: boardId, group_id: groupId}).whereIn('id', gone).del()
     for(let i = 0; i < tasks.length; i++) await writeTask(trx, boardId, groupId, tasks[i], i)
@@ -869,11 +894,153 @@ async function addActivity(boardId, activity){
     })
 }
 
+
+/* ============================================ Papierkorb und Archiv == */
+
+/**
+ * Move something between the three lives.
+ *
+ * One function per table rather than one clever one: the key of a group is
+ * (board_id, id) and that of a task is the same, but a board is just an id,
+ * and a helper that hides that difference would be harder to read than the
+ * three lines it saves.
+ */
+async function setBoardState(boardId, state, userId){
+    const id = checkBoardId(boardId)
+    await db()('board').where({id}).update({
+        state, state_at: Date.now(), state_by: userId?sid(userId):null})
+}
+
+async function setGroupState(boardId, groupId, state, userId){
+    const id = checkBoardId(boardId)
+    await db()('board_group').where({board_id: id, id: sid(groupId)}).update({
+        state, state_at: Date.now(), state_by: userId?sid(userId):null})
+}
+
+async function setTaskState(boardId, taskId, state, userId){
+    const id = checkBoardId(boardId)
+    await db()('task').where({board_id: id, id: sid(taskId)}).update({
+        state, state_at: Date.now(), state_by: userId?sid(userId):null})
+}
+
+/**
+ * What is in one bin of one board.
+ *
+ * Flat lists, not an assembled board: the point of this view is "what did I
+ * throw away and when", and nesting the tasks under groups that are themselves
+ * thrown away would ask the reader to hold two states at once.
+ *
+ * A task whose group is in the same bin is left out. It is not gone — putting
+ * the group back brings it along — and listing it separately would offer a
+ * restore that cannot work on its own.
+ */
+async function findBin(boardId, state){
+    const id = checkBoardId(boardId)
+    const k = db()
+
+    const groups = await k('board_group')
+        .where({board_id: id, state})
+        .orderBy('state_at', 'desc')
+        .select('id', 'title', 'color', 'icon', 'state_at', 'state_by')
+
+    const tasks = await k('task as t')
+        .leftJoin('board_group as g', function(){
+            this.on('g.board_id', 't.board_id').andOn('g.id', 't.group_id')
+        })
+        .where({'t.board_id': id, 't.state': state})
+        .where('g.state', ACTIVE)
+        .orderBy('t.state_at', 'desc')
+        .select('t.id', 't.title', 't.group_id', 't.parent_id', 't.state_at', 't.state_by',
+            'g.title as group_title')
+
+    const counts = await k('task')
+        .where({board_id: id, state: ACTIVE})
+        .whereIn('group_id', groups.map(g => g.id).length?groups.map(g => g.id):[''])
+        .groupBy('group_id')
+        .select('group_id')
+        .count({n: '*'})
+    const countByGroup = new Map(counts.map(r => [r.group_id, Number(r.n)]))
+
+    return {
+        groups: groups.map(g => ({
+            id: g.id, title: g.title || '', color: g.color || '', icon: g.icon || '',
+            taskCount: countByGroup.get(g.id) || 0,
+            stateAt: g.state_at === null?null:Number(g.state_at),
+            stateBy: g.state_by || null
+        })),
+        tasks: tasks.map(t => ({
+            id: t.id, title: t.title || '', groupId: t.group_id,
+            groupTitle: t.group_title || '', isSubtask: Boolean(t.parent_id),
+            stateAt: t.state_at === null?null:Number(t.state_at),
+            stateBy: t.state_by || null
+        }))
+    }
+}
+
+/**
+ * One group row, whatever state it is in.
+ *
+ * The assembled board only carries active groups, so restoring one cannot ask
+ * the board who created it — and "an editor may manage the group they created"
+ * has to hold for putting it back too, or the rule has a hole exactly where
+ * somebody is undoing a mistake.
+ */
+async function findGroupRow(boardId, groupId){
+    const id = checkBoardId(boardId)
+    const row = await db()('board_group').where({board_id: id, id: sid(groupId)}).first()
+    if(!row) return null
+    return {
+        id: row.id, title: row.title || '', createdBy: row.created_by || null,
+        state: row.state || ACTIVE
+    }
+}
+
+/** One task row, whatever state it is in. */
+async function findTaskRow(boardId, taskId){
+    const id = checkBoardId(boardId)
+    const row = await db()('task').where({board_id: id, id: sid(taskId)}).first()
+    if(!row) return null
+    return {
+        id: row.id, title: row.title || '', groupId: row.group_id,
+        parentId: row.parent_id || null, state: row.state || ACTIVE
+    }
+}
+
+/** Hard delete, for emptying a bin. The only place a row really goes away. */
+async function purgeGroup(boardId, groupId){
+    const id = checkBoardId(boardId)
+    await db()('board_group').where({board_id: id, id: sid(groupId)}).del()
+}
+
+async function purgeTask(boardId, taskId){
+    const id = checkBoardId(boardId)
+    await db()('task').where({board_id: id, id: sid(taskId)}).del()
+}
+
+/** Boards in one bin that this person is allowed to see. */
+async function findBoardsByState(user, state){
+    if(!user) return []
+    const k = db()
+    let q = k('board').where('state', state)
+    if(!user.isAdmin){
+        q = q.whereIn('id', k('board_member').select('board_id').where('user_id', sid(user._id)))
+    }
+    const rows = await q.orderBy('state_at', 'desc').select('id', 'title', 'state_at', 'state_by')
+    return rows.map(r => ({
+        _id: r.id, title: r.title || '',
+        stateAt: r.state_at === null?null:Number(r.state_at),
+        stateBy: r.state_by || null
+    }))
+}
+
 module.exports = {
     findById, findForUser, insert, deleteById,
     updateMeta, setColumns, setMembers, setMemberRole, setOwners,
     addGroup, removeGroup, updateGroupMeta, replaceGroup, reorderGroups,
     addTask, addSubtask, setSubtasks, setTaskParent, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,
     addActivity,
+    setBoardState, setGroupState, setTaskState, findBin, findBoardsByState,
+    findGroupRow, findTaskRow, purgeGroup, purgeTask,
+    ACTIVE, ARCHIVED, TRASHED, STATES,
     MAX_ACTIVITIES
 }

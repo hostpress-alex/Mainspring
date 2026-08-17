@@ -105,6 +105,22 @@
             "assignees": "the assigned people"
         }
     },
+    "bin":      {
+        "archive":      "Archive",
+        "board":        "Board",
+        "emptyArchive": "The archive is empty.",
+        "emptyTrash":   "The bin is empty.",
+        "groupWith":    {
+            "one":   "Group with 1 item",
+            "other": "Group with {n} items"
+        },
+        "open":         "Bin and archive",
+        "purge":        "Delete for good",
+        "purgeNote":    "There is no way back from this.",
+        "restore":      "Restore",
+        "title":        "Bin and archive",
+        "trash":        "Bin"
+    },
     "board":    {
         "addFavorite":     "Add to favourites",
         "board":           "Board",
@@ -219,6 +235,7 @@
     },
     "common":   {
         "add":             "Add",
+        "archive":         "Archive",
         "areaFailed":      "{area} could not be shown.",
         "areaFailedHint":  "The rest of the page keeps working. Details are in the browser console.",
         "back":            "Back",

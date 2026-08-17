@@ -143,6 +143,7 @@ Migrations, in order:
 | `20260816_000010_user_language.js` | `user.language` — the interface language of an account |
 | `20260816_000011_comment_pinned.js` | `task_comment.pinned_at` — an update pinned to the top |
 | `20260816_000012_automations.js` | `automation` and `automation_run` — rules and what they did |
+| `20260816_000013_lifecycle.js` | `state` on board, group and task — bin and archive |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -168,6 +169,29 @@ read state per person — which the other way round cannot have without storing
 **A subscription can be muted rather than deleted.** A deleted row cannot be
 told apart from never having subscribed, so the next assignment would sign the
 user up again to the thing they just switched off.
+
+**Nothing is deleted any more, it is moved.** `state` on `board`,
+`board_group` and `task` holds `active`, `archived` or `trashed`, with
+`state_at` and `state_by` beside it. One column rather than two flags and one
+mechanism rather than a separate archive: every read on a board filters by
+this, and two conditions in every query is two chances to write only one.
+
+**There is no cascade, and that is the point.** A row counts as visible when it
+AND all of its parents are active — worked out when reading, not written down.
+Restoring a group therefore brings its tasks back without a record of "these
+went along with it" that would have to survive the third restore, and a task
+somebody threw away by itself stays thrown away.
+
+**The trap: `syncGroupTasks` and `syncSubtasks` delete whatever the client did
+not send.** A row in the bin is never in what the client sends, so both of them
+scope their "what is gone" query to `state = 'active'`. Without that the bin
+empties itself at unpredictable moments, days later, silently. There is a test
+that reads those two functions for the filter, because a machine without
+MariaDB cannot reach the failure any other way.
+
+**Not called `archived_at`.** That name is taken on `board` and
+`task_comment`, where it means when the row was CREATED — the board info dialog
+prints it under "created at".
 
 **An automation runs as the person who wrote it.** `automation.created_by` is
 not decoration: whoever trips a rule may be a viewer, and the rule still has to

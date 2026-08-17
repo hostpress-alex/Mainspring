@@ -491,6 +491,23 @@ export async function removeTaskAction(filteredBoard, groupId, taskId){
     _applyBoard(await boardService.deleteTask(filteredBoard._id, groupId, taskId))
 }
 
+/* ------------------------------------------ Papierkorb und Archiv -- */
+
+/**
+ * Move a task or a group into the archive, into the bin, or back.
+ *
+ * The server answers with the whole board either way, so the row disappears or
+ * reappears without the client working out what changed — which is what it
+ * would have to do, since a restored row was not in the board it holds.
+ */
+export async function setTaskStateAction(filteredBoard, taskId, state){
+    _applyBoard(await boardService.setTaskState(filteredBoard._id, taskId, state))
+}
+
+export async function setGroupStateAction(filteredBoard, groupId, state){
+    _applyBoard(await boardService.setGroupState(filteredBoard._id, groupId, state))
+}
+
 /**
  * Turn a task into a subtask of another, or a subtask back into a task.
  *
