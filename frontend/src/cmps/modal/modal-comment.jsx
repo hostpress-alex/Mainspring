@@ -2,7 +2,16 @@ import { Icon } from '../icon'
 import {confirmDelete} from '../confirm-dialog'
 import {t} from '../../i18n'
 
-export function CommentMenuModal({commentId, onRemoveComment, onOpenEdit, setIsMenuModalOpen, taskId, isReply = false}){
+export function CommentMenuModal({
+    commentId,
+    onRemoveComment,
+    onOpenEdit,
+    setIsMenuModalOpen,
+    taskId,
+    isReply = false,
+    isPinned = false,
+    onTogglePin = null
+}){
 
     async function onRemove(commentId){
         setIsMenuModalOpen(false)
@@ -20,12 +29,22 @@ export function CommentMenuModal({commentId, onRemoveComment, onOpenEdit, setIsM
         onOpenEdit(true)
     }
 
+    function onPin(){
+        setIsMenuModalOpen(false)
+        onTogglePin()
+    }
+
     return (
         <section className="comment-modal">
-            <div className="pin">
-                <Icon name='thumbtack'/>
-                <span>{t('common.pin')}</span>
-            </div>
+            {/* Only shown when there is something to do: a reply cannot be
+                pinned — it hangs off its update and would have to leave it —
+                and a viewer may not pin at all. The host decides both by
+                passing a handler or not. */}
+            {onTogglePin && !isReply &&
+                <div className="pin" onClick={onPin}>
+                    <Icon name='thumbtack'/>
+                    <span>{isPinned?t('common.unpin'):t('common.pin')}</span>
+                </div>}
             <div className="edit" onClick={onEdit}>
                 <Icon name='pen'/>
                 <span>{t('common.edit')}</span>

@@ -1,0 +1,358 @@
+@use "../setup/variables";
+
+/**
+ * The automation panel.
+ *
+ * Three quarters of the screen rather than all of it: large enough that the
+ * pickers inside a sentence have room to open — a rule has up to five of them
+ * and in a small dialog they spend their life clipped — and small enough that
+ * the board stays visible behind it, which is what makes it read as something
+ * you opened rather than somewhere you went.
+ *
+ * `inset: 12.5%` is the whole layout: an equal margin on all four sides leaves
+ * exactly 75% in the middle, with no width, height or centring to keep in step
+ * with each other.
+ */
+.automation-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-backdrop);
+    background: rgba(0, 0, 0, .4);
+}
+
+.automation-overlay {
+    position: fixed;
+    inset: 12.5%;
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+    background: variables.$app-bg;
+}
+
+.automation-header {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-large;
+    padding: variables.$spacing-medium variables.$spacing-large;
+    border-bottom: 1px solid variables.$layout-border-color;
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        white-space: nowrap;
+    }
+
+    .automation-board {
+        color: #676879;
+        font-weight: 400;
+    }
+
+    .automation-close {
+        margin-left: auto;
+        border: 0;
+        background: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: variables.$primary-text-color;
+    }
+}
+
+.automation-tabs {
+    display: flex;
+    gap: variables.$spacing-xs;
+
+    button {
+        padding: 6px 14px;
+        border: 1px solid variables.$layout-border-color;
+        background: variables.$app-bg;
+        cursor: pointer;
+        font: inherit;
+
+        &:first-child { border-radius: 6px 0 0 6px; }
+        &:last-child { border-radius: 0 6px 6px 0; }
+
+        &.is-active {
+            background: variables.$board-btn;
+            border-color: variables.$board-btn;
+            color: #fff;
+        }
+    }
+}
+
+.automation-body {
+    flex: 1;
+    overflow: auto;
+    padding: variables.$spacing-xl;
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.automation-error {
+    margin-bottom: variables.$spacing-medium;
+    padding: 10px 14px;
+    border: 1px solid #e2445c;
+    border-radius: 6px;
+    background: #fff0f2;
+    color: #a3283a;
+}
+
+/* ------------------------------------------------------------ sentence -- */
+
+.automation-line {
+    display: inline;
+    font-size: 20px;
+    line-height: 2;
+}
+
+.automation-sentence .automation-line { font-size: 16px; }
+
+.automation-then {
+    display: flex;
+    align-items: baseline;
+    gap: variables.$spacing-small;
+}
+
+.automation-then-arrow { color: #00c875; }
+
+/**
+ * A word in the sentence that can be clicked.
+ *
+ * `position: relative` here and nowhere else: the list below hangs off this
+ * element, and a slot inside another positioned box would drag its list along.
+ */
+.automation-slot {
+    position: relative;
+    display: inline-block;
+}
+
+.automation-slot-btn {
+    border: 0;
+    border-bottom: 2px solid variables.$layout-border-color;
+    background: none;
+    padding: 0 2px;
+    font: inherit;
+    color: #9699a6;
+    cursor: pointer;
+
+    &.is-set {
+        color: variables.$board-btn;
+        border-bottom-color: variables.$board-btn;
+    }
+}
+
+.automation-slot-static {
+    font-weight: 600;
+    border-bottom: 2px solid variables.$layout-border-color;
+}
+
+.automation-slot-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--z-popover);
+    min-width: 240px;
+    max-height: 280px;
+    margin: 4px 0 0;
+    padding: 4px;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+    background: variables.$app-bg;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .16);
+    list-style: none;
+    overflow-y: auto;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.automation-slot-option {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-small;
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: variables.$workspace-hover; }
+}
+
+.automation-slot-empty {
+    padding: 6px 8px;
+    color: #676879;
+    font-size: 14px;
+}
+
+.automation-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--swatch);
+    flex: none;
+}
+
+/* ------------------------------------------------------------- builder -- */
+
+.automation-builder {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: variables.$spacing-medium;
+}
+
+.automation-arrow { color: #00c875; }
+
+.automation-builder-action {
+    display: flex;
+    align-items: baseline;
+    gap: variables.$spacing-small;
+}
+
+.automation-change {
+    margin-left: variables.$spacing-small;
+    font-size: 13px;
+}
+
+.automation-builder-buttons {
+    display: flex;
+    gap: variables.$spacing-small;
+}
+
+.automation-add-action,
+.automation-primary {
+    padding: 9px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.automation-add-action {
+    border: 1px solid variables.$layout-border-color;
+    background: variables.$app-bg;
+}
+
+.automation-primary {
+    border: 0;
+    background: variables.$board-btn;
+    color: #fff;
+
+    &:disabled {
+        background: variables.$layout-border-color;
+        cursor: default;
+    }
+}
+
+/* ---------------------------------------------------------------- list -- */
+
+.automation-list,
+.automation-runs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.automation-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: variables.$spacing-small;
+    padding: variables.$spacing-medium;
+    margin-bottom: variables.$spacing-medium;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+
+    // A rule that is switched off still says what it would do, quietly.
+    &.is-off { opacity: .55; }
+}
+
+.automation-card-meta {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-small;
+    color: #676879;
+    font-size: 13px;
+}
+
+.automation-card-actions {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-small;
+}
+
+.automation-owner img {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.automation-icon-btn {
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: #676879;
+    font-size: 15px;
+
+    &:hover { color: variables.$primary-text-color; }
+}
+
+.automation-switch {
+    width: 40px;
+    height: 22px;
+    padding: 2px;
+    border: 0;
+    border-radius: 11px;
+    background: variables.$layout-border-color;
+    cursor: pointer;
+
+    .automation-knob {
+        display: block;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform .15s ease;
+    }
+
+    &.is-on {
+        background: variables.$board-btn;
+
+        .automation-knob { transform: translateX(18px); }
+    }
+}
+
+.automation-empty {
+    padding: variables.$spacing-xl;
+    text-align: center;
+    color: #676879;
+}
+
+/* ------------------------------------------------------------ the log -- */
+
+.automation-run {
+    display: grid;
+    grid-template-columns: 110px 1fr 2fr auto;
+    gap: variables.$spacing-medium;
+    align-items: baseline;
+    padding: 10px variables.$spacing-small;
+    border-bottom: 1px solid variables.$border-color;
+    font-size: 14px;
+}
+
+.automation-run-outcome { font-weight: 600; }
+.automation-run.is-done .automation-run-outcome { color: #00734a; }
+.automation-run.is-failed .automation-run-outcome { color: #a3283a; }
+.automation-run.is-skipped .automation-run-outcome { color: #676879; }
+.automation-run-summary { color: #676879; }
+.automation-run-time {
+    color: #676879;
+    white-space: nowrap;
+}

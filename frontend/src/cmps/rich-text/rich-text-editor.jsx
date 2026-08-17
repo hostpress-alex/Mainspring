@@ -6,7 +6,7 @@ import {Icon} from '../icon'
 import {Avatar} from '../avatar'
 import {buildExtensions} from './extensions'
 import {createMentionBridge} from './mention-suggestion'
-import {isEmpty, trimTrailingEmpty} from '../../services/rich-text'
+import {fromLegacy, isEmpty, trimTrailingEmpty} from '../../services/rich-text'
 import {t} from '../../i18n'
 
 /**
@@ -82,7 +82,11 @@ export function RichTextEditor({
 
     const editor = useEditor({
         extensions,
-        content: value || '',
+        // Through fromLegacy, like everywhere a stored value is read. Without
+        // it an older comment opens as its own source — "@[Alex](6a7f…)" as
+        // literal text — and saving that back would store the token twice
+        // over, once as text and once as a real mention.
+        content: fromLegacy(value),
         autofocus: autoFocus?'end':false,
         editorProps: {
             attributes: {class: 'rich-text rich-text-input', 'data-placeholder': placeholder},
@@ -137,7 +141,7 @@ export function RichTextEditor({
     // Only when the host really means a different document — see above.
     useEffect(() => {
         if(!editor) return
-        const incoming = value || ''
+        const incoming = fromLegacy(value)
         if(incoming === editor.getHTML()) return
         if(isEmpty(incoming) && isEmpty(editor.getHTML())) return
         editor.commands.setContent(incoming, {emitUpdate: false})

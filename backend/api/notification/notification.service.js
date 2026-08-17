@@ -291,6 +291,29 @@ async function taskAdded({board, groupId, task, parentId = null, actor}){
 }
 
 /** People added to a board. */
+/**
+ * A rule did something to a task.
+ *
+ * The actor is deliberately null: nobody did this, the board did. `deliver`
+ * drops the actor from the recipients so that a person is never told about
+ * their own doing — here there is no own doing, and whoever the rule names
+ * gets told even if they caused the change themselves. That is the point of
+ * asking to be notified.
+ */
+async function automationFired({board, groupId, taskId, subject, userIds, summary}){
+    return await safely('automationFired', async () => {
+        return await deliver(userIds || [], {
+            boardId: sid(board._id),
+            boardTitle: board.title || '',
+            taskId: taskId?sid(taskId):null,
+            groupId: sid(groupId),
+            subject: subject || '',
+            kind: 'automation',
+            detail: {summary: String(summary || '')}
+        }, null)
+    })
+}
+
 async function boardMembersChanged({board, members, actor}){
     return await safely('boardMembersChanged', async () => {
         const invited = addedMembers(board.members, members)
@@ -306,6 +329,7 @@ module.exports = {
     taskPatched,
     taskAdded,
     boardMembersChanged,
+    automationFired,
     // exported for the tests
     mentionedIds,
     toPlain,

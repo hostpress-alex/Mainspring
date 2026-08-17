@@ -37,7 +37,12 @@ function asFile(value){
     return null
 }
 
-export function FilePicker({info, onUpdate, field = 'file'}){
+/**
+ * `readOnly` keeps the half a viewer is entitled to. The preview and the
+ * download stay — reading an attachment is reading — and only what would write
+ * goes: the upload and the ×.
+ */
+export function FilePicker({info, onUpdate, field = 'file', readOnly = false}){
     const [isBusy, setIsBusy] = useState(false)
     const [err, setErr] = useState(null)
     const [preview, setPreview] = useState(null)
@@ -87,7 +92,7 @@ export function FilePicker({info, onUpdate, field = 'file'}){
     return (
         <section className="file-picker picker" title={describe()}>
             {preview && <FilePreview file={preview} onClose={() => setPreview(null)}/>}
-            {!file && (
+            {!file && !readOnly && (
                 <label htmlFor={'file-upload' + info.id} className="file-picker-add">
                     {isBusy?<span className="file-picker-busy">…</span>:<Icon name='file-circle-plus' className="icon"/>}
                 </label>
@@ -116,13 +121,17 @@ export function FilePicker({info, onUpdate, field = 'file'}){
                             <Icon name={type.faIcon} className={`file-icon is-${type.key}`}/>
                         </a>
                     )}
-                    <button type="button" title={t('file.remove')} onClick={onClear} className="file-picker-clear">
-                        ×
-                    </button>
+                    {!readOnly && (
+                        <button type="button" title={t('file.remove')} onClick={onClear} className="file-picker-clear">
+                            ×
+                        </button>
+                    )}
                 </span>
             )}
 
-            <input ref={elInput} type="file" accept={ACCEPT} onChange={onPick} id={'file-upload' + info.id} className="file-picker-input"/>
+            {!readOnly && (
+                <input ref={elInput} type="file" accept={ACCEPT} onChange={onPick} id={'file-upload' + info.id} className="file-picker-input"/>
+            )}
         </section>
     )
 }

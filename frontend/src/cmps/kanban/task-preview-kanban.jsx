@@ -5,6 +5,7 @@ import {updateTaskAction} from '../../store/board.actions'
 import {GUEST_IMG} from '../../services/avatar'
 import {DynamicCmp} from '../task/task-preview'
 import {filledColumns} from '../board/column-value'
+import * as boardRoles from '../../services/board-roles'
 
 /**
  * The body of a Kanban card: the columns that are filled in, as label/value
@@ -28,6 +29,9 @@ import {filledColumns} from '../board/column-value'
 export function TaskPreviewKanban({task, group, board}){
     const user = useSelector(storeState => storeState.userModule.user)
     const columns = filledColumns(board, task)
+    // The same rule as in the table: a viewer reads the card and changes
+    // nothing on it.
+    const canWork = boardRoles.canEdit(board, user)
 
     async function updateTask(cmpType, data, activity){
         // A copy, never the task from the store. updateTaskAction works out
@@ -36,6 +40,7 @@ export function TaskPreviewKanban({task, group, board}){
         // is never sent. The table row has always cloned here; the Kanban card
         // did not, which is why editing a card looked like it worked and was
         // gone after a reload.
+        if(!canWork) return
         const next = structuredClone(task)
         next[cmpType] = data
         next.updatedBy = {
@@ -57,7 +62,7 @@ export function TaskPreviewKanban({task, group, board}){
                 <Fragment key={column.id}>
                     <dt className="kanban-field-label" title={column.title}>{column.title}</dt>
                     <dd className="kanban-field-value">
-                        <DynamicCmp column={column} board={board} info={task} onUpdate={updateTask}/>
+                        <DynamicCmp column={column} board={board} info={task} onUpdate={updateTask} readOnly={!canWork}/>
                     </dd>
                 </Fragment>
             ))}

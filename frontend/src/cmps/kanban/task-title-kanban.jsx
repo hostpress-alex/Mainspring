@@ -6,9 +6,12 @@ import { Icon } from '../icon'
 import {setDynamicModalObj, updateTaskAction} from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
 import {singleLineEditable} from '../../services/editable'
+import * as boardRoles from '../../services/board-roles'
 
 export function TaskTitleKanban({task, group, board}){
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
+    const user = useSelector(storeState => storeState.userModule.user)
+    const canWork = boardRoles.canEdit(board, user)
     const navigate = useNavigate()
     const elTaskModalBtn = useRef()
 
@@ -24,7 +27,7 @@ export function TaskTitleKanban({task, group, board}){
 
     async function onUpdateTaskTitle(ev, task){
         const value = ev.target.innerText
-        if(value === task.title) return
+        if(!canWork || value === task.title) return
         const activity = boardService.getEmptyActivity()
         activity.action = 'title'
         activity.task = {id: task.id, title: value}
@@ -39,7 +42,7 @@ export function TaskTitleKanban({task, group, board}){
 
     return (
         <section className="task-title">
-            <blockquote contentEditable onBlur={(ev) => onUpdateTaskTitle(ev, task)} suppressContentEditableWarning={true}
+            <blockquote contentEditable={canWork} onBlur={(ev) => onUpdateTaskTitle(ev, task)} suppressContentEditableWarning={true}
                         {...singleLineEditable()}>
                 <span>{task.title}</span>
             </blockquote>

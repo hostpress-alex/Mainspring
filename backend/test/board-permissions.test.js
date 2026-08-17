@@ -20,16 +20,22 @@ const alsPath = require.resolve('../services/als.service')
 
 const OWNER = {_id: 'u_owner', fullname: 'Owner'}
 const MEMBER = {_id: 'u_member', fullname: 'Member'}
+const VIEWER = {_id: 'u_viewer', fullname: 'Viewer'}
+
+/** One update by somebody else, one by the viewer. */
+const FOREIGN_UPDATE = {id: 'c1', parentId: null, txt: 'Fremd', attachments: [], byMember: {_id: MEMBER._id}}
+const OWN_UPDATE = {id: 'c2', parentId: null, txt: 'Eigen', attachments: [], byMember: {_id: VIEWER._id}}
 
 const BOARD = () => ({
     _id: '0123456789abcdef01234567',
     title: 'Board',
-    members: [{_id: OWNER._id}, {_id: MEMBER._id}],
+    members: [{_id: OWNER._id}, {_id: MEMBER._id}, {_id: VIEWER._id, role: 'viewer'}],
     ownerIds: [OWNER._id],
     columns: [{id: 'c1', type: 'status', title: 'Status', field: 'status'}],
     groups: [{
         id: 'g1', title: 'Konzept', color: '#fff', icon: '',
-        tasks: [{id: 't1', title: 'Task', subtasks: []}]
+        tasks: [{id: 't1', title: 'Task', subtasks: [],
+            comments: [{...FOREIGN_UPDATE}, {...OWN_UPDATE}]}]
     }],
     activities: []
 })
@@ -150,6 +156,39 @@ test('an owner may do both', async () => {
         id: 'g1', title: 'Umbenannt', color: '#e2445c', icon: '🚀',
         tasks: [{id: 't1', title: 'Task'}]
     })), false)
+})
+
+/* ------------------------------------------------------------ pinning -- */
+
+/**
+ * Pinning is not editing.
+ *
+ * It decides what everybody on the board reads first, so it belongs to the
+ * people who may shape the board. The trap it was written against: the
+ * per-comment comparison looks at the text and the attachments, so a change
+ * to nothing but the pin used to read as "unchanged" and go straight through
+ * — including on somebody else's update.
+ */
+const pinning = comments => () => boardService.updateTaskFields(BOARD_ID, 'g1', 't1', {comments})
+
+test('a viewer may not pin somebody else\'s update', async () => {
+    assert.strictEqual(await refused(VIEWER, pinning(
+        [{...FOREIGN_UPDATE, pinnedAt: 1000}, {...OWN_UPDATE}])), true)
+})
+
+test('a viewer may not pin their own update either', async () => {
+    assert.strictEqual(await refused(VIEWER, pinning(
+        [{...FOREIGN_UPDATE}, {...OWN_UPDATE, pinnedAt: 1000}])), true)
+})
+
+test('a viewer may still edit their own update', async () => {
+    assert.strictEqual(await refused(VIEWER, pinning(
+        [{...FOREIGN_UPDATE}, {...OWN_UPDATE, txt: 'Geaendert'}])), false)
+})
+
+test('an editor may pin anything', async () => {
+    assert.strictEqual(await refused(MEMBER, pinning(
+        [{...FOREIGN_UPDATE, pinnedAt: 1000}, {...OWN_UPDATE}])), false)
 })
 
 /* ----------------------------------------------------------- outsiders -- */

@@ -71,6 +71,9 @@ function buildComment(row){
         parentId: row.parent_id || null,
         txt: row.txt === null?'':row.txt,
         archivedAt: row.created_at === null?null:Number(row.created_at),
+        // null, never 0: "pinned at the epoch" and "never pinned" have to stay
+        // tellable apart, and 0 is falsy in both places that read this.
+        pinnedAt: row.pinned_at === null || row.pinned_at === undefined?null:Number(row.pinned_at),
         byMember: {_id: row.by_user_id || null, fullname: row.by_user_name || '', imgUrl: row.by_user_img || ''},
         attachments: parseJson(row.attachments, []) || [],
         style: parseJson(row.style, {}) || {}
@@ -315,6 +318,7 @@ async function syncTaskComments(trx, boardId, taskId, comments){
             board_id: boardId, task_id: taskId, id, position: i,
             parent_id: (c && c.parentId)?sid(c.parentId):null,
             created_at: Number.isFinite(Number(c && c.archivedAt))?Number(c.archivedAt):null,
+            pinned_at: Number.isFinite(Number(c && c.pinnedAt)) && Number(c.pinnedAt) > 0?Number(c.pinnedAt):null,
             by_user_id: by._id?sid(by._id):null,
             by_user_name: by.fullname || '',
             by_user_img: by.imgUrl || '',

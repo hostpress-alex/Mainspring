@@ -314,7 +314,7 @@ export function GroupPreview({group, board, idx}){
                                         <div className="sticky-div titles flex" style={{'--group-color': group.color}}>
                                             <div className="hidden"></div>
                                             <div className="check-box">
-                                                <input type="checkbox" checked={isAllSelected} onChange={onClickMainCheckbox}/>
+                                                {canWork && <input type="checkbox" checked={isAllSelected} onChange={onClickMainCheckbox}/>}
                                             </div>
                                             <div className="task title" style={widthStyle(widthOf(widths, TASK_COLUMN))}>
                                                 <span className="col-label">{t('task.task')}</span>
@@ -424,7 +424,11 @@ export function GroupPreview({group, board, idx}){
         {isAddColumnOpen && (
             <AddColumnDialog existingTitles={(board.columns || []).map(c => c.title)} onAdd={onAddColumn} onClose={() => setIsAddColumnOpen(false)}/>
         )}
-        {selectedTasks.length > 0 &&
+        {/* Belt and braces. Without a tick box there can be no selection, so
+            this should be unreachable for a viewer — but a toolbar of actions
+            somebody may not carry out is exactly the thing not to leave to
+            "should be". */}
+        {canWork && selectedTasks.length > 0 &&
             <TaskToolsModal board={board} tasks={selectedTasks} group={group} setSelectedTasks={setSelectedTasks} setIsMainCheckbox={setIsMainCheckbox}/>}
     </ul>
 }

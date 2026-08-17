@@ -39,6 +39,72 @@
         "userDeleted":         "Benutzer „{name}“ gelöscht.",
         "usersHeading":        "Benutzer ({n})"
     },
+    "automation": {
+        "action":          {
+            "move_to_group": {
+                "name": "Task verschieben",
+                "text": "verschiebe den Task nach {group}"
+            },
+            "notify":        {
+                "name": "Benachrichtigen",
+                "text": "benachrichtige {who}"
+            },
+            "set_value":     {
+                "name": "Wert setzen",
+                "text": "setze {column} auf {value}"
+            }
+        },
+        "addAction":       "Aktion hinzufügen",
+        "create":          "Automatisierung erstellen",
+        "delete":          "Automatisierung löschen",
+        "deleteNote":      "Was sie bisher getan hat, bleibt im Verlauf stehen.",
+        "edit":            "Automatisierung bearbeiten",
+        "empty":           "Noch keine Automatisierungen.",
+        "noOptions":       "Nichts zur Auswahl",
+        "noRuns":          "Bisher ist nichts passiert.",
+        "open":            "Automatisierungen",
+        "outcome":         {
+            "done":    "Ausgeführt",
+            "failed":  "Fehlgeschlagen",
+            "skipped": "Übersprungen"
+        },
+        "removeAction":    "Aktion entfernen",
+        "runsAs":          "Läuft mit den Rechten von",
+        "slot":            {
+            "column": "Spalte",
+            "group":  "Gruppe",
+            "value":  "Wert",
+            "who":    "wen"
+        },
+        "tabCreate":       "Erstellen",
+        "tabEdit":         "Bearbeiten",
+        "tabHistory":      "Verlauf",
+        "tabManage":       "Verwalten",
+        "thenPlaceholder": "Dann tu dies",
+        "thisRule":        "Diese Automatisierung",
+        "title":           "Automatisierungen",
+        "trigger":         {
+            "column_changes":    {
+                "name": "Wenn sich eine Spalte ändert",
+                "text": "Wenn sich {column} ändert"
+            },
+            "item_created":      {
+                "name": "Wenn ein Task angelegt wird",
+                "text": "Wenn ein Task angelegt wird"
+            },
+            "status_changes_to": {
+                "name": "Wenn ein Status wechselt",
+                "text": "Wenn {column} auf {value} wechselt"
+            }
+        },
+        "turnOff":         "Ausschalten",
+        "turnOn":          "Einschalten",
+        "updated":         "Geändert",
+        "whenPlaceholder": "Wenn dies geschieht",
+        "who":             {
+            "assignees": "die zugewiesenen Personen"
+        }
+    },
     "board":    {
         "addFavorite":     "Zu den Favoriten",
         "board":           "Board",
@@ -185,6 +251,7 @@
         "search":          "Suchen",
         "thisArea":        "Dieser Bereich",
         "unknownError":    "Unbekannter Fehler",
+        "unpin":           "Nicht mehr anheften",
         "user":            "Benutzer",
         "yes":             "Ja"
     },
@@ -431,6 +498,7 @@
         "discard":          "Verwerfen",
         "dropFiles":        "Dateien hier ablegen",
         "none":             "Noch keine Updates zu diesem Task",
+        "pinned":           "Angeheftet",
         "placeholder":      "Update schreiben — Bilder kannst du mit Strg+V einfügen",
         "replies":          "Antworten",
         "repliesCount":     "Antworten ({n})",

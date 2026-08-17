@@ -3,11 +3,13 @@ import {closeDynamicModal, updateBoardMeta, toggleModal, toggleStarred} from '..
 import {loadBoards} from '../../store/board.actions'
 
 import { Icon } from '../icon'
+import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 import {Tooltip} from '@mui/material'
 import {singleLineEditable} from '../../services/editable'
 import {RichTextView} from '../rich-text/rich-text-view'
+import {AutomationPanel} from '../automation/automation-panel'
 import {boardService} from '../../services/board.service'
 import {t} from '../../i18n'
 
@@ -22,6 +24,7 @@ export function BoardHeader({
 }){
     const isOpen = useSelector(storeState => storeState.boardModule.isBoardModalOpen)
     const navigate = useNavigate()
+    const [isAutomationOpen, setIsAutomationOpen] = useState(false)
 
     async function onSave(ev){
         const value = ev.target.innerText
@@ -75,6 +78,17 @@ export function BoardHeader({
                             <Icon name='circle-exclamation'/>
                         </div>
                     </Tooltip>
+                    {/* Rules change what the board does on its own, which is
+                        board structure — the same door as columns and groups.
+                        Hiding the button is not the permission; the server
+                        refuses every one of these calls to anybody else. */}
+                    {canManage && (
+                        <Tooltip title={t('automation.open')} arrow>
+                            <div className="automation-btn icon" onClick={() => setIsAutomationOpen(true)}>
+                                <Icon name='robot'/>
+                            </div>
+                        </Tooltip>
+                    )}
                     <Tooltip title={t('board.addFavorite')} arrow>
                         <div className="star-btn icon " onClick={onToggleStarred}>
                             {!board.isStarred?<Icon name='star' variant='fa-regular' className="star"/>:<Icon name='star' className="star star-full"/>}
@@ -119,6 +133,7 @@ export function BoardHeader({
             <div className="board-border"></div>
             {boardType !== 'dashboard' &&
                 <BoardFilter onSetFilter={onSetFilter} board={board} setIsInviteModalOpen={setIsInviteModalOpen}/>}
+            {isAutomationOpen && <AutomationPanel board={board} onClose={() => setIsAutomationOpen(false)}/>}
         </header>
     )
 }

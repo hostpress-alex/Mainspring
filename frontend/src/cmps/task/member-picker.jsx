@@ -6,7 +6,7 @@ import {boardService} from '../../services/board.service'
 import {setDynamicModalObj} from '../../store/board.actions'
 import { Avatar } from '../avatar'
 
-export function MemberPicker({info, onUpdate, field = 'memberIds'}){
+export function MemberPicker({info, onUpdate, field = 'memberIds', readOnly = false}){
     const board = useSelector(storeState => storeState.boardModule.board)
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -38,7 +38,8 @@ export function MemberPicker({info, onUpdate, field = 'memberIds'}){
     }
 
     return (
-        <section className="task-person" ref={elMemberSection} onClick={onToggleMenuModal}>
+        <section className={`task-person${readOnly?' is-readonly':''}`} ref={elMemberSection}
+            onClick={readOnly?undefined:onToggleMenuModal}>
             <div className="members-imgs">
                 {members.length === 0 && <Icon name='circle-user' className="icon-person"/>}
                 {members.length > 0 &&

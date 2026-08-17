@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux'
 import {boardService} from '../../services/board.service'
 import {setDynamicModalObj} from '../../store/board.actions'
 
-export function PriorityPicker({info, onUpdate, field = 'priority', column}){
+export function PriorityPicker({info, onUpdate, field = 'priority', column, readOnly = false}){
     const board = useSelector(storeState => storeState.boardModule.board)
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const elPrioritySection = useRef()
@@ -31,7 +31,9 @@ export function PriorityPicker({info, onUpdate, field = 'priority', column}){
         })
     }
 
-    return <section ref={elPrioritySection} className="status-priority-picker picker" style={{'--label-color': color}} onClick={onToggleMenuModal}>
+    return <section ref={elPrioritySection}
+        className={`status-priority-picker picker${readOnly?' is-readonly':''}`}
+        style={{'--label-color': color}} onClick={readOnly?undefined:onToggleMenuModal}>
         <div>{info[field]}</div>
         <span className="fold"></span>
     </section>

@@ -39,6 +39,72 @@
         "userDeleted":         "User “{name}” deleted.",
         "usersHeading":        "Users ({n})"
     },
+    "automation": {
+        "action":          {
+            "move_to_group": {
+                "name": "Move item",
+                "text": "move the item to {group}"
+            },
+            "notify":        {
+                "name": "Notify",
+                "text": "notify {who}"
+            },
+            "set_value":     {
+                "name": "Set value",
+                "text": "set {column} to {value}"
+            }
+        },
+        "addAction":       "Add action",
+        "create":          "Create automation",
+        "delete":          "Delete automation",
+        "deleteNote":      "What it has done so far stays in the history.",
+        "edit":            "Edit automation",
+        "empty":           "No automations yet.",
+        "noOptions":       "Nothing to choose from",
+        "noRuns":          "Nothing has happened yet.",
+        "open":            "Automations",
+        "outcome":         {
+            "done":    "Ran",
+            "failed":  "Failed",
+            "skipped": "Skipped"
+        },
+        "removeAction":    "Remove action",
+        "runsAs":          "Runs with the rights of",
+        "slot":            {
+            "column": "column",
+            "group":  "group",
+            "value":  "value",
+            "who":    "whom"
+        },
+        "tabCreate":       "Create",
+        "tabEdit":         "Edit",
+        "tabHistory":      "History",
+        "tabManage":       "Manage",
+        "thenPlaceholder": "Then do this",
+        "thisRule":        "This automation",
+        "title":           "Automations",
+        "trigger":         {
+            "column_changes":    {
+                "name": "When a column changes",
+                "text": "When {column} changes"
+            },
+            "item_created":      {
+                "name": "When an item is created",
+                "text": "When an item is created"
+            },
+            "status_changes_to": {
+                "name": "When a status changes",
+                "text": "When {column} changes to {value}"
+            }
+        },
+        "turnOff":         "Turn off",
+        "turnOn":          "Turn on",
+        "updated":         "Updated",
+        "whenPlaceholder": "When this happens",
+        "who":             {
+            "assignees": "the assigned people"
+        }
+    },
     "board":    {
         "addFavorite":     "Add to favourites",
         "board":           "Board",
@@ -185,6 +251,7 @@
         "search":          "Search",
         "thisArea":        "This area",
         "unknownError":    "Unknown error",
+        "unpin":           "Unpin",
         "user":            "User",
         "yes":             "Yes"
     },
@@ -431,6 +498,7 @@
         "discard":          "Discard",
         "dropFiles":        "Drop files here",
         "none":             "No updates on this task yet",
+        "pinned":           "Pinned",
         "placeholder":      "Write an update — you can paste images with Ctrl+V",
         "replies":          "Replies",
         "repliesCount":     "Replies ({n})",

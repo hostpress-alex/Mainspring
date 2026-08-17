@@ -328,6 +328,8 @@ function getEmptyComment(){
         // null = standalone update, otherwise the id of the update being
         // replied to. Deliberately only one level deep.
         'parentId': null,
+        // When it was pinned to the top of the task; null = not pinned.
+        'pinnedAt': null,
         'txt': '',
         'attachments': [],
         'style': {

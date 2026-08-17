@@ -16,6 +16,7 @@ import {TextPicker, LongTextPicker, CheckboxPicker, LinkPicker, DropdownPicker} 
 
 import { Icon } from '../icon'
 import {GUEST_IMG} from '../../services/avatar'
+import * as boardRoles from '../../services/board-roles'
 import {widthOf, widthStyle, TASK_COLUMN} from '../board/column-width'
 import {t} from '../../i18n'
 
@@ -42,6 +43,11 @@ export function TaskPreview({
     const isOpen = useSelector((storeState) => storeState.boardModule.isBoardModalOpen)
     const user = useSelector(storeState => storeState.userModule.user)
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
+    // A viewer reads the board and writes comments. Everything in this row
+    // that is not reading is left out rather than disabled: a tick box that
+    // ticks and then does nothing is worse than no tick box, because the
+    // person has already decided what they were going to do with it.
+    const canWork = boardRoles.canEdit(board, user)
     const elTaskPreview = useRef(null)
     const elMenuTask = useRef()
     const navigate = useNavigate()
@@ -51,6 +57,10 @@ export function TaskPreview({
     const hasSubtasks = (task.subtasks || []).length > 0
 
     async function updateTask(cmpType, data, activity){
+        // The last stop before a write that the server will refuse anyway.
+        // Without it the value changes on screen, the request comes back 403,
+        // and the cell snaps back a moment later with no explanation.
+        if(!canWork) return
         const taskToUpdate = structuredClone(task)
         taskToUpdate[cmpType] = data
         taskToUpdate.updatedBy.date = Date.now()
@@ -64,7 +74,7 @@ export function TaskPreview({
 
     async function onUpdateTaskTitle(ev){
         const value = ev.target.innerText
-        if(value === task.title) return
+        if(!canWork || value === task.title) return
         const activity = boardService.getEmptyActivity()
         activity.action = 'title'
         activity.task = {id: task.id, title: value}
@@ -109,10 +119,13 @@ export function TaskPreview({
         <section className={`task-preview flex${isSubtask?' is-subtask':''}`} ref={elTaskPreview}>
             <div ref={elMenuTask} className="sticky-div" style={{'--group-color': group.color}}>
                 <div className="task-menu">
-                    <Icon name='ellipsis' className="icon" onClick={onToggleTaskModal}/>
+                    {canWork && <Icon name='ellipsis' className="icon" onClick={onToggleTaskModal}/>}
                 </div>
+                {/* The box itself stays: it is a column of the table, and a
+                    row that leaves it out is a row that does not line up with
+                    the ones above it. Only the tick goes. */}
                 <div className="check-box">
-                    <input type="checkbox" checked={isSelected} onChange={onCheckBoxChange}/>
+                    {canWork && <input type="checkbox" checked={isSelected} onChange={onCheckBoxChange}/>}
                 </div>
                 <div className="task-title picker flex align-center space-between" style={widthStyle(widthOf(widths, TASK_COLUMN))}>
                     {/* Always in the DOM, but only visible on a row that has
@@ -130,7 +143,9 @@ export function TaskPreview({
                             <Icon name={isSubtasksOpen?'chevron-down':'chevron-right'}/>
                         </button>
                     )}
-                    <blockquote contentEditable onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
+                    {/* A heading you can type into and cannot save is the
+                        same trap as the tick box above. */}
+                    <blockquote contentEditable={canWork} onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
                                 {...singleLineEditable({onFocus: toggleOnTyping})}>
                         <span>{task.title}</span>
                     </blockquote>
@@ -148,17 +163,26 @@ export function TaskPreview({
                 </div>
             </div>
             {(board.columns || []).map(column => (
-                <DynamicCmp key={column.id} column={column} board={board} info={task} width={widthOf(widths, column)} onUpdate={updateTask}/>
+                <DynamicCmp key={column.id} column={column} board={board} info={task} width={widthOf(widths, column)} onUpdate={updateTask} readOnly={!canWork}/>
             ))}
             <div className="empty-div"></div>
         </section>
     )
 }
 
-/** Renders a column by its type. `field` says where the value sits. */
-export function DynamicCmp({column, info, onUpdate, board, width}){
+/**
+ * Renders a column by its type. `field` says where the value sits.
+ *
+ * `readOnly` goes to every picker, and each decides for itself what reading
+ * means for it: a status keeps its colour and loses its menu, a text field
+ * stays selectable and stops taking input, a file keeps its preview and loses
+ * its upload. That is why it is a prop and not `pointer-events: none` on this
+ * cell — the blunt version would also take away marking a value to copy it,
+ * and reading is the whole of what a viewer is here for.
+ */
+export function DynamicCmp({column, info, onUpdate, board, width, readOnly = false}){
     const field = column.field || column.id
-    const props = {info, onUpdate, field, column}
+    const props = {info, onUpdate, field, column, readOnly}
 
     const inner = renderPicker()
     return <div className="col-cell" style={width?widthStyle(width):undefined}>{inner}</div>

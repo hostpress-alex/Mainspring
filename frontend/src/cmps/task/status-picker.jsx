@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux'
 import {boardService} from '../../services/board.service'
 import {setDynamicModalObj} from '../../store/board.actions'
 
-export function StatusPicker({info, onUpdate, field = 'status', column}){
+export function StatusPicker({info, onUpdate, field = 'status', column, readOnly = false}){
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const board = useSelector(storeState => storeState.boardModule.board)
     const activity = boardService.getEmptyActivity()
@@ -36,7 +36,9 @@ export function StatusPicker({info, onUpdate, field = 'status', column}){
     }
 
     return (
-        <section role="contentinfo" ref={elStatusSection} className="status-priority-picker picker" style={{'--label-color': color}} onClick={onToggleMenuModal}>
+        <section role="contentinfo" ref={elStatusSection}
+            className={`status-priority-picker picker${readOnly?' is-readonly':''}`}
+            style={{'--label-color': color}} onClick={readOnly?undefined:onToggleMenuModal}>
             <div className={classText}>{info[field]}</div>
             <span className="fold"></span>
         </section>

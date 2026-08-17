@@ -64,6 +64,27 @@
         border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
     }
 
+    /**
+     * A cell a viewer may read and not change.
+     *
+     * Only the pointer changes, not the colour: the value is what the person
+     * came for, and a greyed-out board says "broken" rather than "yours to
+     * read". Each picker leaves out its own machinery — see DynamicCmp.
+     */
+    .picker.is-readonly,
+    .task-person.is-readonly {
+        cursor: default;
+    }
+
+    .date-readonly,
+    .number-readonly {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 0 variables.$spacing-small;
+    }
+
     .task-title {
         width: variables.$cell-width-task;
         cursor: pointer;

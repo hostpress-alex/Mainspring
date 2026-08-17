@@ -80,7 +80,12 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         for(const list of byParent.values()){
             list.sort((a, b) => (a.archivedAt || 0) - (b.archivedAt || 0))
         }
-        return all.filter(c => c && !c.parentId).map(c => ({comment: c, replies: byParent.get(c.id) || []}))
+        // Pinned updates first, most recently pinned at the very top; the rest
+        // keep the order they came in, which is newest first. Array.sort is
+        // stable, so comparing only the pin does not shuffle the others.
+        const updates = all.filter(c => c && !c.parentId)
+        updates.sort((a, b) => (b.pinnedAt || 0) - (a.pinnedAt || 0))
+        return updates.map(c => ({comment: c, replies: byParent.get(c.id) || []}))
     }, [currTask.comments])
 
     async function onAddReply(parentId, txt){
@@ -242,7 +247,9 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         <div className="task-modal-header flex align-center">
             <Icon name='xmark' className="close-btn" onClick={onCloseModal}/>
             <div className="title">
-                <blockquote contentEditable onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
+                {/* Same rule as in the row behind it: a viewer reads the
+                    task and writes only comments. */}
+                <blockquote contentEditable={boardRoles.canEdit(board, user)} onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
                             {...singleLineEditable()}>
                     {task.title}
                 </blockquote>

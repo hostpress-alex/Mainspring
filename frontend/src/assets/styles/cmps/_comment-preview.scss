@@ -23,6 +23,20 @@
                 img {
                     @include mixins.members();
                 }
+
+                // Says why this update is at the top. Without it the order
+                // looks like a bug rather than a decision.
+                .pinned-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    background-color: variables.$workspace-board-active;
+                    color: variables.$workspace-icon-color;
+                    font-size: functions.rem(12px);
+                    white-space: nowrap;
+                }
             }
 
             .right {
@@ -67,6 +81,12 @@
             padding: 0 variables.$spacing-medium variables.$spacing-medium variables.$spacing-medium;
             max-width: 540px;
             overflow-wrap: break-word;
+        }
+
+        // A pinned update is marked on its edge, so the block is recognisable
+        // while scrolling and not only by its badge.
+        &:has(.comment-preview.is-pinned) {
+            border-left: 3px solid variables.$workspace-icon-color;
         }
 
         .cancel {

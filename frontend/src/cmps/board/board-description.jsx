@@ -2,14 +2,21 @@ import {useEffect, useState} from 'react'
 
 import { Icon } from '../icon'
 import {loadBoards, updateBoardMeta} from '../../store/board.actions';
+import {useSelector} from 'react-redux'
+import * as boardRoles from '../../services/board-roles'
 import {utilService} from '../../services/util.service';
 import { Avatar } from '../avatar'
 import {singleLineEditable} from '../../services/editable'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
+import {RichTextView} from '../rich-text/rich-text-view'
 import {t} from '../../i18n'
 
 export function BoardDescription({setIsShowDescription, board}){
     const [description, setDescription] = useState(board.description || '')
+    const user = useSelector(storeState => storeState.userModule.user)
+    // Name and description are the frame of the board — owner only, and the
+    // server says the same. A viewer opens this dialog to read it.
+    const canManage = boardRoles.isOwner(board, user)
 
     // Another board opened behind this dialog — follow it rather than keep
     // showing the previous text.
@@ -23,7 +30,7 @@ export function BoardDescription({setIsShowDescription, board}){
      * the board answer would arrive back mid-typing.
      */
     async function onSaveDescription(){
-        if(description === (board.description || '')) return
+        if(!canManage || description === (board.description || '')) return
         try {
             await updateBoardMeta(board._id, {description})
             loadBoards()
@@ -35,6 +42,7 @@ export function BoardDescription({setIsShowDescription, board}){
     async function onSave(ev){
         let value = ev.target.innerText
         const key = ev.target.id
+        if(!canManage) return
         if(value === '' && key === 'title') value = board.title
         if(value === board[key]) return
         board[key] = value
@@ -54,18 +62,22 @@ export function BoardDescription({setIsShowDescription, board}){
             </div>
             <div className="board-edit flex column">
                 <div className="board-edit-title">
-                    <blockquote onBlur={onSave} id="title" contentEditable suppressContentEditableWarning={true}
+                    <blockquote onBlur={onSave} id="title" contentEditable={canManage} suppressContentEditableWarning={true}
                                 {...singleLineEditable()}>
                         <h1>{board.title}</h1>
                     </blockquote>
                 </div>
-                <div className="board-edit-description" onBlur={onSaveDescription}>
-                    <RichTextEditor
-                        value={description}
-                        members={board.members}
-                        placeholder={t('board.descriptionPlaceholder')}
-                        onChange={setDescription}
-                    />
+                <div className="board-edit-description" onBlur={canManage?onSaveDescription:undefined}>
+                    {canManage
+                        ?<RichTextEditor
+                            value={description}
+                            members={board.members}
+                            placeholder={t('board.descriptionPlaceholder')}
+                            onChange={setDescription}
+                        />
+                        // A toolbar with nothing behind it is worse than no
+                        // toolbar: the same text, rendered.
+                        :<RichTextView value={description}/>}
                 </div>
             </div>
             <div className="board-info flex column">

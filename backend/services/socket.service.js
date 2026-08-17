@@ -251,6 +251,23 @@ function emitToUser({type, data, userId}){
 }
 
 /**
+ * Send to everyone looking at one board, the sender included.
+ *
+ * The one place where the server tells the browsers what happened instead of
+ * one browser telling the others. It exists because an automation runs after
+ * the response has already gone out: nobody is waiting for it, so nobody would
+ * ever learn about it.
+ *
+ * `args` is a list because the board update carries two — see the note at
+ * loadSocketBoard in the frontend. Sending one where two are expected leaves
+ * the second `undefined`, and the reducer spreads that into an empty board.
+ */
+function emitToBoard({type, boardId, args = []}){
+    if(!gIo) return
+    gIo.to(BOARD_ROOM + String(boardId)).emit(type, ...args)
+}
+
+/**
  * Send to everyone but the given user — in one room, or everywhere.
  *
  * Unused today. It is the way out of the client-to-client relay described at
@@ -275,6 +292,7 @@ async function findUserSocket(userId){
 module.exports = {
     setupSocketAPI,
     emitToUser,
+    emitToBoard,
     broadcast,
     USER_ROOM,
     // Exported so the tests can reach the pure parts without a live server.

@@ -9,6 +9,7 @@ import {AttachmentStrip} from './attachment-strip'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
 import {RichTextView} from '../rich-text/rich-text-view'
 import {isEmpty as isRichEmpty} from '../../services/rich-text'
+import {useDismissable} from '../../customHooks/useDismissable'
 import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
 
@@ -29,10 +30,16 @@ export function CommentPreview({
     members = []
 }){
     const [isMenuModalOpen, setIsMenuModalOpen] = useState(false)
+    // Around the button as well as the menu — see useDismissable.
+    const menuRef = useDismissable(isMenuModalOpen, () => setIsMenuModalOpen(false))
     const [isEditOpen, setIsEditOpen] = useState(false)
     const board = useSelector(storeState => storeState.boardModule.filteredBoard)
     const me = useSelector(storeState => storeState.userModule.user)
     const canWriteThis = boardRoles.canWriteComment(board, me, comment)
+    // Pinning decides what everybody reads first, so it is not an edit of your
+    // own text — an editor may, a viewer may not, and the server says the same.
+    const canPin = !isReply && boardRoles.canEdit(board, me)
+    const isPinned = Boolean(comment.pinnedAt)
     const [editComment, setEditComment] = useState({...comment})
     const [isReplyOpen, setIsReplyOpen] = useState(false)
     const [replyTxt, setReplyTxt] = useState('')
@@ -46,6 +53,11 @@ export function CommentPreview({
     function onSaveEdit(){
         onEditComment({...editComment}, taskId)
         setIsEditOpen(false)
+    }
+
+    /** Pin or unpin. The moment is stored, so several pins keep an order. */
+    function onTogglePin(){
+        onEditComment({...comment, pinnedAt: isPinned?null:Date.now()}, taskId)
     }
 
     async function onSendReply(ev){
@@ -65,11 +77,18 @@ export function CommentPreview({
 
 
     return (
-        <section className={`comment-preview${isReply?' is-reply':''}`}>
+        <section className={`comment-preview${isReply?' is-reply':''}${isPinned?' is-pinned':''}`}>
             <div className="header-comment flex space-between">
                 <div className="left flex align-center">
                     <Avatar src={comment.byMember?.imgUrl} alt=""/>
                     <span>{comment.byMember?.fullname}</span>
+                    {/* Said in the list itself, not only in the menu: an
+                        update at the top for no visible reason looks like a
+                        sorting bug. */}
+                    {isPinned && <span className="pinned-badge">
+                        <Icon name='thumbtack'/>
+                        <span>{t('update.pinned')}</span>
+                    </span>}
                 </div>
                 <div className="right flex align-center">
                     <div className="time flex align-center">
@@ -78,10 +97,10 @@ export function CommentPreview({
                     </div>
                     {/* Edit and delete. A viewer sees it on their own comment
                         and on nobody else's — the server says the same. */}
-                    <div className={`menu-icon-container ${isMenuModalOpen?' active':''}`}>
+                    <div ref={menuRef} className={`menu-icon-container ${isMenuModalOpen?' active':''}`}>
                         {canWriteThis && <Icon name='ellipsis' onClick={() => setIsMenuModalOpen(!isMenuModalOpen)}/>}
                         {isMenuModalOpen &&
-                            <CommentMenuModal onRemoveComment={onRemoveComment} commentId={comment.id} onOpenEdit={setIsEditOpen} setIsMenuModalOpen={setIsMenuModalOpen} taskId={taskId} isReply={isReply}/>}
+                            <CommentMenuModal onRemoveComment={onRemoveComment} commentId={comment.id} onOpenEdit={setIsEditOpen} setIsMenuModalOpen={setIsMenuModalOpen} taskId={taskId} isReply={isReply} isPinned={isPinned} onTogglePin={canPin?onTogglePin:null}/>}
                     </div>
                 </div>
             </div>

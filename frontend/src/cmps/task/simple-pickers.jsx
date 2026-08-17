@@ -17,7 +17,7 @@ function useDraft(value){
     return {draft, setDraft, isEditing, setIsEditing}
 }
 
-export function TextPicker({info, field, onUpdate}){
+export function TextPicker({info, field, onUpdate, readOnly = false}){
     const value = info[field] ?? ''
     const {draft, setDraft, setIsEditing} = useDraft(value)
 
@@ -28,14 +28,16 @@ export function TextPicker({info, field, onUpdate}){
 
     return (
         <section className="picker text-picker">
-            <input type="text" value={draft} placeholder="—" onFocus={() => setIsEditing(true)} onChange={e => setDraft(e.target.value)} onBlur={commit} onKeyDown={e => {
+            {/* readOnly rather than disabled: the text stays selectable and
+                copyable, which is most of what a viewer is here for. */}
+            <input type="text" readOnly={readOnly} value={draft} placeholder="—" onFocus={() => !readOnly && setIsEditing(true)} onChange={e => setDraft(e.target.value)} onBlur={commit} onKeyDown={e => {
                 if(e.key === 'Enter') e.currentTarget.blur()
             }}/>
         </section>
     )
 }
 
-export function LongTextPicker({info, field, onUpdate}){
+export function LongTextPicker({info, field, onUpdate, readOnly = false}){
     const value = info[field] ?? ''
     const [isOpen, setIsOpen] = useState(false)
     const {draft, setDraft, setIsEditing} = useDraft(value)
@@ -48,7 +50,7 @@ export function LongTextPicker({info, field, onUpdate}){
     }
 
     return (
-        <section className="picker longtext-picker" onClick={() => {
+        <section className={`picker longtext-picker${readOnly?' is-readonly':''}`} onClick={readOnly?undefined:() => {
             setIsOpen(true);
             setIsEditing(true)
         }}>
@@ -64,10 +66,12 @@ export function LongTextPicker({info, field, onUpdate}){
     )
 }
 
-export function CheckboxPicker({info, field, onUpdate}){
+export function CheckboxPicker({info, field, onUpdate, readOnly = false}){
     const checked = Boolean(info[field])
     return (
-        <section className="picker checkbox-picker" onClick={() => onUpdate(field, !checked)} title={checked?t('common.done'):t('common.open2')}>
+        <section className={`picker checkbox-picker${readOnly?' is-readonly':''}`}
+            onClick={readOnly?undefined:() => onUpdate(field, !checked)}
+            title={checked?t('common.done'):t('common.open2')}>
             {checked
                 ?<Icon name='square-check' variant='fa-regular' className="checkbox-on"/>
                 :<Icon name='square' variant='fa-regular' className="checkbox-off"/>}
@@ -75,7 +79,7 @@ export function CheckboxPicker({info, field, onUpdate}){
     )
 }
 
-export function LinkPicker({info, field, onUpdate}){
+export function LinkPicker({info, field, onUpdate, readOnly = false}){
     const value = info[field] ?? ''
     const [isEditing, setIsEditing] = useState(false)
     const [draft, setDraft] = useState(value)
@@ -89,7 +93,7 @@ export function LinkPicker({info, field, onUpdate}){
         if(clean !== value) onUpdate(field, clean)
     }
 
-    if(isEditing){
+    if(isEditing && !readOnly){
         return (
             <section className="picker link-picker">
                 <input autoFocus type="url" value={draft} placeholder="https://…" onChange={e => setDraft(e.target.value)} onBlur={commit} onKeyDown={e => {
@@ -99,8 +103,11 @@ export function LinkPicker({info, field, onUpdate}){
         )
     }
 
+    // The link itself still works — following it is reading. Only the step
+    // into the edit field goes.
     return (
-        <section className="picker link-picker is-view" onClick={() => setIsEditing(true)}>
+        <section className={`picker link-picker is-view${readOnly?' is-readonly':''}`}
+            onClick={readOnly?undefined:() => setIsEditing(true)}>
             {value
                 ?<>
                     <a href={value} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>
@@ -118,7 +125,7 @@ export function LinkPicker({info, field, onUpdate}){
  * that already occur in this column on the board — that way the column needs
  * no settings dialog of its own.
  */
-export function DropdownPicker({info, field, onUpdate, board}){
+export function DropdownPicker({info, field, onUpdate, board, readOnly = false}){
     const value = info[field] ?? ''
     const [draft, setDraft] = useState(value)
     const [isEditing, setIsEditing] = useState(false)
@@ -139,7 +146,7 @@ export function DropdownPicker({info, field, onUpdate, board}){
 
     return (
         <section className="picker dropdown-picker">
-            <input list={listId} value={draft} placeholder="—" onFocus={() => setIsEditing(true)} onChange={e => setDraft(e.target.value)} onBlur={commit} onKeyDown={e => {
+            <input list={readOnly?undefined:listId} readOnly={readOnly} value={draft} placeholder="—" onFocus={() => !readOnly && setIsEditing(true)} onChange={e => setDraft(e.target.value)} onBlur={commit} onKeyDown={e => {
                 if(e.key === 'Enter') e.currentTarget.blur()
             }}/>
             <datalist id={listId}>

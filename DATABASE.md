@@ -123,6 +123,8 @@ notification    one row per recipient per event, with a read state
 task_subscription  who wants to hear about a task; muted = the explicit no
 file            upload metadata; the files themselves still live
                 under backend/uploads/ on disk
+automation      per board: when this happens, do that
+automation_run  what a rule did, capped at 200 entries per board
 ```
 
 Migrations, in order:
@@ -139,6 +141,8 @@ Migrations, in order:
 | `20260816_000008_group_icon.js` | `board_group.icon` — one emoji before the title |
 | `20260816_000009_roles.js` | `board_member.role` and `board_group.created_by` |
 | `20260816_000010_user_language.js` | `user.language` — the interface language of an account |
+| `20260816_000011_comment_pinned.js` | `task_comment.pinned_at` — an update pinned to the top |
+| `20260816_000012_automations.js` | `automation` and `automation_run` — rules and what they did |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -164,6 +168,19 @@ read state per person — which the other way round cannot have without storing
 **A subscription can be muted rather than deleted.** A deleted row cannot be
 told apart from never having subscribed, so the next assignment would sign the
 user up again to the thing they just switched off.
+
+**An automation runs as the person who wrote it.** `automation.created_by` is
+not decoration: whoever trips a rule may be a viewer, and the rule still has to
+be allowed to move the task. The rights come from the rule's author, which is
+also why the interface shows a face next to every rule.
+
+**A rule fires at most once per chain, and a chain is at most three deep.**
+Two reasonable rules can point at each other — status sets group, group sets
+status — and each turn would write, wake every client and add an activity. Three
+things stop it: an action that would change nothing is not written at all, a
+rule that has already fired in this chain is refused, and the chain itself is
+cut at `MAX_DEPTH`. All three land in `automation_run` when they bite, because
+"my rule did not fire" needs an answer.
 
 **The language belongs to the account, not the browser.** localStorage still
 holds a copy, because the interface has to choose a language before React

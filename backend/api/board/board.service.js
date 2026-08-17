@@ -13,6 +13,8 @@ const roles = require('./board.roles')
  * lookup and nothing else.
  */
 const notifications = () => require('../notification/notification.service')
+const automations = () => require('../automation/automation.service')
+const automationEngine = require('../automation/automation.engine')
 const userRepo = require('../user/user.repo')
 
 /** Wirft einen Fehler, den der Controller auf einen HTTP-Status abbilden kann. */
@@ -334,6 +336,13 @@ function _requireTaskWrite(board, oldTask, patch){
         // Changed. Compared field by field so an untouched comment travelling
         // along in the list is not read as an edit — the client sends the whole
         // list every time.
+        // Pinning is not editing. It decides what everybody on the board reads
+        // first, so it belongs to the people who may shape the board — not to
+        // a viewer, not even on their own update. Checked before the content
+        // comparison below, which deliberately ignores this field.
+        if((stored.pinnedAt || null) !== (comment.pinnedAt || null)){
+            throw httpError(403, 'Nur Editoren duerfen ein Update anheften')
+        }
         const isChanged = JSON.stringify({txt: stored.txt, attachments: stored.attachments})
             !== JSON.stringify({txt: comment.txt, attachments: comment.attachments})
         if(isChanged && !roles.canWriteComment(board, user, stored)){
@@ -492,6 +501,34 @@ async function replaceGroup(boardId, groupId, group){
     // The creator is decided once, when the group is created, and carried
     // along from the stored group here — never taken from the payload.
     await boardRepo.replaceGroup(boardId, groupId, {...group, createdBy: before.createdBy || null})
+
+    // The narrow write paths say what changed; this one replaces a whole group
+    // and has to work it out. Without this, everything the frontend cannot
+    // express as a smaller write changes the board in silence — no
+    // notification, no rule. It is the fallback branch of _saveGroupSmart, so
+    // it is rare, and "rare" is exactly why the hole would have survived.
+    const beforeById = new Map((before.tasks || []).map(t => [sid(t.id), t]))
+    for(const task of (group && group.tasks) || []){
+        if(!task || !task.id) continue
+        const oldTask = beforeById.get(sid(task.id))
+        if(!oldTask){
+            await notifications().taskAdded({board, groupId, task, actor: getLoggedinUser()})
+            await automations().fire({board, kind: 'created', groupId, task, changes: []})
+            continue
+        }
+        // A cheap "did anything at all move" before the expensive per-task
+        // comparison. Two objects with the same content in a different key
+        // order read as different here; that costs one wasted comparison and
+        // no wrong result, which is the right way round.
+        if(JSON.stringify(oldTask) === JSON.stringify(task)) continue
+
+        await notifications().taskPatched({
+            board, groupId, oldTask, patch: task, actor: getLoggedinUser()})
+        const changes = automationEngine.changesOf(task, oldTask, board.columns)
+        if(changes.length){
+            await automations().fire({board, kind: 'changed', groupId, task, changes})
+        }
+    }
     return await getById(boardId)
 }
 
@@ -512,6 +549,10 @@ async function addTask(boardId, groupId, task, index = null){
     if(!task || !task.id) throw httpError(400, 'task.id fehlt')
     await boardRepo.addTask(boardId, groupId, task, index)
     await notifications().taskAdded({board, groupId, task, actor: getLoggedinUser()})
+    // Only a task, never a subtask: "when an item is created" is about the
+    // board's own list. A subtask appearing under a task is a different
+    // sentence and would need a trigger of its own.
+    await automations().fire({board, kind: 'created', groupId, task, changes: []})
     return await getById(boardId)
 }
 
@@ -535,6 +576,9 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
     await boardRepo.updateTaskFields(boardId, groupId, taskId, patch)
     await notifications().taskPatched({
         board, groupId, oldTask, patch, parentId: parent?parent.id:null, actor: getLoggedinUser()})
+    await automations().fire({
+        board, kind: 'changed', groupId, task: {...oldTask, ...patch},
+        changes: automationEngine.changesOf(patch, oldTask, board.columns)})
     return await getById(boardId)
 }
 
@@ -550,6 +594,9 @@ async function replaceTask(boardId, groupId, taskId, task){
     // works — otherwise this path would silently notify nobody.
     await notifications().taskPatched({
         board, groupId, oldTask, patch: task || {}, parentId: parent?parent.id:null, actor: getLoggedinUser()})
+    await automations().fire({
+        board, kind: 'changed', groupId, task: {...oldTask, ...(task || {})},
+        changes: automationEngine.changesOf(task || {}, oldTask, board.columns)})
     return await getById(boardId)
 }
 

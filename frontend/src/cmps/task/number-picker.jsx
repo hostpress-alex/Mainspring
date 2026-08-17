@@ -2,7 +2,7 @@ import {useState} from 'react'
 import { Icon } from '../icon'
 import {boardService} from '../../services/board.service'
 
-export function NumberPicker({info, onUpdate, field = 'number'}){
+export function NumberPicker({info, onUpdate, field = 'number', readOnly = false}){
     const [number, setNumber] = useState(info[field] || '')
     const [isShowInput, setIsShowInput] = useState(false)
     const activity = boardService.getEmptyActivity()
@@ -29,6 +29,14 @@ export function NumberPicker({info, onUpdate, field = 'number'}){
         setNumber('')
         activity.to = '-'
         onUpdate('number', '', activity)
+    }
+
+    if(readOnly){
+        return (
+            <section className="number-picker picker is-readonly">
+                <span className="number-readonly">{info[field] ?? ''}</span>
+            </section>
+        )
     }
 
     return (
