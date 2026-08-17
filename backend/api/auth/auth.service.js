@@ -68,6 +68,11 @@ async function login(username, password){
     // Same amount of work either way, and the same message either way.
     const match = await bcrypt.compare(password || '', (user && user.password) || DUMMY_HASH)
     if(!user || !match) return Promise.reject('Invalid username or password')
+    // A closed account is not a wrong password, and it is told apart from one
+    // nowhere the client can see: the same message, after the same amount of
+    // work, so the login form cannot be used to ask which accounts still
+    // exist.
+    if(user.state === 'inactive') return Promise.reject('Invalid username or password')
 
     delete user.password
     user._id = user._id.toString()

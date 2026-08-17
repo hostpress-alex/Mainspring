@@ -23,7 +23,10 @@ export function AdminPage(){
 
     async function reload(){
         try {
-            const [u, b] = await Promise.all([userService.getUsers(), boardService.query()])
+            // With the closed accounts: this is the one page that has to be
+            // able to open one again.
+            const [u, b] = await Promise.all([
+                userService.getUsers({withInactive: true}), boardService.query()])
             setUsers(u)
             setBoards(b)
         } catch(e) {
@@ -76,6 +79,18 @@ export function AdminPage(){
         try {
             await userService.remove(user._id)
             flash(t('admin.userDeleted', {name: user.username}))
+            reload()
+        } catch(e) {
+            setErr(readErr(e))
+        }
+    }
+
+    /** Open a closed account again. No question — nothing is lost either way. */
+    async function onSetUserState(user, state){
+        setErr(null)
+        try {
+            await userService.setUserState(user._id, state)
+            flash(t('admin.userReactivated', {name: user.username}))
             reload()
         } catch(e) {
             setErr(readErr(e))
@@ -189,13 +204,21 @@ export function AdminPage(){
                                 <td className="admin-td">{u.fullname}</td>
                                 <td className="admin-td">{u.username}</td>
                                 <td className="admin-td">{u.isAdmin?
-                                    <span className="admin-badge">{t('admin.admin')}</span>:t('common.user')}</td>
+                                    <span className="admin-badge">{t('admin.admin')}</span>:t('common.user')}
+                                    {u.state === 'inactive' &&
+                                        <span className="admin-badge is-off">{t('admin.inactive')}</span>}</td>
                                 <td className="admin-td is-right">
                                     {String(u._id) !== String(me?._id) && <>
                                         <button className="admin-btn-ghost" onClick={() => onToggleAdmin(u)}>
                                             {u.isAdmin?t('admin.revokeAdmin'):t('admin.makeAdmin')}
                                         </button>
-                                        <button className="admin-btn-danger" onClick={() => onDeleteUser(u)}>{t('common.delete')}</button>
+                                        {u.state === 'inactive'
+                                            ?<button className="admin-btn-ghost" onClick={() => onSetUserState(u, 'active')}>
+                                                {t('admin.reactivate')}
+                                            </button>
+                                            :<button className="admin-btn-danger" onClick={() => onDeleteUser(u)}>
+                                                {t('admin.deactivate')}
+                                            </button>}
                                     </>}
                                     {String(u._id) === String(me?._id) &&
                                         <span className="admin-muted">{t('admin.thatIsYou')}</span>}

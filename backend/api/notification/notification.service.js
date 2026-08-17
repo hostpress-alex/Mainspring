@@ -22,6 +22,7 @@
  * board change is the real work, this is commentary on it.
  */
 const notificationRepo = require('./notification.repo')
+const userRepo = require('../user/user.repo')
 const socketService = require('../../services/socket.service')
 const logger = require('../../services/logger.service')
 
@@ -172,11 +173,37 @@ async function deliver(recipients, entry, actor){
     // insertMany keeps the order it was given, so rows[i] belongs to ids[i].
     // The row itself carries no user id — the recipient is not the client's
     // business, it only ever receives its own.
-    rows.forEach((row, i) => {
+    const shown = await withPeople(rows)
+    shown.forEach((row, i) => {
         Promise.resolve(socketService.emitToUser({type: 'notification-added', data: row, userId: ids[i]}))
             .catch(() => {})
     })
-    return rows
+    return shown
+}
+
+/**
+ * Fill in who the actor is.
+ *
+ * The rows carry an id and nothing else. Resolving on the way out means a
+ * changed name or picture is right in every notification, including the ones
+ * sent last year — the copy that used to sit in the row was correct on the day
+ * it was written and wrong from the next profile edit onwards.
+ *
+ * Used on both ways out: the list the client fetches, and the single row
+ * pushed over the socket the moment it is written.
+ */
+async function withPeople(rows){
+    const list = (Array.isArray(rows)?rows:[rows]).filter(Boolean)
+    if(!list.length) return rows
+    const users = await userRepo.findAll()
+    const byId = new Map(users.map(u => [String(u._id), u]))
+
+    const filled = list.map(row => {
+        const user = row.actor && row.actor._id?byId.get(String(row.actor._id)):null
+        if(!user) return row
+        return {...row, actor: {...row.actor, fullname: user.fullname, imgUrl: user.imgUrl || ''}}
+    })
+    return Array.isArray(rows)?filled:filled[0]
 }
 
 /** Anything in here is commentary — it must not break the write it follows. */
@@ -326,6 +353,7 @@ async function boardMembersChanged({board, members, actor}){
 }
 
 module.exports = {
+    withPeople,
     taskPatched,
     taskAdded,
     boardMembersChanged,

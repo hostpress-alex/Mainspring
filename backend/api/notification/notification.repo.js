@@ -15,7 +15,9 @@ function out(row){
         taskId: row.task_id || null,
         subject: row.subject === null?'':row.subject,
         detail: parseJson(row.detail, {}) || {},
-        actor: {_id: row.actor_id || null, fullname: row.actor_name || '', imgUrl: row.actor_img || ''},
+        // The id alone. Who that is gets looked up when the list is read —
+        // see withPeople in notification.service.js.
+        actor: {_id: row.actor_id || null},
         createdAt: Number(row.created_at),
         readAt: row.read_at === null?null:Number(row.read_at)
     }
@@ -29,8 +31,6 @@ async function insertMany(entries){
     const rows = entries.map(e => ({
         user_id: sid(e.userId),
         actor_id: e.actor && e.actor._id?sid(e.actor._id):null,
-        actor_name: (e.actor && e.actor.fullname) || '',
-        actor_img: (e.actor && e.actor.imgUrl) || '',
         kind: e.kind,
         board_id: sid(e.boardId),
         board_title: e.boardTitle || '',

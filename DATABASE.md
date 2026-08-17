@@ -107,10 +107,13 @@ and keep `127.0.0.1` as the host.
 
 ```
 user            users (password as a bcrypt hash), language = the
-                interface language, '' = whatever the browser says
+                interface language, '' = whatever the browser says,
+                state = active/inactive — accounts are switched off, never
+                deleted
 board           a board's header data
 board_member    who belongs to it, role = owner/editor/viewer
-                (is_owner is kept in step and is on its way out)
+                (is_owner is kept in step and is on its way out),
+                state = active/inactive — a former member keeps the row
 board_column    a board's columns, in their order
 board_group     a board's groups
 task            one task; title and order as real columns,
@@ -144,6 +147,8 @@ Migrations, in order:
 | `20260816_000011_comment_pinned.js` | `task_comment.pinned_at` — an update pinned to the top |
 | `20260816_000012_automations.js` | `automation` and `automation_run` — rules and what they did |
 | `20260816_000013_lifecycle.js` | `state` on board, group and task — bin and archive |
+| `20260816_000014_people_state.js` | `state` on user and board_member — switched off, not deleted |
+| `20260816_000015_drop_name_copies.js` | drops the copied names and pictures, adds foreign keys onto `user` |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -169,6 +174,26 @@ read state per person — which the other way round cannot have without storing
 **A subscription can be muted rather than deleted.** A deleted row cannot be
 told apart from never having subscribed, so the next assignment would sign the
 user up again to the thing they just switched off.
+
+**A name is never copied, only looked up.** Every table that records who did
+something stores an id and nothing else; the name and the picture are filled in
+when a board is read (`enrichPeople` in board.service.js, `withPeople` in
+notification.service.js). The copies that used to sit beside the ids aged: one
+person could show four different faces on one screen, because `board_member`
+was refreshed on read and the other four places were not.
+
+**That works because accounts are never deleted.** `user.state` is
+active/inactive, and `board_member.state` the same. The copies only ever
+existed because an id could end up pointing at nothing — with the delete gone,
+so is the reason. Since `20260816_000015` the five author columns carry a real
+foreign key onto `user` with ON DELETE SET NULL, so the rule is the database's
+and not a comment's.
+
+**`board_member.state` is a permission column, not a display one.** A row left
+behind by somebody taken off a board is indistinguishable from a member except
+for this, so every query asking "which boards is this person on" filters it,
+and `board.roles.js` refuses an inactive member a role even if a board reaches
+it from somewhere that forgot.
 
 **Nothing is deleted any more, it is moved.** `state` on `board`,
 `board_group` and `task` holds `active`, `archived` or `trashed`, with

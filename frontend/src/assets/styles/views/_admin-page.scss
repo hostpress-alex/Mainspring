@@ -97,6 +97,14 @@
         border-radius: 10px;
         padding: 2px 9px;
         font-size: 12px;
+
+        // A closed account: grey, and never in the same colour as a role.
+        // The two say different things and sit next to each other.
+        &.is-off {
+            margin-left: 6px;
+            background: #c4c7d4;
+            color: #323338;
+        }
     }
 
     .admin-chip {

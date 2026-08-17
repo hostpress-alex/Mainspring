@@ -18,6 +18,9 @@ function out(row){
         fullname: row.fullname,
         imgUrl: row.img_url || '',
         isAdmin: !!row.is_admin,
+        // 'active' or 'inactive'. A closed account keeps everything it wrote;
+        // it just cannot be signed into any more.
+        state: row.state || 'active',
         // '' means the person never chose one — the browser decides.
         language: row.language || '',
         createdAt: row.created_at
@@ -26,6 +29,7 @@ function out(row){
 
 const COLUMNS = {
     username: 'username',
+    state: 'state',
     password: 'password',
     fullname: 'fullname',
     imgUrl: 'img_url',
@@ -42,12 +46,27 @@ function toRow(user){
     return row
 }
 
+/**
+ * Everyone, closed accounts included.
+ *
+ * Deliberately everyone: this is what the display resolves names against, and
+ * an update written by somebody who has since left still has to say who wrote
+ * it. Lists that people pick FROM ask for active ones — see `query`.
+ */
 async function findAll(){
     return (await db()('user').orderBy('fullname')).map(out)
 }
 
+/** Turn an account off, or back on. Nothing is deleted. */
+async function setState(userId, state){
+    await db()('user').where({id: sid(userId)}).update({state, state_at: Date.now()})
+}
+
 async function query(filterBy = {}){
     let q = db()('user')
+    // Closed accounts are out unless somebody asks for them by name — the
+    // administration does, every picker in the application does not.
+    if(!filterBy.withInactive) q = q.where('state', 'active')
     if(filterBy.txt){
         const needle = String(filterBy.txt).toLowerCase().replace(/[%_\\]/g, ch => '\\' + ch)
         q = q.where(function(){
@@ -82,4 +101,4 @@ async function deleteById(userId){
     await db()('user').where({id: sid(userId)}).del()
 }
 
-module.exports = {findAll, query, findById, findByUsername, insert, updateFields, deleteById}
+module.exports = {findAll, query, findById, findByUsername, insert, updateFields, deleteById, setState}

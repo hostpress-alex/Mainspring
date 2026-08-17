@@ -15,6 +15,7 @@ export const userService = {
     getUsers,
     getById,
     remove,
+    setUserState,
     update,
     create,
     setAdmin
@@ -22,8 +23,20 @@ export const userService = {
 
 window.userService = userService
 
-function getUsers(){
-    return httpService.get(BASE_URL)
+/**
+ * Everyone who can be picked.
+ *
+ * `withInactive` is for the administration alone: a closed account must not
+ * turn up in a member picker, and it must not be impossible to find when
+ * somebody wants to open it again.
+ */
+function getUsers({withInactive = false} = {}){
+    return httpService.get(BASE_URL + (withInactive?'?withInactive=true':''))
+}
+
+/** Close an account or open it again. Nothing is ever deleted. */
+function setUserState(userId, state){
+    return httpService.put(`${BASE_URL}${userId}/state`, {state})
 }
 
 async function getById(userId){

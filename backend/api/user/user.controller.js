@@ -20,7 +20,9 @@ async function getUser(req, res){
 
 async function getUsers(req, res){
     try {
-        const users = await userService.query()
+        // The administration asks for the closed accounts too; everything else
+        // wants people it can actually pick.
+        const users = await userService.query({withInactive: req.query.withInactive === 'true'})
         res.send(users)
     } catch(err) {
         logger.error('Failed to get users', err)
@@ -28,17 +30,29 @@ async function getUsers(req, res){
     }
 }
 
+/**
+ * Closes the account rather than deleting it — see user.service.remove. The
+ * route keeps its name and its verb: every caller already means "this person
+ * is gone", and what that has to do to the database is not the caller's
+ * business.
+ */
 async function deleteUser(req, res){
     try {
-        const requester = getRequester()
-        if(requester && String(requester._id) === String(req.params.id)){
-            return res.status(400).send({err: 'Du kannst dich nicht selbst loeschen'})
-        }
-        await userService.remove(req.params.id)
-        res.send({msg: 'Deleted successfully'})
+        await userService.remove(req.params.id, getRequester())
+        res.send({msg: 'Deactivated successfully'})
     } catch(err) {
-        logger.error('Failed to delete user', err)
-        res.status(500).send({err: 'Failed to delete user'})
+        if(!err.status) logger.error('Failed to deactivate user', err)
+        res.status(err.status || 500).send({err: err.status?err.message:'Failed to deactivate user'})
+    }
+}
+
+/** Switch an account back on, or off, by name. Admins only. */
+async function setUserState(req, res){
+    try {
+        res.json(await userService.setState(req.params.id, req.body.state, getRequester()))
+    } catch(err) {
+        if(!err.status) logger.error('Failed to change the user state', err)
+        res.status(err.status || 500).send({err: err.status?err.message:'Failed to change the user state'})
     }
 }
 
@@ -67,6 +81,7 @@ module.exports = {
     getUser,
     getUsers,
     deleteUser,
+    setUserState,
     updateUser,
     addUser
 }

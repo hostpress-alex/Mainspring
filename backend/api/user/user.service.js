@@ -26,6 +26,7 @@ function withoutPassword(user){
 
 module.exports = {
     query,
+    setState,
     getById,
     getByUsername,
     remove,
@@ -63,11 +64,35 @@ async function getByUsername(username){
     }
 }
 
-async function remove(userId){
+/**
+ * Close an account. Nothing is deleted.
+ *
+ * Every table that records who did something points at this row and none of
+ * them has a foreign key onto it — deleting the row would leave the whole
+ * history pointing at nothing. So the account is switched off: no login, out
+ * of every picker, and their name still under everything they wrote.
+ *
+ * Switching it back on is the same call with 'active'.
+ */
+async function remove(userId, requester){
+    return await setState(userId, 'inactive', requester)
+}
+
+async function setState(userId, state, requester){
     try {
-        await userRepo.deleteById(userId)
+        if(state !== 'active' && state !== 'inactive') throw httpError(400, 'Unbekannter Zustand')
+        const existing = await userRepo.findById(userId)
+        if(!existing) throw httpError(404, 'User not found')
+
+        if(!requester || requester.isAdmin !== true) throw httpError(403, 'Nur Admins')
+        if(state === 'inactive' && String(requester._id) === String(userId)){
+            throw httpError(400, 'Du kannst dein eigenes Konto nicht deaktivieren')
+        }
+
+        await userRepo.setState(userId, state)
+        return withoutPassword(await userRepo.findById(userId))
     } catch(err) {
-        logger.error(`cannot remove user ${userId}`, err)
+        if(!err.status) logger.error(`cannot change the state of user ${userId}`, err)
         throw err
     }
 }

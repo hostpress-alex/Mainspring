@@ -6,6 +6,7 @@
  * for somebody else's list.
  */
 const notificationRepo = require('./notification.repo')
+const notificationService = require('./notification.service')
 const asyncLocalStorage = require('../../services/als.service')
 const logger = require('../../services/logger.service')
 
@@ -28,10 +29,13 @@ const handler = (fn, fallback) => async (req, res) => {
 module.exports = {
     /** Newest first. `before` is the id of the oldest entry already shown. */
     list: handler(async (req, user) => {
-        const items = await notificationRepo.findForUser(user._id, {
+        const rows = await notificationRepo.findForUser(user._id, {
             before: req.query.before || null,
             limit: req.query.limit || 30
         })
+        // The rows carry an actor id; who that is comes from the user table on
+        // the way out rather than from a copy written when it happened.
+        const items = await notificationService.withPeople(rows)
         return {items, unread: await notificationRepo.countUnread(user._id)}
     }, 'Benachrichtigungen konnten nicht geladen werden'),
 

@@ -80,7 +80,11 @@ function buildComment(row){
         // null, never 0: "pinned at the epoch" and "never pinned" have to stay
         // tellable apart, and 0 is falsy in both places that read this.
         pinnedAt: row.pinned_at === null || row.pinned_at === undefined?null:Number(row.pinned_at),
-        byMember: {_id: row.by_user_id || null, fullname: row.by_user_name || '', imgUrl: row.by_user_img || ''},
+        // The id and nothing else. The name and the picture are filled in
+        // when the board is read, from the user table — see enrichPeople in
+        // board.service.js. A copy stored here went stale the day somebody
+        // changed their profile.
+        byMember: {_id: row.by_user_id || null},
         attachments: parseJson(row.attachments, []) || [],
         style: parseJson(row.style, {}) || {}
     }
@@ -109,7 +113,7 @@ function buildActivity(row){
     return {
         action: row.action,
         createdAt: row.created_at === null?null:Number(row.created_at),
-        byMember: parseJson(row.by_member, {}) || {},
+        byMember: {_id: row.by_user_id || null},
         task: {id: row.task_id || '', title: row.task_title === null?'':row.task_title},
         from: unwrapValue(row.from_value),
         to: unwrapValue(row.to_value)
@@ -135,7 +139,12 @@ async function assemble(k, boardRows){
     if(!boardRows.length) return []
     const ids = boardRows.map(b => b.id)
 
-    const members = await k('board_member').whereIn('board_id', ids).orderBy('board_id').orderBy('position')
+    // Active members only, and this is a permission filter rather than a
+    // display one: board.members is what board.roles.js reads to decide who
+    // may do what. Somebody taken off a board keeps their row — see the
+    // people-state migration — and must not turn up here.
+    const members = await k('board_member').whereIn('board_id', ids).where('state', ACTIVE)
+        .orderBy('board_id').orderBy('position')
     const columns = await k('board_column').whereIn('board_id', ids).orderBy('board_id').orderBy('position')
     // Only what is on the board. Archived and thrown-away rows stay in the
     // table and are read by findBin, never by the board itself — see the
@@ -183,14 +192,10 @@ async function assemble(k, boardRows){
             state: row.state || ACTIVE,
             stateAt: row.state_at === null || row.state_at === undefined?null:Number(row.state_at),
             stateBy: row.state_by || null,
-            createdBy: {
-                _id: row.created_by_id || '',
-                fullname: row.created_by_name || '',
-                imgUrl: row.created_by_img || ''
-            },
+            createdBy: {_id: row.created_by_id || ''},
             labels: parseJson(row.labels, []) || [],
             members: mem.map(m => ({
-                _id: m.user_id, fullname: m.fullname, imgUrl: m.img_url,
+                _id: m.user_id,
                 // The role travels with the member rather than in a list of
                 // its own — a second list would have to be kept in step, and
                 // the one place that forgets is a permission hole.
@@ -234,7 +239,8 @@ async function findForUser(user, filterBy = {}){
     // ones are asked for by name, through findBoardsByState.
     let q = k('board').select('board.*').where('board.state', ACTIVE)
     if(!user.isAdmin){
-        q = q.whereIn('board.id', k('board_member').select('board_id').where('user_id', sid(user._id)))
+        q = q.whereIn('board.id', k('board_member').select('board_id')
+            .where({user_id: sid(user._id), state: ACTIVE}))
     }
     if(filterBy.title){
         const needle = String(filterBy.title).toLowerCase().replace(/[%_\\]/g, ch => '\\' + ch)
@@ -304,8 +310,7 @@ function splitTask(task){
         // Mirror for DBeaver and later analysis. The truth still lives
         // in col_values.updatedBy, so nothing gets lost.
         updatedAt: Number.isFinite(Number(updatedBy.date))?Number(updatedBy.date):null,
-        updatedById: updatedBy._id?sid(updatedBy._id):null,
-        updatedByImg: typeof updatedBy.imgUrl === 'string'?updatedBy.imgUrl:''
+        updatedById: updatedBy._id?sid(updatedBy._id):null
     }
 }
 
@@ -338,8 +343,6 @@ async function syncTaskComments(trx, boardId, taskId, comments){
             created_at: Number.isFinite(Number(c && c.archivedAt))?Number(c.archivedAt):null,
             pinned_at: Number.isFinite(Number(c && c.pinnedAt)) && Number(c.pinnedAt) > 0?Number(c.pinnedAt):null,
             by_user_id: by._id?sid(by._id):null,
-            by_user_name: by.fullname || '',
-            by_user_img: by.imgUrl || '',
             txt: (c && c.txt) || '',
             style: toJson((c && c.style) || {}),
             attachments: toJson((c && c.attachments) || [])
@@ -364,7 +367,7 @@ async function writeTask(trx, boardId, groupId, task, position, parentId = null)
     await trx('task').insert({
         board_id: boardId, id, group_id: groupId, position, parent_id: parentId || null,
         title: s.title, col_values: toJson(s.values),
-        updated_at: s.updatedAt, updated_by_id: s.updatedById, updated_by_img: s.updatedByImg
+        updated_at: s.updatedAt, updated_by_id: s.updatedById
     }).onConflict(['board_id', 'id']).merge()
     await syncTaskMembers(trx, boardId, id, s.memberIds)
     await syncTaskComments(trx, boardId, id, s.comments)
@@ -439,11 +442,18 @@ async function writeColumns(trx, boardId, columns){
     await trx('board_column').insert(rows)
 }
 
+/**
+ * Bring the member list of a board to what was asked for.
+ *
+ * Nobody is deleted. Whoever is no longer in the list is switched off, and
+ * whoever comes back gets their old row switched on again — with everything
+ * that hung off it. Deleting and re-inserting would work exactly as well until
+ * somebody is re-invited, and then they would be a stranger on a board full of
+ * their own updates.
+ */
 async function writeMembers(trx, boardId, members, ownerIds){
     const owners = new Set((ownerIds || []).map(sid))
-    await trx('board_member').where({board_id: boardId}).del()
     const list = (members || []).filter(m => m && m._id)
-    if(!list.length) return
     const seen = new Set()
     const rows = []
     list.forEach((m, i) => {
@@ -458,10 +468,20 @@ async function writeMembers(trx, boardId, members, ownerIds){
         rows.push({
             board_id: boardId, user_id: userId, position: i,
             role, is_owner: role === 'owner',
-            fullname: m.fullname || '', img_url: m.imgUrl || ''
+            // In the inserted columns on purpose: `merge` below reads this
+            // list, so coming back switches the old row on again.
+            state: ACTIVE, state_at: null
         })
     })
-    await trx('board_member').insert(rows)
+
+    const keep = rows.map(r => r.user_id)
+    const dropped = trx('board_member').where({board_id: boardId, state: ACTIVE})
+    if(keep.length) dropped.whereNotIn('user_id', keep)
+    await dropped.update({state: 'inactive', state_at: Date.now()})
+
+    if(rows.length){
+        await trx('board_member').insert(rows).onConflict(['board_id', 'user_id']).merge()
+    }
 }
 
 function boardMetaRow(board){
@@ -472,8 +492,6 @@ function boardMetaRow(board){
         folder: board.folder || '',
         is_starred: !!board.isStarred,
         created_by_id: createdBy._id?sid(createdBy._id):null,
-        created_by_name: createdBy.fullname || '',
-        created_by_img: createdBy.imgUrl || '',
         archived_at: Number.isFinite(Number(board.archivedAt))?Number(board.archivedAt):null,
         labels: toJson(board.labels || [])
     }
@@ -544,7 +562,8 @@ async function setColumns(boardId, columns){
 async function setMembers(boardId, members){
     await tx(async trx => {
         const id = await requireBoardRow(trx, boardId)
-        const current = await trx('board_member').where({board_id: id}).select('user_id', 'is_owner', 'role')
+        const current = await trx('board_member').where({board_id: id, state: ACTIVE})
+            .select('user_id', 'is_owner', 'role')
         const before = new Map(current.map(r => [r.user_id, r.role || (r.is_owner?'owner':'editor')]))
 
         const withRoles = (members || []).filter(m => m && m._id).map(m => ({
@@ -560,7 +579,7 @@ async function setMemberRole(boardId, userId, role){
     if(!ROLE_NAMES.has(role)) throw httpError(400, 'Unbekannte Rolle')
     const id = checkBoardId(boardId)
     const count = await db()('board_member')
-        .where({board_id: id, user_id: sid(userId)})
+        .where({board_id: id, user_id: sid(userId), state: ACTIVE})
         .update({role, is_owner: role === 'owner'})
     if(!count) throw httpError(404, 'Mitglied nicht gefunden')
 }
@@ -576,10 +595,10 @@ async function setOwners(boardId, ownerIds){
         const id = await requireBoardRow(trx, boardId)
         const wanted = (ownerIds || []).map(sid)
 
-        await trx('board_member').where({board_id: id}).where('role', 'owner')
+        await trx('board_member').where({board_id: id, state: ACTIVE}).where('role', 'owner')
             .update({role: 'editor', is_owner: false})
         if(wanted.length){
-            await trx('board_member').where({board_id: id}).whereIn('user_id', wanted)
+            await trx('board_member').where({board_id: id, state: ACTIVE}).whereIn('user_id', wanted)
                 .update({role: 'owner', is_owner: true})
         }
     })
@@ -808,7 +827,6 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
                 const by = value || {}
                 update.updated_at = Number.isFinite(Number(by.date))?Number(by.date):null
                 update.updated_by_id = by._id?sid(by._id):null
-                update.updated_by_img = typeof by.imgUrl === 'string'?by.imgUrl:''
             }
         }
         if(touchesValues) update.col_values = toJson(values)
@@ -874,7 +892,6 @@ async function insertActivity(trx, boardId, activity){
         action: a.action || '',
         created_at: Number.isFinite(Number(a.createdAt))?Number(a.createdAt):Date.now(),
         by_user_id: a.byMember && a.byMember._id?sid(a.byMember._id):null,
-        by_member: toJson(a.byMember || {}),
         task_id: a.task && a.task.id?sid(a.task.id):null,
         task_title: a.task && a.task.title?String(a.task.title):'',
         from_value: wrapValue(a.from),
@@ -1023,7 +1040,8 @@ async function findBoardsByState(user, state){
     const k = db()
     let q = k('board').where('state', state)
     if(!user.isAdmin){
-        q = q.whereIn('id', k('board_member').select('board_id').where('user_id', sid(user._id)))
+        q = q.whereIn('id', k('board_member').select('board_id')
+            .where({user_id: sid(user._id), state: ACTIVE}))
     }
     const rows = await q.orderBy('state_at', 'desc').select('id', 'title', 'state_at', 'state_by')
     return rows.map(r => ({

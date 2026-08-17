@@ -51,29 +51,74 @@ const hasAccess = (board, user) => roles.canView(board, user)
 const isOwner = (board, user) => roles.isOwner(board, user)
 
 /**
- * board.members speichert Name und Bild redundant aus dem Moment der Einladung.
- * Damit ein geaendertes Profilbild ueberall sofort erscheint, werden diese
- * Felder beim Lesen aus der user-Collection aufgefrischt. Die Mitgliedschaft
- * selbst (die _id) bleibt unangetastet — sie ist die Rechtequelle.
+ * Names and pictures, filled in from the user table.
+ *
+ * The database stores an id and nothing else wherever it records who did
+ * something. It used to store the name and the picture alongside, copied at
+ * the moment it happened — and those copies aged: change your avatar and the
+ * board members showed the new one while your own updates, the "last changed
+ * by" column and every notification kept the old. One person, four faces on
+ * one screen.
+ *
+ * So it is resolved here, once, on the way out. One query for everybody, not
+ * one per row: fifteen users is a smaller answer than the copies it replaces.
+ * At a thousand this wants a cache — at fifteen a cache would be the thing
+ * that goes stale instead.
+ *
+ * Closed accounts are resolved too. Somebody who has left the company still
+ * wrote what they wrote, and their name belongs under it.
  */
-async function enrichMembers(boards){
-    const list = Array.isArray(boards)?boards:[boards]
-    const ids = new Set()
-    for(const b of list) for(const m of (b.members || [])) if(m && m._id) ids.add(String(m._id))
-    if(!ids.size) return boards
+async function enrichPeople(boards){
+    const list = (Array.isArray(boards)?boards:[boards]).filter(Boolean)
+    if(!list.length) return boards
 
     const found = await userRepo.findAll()
     const byId = new Map(found.map(u => [String(u._id), u]))
 
-    for(const b of list){
-        b.members = (b.members || []).map(m => {
-            const u = m && byId.get(String(m._id))
-            if(!u) return m   // geloeschter Benutzer: gespeicherte Kopie behalten
-            return {...m, fullname: u.fullname, imgUrl: u.imgUrl || ''}
-        })
+    /**
+     * Put the name and the picture on one `{_id}`.
+     *
+     * An id nobody knows any more keeps whatever it had. That case should not
+     * exist now that accounts are only ever switched off — it is here for the
+     * rows written before that was true.
+     */
+    const fill = person => {
+        if(!person || !person._id) return person
+        const user = byId.get(String(person._id))
+        if(!user) return person
+        return {...person, fullname: user.fullname, imgUrl: user.imgUrl || ''}
+    }
+
+    for(const board of list){
+        board.members = (board.members || []).map(fill)
+        board.createdBy = fill(board.createdBy)
+        board.activities = (board.activities || []).map(a =>
+            (a?{...a, byMember: fill(a.byMember)}:a))
+
+        for(const group of board.groups || []){
+            for(const task of group.tasks || []){
+                fillTask(task, fill)
+                for(const child of task.subtasks || []) fillTask(child, fill)
+            }
+        }
     }
     return boards
 }
+
+/** In place: the caller is walking a board it has just built for this reply. */
+function fillTask(task, fill){
+    if(!task) return
+    if(task.updatedBy && task.updatedBy._id) task.updatedBy = fill(task.updatedBy)
+    if(Array.isArray(task.comments)){
+        task.comments = task.comments.map(c => (c?{...c, byMember: fill(c.byMember)}:c))
+    }
+}
+
+/**
+ * The old name, kept because the tests and the socket layer ask for it.
+ * Members were only ever the first of the five places this had to happen.
+ */
+const enrichMembers = enrichPeople
 
 const COL_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -168,7 +213,7 @@ async function query(filterBy = {}){
     try {
         const boards = await boardRepo.findForUser(user, filterBy)
         boards.forEach(ensureColumnLabels)
-        return await enrichMembers(boards)
+        return await enrichPeople(boards)
     } catch(err) {
         logger.error('cannot find boards', err)
         throw err
@@ -187,7 +232,7 @@ async function getById(boardId){
         if(!board) throw httpError(404, 'Board not found')
         if(!hasAccess(board, user)) throw httpError(403, 'Kein Zugriff auf dieses Board')
         ensureColumnLabels(board)
-        return await enrichMembers(board)
+        return await enrichPeople(board)
     } catch(err) {
         if(!err.status) logger.error(`while finding board ${boardId}`, err)
         throw err
@@ -804,6 +849,7 @@ module.exports = {
     isOwner,
     ownerIdsOf,
     enrichMembers,
+    enrichPeople,
     ensureColumnLabels,
 
     updateMeta,

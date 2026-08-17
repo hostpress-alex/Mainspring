@@ -54,6 +54,10 @@ function roleOf(board, user){
 
     const member = (board.members || []).find(m => m && sid(m._id) === uid)
     if(!member) return null
+    // Belt and braces. The board assembly already leaves former members out —
+    // this is the second lock on the door that matters most, in case a board
+    // ever reaches here from a path that does not filter.
+    if(member.state && member.state !== 'active') return null
     return ROLES.includes(member.role)?member.role:EDITOR
 }
 
