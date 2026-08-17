@@ -231,7 +231,11 @@ export function RichTextEditor({
                 }}
                 onDragLeave={() => setIsDropping(false)}
                 onDrop={() => setIsDropping(false)}>
-                <EditorContent editor={editor}/>
+                {/* EditorContent puts a wrapper div of its own around the
+                    editable element. It needs a name, or the column that lets
+                    the text scroll under a fixed toolbar breaks on the one
+                    element in the chain nobody can see. */}
+                <EditorContent className="rich-text-content" editor={editor}/>
                 {isDropping && <span className="rich-text-drop-hint">{t('update.dropFiles')}</span>}
             </div>
 

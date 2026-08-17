@@ -15,13 +15,17 @@
     },
     "admin":    {
         "admin":               "Admin",
+        "userReactivated": "Benutzer „{name}“ ist wieder aktiv.",
+        "inactive":       "Deaktiviert",
+        "reactivate":     "Wieder aktivieren",
+        "deactivate":     "Deaktivieren",
         "adminGranted":        "{name}: Admin-Recht vergeben.",
         "adminRevoked":        "{name}: Admin-Recht entzogen.",
         "chooseUser":          "Benutzer wählen…",
         "createUser":          "Benutzer anlegen",
-        "deleteUser":          "Benutzer löschen",
+        "deleteUser":          "Benutzer deaktivieren",
         "deleteUserName":      "Der Benutzer „{name}“",
-        "deleteUserNote":      "Die Anmeldung wird sofort ungültig. Bereits geschriebene Updates bleiben erhalten.",
+        "deleteUserNote":      "Die Anmeldung wird sofort ungültig. Alles Geschriebene bleibt mit dem Namen darunter stehen, und das Konto lässt sich hier jederzeit wieder aktivieren.",
         "makeAdmin":           "Zum Admin machen",
         "makeOwner":           "Zum Owner machen",
         "memberAdded":         "{name} zu „{board}“ hinzugefügt.",
@@ -36,7 +40,7 @@
         "signedInAs":          "Angemeldet als {name}.",
         "thatIsYou":           "das bist du",
         "userCreated":         "Benutzer „{name}“ angelegt.",
-        "userDeleted":         "Benutzer „{name}“ gelöscht.",
+        "userDeleted":         "Benutzer „{name}“ deaktiviert.",
         "usersHeading":        "Benutzer ({n})"
     },
     "automation": {
@@ -157,6 +161,7 @@
         "more":            "Mehr",
         "name":            "Board-Name",
         "newButton":       "+ Neues Board",
+        "noDescription":   "Noch keine Beschreibung.",
         "newTitle":        "Neues Board",
         "noMatch":         "Kein Board passt zu „{filter}“.",
         "noMembers":       "keine Mitglieder",
@@ -271,6 +276,19 @@
         "unpin":           "Nicht mehr anheften",
         "user":            "Benutzer",
         "yes":             "Ja"
+    },
+    "date":     {
+        "dueIn":     {
+            "one":   "in 1 Tag fällig",
+            "other": "in {n} Tagen fällig"
+        },
+        "overdue":   {
+            "one":   "1 Tag überfällig",
+            "other": "{n} Tage überfällig"
+        },
+        "today":     "heute fällig",
+        "tomorrow":  "morgen fällig",
+        "yesterday": "gestern fällig"
     },
     "errors":   {
         "loginFailed":     "Benutzername oder Passwort stimmt nicht.",
@@ -460,6 +478,29 @@
         "forNew":       "Rolle für neue Mitglieder",
         "lastOwner":    "Ein Board braucht mindestens einen Owner",
         "changeFailed": "Die Rolle konnte nicht geändert werden"
+    },
+    "search":   {
+        "kind":        {
+            "board":   "Board",
+            "file":    "Datei",
+            "person":  "Person",
+            "subtask": "Subtask",
+            "task":    "Task",
+            "update":  "Update"
+        },
+        "nothing":     "Nichts gefunden für „{term}“.",
+        "placeholder": "Alles durchsuchen …",
+        "start":       "Tippen, um zu suchen.",
+        "tab":         {
+            "all":     "Alle",
+            "boards":  "Boards",
+            "files":   "Dateien",
+            "people":  "Personen",
+            "tasks":   "Tasks",
+            "updates": "Updates"
+        },
+        "title":       "Suche",
+        "tooShort":    "Mindestens {n} Zeichen."
     },
     "task":     {
         "add":            "+ Task hinzufügen",

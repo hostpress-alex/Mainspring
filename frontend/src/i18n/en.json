@@ -15,13 +15,17 @@
     },
     "admin":    {
         "admin":               "Admin",
+        "userReactivated": "User “{name}” is active again.",
+        "inactive":       "Deactivated",
+        "reactivate":     "Reactivate",
+        "deactivate":     "Deactivate",
         "adminGranted":        "{name}: admin rights granted.",
         "adminRevoked":        "{name}: admin rights revoked.",
         "chooseUser":          "Choose user…",
         "createUser":          "Create user",
-        "deleteUser":          "Delete user",
+        "deleteUser":          "Deactivate user",
         "deleteUserName":      "The user “{name}”",
-        "deleteUserNote":      "The login becomes invalid immediately. Updates already written stay.",
+        "deleteUserNote":      "The login stops working at once. Everything they wrote stays, with their name under it, and the account can be switched back on here at any time.",
         "makeAdmin":           "Make admin",
         "makeOwner":           "Make owner",
         "memberAdded":         "{name} added to “{board}”.",
@@ -36,7 +40,7 @@
         "signedInAs":          "Signed in as {name}.",
         "thatIsYou":           "that's you",
         "userCreated":         "User “{name}” created.",
-        "userDeleted":         "User “{name}” deleted.",
+        "userDeleted":         "User “{name}” deactivated.",
         "usersHeading":        "Users ({n})"
     },
     "automation": {
@@ -157,6 +161,7 @@
         "more":            "More",
         "name":            "Board name",
         "newButton":       "+ New board",
+        "noDescription":   "No description yet.",
         "newTitle":        "New board",
         "noMatch":         "No board matches “{filter}”.",
         "noMembers":       "no members",
@@ -271,6 +276,19 @@
         "unpin":           "Unpin",
         "user":            "User",
         "yes":             "Yes"
+    },
+    "date":     {
+        "dueIn":     {
+            "one":   "due in 1 day",
+            "other": "due in {n} days"
+        },
+        "overdue":   {
+            "one":   "1 day overdue",
+            "other": "{n} days overdue"
+        },
+        "today":     "due today",
+        "tomorrow":  "due tomorrow",
+        "yesterday": "was due yesterday"
     },
     "errors":   {
         "loginFailed":     "Username or password is wrong.",
@@ -460,6 +478,29 @@
         "forNew":       "Role for new members",
         "lastOwner":    "A board needs at least one owner",
         "changeFailed": "The role could not be changed"
+    },
+    "search":   {
+        "kind":        {
+            "board":   "Board",
+            "file":    "File",
+            "person":  "Person",
+            "subtask": "Subtask",
+            "task":    "Task",
+            "update":  "Update"
+        },
+        "nothing":     "Nothing found for “{term}”.",
+        "placeholder": "Search everything …",
+        "start":       "Type to search.",
+        "tab":         {
+            "all":     "All",
+            "boards":  "Boards",
+            "files":   "Files",
+            "people":  "People",
+            "tasks":   "Tasks",
+            "updates": "Updates"
+        },
+        "title":       "Search",
+        "tooShort":    "At least {n} characters."
     },
     "task":     {
         "add":            "+ Add task",

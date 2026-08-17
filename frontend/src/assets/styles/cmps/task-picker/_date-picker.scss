@@ -2,15 +2,68 @@
 
 .date-picker {
     outline: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     // No fixed cap: the column width is dragged by the user and lives on the
     // cell. A max-width here made the field stop growing at 140px while its
     // cell kept getting wider — the value then floated in an empty column.
     width: 100%;
 
+    /**
+     * The symbol in front of the date.
+     *
+     * `flex: none` on both: the circle is a fixed size and must not be
+     * squeezed when the column is dragged narrow — a squashed circle reads as
+     * a rendering fault, and the date has the elastic width anyway.
+     */
+    .due-mark {
+        flex: none;
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    .due-mark.is-late {
+        color: #d83a52;
+    }
+
+    /**
+     * The filling circle.
+     *
+     * A conic gradient rather than an SVG arc: `--fill` comes in from the
+     * component as a percentage and the browser does the geometry. The ring is
+     * the border, the filling is the gradient, and both take `currentColor` —
+     * so the cell's tone (overdue, today, soon) colours this without a rule of
+     * its own.
+     *
+     * `content-box` on the background keeps the fill inside the ring instead
+     * of painting over it.
+     */
+    .due-dot {
+        width: 13px;
+        height: 13px;
+        border: 1.5px solid currentColor;
+        border-radius: 50%;
+        background-image: conic-gradient(currentColor var(--fill, 0%), transparent var(--fill, 0%));
+        background-origin: content-box;
+        background-clip: content-box;
+        color: #9699a6;
+    }
+
+    /* An empty circle should not look like a smudge — the ring alone is the
+       "there is time yet" state. */
+    &.is-soon .due-dot { color: #676879; }
+    &.is-today .due-dot { color: #c98a00; }
+
     .react-datepicker-wrapper {
         height: 100%;
         display: flex;
         align-items: center;
+        // The row is a flex container now: without this the wrapper keeps its
+        // content width and the date drifts away from the symbol.
+        flex: 1 1 auto;
+        min-width: 0;
     }
 
     .date-picker-input {
@@ -22,7 +75,11 @@
     }
 
     input {
-        width: 100%;
+        // Not 100% any more: the symbol sits next to it in the same flex row,
+        // and a field that insists on the full width pushes the symbol out.
+        width: auto;
+        min-width: 0;
+        flex: 1 1 auto;
         outline: none;
         border: none;
         text-align: center;

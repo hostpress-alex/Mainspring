@@ -9,10 +9,15 @@ import { Avatar } from '../avatar'
 import {singleLineEditable} from '../../services/editable'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
 import {RichTextView} from '../rich-text/rich-text-view'
+import {isEmpty as isRichEmpty} from '../../services/rich-text'
 import {t} from '../../i18n'
 
 export function BoardDescription({setIsShowDescription, board}){
     const [description, setDescription] = useState(board.description || '')
+    // The description is text on the page until somebody who may change it
+    // clicks into it. A toolbar sitting over a paragraph nobody is editing is
+    // noise, and for a viewer it is a promise the server will not keep.
+    const [isEditing, setIsEditing] = useState(false)
     const user = useSelector(storeState => storeState.userModule.user)
     // Name and description are the frame of the board — owner only, and the
     // server says the same. A viewer opens this dialog to read it.
@@ -22,6 +27,7 @@ export function BoardDescription({setIsShowDescription, board}){
     // showing the previous text.
     useEffect(() => {
         setDescription(board.description || '')
+        setIsEditing(false)
     }, [board._id])
 
     /**
@@ -37,6 +43,20 @@ export function BoardDescription({setIsShowDescription, board}){
         } catch(err) {
             console.error('saving the description failed', err)
         }
+    }
+
+    /**
+     * Leave the editor when the focus really leaves it.
+     *
+     * `relatedTarget` is what is about to receive the focus. Without this
+     * check the link row inside the editor would close the whole thing the
+     * moment its input took focus — the toolbar buttons refuse the focus and
+     * never get this far, but that input does.
+     */
+    function onLeaveEditor(ev){
+        if(ev.currentTarget.contains(ev.relatedTarget)) return
+        onSaveDescription()
+        setIsEditing(false)
     }
 
     async function onSave(ev){
@@ -67,18 +87,27 @@ export function BoardDescription({setIsShowDescription, board}){
                         <h1>{board.title}</h1>
                     </blockquote>
                 </div>
-                <div className="board-edit-description" onBlur={canManage?onSaveDescription:undefined}>
-                    {canManage
-                        ?<RichTextEditor
+                {isEditing?(
+                    <div className="board-edit-description" onBlur={onLeaveEditor}>
+                        <RichTextEditor
                             value={description}
                             members={board.members}
                             placeholder={t('board.descriptionPlaceholder')}
+                            autoFocus
                             onChange={setDescription}
                         />
-                        // A toolbar with nothing behind it is worse than no
-                        // toolbar: the same text, rendered.
-                        :<RichTextView value={description}/>}
-                </div>
+                    </div>
+                ):(
+                    <div className={`board-edit-description is-view${canManage?' is-editable':''}`}
+                        onClick={() => canManage && setIsEditing(true)}
+                        title={canManage?t('board.clickToEdit'):undefined}>
+                        {isRichEmpty(description)
+                            ?<span className="board-description-empty">
+                                {canManage?t('board.descriptionPlaceholder'):t('board.noDescription')}
+                            </span>
+                            :<RichTextView value={description}/>}
+                    </div>
+                )}
             </div>
             <div className="board-info flex column">
                 <span className="title">{t('board.info')}</span>

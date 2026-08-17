@@ -1,0 +1,165 @@
+@use "../setup/variables";
+
+/**
+ * The global search.
+ *
+ * Near the top of the screen rather than in the middle: the list grows
+ * downwards as you type, and a box centred on an empty result would jump the
+ * moment the first answer arrives.
+ */
+.search-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-backdrop);
+    background: rgba(0, 0, 0, .4);
+}
+
+.search-overlay {
+    position: fixed;
+    top: 8vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-modal);
+    display: flex;
+    flex-direction: column;
+    width: min(720px, 92vw);
+    max-height: 76vh;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+    background: variables.$app-bg;
+}
+
+.search-header {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-small;
+    padding: variables.$spacing-medium;
+    border-bottom: 1px solid variables.$layout-border-color;
+
+    .search-icon { color: variables.$workspace-icon-color; }
+
+    .search-close {
+        border: 0;
+        background: none;
+        font-size: 16px;
+        color: variables.$workspace-icon-color;
+        cursor: pointer;
+    }
+}
+
+.search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    font: inherit;
+    font-size: 18px;
+    background: none;
+}
+
+.search-tabs {
+    display: flex;
+    gap: variables.$spacing-xs;
+    padding: variables.$spacing-small variables.$spacing-medium;
+    border-bottom: 1px solid variables.$layout-border-color;
+
+    button {
+        padding: 5px 12px;
+        border: 0;
+        border-radius: 14px;
+        background: none;
+        font: inherit;
+        font-size: 14px;
+        color: variables.$workspace-icon-color;
+        cursor: pointer;
+
+        &:hover { background: variables.$workspace-hover; }
+
+        &.is-active {
+            background: variables.$board-btn;
+            color: #fff;
+        }
+    }
+}
+
+.search-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: variables.$spacing-small 0;
+}
+
+.search-hint,
+.search-error {
+    margin: 0;
+    padding: variables.$spacing-large variables.$spacing-medium;
+    text-align: center;
+    color: #676879;
+}
+
+.search-error { color: #a3283a; }
+
+/**
+ * One result.
+ *
+ * A button, not a div with an onClick: the list is walkable with the keyboard
+ * that way, which is the whole point of a search box you opened by typing.
+ * The one kind that leads nowhere — a person — is a div and says so.
+ */
+.search-row {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: variables.$spacing-small variables.$spacing-medium;
+    width: 100%;
+    padding: 8px variables.$spacing-medium;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible { background: variables.$workspace-hover; }
+
+    &.is-static { cursor: default; }
+}
+
+.search-row-icon { color: #676879; }
+
+.search-row-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.search-row-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Where it comes from, under the title and across both text columns — a hit
+   without its board is not an answer on a board with forty of them. */
+.search-row-where {
+    grid-column: 2;
+    color: #676879;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.search-row-kind {
+    grid-row: 1 / span 2;
+    grid-column: 3;
+    align-self: center;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #f1f2f6;
+    color: #676879;
+    font-size: 12px;
+    white-space: nowrap;
+}

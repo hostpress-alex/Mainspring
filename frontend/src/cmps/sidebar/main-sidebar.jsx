@@ -9,6 +9,7 @@ import {Tooltip} from '@mui/material'
 import {LogoMark} from '../logo-mark'
 import { Avatar } from '../avatar'
 import {NotificationBell} from '../notification/notification-bell'
+import {SearchPanel} from '../search/search-panel'
 import {t} from '../../i18n'
 
 /**
@@ -20,6 +21,7 @@ import {t} from '../../i18n'
  */
 export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWorkspaceOpen}){
     const [display, setDisplay] = useState('board')
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
     const user = useSelector(storeState => storeState.userModule.user)
     const location = useLocation()
     const navigate = useNavigate()
@@ -61,6 +63,15 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
                     </div>
                 </Tooltip>
 
+                {/* Above the bell rather than below: looking for something is
+                    the more common errand, and the bell is where people are
+                    used to it being. */}
+                <Tooltip title={t('search.title')} arrow placement="right">
+                    <div className="icon-container" onClick={() => setIsSearchOpen(true)}>
+                        <Icon name='magnifying-glass'/>
+                    </div>
+                </Tooltip>
+
                 <NotificationBell/>
 
                 <Tooltip title={t('nav.calendar')} arrow placement="right">
@@ -79,6 +90,8 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
                     </Tooltip>
                 )}
             </div>
+
+            {isSearchOpen && <SearchPanel onClose={() => setIsSearchOpen(false)}/>}
 
             <div className="bottom">
                 <Tooltip title={user?t('nav.profileTooltip', {name: user.fullname}):t('nav.login')} arrow placement="right">

@@ -76,6 +76,30 @@
         cursor: default;
     }
 
+    /**
+     * Three states worth noticing at a glance. Everything further out than a
+     * week stays plain — if every date is coloured, none of them is a warning.
+     *
+     * The dates keep their weight; only the colour changes. The full sentence
+     * ("87 Tage überfällig") is the tooltip on the cell.
+     */
+    .date-picker.is-overdue input,
+    .date-picker.is-overdue .date-readonly {
+        color: #d83a52;
+        font-weight: 600;
+    }
+
+    .date-picker.is-today input,
+    .date-picker.is-today .date-readonly {
+        color: #c98a00;
+        font-weight: 600;
+    }
+
+    .date-picker.is-soon input,
+    .date-picker.is-soon .date-readonly {
+        color: variables.$primary-text-color;
+    }
+
     .date-readonly,
     .number-readonly {
         display: flex;
@@ -83,6 +107,9 @@
         justify-content: center;
         height: 100%;
         padding: 0 variables.$spacing-small;
+        // The date shares its cell with the symbol in front of it.
+        flex: 1 1 auto;
+        min-width: 0;
     }
 
     .task-title {
