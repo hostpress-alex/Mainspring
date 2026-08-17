@@ -18,13 +18,12 @@
  * board id or a task id; only the server's answer to "are you allowed?" is
  * new. One socket is in at most one room at a time, exactly as before.
  *
- * Known limitation, deliberately left alone for now: 'board-send-update'
- * relays a board that the *client* composed. The server does not verify its
- * contents, so a member of a board can still push a fabricated board to the
- * other members of that same board. Closing that means emitting from the
- * service layer after every write instead of relaying between clients — a
- * larger change that touches board.service.js. The room checks below limit
- * the blast radius to people who are members of that board anyway.
+ * Boards are no longer relayed between clients. 'board-send-update' used to
+ * take a board the CLIENT had composed and hand it to everybody else in the
+ * room, unverified — so a member could push a board that never existed, and,
+ * far more often, whoever happened to save decided what the others saw. Every
+ * write in board.service.js now reads the board back and emits it from here
+ * (see _pushed there). The event a client listens for is unchanged.
  */
 const config = require('../config')
 const logger = require('./logger.service')
@@ -85,6 +84,11 @@ function identify(handshake){
 /** The board, if this user may see it. Null in every other case. */
 async function boardIfPermitted(boardId, user){
     if(!boardId || !user) return null
+    // The socket's user comes from the cookie it connected with, and a cookie
+    // outlives the account it names. Same question the REST layer asks, same
+    // ten-second answer.
+    const account = await require('./account.service').currentUser(user._id)
+    if(!account) return null
     let board
     try {
         board = await boardRepo.findById(boardId)
@@ -93,7 +97,7 @@ async function boardIfPermitted(boardId, user){
         return null
     }
     if(!board) return null
-    return boardService.hasAccess(board, user)?board:null
+    return boardService.hasAccess(board, account)?board:null
 }
 
 function boardHasTask(board, taskId){
@@ -204,11 +208,11 @@ function setupSocketAPI(http){
             socket.broadcast.to(room).emit('chat-add-msg', msg)
         })
 
-        socket.on('board-send-update', ({filteredBoard, board} = {}) => {
-            const room = socket.data.room
-            if(!room || !room.startsWith(BOARD_ROOM)) return refuse(socket, 'board-send-update')
-            socket.broadcast.to(room).emit('board-add-update', filteredBoard, board)
-        })
+        // 'board-send-update' was here. A client sending the others its own
+        // idea of a board is gone for good — the service layer emits the board
+        // it has just read back instead, which is the only version anybody can
+        // check. Nothing takes its place: a client that still sends this is
+        // simply not listened to.
 
         // Kept for the existing client. The id it sends is ignored — the
         // cookie decides. A mismatch is worth a line in the log.
@@ -248,6 +252,18 @@ function emitToUser({type, data, userId}){
     const id = String(userId)
     logger.info(`Emitting ${type} to user ${id}`)
     gIo.to(USER_ROOM + id).emit(type, data)
+}
+
+/**
+ * Cut somebody's live connections.
+ *
+ * Called when an account is switched off. Without it a browser already sitting
+ * in a board room keeps receiving the pushes that follow an automation — the
+ * door is locked and somebody is still standing inside.
+ */
+function disconnectUser(userId){
+    if(!gIo) return
+    gIo.to(USER_ROOM + String(userId)).disconnectSockets(true)
 }
 
 /**
@@ -293,6 +309,7 @@ module.exports = {
     setupSocketAPI,
     emitToUser,
     emitToBoard,
+    disconnectUser,
     broadcast,
     USER_ROOM,
     // Exported so the tests can reach the pure parts without a live server.

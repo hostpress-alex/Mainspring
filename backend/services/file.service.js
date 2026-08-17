@@ -167,6 +167,10 @@ async function save(buffer, mime, user, opts = {}){
         scope: opts.scope || 'misc',
         originalName,
         taskId: opts.scope === 'task'?safeSegment(opts.taskId):null,
+        // Written now rather than worked out later: a task's key is
+        // (board_id, id), so looking a board up by task id alone is only
+        // unique by luck, and a permission check may not rest on luck.
+        boardId: opts.boardId?safeSegment(opts.boardId):null,
         uploadedBy: user?String(user._id):null,
         uploadedByName: user?user.fullname:null,
         createdAt: now

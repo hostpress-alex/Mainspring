@@ -435,6 +435,12 @@
     },
     "profile":  {
         "changePassword":   "Change password",
+        "logoutAll":       "Sign out everywhere",
+        "logoutAllNote":   "This window too. You will have to sign in again.",
+        "logoutAllWhat":   "Every sign-in of this account",
+        "passwordChangedSignOut": "Password changed. Every sign-in was ended — you will be asked to sign in again.",
+        "sessions":        "Sign-ins",
+        "sessionsHint":    "Ends every sign-in of this account, in every browser. Useful when you left yourself signed in on somebody else\u2019s machine.",
         "choosePicture":    "Choose picture",
         "currentPassword":  "Current password",
         "fullName":         "Full name",

@@ -2,7 +2,9 @@ import {useState, useRef} from 'react'
 import {useSelector} from 'react-redux'
 import {Link, useNavigate} from 'react-router-dom'
 
-import {updateProfile} from '../store/user.actions'
+import {logout, updateProfile} from '../store/user.actions'
+import {userService} from '../services/user.service'
+import {confirmDelete} from '../cmps/confirm-dialog'
 import {uploadAvatar, imagesFromClipboard} from '../services/upload.service'
 import {GUEST_IMG} from '../services/avatar'
 import { Avatar } from '../cmps/avatar'
@@ -147,10 +149,42 @@ export function ProfilePage(){
         try {
             await updateProfile(user._id, {password: pw.next, currentPassword: pw.current})
             setPw({current: '', next: '', repeat: ''})
-            flash(t('profile.passwordChanged'))
+            // The server ends every session on a password change, this one
+            // included — a password changed because somebody else knew it is
+            // worth little while their tab is still open. So: say so, and go
+            // to the login rather than let the next click fail with a 401.
+            flash(t('profile.passwordChangedSignOut'))
+            setTimeout(signOut, 1500)
         } catch(e) {
             setErr(readErr(e))
         } finally {
+            setBusy(false)
+        }
+    }
+
+    /** Local clean-up. The server has already invalidated the cookie. */
+    async function signOut(){
+        try {
+            await logout()
+        } catch(e) { /* the session is gone either way */
+        }
+        navigate('/auth/login', {replace: true})
+    }
+
+    async function onLogoutEverywhere(){
+        const ok = await confirmDelete({
+            what: t('profile.logoutAllWhat'),
+            note: t('profile.logoutAllNote'),
+            button: t('profile.logoutAll')
+        })
+        if(!ok) return
+        setErr(null)
+        setBusy(true)
+        try {
+            await userService.logoutEverywhere(user._id)
+            await signOut()
+        } catch(e) {
+            setErr(readErr(e))
             setBusy(false)
         }
     }
@@ -205,6 +239,13 @@ export function ProfilePage(){
                         </div>
                         <button className="profile-btn" type="submit" disabled={busy || !fullname.trim()}>{t('profile.saveName')}</button>
                     </form>
+                </div>
+
+                <div className="profile-card">
+                    <h2 className="profile-section-title">{t('profile.sessions')}</h2>
+                    <p className="profile-hint">{t('profile.sessionsHint')}</p>
+                    <button type="button" className="profile-btn-ghost" disabled={busy}
+                        onClick={onLogoutEverywhere}>{t('profile.logoutAll')}</button>
                 </div>
 
                 <div className="profile-card">

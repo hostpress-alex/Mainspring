@@ -46,6 +46,23 @@ async function deleteUser(req, res){
     }
 }
 
+/**
+ * Sign this person out of every browser, including the one asking.
+ *
+ * The cookie goes with the answer: it is invalid from this moment on, and
+ * leaving it in place only means the next request finds out the hard way.
+ */
+async function logoutEverywhere(req, res){
+    try {
+        const result = await userService.logoutEverywhere(req.params.id, getRequester())
+        if(String(getRequester()?._id) === String(req.params.id)) res.clearCookie('loginToken')
+        res.json(result)
+    } catch(err) {
+        if(!err.status) logger.error('Failed to sign the user out everywhere', err)
+        res.status(err.status || 500).send({err: err.status?err.message:'Failed to sign out'})
+    }
+}
+
 /** Switch an account back on, or off, by name. Admins only. */
 async function setUserState(req, res){
     try {
@@ -82,6 +99,7 @@ module.exports = {
     getUsers,
     deleteUser,
     setUserState,
+    logoutEverywhere,
     updateUser,
     addUser
 }

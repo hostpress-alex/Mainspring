@@ -191,7 +191,8 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         setUploadErr(null)
         setIsUploading(true)
         try {
-            const saved = await uploadFile(file, {scope: 'task', taskId: currTask.id, name: file.name})
+            const saved = await uploadFile(file,
+                {scope: 'task', taskId: currTask.id, boardId: board?._id, name: file.name})
             return {...saved, name: saved.name || file.name || t('file.file')}
         } catch(err) {
             setUploadErr(err.message || t('file.uploadFailed'))

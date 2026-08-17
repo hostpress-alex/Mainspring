@@ -37,6 +37,7 @@ const searchRoutes = require('./api/search/search.routes')
 const {setupSocketAPI} = require('./services/socket.service')
 
 // routes
+const logger = require('./services/logger.service')
 const setupAsyncLocalStorage = require('./middlewares/setupAls.middleware')
 app.all('/*splat', setupAsyncLocalStorage)
 
@@ -50,11 +51,23 @@ app.use('/api/automation', automationRoutes)
 app.use('/api/search', searchRoutes)
 setupSocketAPI(http)
 
+/**
+ * Anything under /api that no route claimed is a mistake, and says so.
+ *
+ * Without this it fell through to the catch-all below and answered the single
+ * page application: HTTP 200, Content-Type text/html, for a mistyped endpoint.
+ * A client checking `res.ok` sees success and then fails somewhere else
+ * entirely, on markup it tried to read as JSON.
+ */
+app.use('/api', (req, res) => {
+    logger.warn(`Unknown endpoint: ${req.method} ${req.originalUrl}`)
+    res.status(404).json({err: 'Unknown endpoint'})
+})
+
 app.get('/*splat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
 
-const logger = require('./services/logger.service')
 const port = process.env.PORT || 3030
 
 /**

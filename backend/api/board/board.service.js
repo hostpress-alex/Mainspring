@@ -15,6 +15,32 @@ const roles = require('./board.roles')
 const notifications = () => require('../notification/notification.service')
 const automations = () => require('../automation/automation.service')
 const automationEngine = require('../automation/automation.engine')
+const sockets = () => require('../../services/socket.service')
+
+/**
+ * Read the board back and tell everyone looking at it.
+ *
+ * Every write in this file ends with this. It replaces a relay between
+ * browsers: the client that saved used to broadcast its own idea of the board
+ * to the others, so a member could push a board that never existed — and, less
+ * dramatically but more often, whoever saved decided what everybody else saw.
+ *
+ * Now the answer to the writer and the push to the room are the same object,
+ * read from the database after the write.
+ *
+ * It never throws. A socket that is not there is not a reason for a save to
+ * fail — the writer already has the board in the reply either way.
+ */
+async function _pushed(boardId){
+    const board = await getById(boardId)
+    try {
+        sockets().emitToBoard({
+            type: 'board-add-update', boardId: sid(boardId), args: [board, board]})
+    } catch(err) {
+        logger.error('cannot push the board to its room', err)
+    }
+    return board
+}
 const userRepo = require('../user/user.repo')
 
 /** Wirft einen Fehler, den der Controller auf einen HTTP-Status abbilden kann. */
@@ -438,7 +464,7 @@ function _findParent(group, taskId){
 async function updateMeta(boardId, patch){
     await _requireBoard(boardId, {owner: true})
     await boardRepo.updateMeta(boardId, patch)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /**
@@ -455,7 +481,7 @@ async function setColumns(boardId, columns){
     await _requireBoard(boardId, {owner: true})
     if(!Array.isArray(columns)) throw httpError(400, 'columns muss eine Liste sein')
     await boardRepo.setColumns(boardId, columns)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function setMembers(boardId, members){
@@ -466,7 +492,7 @@ async function setMembers(boardId, members){
     if(orphanOwners.length) throw httpError(400, 'Owner koennen nicht als Mitglied entfernt werden')
     await boardRepo.setMembers(boardId, members)
     await notifications().boardMembersChanged({board, members, actor: getLoggedinUser()})
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /**
@@ -490,7 +516,7 @@ async function setMemberRole(boardId, userId, role){
     }
 
     await boardRepo.setMemberRole(boardId, target, role)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function setOwners(boardId, ownerIds){
@@ -502,7 +528,7 @@ async function setOwners(boardId, ownerIds){
         throw httpError(400, 'Owner muessen auch Mitglied des Boards sein')
     }
     await boardRepo.setOwners(boardId, wanted)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /** An editor may add a group, and what they add is theirs. */
@@ -513,21 +539,21 @@ async function addGroup(boardId, group, index = null){
     // Decided here, never taken from the request: a client that may name its
     // own group's creator may name anyone's.
     await boardRepo.addGroup(boardId, {...group, createdBy: user?sid(user._id):null}, index)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function removeGroup(boardId, groupId){
     const board = await _requireBoard(boardId)
     _requireGroupRights(board, _findGroup(board, groupId))
     await boardRepo.setGroupState(boardId, groupId, boardRepo.TRASHED, _me())
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function updateGroupMeta(boardId, groupId, patch){
     const board = await _requireBoard(boardId)
     _requireGroupRights(board, _findGroup(board, groupId))
     await boardRepo.updateGroupMeta(boardId, groupId, patch)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /**
@@ -587,7 +613,7 @@ async function replaceGroup(boardId, groupId, group){
             await automations().fire({board, kind: 'changed', groupId, task, changes})
         }
     }
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function reorderGroups(boardId, groupIds){
@@ -598,7 +624,7 @@ async function reorderGroups(boardId, groupIds){
         throw httpError(400, 'Die Gruppenliste stimmt nicht mit dem Board ueberein')
     }
     await boardRepo.reorderGroups(boardId, next)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function addTask(boardId, groupId, task, index = null){
@@ -611,14 +637,14 @@ async function addTask(boardId, groupId, task, index = null){
     // board's own list. A subtask appearing under a task is a different
     // sentence and would need a trigger of its own.
     await automations().fire({board, kind: 'created', groupId, task, changes: []})
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function removeTask(boardId, groupId, taskId){
     const board = await _requireBoard(boardId, {editor: true})
     _findTask(_findGroup(board, groupId), taskId)
     await boardRepo.setTaskState(boardId, taskId, boardRepo.TRASHED, _me())
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /** Der haeufigste Schreibvorgang ueberhaupt: einzelne Felder eines Tasks. */
@@ -637,7 +663,7 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
     await automations().fire({
         board, kind: 'changed', groupId, task: {...oldTask, ...patch},
         changes: automationEngine.changesOf(patch, oldTask, board.columns)})
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function replaceTask(boardId, groupId, taskId, task){
@@ -655,7 +681,7 @@ async function replaceTask(boardId, groupId, taskId, task){
     await automations().fire({
         board, kind: 'changed', groupId, task: {...oldTask, ...(task || {})},
         changes: automationEngine.changesOf(task || {}, oldTask, board.columns)})
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /**
@@ -673,7 +699,7 @@ async function addSubtask(boardId, groupId, parentId, subtask, index = null){
     if(!subtask || !subtask.id) throw httpError(400, 'task.id fehlt')
     await boardRepo.addSubtask(boardId, parentId, subtask, index)
     await notifications().taskAdded({board, groupId, task: subtask, parentId, actor: getLoggedinUser()})
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function reorderSubtasks(boardId, groupId, parentId, taskIds){
@@ -685,7 +711,7 @@ async function reorderSubtasks(boardId, groupId, parentId, taskIds){
         throw httpError(400, 'Die Subtaskliste stimmt nicht mit dem Task ueberein')
     }
     await boardRepo.setSubtasks(boardId, parentId, next)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /**
@@ -724,7 +750,7 @@ async function setTaskParent(boardId, groupId, taskId, parentId = null, index = 
     }
 
     await boardRepo.setTaskParent(boardId, taskId, parentId || null, index)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function reorderTasks(boardId, groupId, taskIds){
@@ -736,7 +762,7 @@ async function reorderTasks(boardId, groupId, taskIds){
         throw httpError(400, 'Die Taskliste stimmt nicht mit der Gruppe ueberein')
     }
     await boardRepo.setGroupTasks(boardId, groupId, next)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function moveTask(boardId, fromGroupId, toGroupId, taskId, index = null){
@@ -749,13 +775,13 @@ async function moveTask(boardId, fromGroupId, toGroupId, taskId, index = null){
             (from.tasks || []).map(t => t.id))
     }
     await boardRepo.moveTask(boardId, fromGroupId, toGroupId, task, index)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function addActivity(boardId, activity){
     await _requireBoard(boardId, {editor: true})
     await boardRepo.addActivity(boardId, activity)
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 
@@ -795,7 +821,7 @@ async function setGroupState(boardId, groupId, state){
     if(!group) throw httpError(404, 'Gruppe nicht gefunden')
     _requireGroupRights(board, group)
     await boardRepo.setGroupState(boardId, groupId, state, _me())
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 async function setTaskState(boardId, taskId, state){
@@ -804,7 +830,7 @@ async function setTaskState(boardId, taskId, state){
     const task = await boardRepo.findTaskRow(boardId, taskId)
     if(!task) throw httpError(404, 'Task nicht gefunden')
     await boardRepo.setTaskState(boardId, taskId, state, _me())
-    return await getById(boardId)
+    return await _pushed(boardId)
 }
 
 /** What is in one bin. Anybody who may see the board may see what left it. */

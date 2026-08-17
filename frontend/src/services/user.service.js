@@ -15,6 +15,7 @@ export const userService = {
     getUsers,
     getById,
     remove,
+    logoutEverywhere,
     setUserState,
     update,
     create,
@@ -32,6 +33,16 @@ window.userService = userService
  */
 function getUsers({withInactive = false} = {}){
     return httpService.get(BASE_URL + (withInactive?'?withInactive=true':''))
+}
+
+/**
+ * End every session of this account, this browser included.
+ *
+ * There is no list of sessions to show: the cookie is the session, so the only
+ * honest control is "none of the old ones count any more".
+ */
+function logoutEverywhere(userId){
+    return httpService.put(`${BASE_URL}${userId}/sessions`, {})
 }
 
 /** Close an account or open it again. Nothing is ever deleted. */

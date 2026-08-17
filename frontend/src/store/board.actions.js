@@ -13,7 +13,6 @@ import {
     SET_DYNAMIC_MODAL
 } from './board.reducer.js'
 import {utilService} from '../services/util.service.js'
-import {socketService, SOCKET_EMIT_SEND_UPDATE_BOARD} from '../services/socket.service.js'
 
 /* ======================================================================
  * Why this file looks the way it does
@@ -95,7 +94,10 @@ function _applyBoard(fresh){
     const filteredBoard = boardService.getFilteredBoard(fresh, filter)
     store.dispatch({type: SET_BOARD, board: fresh})
     store.dispatch({type: SET_FILTER_BOARD, filteredBoard})
-    socketService.emit(SOCKET_EMIT_SEND_UPDATE_BOARD, {filteredBoard, board: fresh})
+    // No relay to the others any more. The server pushes the board it has just
+    // read back, to everyone in the room including this browser — that is the
+    // only version anybody can check, and it is no longer whoever saved who
+    // decides what the rest of the team sees.
     return fresh
 }
 
@@ -112,15 +114,28 @@ export async function loadBoards(filterBy){
     }
 }
 
+/**
+ * A board pushed by the server.
+ *
+ * Both arguments are the same board now — the event kept its shape so that a
+ * page left open across the deploy does not break. The filter is applied HERE,
+ * from this browser's own state: it used to arrive pre-filtered by whoever
+ * saved, which meant their filter briefly became everybody's.
+ */
 export async function loadSocketBoard(filteredBoard, board){
-    try {
-        _rememberServer(board)
-        store.dispatch({type: SET_BOARD, board})
-        if(!filteredBoard) store.dispatch({type: SET_FILTER_BOARD, filteredBoard: board})
-        else store.dispatch({type: SET_FILTER_BOARD, filteredBoard})
-    } catch(err) {
-        throw err
-    }
+    const fresh = board || filteredBoard
+    if(!fresh || !fresh._id) return
+
+    // A push for a board this browser is not looking at any more. It arrives
+    // while switching boards, and applying it would put the previous one back
+    // on screen.
+    const current = store.getState().boardModule.board
+    if(current && current._id !== fresh._id) return
+
+    _rememberServer(fresh)
+    const {filter} = store.getState().boardModule
+    store.dispatch({type: SET_BOARD, board: fresh})
+    store.dispatch({type: SET_FILTER_BOARD, filteredBoard: boardService.getFilteredBoard(fresh, filter)})
 }
 
 export async function loadBoard(boardId, filterBy){
@@ -163,7 +178,6 @@ export async function saveBoard(board){
     try {
         const newBoard = await boardService.save(board)
         store.dispatch({type, board: newBoard})
-        socketService.emit(SOCKET_EMIT_SEND_UPDATE_BOARD, {filteredBoard: null, board: newBoard})
         // On create it is the server that hands out the _id — hence newBoard, not board.
         return newBoard
     } catch(err) {

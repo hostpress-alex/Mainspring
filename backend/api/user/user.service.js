@@ -27,6 +27,7 @@ function withoutPassword(user){
 module.exports = {
     query,
     setState,
+    logoutEverywhere,
     getById,
     getByUsername,
     remove,
@@ -78,6 +79,34 @@ async function remove(userId, requester){
     return await setState(userId, 'inactive', requester)
 }
 
+/**
+ * Sign somebody out of everywhere, this browser included.
+ *
+ * Self or an administrator — the same rule as changing the profile. There is
+ * no list of sessions to show, because there are none: the cookie IS the
+ * session, so the only honest control is "none of the old ones count any
+ * more".
+ */
+async function logoutEverywhere(userId, requester){
+    const existing = await userRepo.findById(userId)
+    if(!existing) throw httpError(404, 'User not found')
+
+    const isSelf = requester && String(requester._id) === String(userId)
+    const isAdmin = requester && requester.isAdmin === true
+    if(!isSelf && !isAdmin) throw httpError(403, 'Kein Zugriff auf diesen Benutzer')
+
+    await revokeSessions(userId)
+    return {ok: true}
+}
+
+/** The line itself, plus everything that has to hear about it at once. */
+async function revokeSessions(userId){
+    await userRepo.setSessionsValidFrom(userId, Date.now())
+    // Lazily required: both of these read this file — see setState.
+    require('../../services/account.service').forget(userId)
+    require('../../services/socket.service').disconnectUser(userId)
+}
+
 async function setState(userId, state, requester){
     try {
         if(state !== 'active' && state !== 'inactive') throw httpError(400, 'Unbekannter Zustand')
@@ -90,6 +119,14 @@ async function setState(userId, state, requester){
         }
 
         await userRepo.setState(userId, state)
+
+        // Lazily required: account.service reads this file, and a plain
+        // require at the top would be a circle.
+        require('../../services/account.service').forget(userId)
+        if(state === 'inactive'){
+            // Their open tabs sit in board rooms and would go on being fed.
+            require('../../services/socket.service').disconnectUser(userId)
+        }
         return withoutPassword(await userRepo.findById(userId))
     } catch(err) {
         if(!err.status) logger.error(`cannot change the state of user ${userId}`, err)
@@ -108,6 +145,7 @@ async function update(user, requester){
 
         // Whitelist. Alles andere aus dem Request-Body wird ignoriert.
         const userToSave = {}
+        let changesPassword = false
         if(typeof user.fullname === 'string') userToSave.fullname = user.fullname
         if(typeof user.username === 'string' && user.username !== existing.username){
             const taken = await userRepo.findByUsername(user.username)
@@ -146,6 +184,12 @@ async function update(user, requester){
                 if(!ok) throw httpError(403, 'Aktuelles Passwort ist falsch')
             }
             userToSave.password = await bcrypt.hash(user.password, SALT_ROUNDS)
+            // Everything signed in with the old password stops working. A
+            // password changed because somebody else knew it is worth little
+            // while their tab is still open — and that includes the session
+            // making this very request, which is why the profile page signs
+            // out straight afterwards.
+            changesPassword = true
         }
         // Nur Admins duerfen das Admin-Flag setzen, und niemand sich selbst degradieren.
         if(typeof user.isAdmin === 'boolean' && isAdmin){
@@ -154,6 +198,7 @@ async function update(user, requester){
         }
 
         await userRepo.updateFields(existing._id, userToSave)
+        if(changesPassword) await revokeSessions(existing._id)
         return withoutPassword(await userRepo.findById(existing._id))
     } catch(err) {
         if(!err.status) logger.error(`cannot update user ${user._id}`, err)

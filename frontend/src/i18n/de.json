@@ -435,6 +435,12 @@
     },
     "profile":  {
         "changePassword":   "Passwort ändern",
+        "logoutAll":       "Überall abmelden",
+        "logoutAllNote":   "Auch dieses Fenster. Danach musst du dich neu anmelden.",
+        "logoutAllWhat":   "Alle Anmeldungen dieses Kontos",
+        "passwordChangedSignOut": "Passwort geändert. Alle Anmeldungen wurden beendet — du wirst neu angemeldet.",
+        "sessions":        "Anmeldungen",
+        "sessionsHint":    "Beendet jede Anmeldung dieses Kontos, in jedem Browser. Sinnvoll, wenn du dich an einem fremden Rechner nicht abgemeldet hast.",
         "choosePicture":    "Bild wählen",
         "currentPassword":  "Aktuelles Passwort",
         "fullName":         "Voller Name",

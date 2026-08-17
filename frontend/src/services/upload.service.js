@@ -39,6 +39,10 @@ export async function uploadFile(fileOrBlob, opts = {}){
     const params = new URLSearchParams()
     if(opts.scope) params.set('scope', opts.scope)
     if(opts.taskId) params.set('taskId', opts.taskId)
+    // The board decides who may download this again. Worked out here rather
+    // than from the task on the server: a task's key is (board_id, id), so a
+    // lookup by task id alone is unique only by luck.
+    if(opts.boardId) params.set('boardId', opts.boardId)
     // The server needs the name for two things: the download name and —
     // when the browser reports no usable type — working out the type.
     const name = opts.name || fileOrBlob.name

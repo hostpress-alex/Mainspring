@@ -149,6 +149,8 @@ Migrations, in order:
 | `20260816_000013_lifecycle.js` | `state` on board, group and task — bin and archive |
 | `20260816_000014_people_state.js` | `state` on user and board_member — switched off, not deleted |
 | `20260816_000015_drop_name_copies.js` | drops the copied names and pictures, adds foreign keys onto `user` |
+| `20260816_000016_session_epoch.js` | `user.sessions_valid_from` — sign out everywhere |
+| `20260816_000017_file_board.js` | `file.board_id` — who may download an upload |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -174,6 +176,40 @@ read state per person — which the other way round cannot have without storing
 **A subscription can be muted rather than deleted.** A deleted row cannot be
 told apart from never having subscribed, so the next assignment would sign the
 user up again to the thing they just switched off.
+
+**An upload belongs to a board.** `GET /api/upload/:id` asked for a login and
+nothing else: any signed-in person holding an id got the file, whatever board
+it came from. The ids are random, which is not a permission — a URL noted down
+before somebody was taken off a board went on working. `file.board_id` is
+written when the file is saved and checked when it is served; a file with no
+board (profile pictures live in this table too) stays open to anybody signed
+in. It is written rather than looked up through `task_id`, because a task's key
+is (board_id, id) and a lookup by task id alone is unique only by luck.
+
+**Boards are pushed by the server, not relayed between browsers.** Every write
+in board.service.js reads the board back and emits it to the board's room
+(`_pushed`). The old `board-send-update` let a client hand the others its own
+idea of a board, unverified — and, more often than that mattered, whoever
+happened to save decided what everybody else saw, filter and all.
+
+**A login has an age and can be taken back.** The token now carries `iat` and
+is refused after thirty days, whoever is holding it — before this it carried no
+time at all and a copied cookie worked forever. Revocation is
+`user.sessions_valid_from`: a token issued before that moment is not accepted.
+That is what "sign out everywhere" writes, and what a password change writes on
+its own. There is no session table because the cookie IS the session.
+
+*Tokens issued before this went live carry no `iat` and are refused, so
+everybody signs in once more after the deploy. Those are exactly the tokens
+that were going to be valid forever.*
+
+**The cookie says who, the database says what they may.** The login token
+carries `_id`, `fullname` and `isAdmin`, and until now nothing looked further —
+so an account switched off went on working until the browser was closed, and
+revoked admin rights lasted just as long. `requireAuth` now reads the row
+(services/account.service.js, cached ten seconds) and takes the rights from
+there. Ten seconds is the honest wording of the guarantee, and it is a
+different sentence from "until they next sign in".
 
 **A name is never copied, only looked up.** Every table that records who did
 something stores an id and nothing else; the name and the picture are filled in

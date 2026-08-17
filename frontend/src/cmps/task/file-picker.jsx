@@ -42,7 +42,7 @@ function asFile(value){
  * download stay — reading an attachment is reading — and only what would write
  * goes: the upload and the ×.
  */
-export function FilePicker({info, onUpdate, field = 'file', readOnly = false}){
+export function FilePicker({info, onUpdate, field = 'file', readOnly = false, board = null}){
     const [isBusy, setIsBusy] = useState(false)
     const [err, setErr] = useState(null)
     const [preview, setPreview] = useState(null)
@@ -67,7 +67,8 @@ export function FilePicker({info, onUpdate, field = 'file', readOnly = false}){
         setErr(null)
         setIsBusy(true)
         try {
-            const saved = await uploadFile(picked, {scope: 'task', taskId: info.id, name: picked.name})
+            const saved = await uploadFile(picked,
+                {scope: 'task', taskId: info.id, boardId: board?._id, name: picked.name})
             onUpdate(field, {
                 url: saved.url,
                 name: saved.name || picked.name || '',

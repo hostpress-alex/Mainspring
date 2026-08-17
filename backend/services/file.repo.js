@@ -16,6 +16,9 @@ function out(row){
         scope: row.scope,
         originalName: row.original_name || '',
         taskId: row.task_id,
+        // Which board this hangs off. null = none, which is what a profile
+        // picture is — see the file-board migration.
+        boardId: row.board_id || null,
         uploadedBy: row.uploaded_by_id,
         uploadedByName: row.uploaded_by_name,
         createdAt: row.created_at
@@ -31,6 +34,7 @@ function toRow(doc){
         scope: doc.scope || 'misc',
         original_name: doc.originalName || null,
         task_id: doc.taskId || null,
+        board_id: doc.boardId || null,
         uploaded_by_id: doc.uploadedBy || null,
         uploaded_by_name: doc.uploadedByName || null,
         created_at: doc.createdAt?new Date(doc.createdAt):new Date()

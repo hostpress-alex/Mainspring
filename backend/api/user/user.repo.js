@@ -21,6 +21,10 @@ function out(row){
         // 'active' or 'inactive'. A closed account keeps everything it wrote;
         // it just cannot be signed into any more.
         state: row.state || 'active',
+        // Tokens issued before this moment are refused. null = nothing has
+        // ever been revoked for this account.
+        sessionsValidFrom: (row.sessions_valid_from === null || row.sessions_valid_from === undefined)
+            ?null:Number(row.sessions_valid_from),
         // '' means the person never chose one — the browser decides.
         language: row.language || '',
         createdAt: row.created_at
@@ -62,6 +66,16 @@ async function setState(userId, state){
     await db()('user').where({id: sid(userId)}).update({state, state_at: Date.now()})
 }
 
+/**
+ * Draw a line: every token issued before `at` stops working.
+ *
+ * The whole of "sign out everywhere", in one column. There is no session table
+ * to empty because there are no sessions — the cookie is the session.
+ */
+async function setSessionsValidFrom(userId, at){
+    await db()('user').where({id: sid(userId)}).update({sessions_valid_from: Number(at)})
+}
+
 async function query(filterBy = {}){
     let q = db()('user')
     // Closed accounts are out unless somebody asks for them by name — the
@@ -101,4 +115,4 @@ async function deleteById(userId){
     await db()('user').where({id: sid(userId)}).del()
 }
 
-module.exports = {findAll, query, findById, findByUsername, insert, updateFields, deleteById, setState}
+module.exports = {findAll, query, findById, findByUsername, insert, updateFields, deleteById, setState, setSessionsValidFrom}

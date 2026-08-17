@@ -1,56 +1,25 @@
 /**
- * Passwords and the login cookie.
+ * Passwords, and starting a session.
  *
- * The cookie is not a random session id looked up in a table, it is the user
- * record itself, encrypted. Whoever knows the key can mint a cookie for any
- * account, admin included, without ever touching the database. So the key is
- * the whole of the security here.
+ * There is no signing key here any more, and that is the point of this file.
  *
- * It used to have a hardcoded fallback, which meant every checkout of this
- * repository shared one key. It does not any more: in production a missing
- * SECRET1 stops the server (see server.js), and in development the fallback
- * is named so that nobody mistakes it for a secret.
+ * The login cookie used to BE the user record, encrypted with SECRET1 —
+ * whoever knew that key could write `{_id: "<an admin's id>"}`, encrypt it,
+ * and be that admin. Guards were added around it (an age, a revocation date,
+ * rights read from the database rather than the token), and every one of them
+ * is a condition ON that credential. None of them helps against somebody who
+ * can issue new ones.
  *
- * Generate one with:  openssl rand -hex 32
+ * The cookie now carries 32 random bytes that mean nothing by themselves. The
+ * session is a row in the database (services/session.repo.js). Nothing can be
+ * derived, so nothing can be forged: SECRET1 no longer grants anything.
  */
-const Cryptr = require('cryptr')
 const bcrypt = require('bcrypt')
 const userService = require('../user/user.service')
+const sessionRepo = require('../../services/session.repo')
 const logger = require('../../services/logger.service')
-const config = require('../../config')
 
 const SALT_ROUNDS = 10
-
-/** Obvious on sight, and it never leaves a developer machine. */
-const DEV_SECRET = 'insecure-development-key-do-not-use-in-production'
-
-let cryptrInstance = null
-let warnedAboutDevSecret = false
-
-/**
- * Built on first use rather than at import time, so that a tool which only
- * wants userService does not fall over on a missing key.
- */
-function cryptr(){
-    if(cryptrInstance) return cryptrInstance
-
-    let secret = config.sessionSecret
-    if(!secret){
-        if(process.env.NODE_ENV === 'production'){
-            // server.js catches this at start-up. Reaching here means someone
-            // bypassed it, and carrying on would be worse than crashing.
-            throw new Error('SECRET1 is not set')
-        }
-        secret = DEV_SECRET
-        if(!warnedAboutDevSecret){
-            warnedAboutDevSecret = true
-            logger.warn('SECRET1 is not set, using the development key. Never do this on a reachable server.')
-        }
-    }
-
-    cryptrInstance = new Cryptr(secret)
-    return cryptrInstance
-}
 
 /**
  * A hash to compare against when the username does not exist.
@@ -90,25 +59,55 @@ async function signup({username, password, fullname, imgUrl}){
     return userService.add({username, password: hash, fullname, imgUrl, isAdmin: false})
 }
 
-function getLoginToken(user){
-    const userInfo = {_id: user._id, fullname: user.fullname, isAdmin: user.isAdmin}
-    return cryptr().encrypt(JSON.stringify(userInfo))
+/**
+ * How long a token is accepted, however carefully it is kept.
+ *
+ * The cookie itself has no `maxAge`, so a browser drops it when it closes —
+ * but the VALUE carried no time at all, and a copy of it worked forever. This
+ * is the ceiling on that: thirty days from the moment it was issued, whoever
+ * is holding it.
+ *
+ * Not a substitute for revocation. That is `sessions_valid_from` on the user,
+ * checked in requireAuth — this is the backstop for the tokens nobody knows
+ * about.
+ */
+const TOKEN_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000
+
+/**
+ * Start a session for somebody who has proved who they are.
+ *
+ * Returns the raw token, which is the one moment it exists outside the
+ * browser: the table holds its hash.
+ */
+async function startSession(user, {userAgent = '', ip = ''} = {}){
+    const {token} = await sessionRepo.create(user._id, {userAgent, ip})
+    return token
 }
 
-function validateToken(loginToken){
-    try {
-        return JSON.parse(cryptr().decrypt(loginToken))
-    } catch(err) {
-        // An expired or tampered cookie is normal traffic, not an incident.
-        // It used to print on every single request carrying a stale cookie.
-        logger.debug('Invalid login token')
-        return null
-    }
+/**
+ * Who is holding this token, or null.
+ *
+ * Null covers all of: no token, no such session, and one that has expired.
+ * They are the same answer on purpose — the reply must not say which.
+ */
+async function resolveSession(token){
+    const session = await sessionRepo.find(token)
+    if(!session) return null
+    // Fire and forget: pushing the expiry out must not make a request wait,
+    // and a lost touch only means the session expires a few minutes earlier.
+    Promise.resolve(sessionRepo.touch(session)).catch(err =>
+        logger.error('cannot refresh the session', err))
+    return session
+}
+
+async function endSession(token){
+    await sessionRepo.removeByToken(token)
 }
 
 module.exports = {
     signup,
     login,
-    getLoginToken,
-    validateToken
+    startSession,
+    resolveSession,
+    endSession
 }

@@ -182,7 +182,7 @@ export function TaskPreview({
  */
 export function DynamicCmp({column, info, onUpdate, board, width, readOnly = false}){
     const field = column.field || column.id
-    const props = {info, onUpdate, field, column, readOnly}
+    const props = {info, onUpdate, field, column, readOnly, board}
 
     const inner = renderPicker()
     return <div className="col-cell" style={width?widthStyle(width):undefined}>{inner}</div>

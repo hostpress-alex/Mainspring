@@ -995,6 +995,26 @@ async function findBin(boardId, state){
 }
 
 /**
+ * Is this person on this board, right now?
+ *
+ * One row, no assembly. Serving a file asks this on every request, and reading
+ * a whole board with its groups, tasks and comments to answer "may they" would
+ * turn every image on a board into a full board read.
+ */
+async function isMember(boardId, userId){
+    let id
+    try {
+        id = checkBoardId(boardId)
+    } catch(err) {
+        return false
+    }
+    const row = await db()('board_member')
+        .where({board_id: id, user_id: sid(userId), state: ACTIVE})
+        .first('user_id')
+    return Boolean(row)
+}
+
+/**
  * One group row, whatever state it is in.
  *
  * The assembled board only carries active groups, so restoring one cannot ask
@@ -1058,7 +1078,7 @@ module.exports = {
     addTask, addSubtask, setSubtasks, setTaskParent, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,
     addActivity,
     setBoardState, setGroupState, setTaskState, findBin, findBoardsByState,
-    findGroupRow, findTaskRow, purgeGroup, purgeTask,
+    findGroupRow, findTaskRow, purgeGroup, purgeTask, isMember,
     ACTIVE, ARCHIVED, TRASHED, STATES,
     MAX_ACTIVITIES
 }
