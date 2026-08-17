@@ -69,27 +69,13 @@ test('forgetting makes the next request read again', async () => {
     assert.strictEqual(reads, 1)
 })
 
-/* ----------------------------------------------------------- revocation -- */
-
-test('a token from before the line is refused', () => {
-    const user = {_id: 'u1', sessionsValidFrom: 5000}
-    assert.strictEqual(accountService.isRevoked(user, 4999), true)
-    assert.strictEqual(accountService.isRevoked(user, 5000), false, 'the one issued at that moment stands')
-    assert.strictEqual(accountService.isRevoked(user, 6000), false)
-})
-
-test('an account that has never revoked anything refuses nothing', () => {
-    // Every account today. Reading a missing line as "everything is revoked"
-    // would sign the whole company out on deploy.
-    assert.strictEqual(accountService.isRevoked({_id: 'u1'}, 1), false)
-    assert.strictEqual(accountService.isRevoked({_id: 'u1', sessionsValidFrom: null}, 1), false)
-})
-
-test('a token with no issue time is refused once a line exists', () => {
-    // The tokens from before the age check. Exactly the ones that would
-    // otherwise have been valid forever.
-    assert.strictEqual(accountService.isRevoked({sessionsValidFrom: 5000}, undefined), true)
-})
+/* ---------------------------------------------------------------------------
+ * The three tests that were here checked `isRevoked` — a date on the user
+ * compared against a timestamp in the token. That was the shape of revocation
+ * while there was nothing to delete. Sessions are rows now, so signing out is
+ * a DELETE and the question those tests asked cannot be asked any more. See
+ * session-store.test.js.
+ * ------------------------------------------------------------------------ */
 
 test('a database that is away is an error, not a logout', async () => {
     // Answering "not authenticated" would sign the whole company out for ten

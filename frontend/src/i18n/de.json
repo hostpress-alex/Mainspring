@@ -435,6 +435,11 @@
     },
     "profile":  {
         "changePassword":   "Passwort ändern",
+        "endSession":      "Abmelden",
+        "lastSeen":        "zuletzt",
+        "noSessions":      "Keine weiteren Anmeldungen.",
+        "thisDevice":      "dieses Gerät",
+        "unknownDevice":   "Unbekanntes Gerät",
         "logoutAll":       "Überall abmelden",
         "logoutAllNote":   "Auch dieses Fenster. Danach musst du dich neu anmelden.",
         "logoutAllWhat":   "Alle Anmeldungen dieses Kontos",

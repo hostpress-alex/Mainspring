@@ -70,13 +70,20 @@ function readCookie(header, name){
  * Returns null for anonymous sockets. Anonymous sockets are still allowed to
  * connect — the client opens its socket while the login page is on screen,
  * and refusing the connection there would put socket.io into a retry loop —
- * but they cannot join a room, send a message or push a board update.
+ * but they cannot join a room or send a message.
+ *
+ * Asynchronous now: the cookie is an opaque token and the session it names is
+ * a row. It used to be a decrypt, which is why this was a plain function.
  */
-function identify(handshake){
+async function identify(handshake){
     const header = handshake && handshake.headers && handshake.headers.cookie
     const token = readCookie(header, COOKIE_NAME)
     if(!token) return null
-    return authService.validateToken(token) || null
+    const session = await authService.resolveSession(token)
+    if(!session) return null
+    // Only the id is kept. Everything the socket decides is decided against
+    // the account read at that moment — see boardIfPermitted.
+    return {_id: session.userId}
 }
 
 /* ------------------------------------------------------------ permission -- */
@@ -160,15 +167,22 @@ function setupSocketAPI(http){
         }
     })
 
-    gIo.use((socket, next) => {
-        socket.data.user = identify(socket.handshake)
+    gIo.use(async (socket, next) => {
+        try {
+            socket.data.user = await identify(socket.handshake)
+        } catch(err) {
+            // A socket that cannot be identified connects as anonymous rather
+            // than not at all — see identify.
+            logger.error('cannot identify a socket', err)
+            socket.data.user = null
+        }
         socket.data.room = null
         socket.data.boardId = null
         next()
     })
 
     gIo.on('connection', socket => {
-        const who = () => (socket.data.user?socket.data.user.fullname:'anonymous')
+        const who = () => (socket.data.user?socket.data.user._id:'anonymous')
         logger.info(`Socket connected [id: ${socket.id}, user: ${who()}]`)
 
         // Anything addressed at this person goes here, whichever tab it is.

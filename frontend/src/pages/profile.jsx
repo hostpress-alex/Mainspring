@@ -5,6 +5,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import {logout, updateProfile} from '../store/user.actions'
 import {userService} from '../services/user.service'
 import {confirmDelete} from '../cmps/confirm-dialog'
+import {SessionList} from '../cmps/session-list'
 import {uploadAvatar, imagesFromClipboard} from '../services/upload.service'
 import {GUEST_IMG} from '../services/avatar'
 import { Avatar } from '../cmps/avatar'
@@ -244,6 +245,7 @@ export function ProfilePage(){
                 <div className="profile-card">
                     <h2 className="profile-section-title">{t('profile.sessions')}</h2>
                     <p className="profile-hint">{t('profile.sessionsHint')}</p>
+                    <SessionList userId={user._id} onCurrentEnded={signOut}/>
                     <button type="button" className="profile-btn-ghost" disabled={busy}
                         onClick={onLogoutEverywhere}>{t('profile.logoutAll')}</button>
                 </div>

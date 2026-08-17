@@ -27,8 +27,11 @@ require.cache[authServicePath] = {
             if(!loginSucceeds) throw new Error('Invalid username or password')
             return {_id: 'u1', username, fullname: 'Test', isAdmin: false}
         },
-        getLoginToken: () => 'a-token',
-        validateToken: () => null,
+        // The session is a row now; the controller asks for one and puts the
+        // token it gets back into the cookie.
+        startSession: async () => 'a-token',
+        resolveSession: async () => null,
+        endSession: async () => {},
         signup: async() => ({})
     }
 }
@@ -67,7 +70,11 @@ function fakeRes(){
     return res
 }
 
-const reqFrom = (ip, username, password = 'wrong') => ({ip, body: {username, password}})
+// `get` as well as the body: starting a session records the user agent, so
+// the controller asks the request for it.
+const reqFrom = (ip, username, password = 'wrong') => ({
+    ip, body: {username, password}, get: () => 'a-browser'
+})
 
 async function attempt(ip, username, password){
     const res = fakeRes()

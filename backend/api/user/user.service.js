@@ -28,6 +28,8 @@ module.exports = {
     query,
     setState,
     logoutEverywhere,
+    sessions,
+    endSession,
     getById,
     getByUsername,
     remove,
@@ -80,6 +82,52 @@ async function remove(userId, requester){
 }
 
 /**
+ * The devices this account is signed in on.
+ *
+ * Only ever your own, or an administrator asking about somebody else. The
+ * token is not in the answer and cannot be — the table holds its hash.
+ */
+async function sessions(userId, requester, currentId = null){
+    const existing = await userRepo.findById(userId)
+    if(!existing) throw httpError(404, 'User not found')
+    _requireSelfOrAdmin(userId, requester)
+
+    const rows = await require('../../services/session.repo').findForUser(userId)
+    return rows.map(row => ({
+        id: row.id,
+        createdAt: row.createdAt,
+        lastSeenAt: row.lastSeenAt,
+        userAgent: row.userAgent,
+        ip: row.ip,
+        // So the interface can say "this one" rather than asking somebody to
+        // work out which line is the browser they are reading it in.
+        isCurrent: Boolean(currentId) && row.id === currentId
+    }))
+}
+
+/** End one session — one device, not all of them. */
+async function endSession(userId, sessionId, requester){
+    const existing = await userRepo.findById(userId)
+    if(!existing) throw httpError(404, 'User not found')
+    _requireSelfOrAdmin(userId, requester)
+
+    const repo = require('../../services/session.repo')
+    // Checked against the owner rather than deleted by id: an id from
+    // somewhere else must not end somebody else's session.
+    const mine = await repo.findForUser(userId)
+    if(!mine.some(s => s.id === sessionId)) throw httpError(404, 'Sitzung nicht gefunden')
+
+    await repo.remove(sessionId)
+    return {ok: true}
+}
+
+function _requireSelfOrAdmin(userId, requester){
+    const isSelf = requester && String(requester._id) === String(userId)
+    const isAdmin = requester && requester.isAdmin === true
+    if(!isSelf && !isAdmin) throw httpError(403, 'Kein Zugriff auf diesen Benutzer')
+}
+
+/**
  * Sign somebody out of everywhere, this browser included.
  *
  * Self or an administrator — the same rule as changing the profile. There is
@@ -91,18 +139,22 @@ async function logoutEverywhere(userId, requester){
     const existing = await userRepo.findById(userId)
     if(!existing) throw httpError(404, 'User not found')
 
-    const isSelf = requester && String(requester._id) === String(userId)
-    const isAdmin = requester && requester.isAdmin === true
-    if(!isSelf && !isAdmin) throw httpError(403, 'Kein Zugriff auf diesen Benutzer')
+    _requireSelfOrAdmin(userId, requester)
 
     await revokeSessions(userId)
     return {ok: true}
 }
 
-/** The line itself, plus everything that has to hear about it at once. */
+/**
+ * End every session of this account.
+ *
+ * A DELETE, not a date to compare against. That was the shape of this while
+ * there was nothing to delete; there is now, and a row that is gone cannot be
+ * argued with.
+ */
 async function revokeSessions(userId){
-    await userRepo.setSessionsValidFrom(userId, Date.now())
-    // Lazily required: both of these read this file — see setState.
+    // Lazily required: all three read this file — see setState.
+    await require('../../services/session.repo').removeAllForUser(userId)
     require('../../services/account.service').forget(userId)
     require('../../services/socket.service').disconnectUser(userId)
 }

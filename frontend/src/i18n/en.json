@@ -435,6 +435,11 @@
     },
     "profile":  {
         "changePassword":   "Change password",
+        "endSession":      "Sign out",
+        "lastSeen":        "last used",
+        "noSessions":      "No other sign-ins.",
+        "thisDevice":      "this device",
+        "unknownDevice":   "Unknown device",
         "logoutAll":       "Sign out everywhere",
         "logoutAllNote":   "This window too. You will have to sign in again.",
         "logoutAllWhat":   "Every sign-in of this account",

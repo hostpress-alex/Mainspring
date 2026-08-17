@@ -81,13 +81,10 @@ async function start(){
     // The login cookie is the user record, encrypted. Without a real key it
     // is encrypted with one that is printed in the source, which means anyone
     // can write themselves an admin cookie. Refuse rather than pretend.
-    if(process.env.NODE_ENV === 'production' && !config.sessionSecret){
-        console.error('\nSECRET1 is not set.\n' +
-            '   The login cookie would be encrypted with a key that is public.\n' +
-            '   Generate one and put it in the environment:\n\n' +
-            '       openssl rand -hex 32\n')
-        process.exit(1)
-    }
+    // The check for SECRET1 was here. It guarded a key that signed the login
+    // cookie — and a key that can sign a cookie can sign an admin's. Sessions
+    // are rows now (services/session.repo.js); there is no key left to leak,
+    // so there is nothing to refuse to start without.
 
     try {
         await require('./db/knex').assertMigrated()

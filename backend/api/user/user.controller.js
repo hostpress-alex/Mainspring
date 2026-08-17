@@ -46,6 +46,30 @@ async function deleteUser(req, res){
     }
 }
 
+/** The devices this account is signed in on. Self or admin. */
+async function listSessions(req, res){
+    try {
+        const store = asyncLocalStorage.getStore()
+        res.json(await userService.sessions(req.params.id, getRequester(), store && store.sessionId))
+    } catch(err) {
+        if(!err.status) logger.error('Failed to list the sessions', err)
+        res.status(err.status || 500).send({err: err.status?err.message:'Failed to list the sessions'})
+    }
+}
+
+/** End one of them. If it is the one asking, its cookie goes too. */
+async function endSession(req, res){
+    try {
+        const store = asyncLocalStorage.getStore()
+        const result = await userService.endSession(req.params.id, req.params.sessionId, getRequester())
+        if(store && store.sessionId === req.params.sessionId) res.clearCookie('loginToken')
+        res.json(result)
+    } catch(err) {
+        if(!err.status) logger.error('Failed to end the session', err)
+        res.status(err.status || 500).send({err: err.status?err.message:'Failed to end the session'})
+    }
+}
+
 /**
  * Sign this person out of every browser, including the one asking.
  *
@@ -100,6 +124,8 @@ module.exports = {
     deleteUser,
     setUserState,
     logoutEverywhere,
+    listSessions,
+    endSession,
     updateUser,
     addUser
 }

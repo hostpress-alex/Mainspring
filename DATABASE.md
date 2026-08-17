@@ -126,6 +126,8 @@ notification    one row per recipient per event, with a read state
 task_subscription  who wants to hear about a task; muted = the explicit no
 file            upload metadata; the files themselves still live
                 under backend/uploads/ on disk
+session         one row per signed-in browser; the id is the SHA-256 of
+                the value in the cookie
 automation      per board: when this happens, do that
 automation_run  what a rule did, capped at 200 entries per board
 ```
@@ -151,6 +153,7 @@ Migrations, in order:
 | `20260816_000015_drop_name_copies.js` | drops the copied names and pictures, adds foreign keys onto `user` |
 | `20260816_000016_session_epoch.js` | `user.sessions_valid_from` — sign out everywhere |
 | `20260816_000017_file_board.js` | `file.board_id` — who may download an upload |
+| `20260816_000018_sessions.js` | `session` — the cookie stops being a credential you can mint |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -192,16 +195,24 @@ in board.service.js reads the board back and emits it to the board's room
 idea of a board, unverified — and, more often than that mattered, whoever
 happened to save decided what everybody else saw, filter and all.
 
-**A login has an age and can be taken back.** The token now carries `iat` and
-is refused after thirty days, whoever is holding it — before this it carried no
-time at all and a copied cookie worked forever. Revocation is
-`user.sessions_valid_from`: a token issued before that moment is not accepted.
-That is what "sign out everywhere" writes, and what a password change writes on
-its own. There is no session table because the cookie IS the session.
+**The cookie is not a credential anybody can mint.** It used to BE the user
+record, encrypted with SECRET1 — whoever knew that key could write
+`{_id: "<an admin's id>"}`, encrypt it and be that admin. Every guard put
+around it (an age, a revocation date, rights read from the row) was a condition
+ON that credential and helped only against a stolen one.
 
-*Tokens issued before this went live carry no `iat` and are refused, so
-everybody signs in once more after the deploy. Those are exactly the tokens
-that were going to be valid forever.*
+The cookie now carries 32 random bytes that mean nothing by themselves; the
+session is a row in `session`. Stored is the SHA-256 of the value, so a copy of
+that table is not a set of working cookies — the same reason a password column
+holds a hash. There is no key left to leak: **SECRET1 grants nothing**, and the
+start-up check for it is gone with it.
+
+Signing out is a DELETE. `user.sessions_valid_from`, added two hours earlier as
+the poor man's version of exactly this, is dropped in the same migration.
+Sessions expire 30 days after they were last used, pushed out on use and
+written at most every five minutes.
+
+*Everybody signs in once more after this deploy: the old cookies name no row.*
 
 **The cookie says who, the database says what they may.** The login token
 carries `_id`, `fullname` and `isAdmin`, and until now nothing looked further —

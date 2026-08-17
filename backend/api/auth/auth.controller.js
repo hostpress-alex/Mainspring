@@ -9,8 +9,12 @@ const config = require('../../config')
  * httpOnly so that no script can read it, sameSite Lax so it does not travel
  * with cross-site requests, secure once there is TLS to be secure over.
  */
-function setLoginCookie(res, user){
-    res.cookie('loginToken', authService.getLoginToken(user), {
+async function setLoginCookie(req, res, user){
+    const token = await authService.startSession(user, {
+        userAgent: req.get('user-agent') || '',
+        ip: addressOf(req)
+    })
+    res.cookie('loginToken', token, {
         httpOnly: true,
         sameSite: 'Lax',
         secure: process.env.NODE_ENV === 'production'
@@ -47,7 +51,7 @@ async function login(req, res){
     try {
         const user = await authService.login(username, password)
         throttle.recordSuccess(address, username)
-        setLoginCookie(res, user)
+        await setLoginCookie(req, res, user)
         logger.info(`User login: ${user.username || user.fullname}`)
         res.json(user)
     } catch(err) {
@@ -69,7 +73,7 @@ async function signup(req, res){
         logger.debug('auth.route - new account created: ' + JSON.stringify(account))
         const user = await authService.login(credentials.username, credentials.password)
         logger.info(`User signup: ${user.username || user.fullname}`)
-        setLoginCookie(res, user)
+        await setLoginCookie(req, res, user)
         res.json(user)
     } catch(err) {
         logger.error('Failed to signup ' + err)
@@ -77,11 +81,20 @@ async function signup(req, res){
     }
 }
 
+/**
+ * Sign out.
+ *
+ * The row goes as well as the cookie. Clearing the cookie alone used to be the
+ * whole of it — a copy of the value went on working, because there was nothing
+ * on the server that knew the session had ended.
+ */
 async function logout(req, res){
     try {
+        await authService.endSession(req.cookies && req.cookies.loginToken)
         res.clearCookie('loginToken')
         res.send({msg: 'Logged out successfully'})
     } catch(err) {
+        logger.error('Failed to logout', err)
         res.status(500).send({err: 'Failed to logout'})
     }
 }

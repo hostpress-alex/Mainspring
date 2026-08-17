@@ -40,26 +40,9 @@ async function currentUser(userId){
     return usable
 }
 
-/**
- * Was this token signed before the account drew a line under everything?
- *
- * "Sign out everywhere" and a password change both write that line. A token
- * older than it is refused — that is the whole revocation, because there is no
- * session table to empty.
- *
- * A missing `iat` counts as revoked whenever a line exists: those are the
- * tokens from before the age check, and they are the ones this was written
- * against.
- */
-function isRevoked(user, iat){
-    const validFrom = Number((user && user.sessionsValidFrom) || 0)
-    if(!validFrom) return false
-    return Number(iat || 0) < validFrom
-}
-
 /** Called when an account changes, so nobody has to wait the ten seconds out. */
 function forget(userId){
     cache.delete(String(userId || ''))
 }
 
-module.exports = {currentUser, forget, isRevoked, FRESH_MS}
+module.exports = {currentUser, forget, FRESH_MS}

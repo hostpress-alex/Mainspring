@@ -111,6 +111,55 @@
         border: 1px solid #e0e3ee;
     }
 
+    /**
+     * Where this account is signed in. One row per browser, this one marked.
+     *
+     * A grid rather than a flex row: the four parts line up down the list, and
+     * a long user agent shortens instead of pushing the button off the edge.
+     */
+    .session-list {
+        margin-bottom: 14px;
+    }
+
+    .session-row {
+        display: grid;
+        grid-template-columns: 18px minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid #e6e9ef;
+        font-size: 14px;
+
+        &:last-child {
+            border-bottom: 0;
+        }
+    }
+
+    .session-icon {
+        color: #676879;
+    }
+
+    .session-agent {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .session-badge {
+        margin-left: 8px;
+        padding: 1px 8px;
+        border-radius: 10px;
+        background: #eaf3ff;
+        color: #0073ea;
+        font-size: 12px;
+    }
+
+    .session-seen {
+        color: #676879;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
     .profile-error {
         background: #fff0f2;
         border: 1px solid #e2445c;

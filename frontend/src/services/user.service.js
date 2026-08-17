@@ -16,6 +16,8 @@ export const userService = {
     getById,
     remove,
     logoutEverywhere,
+    getSessions,
+    endSession,
     setUserState,
     update,
     create,
@@ -33,6 +35,16 @@ window.userService = userService
  */
 function getUsers({withInactive = false} = {}){
     return httpService.get(BASE_URL + (withInactive?'?withInactive=true':''))
+}
+
+/** The devices this account is signed in on, this one marked. */
+function getSessions(userId){
+    return httpService.get(`${BASE_URL}${userId}/sessions`)
+}
+
+/** End one of them. */
+function endSession(userId, sessionId){
+    return httpService.delete(`${BASE_URL}${userId}/sessions/${sessionId}`)
 }
 
 /**

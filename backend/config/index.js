@@ -36,6 +36,8 @@ config.allowSignup = process.env.ALLOW_SIGNUP !== 'false'
 // to a key that is named after what it is.
 //
 //   openssl rand -hex 32
+// Unused since sessions became rows. Kept for one release so that an
+// environment still setting SECRET1 does not look broken; nothing reads it.
 config.sessionSecret = process.env.SECRET1 || null
 
 // Set to true when the server sits behind a reverse proxy, so that Express
