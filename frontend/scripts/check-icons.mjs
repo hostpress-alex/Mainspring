@@ -16,12 +16,15 @@ const METADATA = 'node_modules/@fortawesome/fontawesome-free/metadata/icon-famil
 /**
  * `<Icon name='star' variant='fa-regular' />` — the usual way.
  *
+ * Both quote styles, because the codebase uses both and a check that only sees
+ * half the call sites is worse than none: it reports "all clear" either way.
+ *
  * The prop is `variant`, not `style`: `style` is the DOM attribute and was
  * renamed in cmps/icon.jsx. This pattern has to be kept in step with that
  * component, otherwise every icon silently counts as `fa-solid` and a
  * `fa-brands` icon like github is reported as needing Pro.
  */
-const USE = /<Icon\s+name='([a-z0-9-]+)'(?:\s+variant='fa-([a-z-]+)')?/g
+const USE = /<Icon\s+name=['"]([a-z0-9-]+)['"](?:\s+variant=['"]fa-([a-z-]+)['"])?/g
 
 /**
  * Icons chosen at runtime cannot be read out of the JSX. They are declared in
@@ -29,7 +32,7 @@ const USE = /<Icon\s+name='([a-z0-9-]+)'(?:\s+variant='fa-([a-z-]+)')?/g
  * way and the check sees them too. The key is deliberately not `icon:`, which
  * already means something else elsewhere (column.service.js).
  */
-const TABLE = /\bfaIcon:\s*'([a-z0-9-]+)'/g
+const TABLE = /\bfaIcon:\s*['"]([a-z0-9-]+)['"]/g
 
 function sourceFiles (dir, found = []) {
     for (const entry of readdirSync(dir)) {

@@ -27,6 +27,40 @@ export async function removeUser(userId){
     }
 }
 
+/**
+ * The restore is attempted once per page load, not once per guarded route.
+ *
+ * Every protected route asks the same question at the same moment, and the
+ * answer is the same for all of them. Holding the promise rather than a
+ * "already tried" flag matters: with a flag, the second route to ask would see
+ * "already tried", find no user yet, and redirect to the login page while the
+ * first one was still waiting for the answer.
+ */
+let restoreAttempt = null
+
+export function ensureSession(){
+    if(!restoreAttempt) restoreAttempt = restoreSession()
+    return restoreAttempt
+}
+
+/** Signing out invalidates the answer — otherwise it restores the old user. */
+export function forgetSession(){
+    restoreAttempt = null
+}
+
+/**
+ * Pick the session back up from the cookie.
+ *
+ * Returns the user, or null if there is none. Deliberately quiet: this runs on
+ * every cold start of the app, and "not signed in" is the ordinary case on the
+ * login page.
+ */
+export async function restoreSession(){
+    const user = await userService.restore()
+    if(user) store.dispatch({type: SET_USER, user})
+    return user
+}
+
 export async function login(credentials){
     try {
         const user = await userService.login(credentials)
@@ -70,6 +104,7 @@ export async function updateProfile(userId, changes){
 
 export async function logout(){
     try {
+        forgetSession()
         await userService.logout()
         store.dispatch({
             type: SET_USER,

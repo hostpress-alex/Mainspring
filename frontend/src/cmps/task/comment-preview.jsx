@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux'
 
 import { Icon } from '../icon'
 import {CommentMenuModal} from '../modal/modal-comment'
-import {utilService} from '../../services/util.service'
+import {formatRelative} from '../../services/date.util'
 import { Avatar } from '../avatar'
 import {AttachmentStrip} from './attachment-strip'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
@@ -42,6 +42,12 @@ export function CommentPreview({
     const isPinned = Boolean(comment.pinnedAt)
     const [editComment, setEditComment] = useState({...comment})
     const [isReplyOpen, setIsReplyOpen] = useState(false)
+    const [isThreadOpen, setIsThreadOpen] = useState(false)
+
+    // Oldest first in the list, so the ones that fold are the ones at the top.
+    const foldFrom = isThreadOpen?0:Math.max(0, replies.length - VISIBLE_REPLIES)
+    const hiddenReplies = replies.slice(0, foldFrom)
+    const shownReplies = replies.slice(foldFrom)
     const [replyTxt, setReplyTxt] = useState('')
     const [isSendingReply, setIsSendingReply] = useState(false)
 
@@ -78,39 +84,37 @@ export function CommentPreview({
 
     return (
         <section className={`comment-preview${isReply?' is-reply':''}${isPinned?' is-pinned':''}`}>
-            <div className="header-comment flex space-between">
-                <div className="left flex align-center">
-                    <Avatar src={comment.byMember?.imgUrl} alt=""/>
-                    <span>{comment.byMember?.fullname}</span>
-                    {/* Said in the list itself, not only in the menu: an
-                        update at the top for no visible reason looks like a
-                        sorting bug. */}
-                    {isPinned && <span className="pinned-badge">
-                        <Icon name='thumbtack'/>
-                        <span>{t('update.pinned')}</span>
-                    </span>}
-                </div>
-                <div className="right flex align-center">
-                    <div className="time flex align-center">
-                        <Icon name='clock' variant='fa-regular'/>
-                        <span>{utilService.calculateTime(comment.archivedAt)}</span>
-                    </div>
-                    {/* Edit and delete. A viewer sees it on their own comment
-                        and on nobody else's — the server says the same. */}
-                    <div ref={menuRef} className={`menu-icon-container ${isMenuModalOpen?' active':''}`}>
-                        {canWriteThis && <Icon name='ellipsis' onClick={() => setIsMenuModalOpen(!isMenuModalOpen)}/>}
-                        {isMenuModalOpen &&
-                            <CommentMenuModal onRemoveComment={onRemoveComment} commentId={comment.id} onOpenEdit={setIsEditOpen} setIsMenuModalOpen={setIsMenuModalOpen} taskId={taskId} isReply={isReply} isPinned={isPinned} onTogglePin={canPin?onTogglePin:null}/>}
-                    </div>
+            {/* Author, then when, on one line. Who wrote it is the first
+                thing anybody looks for in a thread, so it reads before the
+                text rather than beside it in grey. */}
+            <div className="comment-head">
+                <Avatar src={comment.byMember?.imgUrl} className="comment-avatar"/>
+                <span className="comment-author">{comment.byMember?.fullname || t('update.someone')}</span>
+                <time className="comment-when" dateTime={new Date(comment.archivedAt || 0).toISOString()}
+                    title={new Date(comment.archivedAt || 0).toLocaleString()}>
+                    {formatRelative(comment.archivedAt)}
+                </time>
+                {/* Said in the list itself, not only in the menu: an update at
+                    the top for no visible reason looks like a sorting bug. */}
+                {isPinned && <span className="pinned-badge">
+                    <Icon name='thumbtack'/>
+                    <span>{t('update.pinned')}</span>
+                </span>}
+                {/* Edit and delete. A viewer sees it on their own comment and
+                    on nobody else's — the server says the same. */}
+                <div ref={menuRef} className={`comment-tools menu-icon-container${isMenuModalOpen?' active':''}`}>
+                    {canWriteThis && <Icon name='ellipsis' onClick={() => setIsMenuModalOpen(!isMenuModalOpen)}/>}
+                    {isMenuModalOpen &&
+                        <CommentMenuModal onRemoveComment={onRemoveComment} commentId={comment.id} onOpenEdit={setIsEditOpen} setIsMenuModalOpen={setIsMenuModalOpen} taskId={taskId} isReply={isReply} isPinned={isPinned} onTogglePin={canPin?onTogglePin:null}/>}
                 </div>
             </div>
-            {!isEditOpen && <>
+            {!isEditOpen && <div className="comment-body">
                 {/* No `style` any more: it carried the whole-comment
                     formatting that this round replaced. Old comments still
                     hold it in the database and it is simply not read. */}
                 <RichTextView value={comment.txt}/>
                 <AttachmentStrip attachments={comment.attachments}/>
-            </>}
+            </div>}
             {isEditOpen && <form className="input-container">
                 <RichTextEditor
                     value={editComment.txt}
@@ -127,20 +131,13 @@ export function CommentPreview({
 
             {!isReply && !isEditOpen && (
                 <div className="comment-replies">
-                    {replies.length > 0 && (
-                        <ul className="reply-list">
-                            {replies.map(reply => (
-                                <li key={reply.id}>
-                                    <CommentPreview comment={reply} taskId={taskId} isReply onRemoveComment={onRemoveComment} onEditComment={onEditComment} members={members}/>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-
+                    {/* The button first, the thread after it. On a long thread
+                        the way to answer used to be at the bottom, so replying
+                        meant scrolling past everything already said. */}
                     {!isReplyOpen && (
                         <button type="button" className="reply-btn" onClick={() => setIsReplyOpen(true)}>
                             <Icon name='reply'/>
-                            <span>{replies.length?t('update.repliesCount', {n: replies.length}):t('update.replies')}</span>
+                            <span>{t('update.replies')}</span>
                         </button>
                     )}
 
@@ -159,7 +156,7 @@ export function CommentPreview({
                             />
                             <div className="reply-actions">
                                 <button type="submit" className="save" disabled={isRichEmpty(replyTxt) || isSendingReply}>
-                                    {isSendingReply?'Sendet…':t('update.replies')}
+                                    {isSendingReply?t('update.sending'):t('update.replies')}
                                 </button>
                                 <button type="button" className="cancel" onClick={() => {
                                     setIsReplyOpen(false);
@@ -168,8 +165,61 @@ export function CommentPreview({
                             </div>
                         </form>
                     )}
+
+                    {/* Only the last few, unless somebody asks for the rest.
+                        A thread of twenty answers pushes the next update off
+                        the screen, and the ones that matter are the recent
+                        ones — which is why the older ones fold and not the
+                        newer ones. */}
+                    {hiddenReplies.length > 0 && !isThreadOpen && (
+                        <button type="button" className="reply-more" onClick={() => setIsThreadOpen(true)}>
+                            <span className="reply-more-faces">
+                                {facesOf(hiddenReplies).map(person => (
+                                    <Avatar key={person._id} src={person.imgUrl} title={person.fullname}/>
+                                ))}
+                            </span>
+                            <span>{t('update.previousReplies', {n: hiddenReplies.length})}</span>
+                        </button>
+                    )}
+
+                    {shownReplies.length > 0 && (
+                        <ul className="reply-list">
+                            {shownReplies.map(reply => (
+                                <li key={reply.id}>
+                                    <CommentPreview comment={reply} taskId={taskId} isReply onRemoveComment={onRemoveComment} onEditComment={onEditComment} members={members}/>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
             )}
         </section>
     )
+}
+
+/**
+ * How many replies stay in view before the rest fold away.
+ *
+ * Three rather than all of them: the answer that matters is almost always the
+ * last one, and a thread that grows without bound buries the next update.
+ */
+const VISIBLE_REPLIES = 3
+
+/**
+ * Up to three distinct people out of the folded replies.
+ *
+ * Faces say more about whether a thread is worth opening than a number does —
+ * "three colleagues talked about this" is a different message from "one person
+ * wrote seven times".
+ */
+function facesOf(replies){
+    const seen = new Map()
+    for(const reply of replies){
+        const person = reply?.byMember
+        const id = person?._id?String(person._id):''
+        if(!id || seen.has(id)) continue
+        seen.set(id, {_id: id, imgUrl: person.imgUrl, fullname: person.fullname || ''})
+        if(seen.size === 3) break
+    }
+    return [...seen.values()]
 }

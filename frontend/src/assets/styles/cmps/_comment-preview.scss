@@ -1,86 +1,38 @@
-@use "sass:color";
 @use "../setup/functions";
 @use "../setup/mixins";
 @use "../setup/variables";
 
+/*
+ * An update, as a card.
+ *
+ * Three bands, and the order is the point: who and when, then what they said,
+ * then what you can do about it. The actions used to sit loose under the text
+ * with nothing between them, so a long update ran straight into its own reply
+ * button and the eye had to work out where one thread ended and the next
+ * began. A line and a change of background do that work instead.
+ */
+
+$comment-border: #e1e3eb;
+$comment-quiet: #676879;
+$comment-thread-bg: #f5f6f8;
+
 .comments-list {
-    li {
-        border-radius: 4px;
-        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-        margin-bottom: variables.$spacing-medium;
-        padding: variables.$spacing-medium;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 
-        .header-comment {
-            padding-bottom: variables.$spacing-small;
-            font-size: functions.rem(14px);
-            color: variables.$workspace-icon-color;
+    > li {
+        border: 1px solid $comment-border;
+        border-radius: 8px;
+        background: #fff;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        transition: box-shadow .15s, border-color .15s;
 
-            .left {
-                gap: variables.$spacing-small;
-                font-size: 16px;
-                color: variables.$primary-text-color;
-
-                img {
-                    @include mixins.members();
-                }
-
-                // Says why this update is at the top. Without it the order
-                // looks like a bug rather than a decision.
-                .pinned-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 4px;
-                    padding: 2px 8px;
-                    border-radius: 10px;
-                    background-color: variables.$workspace-board-active;
-                    color: variables.$workspace-icon-color;
-                    font-size: functions.rem(12px);
-                    white-space: nowrap;
-                }
-            }
-
-            .right {
-                gap: variables.$spacing-small;
-
-                .time {
-                    gap: 2px;
-                }
-
-                .menu-icon-container {
-                    @include mixins.center-flex();
-                    position: relative;
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 4px;
-
-                    &:hover {
-                        background-color: variables.$workspace-hover;
-                    }
-
-                    &.active {
-                        background-color: variables.$workspace-board-active;
-                    }
-
-                    .comment-modal {
-                        @include mixins.menu-modal();
-                        // Without this the menu looks clickable but behaves
-                        // like text.
-                        > * {
-                            cursor: pointer;
-                        }
-
-                        right: 0;
-                        width: 265px;
-                    }
-                }
-            }
-        }
-
-        p {
-            margin-top: variables.$spacing-small;
-            padding: 0 variables.$spacing-medium variables.$spacing-medium variables.$spacing-medium;
-            max-width: 540px;
-            overflow-wrap: break-word;
+        &:hover {
+            border-color: #c3c6d4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
         }
 
         // A pinned update is marked on its edge, so the block is recognisable
@@ -88,19 +40,90 @@
         &:has(.comment-preview.is-pinned) {
             border-left: 3px solid variables.$workspace-icon-color;
         }
+    }
+}
 
-        .cancel {
-            background-color: white;
-            color: black;
-            margin: 0;
-            height: 32px;
-            border-radius: 4px;
-            padding: variables.$spacing-xs variables.$spacing-small;
-            @include mixins.center-flex();
+.comment-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px 0;
 
-            &:hover {
-                background-color: variables.$workspace-hover;
-            }
+    .comment-avatar {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .comment-author {
+        font-weight: 600;
+        font-size: functions.rem(15px);
+        color: variables.$primary-text-color;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    // Written out — "vor 3 Tagen", not "3d". Quiet, because it is the second
+    // question, never the first.
+    .comment-when {
+        font-size: functions.rem(13px);
+        color: $comment-quiet;
+        white-space: nowrap;
+    }
+
+    .pinned-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background-color: variables.$workspace-board-active;
+        color: variables.$workspace-icon-color;
+        font-size: functions.rem(12px);
+        white-space: nowrap;
+    }
+
+    .comment-tools {
+        @include mixins.center-flex();
+        position: relative;
+        margin-left: auto;
+        width: 26px;
+        height: 26px;
+        border-radius: 4px;
+        color: $comment-quiet;
+        flex: 0 0 auto;
+
+        &:hover { background-color: variables.$workspace-hover; }
+        &.active { background-color: variables.$workspace-board-active; }
+
+        .comment-modal {
+            @include mixins.menu-modal();
+            > * { cursor: pointer; }
+            right: 0;
+            width: 265px;
         }
     }
+}
+
+.comment-body {
+    padding: 8px 16px 16px 58px;   // lines up under the name, not the avatar
+    overflow-wrap: anywhere;
+
+    p {
+        margin: 0 0 8px;
+        padding: 0;
+        max-width: none;
+        line-height: 1.55;
+
+        &:last-child { margin-bottom: 0; }
+    }
+}
+
+/* The edit form sits where the text was. */
+.comment-preview .input-container,
+.comment-preview .button-container {
+    padding: 0 16px 12px 58px;
 }

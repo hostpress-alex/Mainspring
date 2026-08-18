@@ -2,7 +2,7 @@
  * Date and layout helpers for the calendar.
  * All in local time, the week starts on Monday (DIN 1355).
  */
-import {getLanguage} from '../i18n'
+import {getLanguage, t} from '../i18n'
 
 /**
  * Weekday and month names come from the browser in the active language, so
@@ -216,4 +216,38 @@ export function layoutDay(entries, day){
 /** Round to a grid (e.g. 15 minutes) — for dragging and creating. */
 export function snapMinutes(minutes, step = 15){
     return Math.max(0, Math.min(1440, Math.round(minutes / step) * step))
+}
+
+/**
+ * "gerade eben", "vor 3 Tagen", "18. Aug.", "Sep. 2025".
+ *
+ * The old `calculateTime` said "3d" and "12m" — English abbreviations in a
+ * German interface, and ambiguous on top of it: "12m" reads as twelve months
+ * just as easily as twelve minutes. Written out there is nothing to decode.
+ *
+ * Beyond a week it stops counting and gives the date. "vor 34 Tagen" is a
+ * number nobody converts into a point in time; "18. Aug." is one everybody
+ * already has.
+ */
+export function formatRelative(ms){
+    const then = Number(ms)
+    if(!Number.isFinite(then) || then <= 0) return ''
+
+    const now = Date.now()
+    const seconds = Math.round((then - now) / 1000)
+    const abs = Math.abs(seconds)
+    const language = getLanguage()
+
+    if(abs < 60) return t('time.justNow')
+
+    const relative = new Intl.RelativeTimeFormat(language, {numeric: 'auto'})
+    if(abs < 60 * 60) return relative.format(Math.round(seconds / 60), 'minute')
+    if(abs < 60 * 60 * 24) return relative.format(Math.round(seconds / 3600), 'hour')
+    if(abs < 60 * 60 * 24 * 7) return relative.format(Math.round(seconds / 86400), 'day')
+
+    const date = new Date(then)
+    const sameYear = date.getFullYear() === new Date(now).getFullYear()
+    return new Intl.DateTimeFormat(language, sameYear
+        ?{day: 'numeric', month: 'short'}
+        :{month: 'short', year: 'numeric'}).format(date)
 }

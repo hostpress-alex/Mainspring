@@ -1,0 +1,432 @@
+@use "../setup/functions";
+@use "../setup/variables";
+
+/* Time tracking: the control in the row, the dialog, the history, and the
+   indicator in the sidebar. */
+
+$time-accent: #0073ea;
+$time-running: #00c875;
+$time-warn: #e2445c;
+
+/* --- the control, in the task's header -------------------------------- */
+
+.task-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+    // Pushed to the right-hand end of the header, opposite the title.
+    margin-left: auto;
+    padding-left: 12px;
+
+    .task-timer-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #676879;
+        cursor: pointer;
+        font-size: functions.rem(12px);
+
+        &:hover:not(:disabled) { background: #e6e9ef; color: #323338; }
+        &:disabled { opacity: .5; cursor: default; }
+        &.is-start:hover:not(:disabled) { color: $time-running; }
+        &.is-stop:hover:not(:disabled) { color: $time-warn; }
+    }
+
+    .task-timer-clock {
+        font-size: functions.rem(12px);
+        font-variant-numeric: tabular-nums;
+        color: $time-running;
+        font-weight: 600;
+        padding-right: 2px;
+    }
+
+    .task-timer-total {
+        font-size: functions.rem(12px);
+        font-variant-numeric: tabular-nums;
+        color: #676879;
+        white-space: nowrap;
+        padding-left: 4px;
+    }
+}
+
+/* --- the sign in the board row ---------------------------------------- */
+
+// Blinking, because it has to be noticed from the corner of the eye while
+// somebody is reading a different row. Opacity only — nothing moves, nothing
+// changes size, so the row does not twitch.
+@keyframes time-running-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .25; }
+}
+
+.task-running-dot {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    padding: 0 4px;
+    color: $time-running;
+    font-size: functions.rem(13px);
+    animation: time-running-pulse 1.4s ease-in-out infinite;
+
+    // A blinking element is a genuine problem for some people. The sign stays,
+    // the blinking goes.
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+/* --- the dialog ------------------------------------------------------- */
+
+.time-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.time-dialog {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 22px;
+    width: min(420px, calc(100vw - 32px));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .2);
+
+    .time-dialog-title {
+        margin: 0 0 10px;
+        font-size: functions.rem(17px);
+    }
+
+    .time-dialog-elapsed {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 0 14px;
+        color: #676879;
+        font-variant-numeric: tabular-nums;
+
+        .time-dialog-task {
+            color: #323338;
+            font-weight: 600;
+        }
+    }
+
+    .time-dialog-label {
+        display: block;
+        font-size: functions.rem(13px);
+        color: #676879;
+        margin-bottom: 4px;
+    }
+
+    .time-dialog-note {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #c3c6d4;
+        border-radius: 6px;
+        font-size: functions.rem(14px);
+        font-family: inherit;
+        resize: vertical;
+    }
+
+    .time-dialog-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        font-size: functions.rem(13px);
+        cursor: pointer;
+
+        // Nothing to post yet: shown, so the option is discoverable, but
+        // plainly not available.
+        &.is-off { opacity: .45; cursor: default; }
+    }
+
+    .time-dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 18px;
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: functions.rem(14px);
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .time-dialog-cancel {
+            background: #fff;
+            border-color: #c3c6d4;
+            color: #323338;
+        }
+
+        .time-dialog-ok {
+            background: $time-accent;
+            color: #fff;
+
+            &.is-ghost {
+                background: #fff;
+                border-color: $time-accent;
+                color: $time-accent;
+            }
+        }
+
+        button:disabled { opacity: .6; cursor: default; }
+    }
+}
+
+/* --- the history in the task modal ------------------------------------ */
+
+.time-panel {
+    padding: 16px 20px 24px;
+
+    .time-panel-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .time-panel-total-value {
+        font-size: functions.rem(22px);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        margin-right: 6px;
+    }
+
+    .time-panel-total-label { color: #676879; }
+
+    .time-panel-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border: 1px solid #c3c6d4;
+        border-radius: 6px;
+        background: #fff;
+        color: #323338;
+        cursor: pointer;
+        font-size: functions.rem(13px);
+
+        &:hover { background: #f5f6f8; }
+    }
+
+    .time-panel-people {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 10px 0 14px;
+        border-bottom: 1px solid #e6e9ef;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: functions.rem(13px);
+        }
+
+        .time-panel-avatar { width: 22px; height: 22px; border-radius: 50%; }
+        .time-panel-person-total { color: #676879; font-variant-numeric: tabular-nums; }
+    }
+
+    .time-panel-empty {
+        color: #676879;
+        padding: 12px 0;
+    }
+
+    .time-panel-list {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.time-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f1f4;
+
+    &:hover .time-entry-actions { opacity: 1; }
+
+    // A timer that is still going, and one the server had to close: both are
+    // numbers you cannot yet trust, and both say so with a stripe rather than
+    // with a sentence nobody reads twice.
+    &.is-running { border-left: 3px solid $time-running; padding-left: 8px; }
+    &.is-auto { border-left: 3px solid $time-warn; padding-left: 8px; }
+
+    .time-entry-avatar { width: 26px; height: 26px; border-radius: 50%; flex: 0 0 auto; }
+
+    .time-entry-body { flex: 1 1 auto; min-width: 0; }
+
+    .time-entry-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .time-entry-span { color: #676879; font-size: functions.rem(13px); font-variant-numeric: tabular-nums; }
+    .time-entry-duration { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .time-entry-tag {
+        font-size: functions.rem(11px);
+        padding: 1px 7px;
+        border-radius: 10px;
+        background: #e6e9ef;
+        color: #676879;
+
+        &.is-warn { background: #ffe6ea; color: #a3283a; }
+    }
+
+    .time-entry-note {
+        margin: 4px 0 0;
+        font-size: functions.rem(13px);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .time-entry-actions {
+        display: flex;
+        gap: 2px;
+        opacity: 0;
+        transition: opacity .12s;
+
+        button {
+            border: none;
+            background: transparent;
+            color: #676879;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+
+            &:hover { background: #e6e9ef; color: #323338; }
+        }
+    }
+}
+
+.time-entry-form {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #c3c6d4;
+    border-radius: 8px;
+    background: #f9fafc;
+
+    .time-entry-form-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+
+        label { display: flex; flex-direction: column; gap: 3px; font-size: functions.rem(12px); color: #676879; }
+        input { padding: 6px 8px; border: 1px solid #c3c6d4; border-radius: 6px; font-size: functions.rem(13px); }
+    }
+
+    .time-entry-form-note {
+        width: 100%;
+        margin-top: 10px;
+        padding: 7px 10px;
+        border: 1px solid #c3c6d4;
+        border-radius: 6px;
+        font-size: functions.rem(13px);
+    }
+
+    .time-entry-form-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        font-size: functions.rem(13px);
+        cursor: pointer;
+
+        &.is-off { opacity: .45; cursor: default; }
+    }
+
+    .time-entry-form-error { color: #a3283a; margin: 8px 0 0; font-size: functions.rem(13px); }
+
+    .time-entry-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+
+        button {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #c3c6d4;
+            background: #fff;
+            color: #323338;
+            cursor: pointer;
+            font-size: functions.rem(13px);
+
+            &.is-primary { background: $time-accent; border-color: $time-accent; color: #fff; }
+            &:disabled { opacity: .6; cursor: default; }
+        }
+    }
+}
+
+/* --- the indicator in the sidebar -------------------------------------- */
+
+.running-timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 12px;
+
+    // The rail is sized by its widest child, so anything in here that is wider
+    // than the icons makes the whole sidebar jump — every time a timer starts
+    // and again when it stops. It gets the rail's width and nothing more.
+    width: variables.$sidebar-main-width;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    .running-timer-open {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        border: none;
+        background: transparent;
+        color: $time-running;
+        cursor: pointer;
+        padding: 2px;
+    }
+
+    .running-timer-clock {
+        font-size: functions.rem(10px);
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .running-timer-actions {
+        display: flex;
+        gap: 2px;
+
+        button {
+            border: none;
+            background: transparent;
+            color: #c3c6d4;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: functions.rem(11px);
+
+            &:hover { color: #fff; background: rgba(255, 255, 255, .12); }
+        }
+    }
+}

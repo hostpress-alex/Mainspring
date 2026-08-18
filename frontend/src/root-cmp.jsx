@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {Routes, Route, Navigate, useLocation} from 'react-router'
 import {Provider, useSelector} from 'react-redux'
 import {BoardDetails} from './pages/board-details'
@@ -9,8 +9,35 @@ import {ProfilePage} from './pages/profile'
 import {CalendarPage} from './pages/calendar'
 import {AppShell} from './cmps/sidebar/app-shell'
 import {store} from './store/store'
+import {ensureSession} from './store/user.actions'
 import {ConfirmHost} from './cmps/confirm-dialog'
 import {ErrorBoundary} from './cmps/error-boundary'
+
+/**
+ * "Nobody is signed in" and "we have not asked yet" are different answers.
+ *
+ * The store starts out empty on every cold load — a new tab, a middle-clicked
+ * board, a restored window. Treating that as signed out is what used to send
+ * people to the login form while their cookie was perfectly valid. So: no user
+ * in the store means ask the server once, and decide when the answer is in.
+ */
+function useSession(){
+    const user = useSelector(storeState => storeState.userModule.user)
+    const [isAsking, setIsAsking] = useState(!user)
+
+    useEffect(() => {
+        if(user){
+            setIsAsking(false)
+            return
+        }
+        let alive = true
+        setIsAsking(true)
+        ensureSession().finally(() => { if(alive) setIsAsking(false) })
+        return () => { alive = false }
+    }, [user])
+
+    return {user, isAsking}
+}
 
 /**
  * Protects a route. Without a logged-in user it redirects to /auth/login; the
@@ -18,16 +45,21 @@ import {ErrorBoundary} from './cmps/error-boundary'
  * there after logging in.
  */
 function RequireAuth({children}){
-    const user = useSelector(storeState => storeState.userModule.user)
+    const {user, isAsking} = useSession()
     const location = useLocation()
 
+    // Nothing, deliberately: a spinner for the few milliseconds this takes
+    // reads as a page that is broken, and a flash of the login form reads as
+    // being thrown out.
+    if(isAsking) return null
     if(!user) return <Navigate to="/auth/login" replace state={{from: location.pathname + location.search}}/>
     return children
 }
 
 /** Like RequireAuth, additionally demands the admin flag. */
 function RequireAdmin({children}){
-    const user = useSelector(storeState => storeState.userModule.user)
+    const {user, isAsking} = useSession()
+    if(isAsking) return null
     if(!user) return <Navigate to="/auth/login" replace/>
     if(!user.isAdmin) return <Navigate to="/" replace/>
     return children

@@ -57,7 +57,7 @@ async function getById(userId){
     }
 }
 
-/** Mit Passwort — wird fuer die Anmeldung gebraucht. */
+/** With the password — the login needs it. */
 async function getByUsername(username){
     try {
         return await userRepo.findByUsername(username)

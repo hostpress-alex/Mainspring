@@ -11,6 +11,7 @@ import { Avatar } from '../avatar'
 import {NotificationBell} from '../notification/notification-bell'
 import {SearchPanel} from '../search/search-panel'
 import {t} from '../../i18n'
+import {RunningTimer} from '../time/running-timer'
 
 /**
  * Left-hand main navigation. Runs in two contexts:
@@ -94,6 +95,10 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
             {isSearchOpen && <SearchPanel onClose={() => setIsSearchOpen(false)}/>}
 
             <div className="bottom">
+                {/* Only visible while something runs — see running-timer.jsx.
+                    Above the avatar, because it is the one thing here that is
+                    costing time while it is being ignored. */}
+                <RunningTimer/>
                 <Tooltip title={user?t('nav.profileTooltip', {name: user.fullname}):t('nav.login')} arrow placement="right">
                     <Avatar className="logged-user-img" src={user?.imgUrl} onClick={() => setIsLoginModalOpen && setIsLoginModalOpen(prev => !prev)}/>
                 </Tooltip>

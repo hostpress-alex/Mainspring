@@ -15,6 +15,9 @@ $login-bg: #f7f7f7;
 $border-color: #d0d4e466;
 $sidebar-workspace-bg: #F6F7FB;
 $sidebar-main-bg: #292f4c;
+// The narrow icon rail on the left. Named because more than one thing has to
+// fit inside it without making it wider — see the running timer.
+$sidebar-main-width: 66px;
 $menu-icon-color: #6c6cff;
 $workspace-width: 255px;
 $workspace-icon-color: #676879;

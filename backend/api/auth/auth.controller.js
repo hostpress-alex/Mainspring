@@ -99,8 +99,26 @@ async function logout(req, res){
     }
 }
 
+/**
+ * Who is signed in.
+ *
+ * The browser holds the login cookie, and until this route existed it had no
+ * way to ask what the cookie meant. The signed-in user lived only in
+ * `sessionStorage`, which is per TAB — so a second tab showed the login form
+ * to somebody who was perfectly well signed in, and any 401 anywhere emptied
+ * that store and locked the person out of a session that was still valid.
+ *
+ * There is nothing to look up here: requireAuth has already resolved the
+ * session and the account, and getById strips the password hash on the way
+ * out. This route is the answer to a question, not a second source of truth.
+ */
+async function me(req, res){
+    res.json(req.loggedinUser)
+}
+
 module.exports = {
     login,
     signup,
-    logout
+    logout,
+    me
 }

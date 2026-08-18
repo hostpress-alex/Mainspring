@@ -6,7 +6,7 @@
     flex-direction: column;
     justify-content: space-between;
     background-color: variables.$sidebar-main-bg;
-    min-width: 66px;
+    min-width: variables.$sidebar-main-width;
     height: 100vh;
     position: sticky;
     top: 0;
@@ -91,6 +91,10 @@
 
     .bottom {
         @include mixins.center-flex();
+        // A column, so the running timer sits ABOVE the picture instead of
+        // beside it — side by side it made the rail wider and read as a second
+        // account rather than as a state.
+        flex-direction: column;
         gap: variables.$spacing-medium;
         padding: variables.$spacing-medium 0;
     }

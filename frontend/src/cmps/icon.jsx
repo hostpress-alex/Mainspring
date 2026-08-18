@@ -33,6 +33,13 @@
 export const ICON_STYLE = 'fa-solid'
 
 export function Icon({name, variant = ICON_STYLE, fixedWidth = false, className = '', ...rest}){
-    const classes = [variant, `fa-${name}`, fixedWidth && 'fa-fw', className].filter(Boolean).join(' ')
+    // `name` is written WITHOUT the fa- prefix; this adds it. Writing it out
+    // produced `fa-fa-…`, which matches no rule and renders an empty box that
+    // looks exactly like an icon that has not loaded yet — so it is caught
+    // here, where it is cheap, instead of by eye on a page nobody opened.
+    const clean = String(name || '').replace(/^fa-/, '')
+    if(import.meta.env?.DEV && clean !== name) console.warn('[icon] name should not start with fa-:', name)
+
+    const classes = [variant, `fa-${clean}`, fixedWidth && 'fa-fw', className].filter(Boolean).join(' ')
     return <i className={classes} aria-hidden="true" {...rest} />
 }

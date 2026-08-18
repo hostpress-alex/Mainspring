@@ -38,7 +38,13 @@ async function ajax(endpoint, method = 'GET', data = null){
     } catch(err) {
         console.log(`Had Issues ${method}ing to the backend, endpoint: ${endpoint}, with data: `, data)
         console.dir(err)
-        if(err.response && err.response.status === 401){
+        // Asking who is signed in and being told "nobody" is the answer, not
+        // an accident. Without this exception the check itself would clear the
+        // store and hard-navigate to the login page, which loses the path the
+        // person actually asked for.
+        const isSessionCheck = String(endpoint).startsWith('auth/me')
+
+        if(err.response && err.response.status === 401 && !isSessionCheck){
             sessionStorage.clear()
             // Do not redirect if we are already on the login page —
             // otherwise the reload swallows the error from the login attempt.

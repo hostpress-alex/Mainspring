@@ -18,6 +18,7 @@ import { Icon } from '../icon'
 import {GUEST_IMG} from '../../services/avatar'
 import * as boardRoles from '../../services/board-roles'
 import {widthOf, widthStyle, TASK_COLUMN} from '../board/column-width'
+import {TaskRunningDot} from '../time/task-timer'
 import {t} from '../../i18n'
 
 /**
@@ -149,9 +150,12 @@ export function TaskPreview({
                                 {...singleLineEditable({onFocus: toggleOnTyping})}>
                         <span>{task.title}</span>
                     </blockquote>
+                    {/* Only the fact that something is running. Operating it
+                        happens in the task itself, where its name is on
+                        screen — see task-timer.jsx. */}
+                    <TaskRunningDot board={board} task={task}/>
                     <div className="open-task-details " onClick={onOpenModal}>
-                        <Icon name='expand'/>
-                        <span className="open-btn">{t('common.open')}</span>
+                        <Icon name='up-right-and-down-left-from-center'/>
                     </div>
                     <div onClick={onOpenModal} className="chat-icon">
                         {updateCount > 0 && <div>

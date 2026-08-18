@@ -10,6 +10,9 @@ import {singleLineEditable} from '../../services/editable'
 import {utilService} from '../../services/util.service'
 import {CommentPreview} from '../task/comment-preview'
 import {ActivityPreview} from '../activity-preview'
+import {TimePanel} from '../time/time-panel'
+import {TaskTimerControls} from '../time/task-timer'
+import {useBoardTotals} from '../time/use-board-totals'
 import {ErrorBoundary} from '../error-boundary'
 import {
     socketService,
@@ -30,7 +33,18 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
     const [comment, setComment] = useState(boardService.getEmptyComment())
     const [isWriteNewUpdate, setIsWriteNewUpdate] = useState(false)
     const [taskActivities, setTaskActivities] = useState([])
-    const [isShowUpdate, setIsShowUpdate] = useState(true)
+    /**
+     * Which of the three panels is open.
+     *
+     * This was a boolean while there were two, and the third one is exactly
+     * why it is not any more: `!isShowUpdate` meant "activity", which stops
+     * being true the moment there is somewhere else to be. The two old flags
+     * are derived below so the rest of this file did not have to change.
+     */
+    const timeTotals = useBoardTotals(board?._id)
+    const [tab, setTab] = useState('updates')
+    const isShowUpdate = tab === 'updates'
+    const isShowActivity = tab === 'activity'
     const [currTask, setCurrTask] = useState(task)
     const [isUploading, setIsUploading] = useState(false)
     const [uploadErr, setUploadErr] = useState(null)
@@ -255,17 +269,33 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
                     {task.title}
                 </blockquote>
             </div>
+            {/* The timer belongs where the task's name is: start it and you
+                can see what you started it on. */}
+            {boardRoles.canEdit(board, user) &&
+                <TaskTimerControls board={board} task={currTask} total={timeTotals[currTask.id] || 0}/>}
         </div>
         <div className="task-modal-type flex">
-            <div onClick={() => setIsShowUpdate(!isShowUpdate)} className={`updates-btn ${isShowUpdate?'active':''}`}>
-                <Icon name='house'/>
-                <span>{t('update.updates')}</span>
+            <div onClick={() => setTab('updates')} className={`updates-btn ${isShowUpdate?'active':''}`}>
+                {/* Was a house, inherited from the template. An update is a
+                    message, not a home page. */}
+                <Icon name='comment' variant='fa-regular'/>
+                {/* The number belongs on the tab: how much is in there is the
+                    reason to click it, and finding out by clicking is one
+                    click too many. */}
+                <span>{t('update.updates')}{threads.length?` · ${threads.length}`:''}</span>
             </div>
-            <div onClick={() => setIsShowUpdate(!isShowUpdate)} className={`activity-btn ${!isShowUpdate?'active':''}`}>
+            <div onClick={() => setTab('activity')} className={`activity-btn ${isShowActivity?'active':''}`}>
                 <span>{t('activity.activity')}</span>
             </div>
+            <div onClick={() => setTab('time')} className={`time-btn ${tab === 'time'?'active':''}`}>
+                <Icon name='stopwatch'/>
+                <span>{t('time.times')}</span>
+            </div>
         </div>
-        {!isShowUpdate && <ErrorBoundary label={t('activity.area')}>
+        {tab === 'time' && <ErrorBoundary label={t('time.times')}>
+            <TimePanel board={board} task={currTask}/>
+        </ErrorBoundary>}
+        {isShowActivity && <ErrorBoundary label={t('activity.area')}>
             <ul className="activities">
                 {
                     taskActivities.map((activity, idx) => {
@@ -323,8 +353,7 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
                     <img src={noUpdate} alt=""/>
                     <div className="txt flex column align-center">
                         <h2>{t('update.none')}</h2>
-                        <p>Be the first one to update about progress, mention someone
-                            <br/>or upload files to share with your team members </p>
+                        <p>{t('update.noneHint')}</p>
                     </div>
                 </div>}
         </section>}

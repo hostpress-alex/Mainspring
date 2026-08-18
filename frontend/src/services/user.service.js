@@ -11,6 +11,7 @@ export const userService = {
     logout,
     signup,
     getLoggedinUser,
+    restore,
     saveLocalUser,
     getUsers,
     getById,
@@ -97,6 +98,31 @@ async function signup(userCred){
     const user = await httpService.post('auth/signup', userCred)
     socketService.login(user._id)
     return saveLocalUser(user)
+}
+
+/**
+ * Who does the cookie say we are?
+ *
+ * The signed-in user lives in `sessionStorage`, and `sessionStorage` is per
+ * TAB: a second tab, a middle-click on a board, a restored window — all of
+ * them start out empty and used to show the login form to somebody who was
+ * signed in the whole time. The cookie knew; nothing asked it.
+ *
+ * Returns null rather than throwing when there is no session. "Nobody is
+ * signed in" is an answer, not a failure, and the caller has to be able to
+ * tell it apart from "the server is down".
+ */
+async function restore(){
+    try {
+        const user = await httpService.get('auth/me')
+        if(!user || !user._id) return null
+        // Same as after a real login: the socket handshake was made before we
+        // knew who this was, so it has to be made again.
+        socketService.login(user._id)
+        return saveLocalUser(user)
+    } catch(err) {
+        return null
+    }
 }
 
 async function logout(){

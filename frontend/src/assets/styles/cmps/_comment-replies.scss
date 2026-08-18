@@ -1,62 +1,123 @@
+@use "../setup/functions";
 @use "../setup/variables";
 
 /*
- * Replies to an update.
+ * Replies, and the bar above them.
  *
- * The selectors deliberately hang under .comments-list: there
- * `li { border: 1px solid …; padding: 16px; margin-bottom: 16px }` applies to
- * the updates. Without higher specificity every reply gets the same frame and
- * would look like an update in its own right.
+ * One band at the foot of the card: a line, a different background, and inside
+ * it every reply as its own small block. The whole point is that a reply must
+ * never be mistakable for an update of its own — before this they carried the
+ * same frame and the thread read as four separate posts.
+ *
+ * The selectors hang under .comments-list because that is where the update
+ * tile is styled; without the extra specificity a reply inherits the card.
  */
+
+$reply-bg: #f5f6f8;
+$reply-block: #fff;
+$reply-border: #e1e3eb;
+$reply-quiet: #676879;
+
 .comment-replies {
-    margin-top: 10px;
-    border-top: 1px solid #e6e9ef;
-    padding-top: 6px;
+    border-top: 1px solid $reply-border;
+    background: $reply-bg;
+    padding: 8px 12px 10px;
 }
 
 .comments-list .comment-replies .reply-list {
     list-style: none;
     margin: 0 0 4px;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 /* The reset against the update tile. */
 .comments-list .comment-replies .reply-list > li {
     border: none;
-    border-left: 2px solid #e6e9ef;
     border-radius: 0;
-    margin: 0 0 2px;
-    padding: 2px 0 2px 12px;
+    margin: 0;
+    padding: 0;
     background: transparent;
+    box-shadow: none;
 }
 
 .comments-list .comment-replies .comment-preview.is-reply {
-    border: none;
-    box-shadow: none;
+    background: $reply-block;
+    border: 1px solid $reply-border;
+    border-radius: 6px;
     padding: 0;
     margin: 0;
+}
+
+/* Quieter than the update above it: smaller picture, smaller type. */
+.comments-list .comment-replies .comment-preview.is-reply .comment-head {
+    padding: 8px 10px 0;
+    gap: 8px;
+}
+
+.comments-list .comment-replies .comment-preview.is-reply .comment-avatar {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+}
+
+.comments-list .comment-replies .comment-preview.is-reply .comment-author {
+    font-size: functions.rem(14px);
+}
+
+.comments-list .comment-replies .comment-preview.is-reply .comment-when {
+    font-size: functions.rem(12px);
+}
+
+.comments-list .comment-replies .comment-preview.is-reply .comment-body {
+    padding: 4px 10px 10px 42px;
+    font-size: functions.rem(14px);
+}
+
+/*
+ * "Vorherige N Antworten".
+ *
+ * Faces rather than only a number: three people talking about something is a
+ * different thread from one person writing seven times, and that difference
+ * decides whether it is worth opening.
+ */
+.comments-list .comment-replies .reply-more {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    margin: 2px 0 6px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
     background: transparent;
+    color: variables.$board-btn;
+    font: inherit;
+    font-size: functions.rem(13px);
+    font-weight: 500;
+    cursor: pointer;
 }
 
-/* Smaller avatar and a quieter header than on the update itself. */
-.comments-list .comment-replies .comment-preview.is-reply .header-comment {
-    padding-bottom: 2px;
+.comments-list .comment-replies .reply-more:hover {
+    background: #e6e9ef;
 }
 
-.comments-list .comment-replies .comment-preview.is-reply .header-comment .left {
-    font-size: 14px;
+.comments-list .comment-replies .reply-more-faces {
+    display: inline-flex;
+    align-items: center;
 }
 
-.comments-list .comment-replies .comment-preview.is-reply .header-comment .left img {
-    width: 22px;
-    height: 22px;
-    min-width: 22px;
-    min-height: 22px;
-}
+.comments-list .comment-replies .reply-more-faces img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid $reply-bg;
+    margin-left: -7px;
 
-.comments-list .comment-replies .comment-preview.is-reply p {
-    font-size: 14px;
-    margin: 2px 0 0;
+    &:first-child { margin-left: 0; }
 }
 
 .comments-list .comment-replies .reply-btn {
@@ -65,18 +126,19 @@
     gap: 6px;
     border: none;
     background: transparent;
-    color: variables.$workspace-icon-color;
+    color: $reply-quiet;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 6px 8px;
     margin: 0;
     border-radius: 4px;
     font: inherit;
-    font-size: 13px;
+    font-size: functions.rem(13px);
+    font-weight: 500;
     width: auto;
 }
 
 .comments-list .comment-replies .reply-btn:hover {
-    background: variables.$workspace-hover;
+    background: #e6e9ef;
     color: variables.$primary-text-color;
 }
 
@@ -85,26 +147,6 @@
     flex-direction: column;
     gap: 6px;
     padding: 4px 0 2px;
-}
-
-.comments-list .comment-replies .reply-form textarea {
-    width: 100%;
-    box-sizing: border-box;
-    resize: vertical;
-    min-height: 54px;
-    padding: 8px;
-    border: 1px solid #c3c6d4;
-    border-radius: 4px;
-    font: inherit;
-    font-size: 14px;
-    line-height: 1.4;
-    color: variables.$primary-text-color;
-    background: variables.$app-bg;
-}
-
-.comments-list .comment-replies .reply-form textarea:focus {
-    outline: none;
-    border-color: variables.$board-btn;
 }
 
 .comments-list .comment-replies .reply-actions {
@@ -123,7 +165,7 @@
     color: variables.$app-bg;
     cursor: pointer;
     font: inherit;
-    font-size: 13px;
+    font-size: functions.rem(13px);
 }
 
 .comments-list .comment-replies .reply-actions .save:hover {
@@ -145,7 +187,7 @@
     color: variables.$primary-text-color;
     cursor: pointer;
     font: inherit;
-    font-size: 13px;
+    font-size: functions.rem(13px);
 }
 
 .comments-list .comment-replies .reply-actions .cancel:hover {

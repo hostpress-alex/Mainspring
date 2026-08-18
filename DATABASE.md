@@ -131,6 +131,8 @@ session         one row per signed-in browser; the id is the SHA-256 of
 automation      per board: when this happens, do that
 automation_run  what a rule did, capped at 200 entries per board
 board_view      a tab on a board: which rows, which drawing, who sees it
+task_time       one worked interval on a task: who, from when to when,
+                and what they wrote about it
 ```
 
 Migrations, in order:
@@ -157,6 +159,7 @@ Migrations, in order:
 | `20260816_000018_sessions.js` | `session` — the cookie stops being a credential you can mint |
 | `20260816_000019_board_views.js` | `board_view` — a filter with a name, shared with the board |
 | `20260817_000020_view_tabs.js` | `board_view.display` and `.visibility` — a saved filter becomes a tab |
+| `20260818_000021_task_time.js` | `task_time` — recorded working time, one row per interval |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -192,6 +195,31 @@ deliberately not somebody's private ones.
 The filter somebody currently has set is **not** in here: that lives in their
 browser, per board *and per tab*. Only the ones that get a name reach the
 server.
+
+**One worked interval is one row.** Somebody starts, pauses, comes back and
+stops: that is not one session with holes in it, it is three intervals.
+Storing them separately is what makes the two things anybody ever does cheap —
+adding them up, and correcting exactly one of them without disturbing the rest.
+A session row with a list of pauses inside it would make every correction a
+rewrite of the whole day.
+
+`ended_at IS NULL` means running, and there is at most one such row per person.
+That rule lives in the service, not in a constraint: MySQL has no partial
+unique index, and a unique key over `(user_id, ended_at)` would also forbid two
+finished intervals that happen to end in the same millisecond.
+
+`ended_by` is `pause`, `stop` or `auto`. Pause and stop produce an identical
+row — the same minutes, worked the same way — and are kept apart only so the
+history can say which happened and the interface knows what to offer next.
+`auto` is the one that matters: a timer somebody forgot is closed AT the cap
+(`TIME_MAX_HOURS`, 8 by default) rather than at the moment it is noticed, and
+marked, so it stands out as a figure to check instead of dissolving into a
+plausible-looking total.
+
+The times are stored unrounded. They are here to show where the day went, not
+to be invoiced; a rounding rule would only make them less true. If they ever do
+have to feed an invoice, that is the point at which rounding, closed periods
+and an export get designed — deliberately not before.
 
 **Replies are one level deep.** A comment carrying a `parent_id` is a reply to
 the comment with that id. Deliberately not deeper — nobody reads replies to
