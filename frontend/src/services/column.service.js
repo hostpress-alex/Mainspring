@@ -56,6 +56,25 @@ export function makeColumn(type, title){
     return {id, type, title: title || (entry?entry.label:type), field: id}
 }
 
+/**
+ * The labels a status or priority column can take.
+ *
+ * Per column, with the board's own list as the fallback. A column only gets
+ * its own `labels` once somebody has saved one in the label editor
+ * (board.actions, setColumnLabels) — makeColumn does not seed one. Reading
+ * `column.labels` alone therefore returns nothing for almost every column
+ * that exists, which is how the filter and the automation builder ended up
+ * offering an empty list of values while the pickers on the board showed a
+ * full one.
+ *
+ * The four places that need this list now ask here instead of each carrying
+ * their own version of the fallback.
+ */
+export function labelsOf(board, column){
+    const own = (column && Array.isArray(column.labels))?column.labels:null
+    return (own || board?.labels || []).filter(l => l && l.title)
+}
+
 /** Read the value of a column on a task. */
 export function valueOf(task, column){
     const raw = task?task[column.field]:undefined

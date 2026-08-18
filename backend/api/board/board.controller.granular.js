@@ -22,6 +22,22 @@ const handler = (fn, fallback) => async(req, res) => {
 }
 
 module.exports = {
+    /* ------------------------------------------ Gespeicherte Filter -- */
+
+    getViews: handler(req =>
+        boardService.views(req.params.boardId), 'Ansichten konnten nicht geladen werden'),
+
+    postView: handler(req =>
+        boardService.addView(req.params.boardId, req.body), 'Ansicht konnte nicht gespeichert werden'),
+
+    putView: handler(req =>
+        boardService.updateView(req.params.boardId, req.params.viewId, req.body),
+        'Ansicht konnte nicht gespeichert werden'),
+
+    deleteView: handler(req =>
+        boardService.removeView(req.params.boardId, req.params.viewId),
+        'Ansicht konnte nicht geloescht werden'),
+
     /* ---------------------------------------- Papierkorb und Archiv -- */
 
     putBoardState: handler(req =>

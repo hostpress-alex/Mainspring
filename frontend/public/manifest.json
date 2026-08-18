@@ -1,6 +1,6 @@
 {
-    "short_name":       "myday",
-    "name":             "myday — Aufgaben und Zeitplanung",
+    "short_name":       "Mainspring",
+    "name":             "Mainspring — Aufgaben und Zeitplanung",
     "icons":            [
         {
             "src":   "logo.svg",

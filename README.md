@@ -1,8 +1,12 @@
-# Project Manager
+# Mainspring
 
 Board-based task management. A board has groups, a group has tasks, and a task
 has whatever columns you gave the board: status, priority, dates, people,
 numbers, files, plain text.
+
+The name is the coiled spring that drives a mechanical clock — the part that
+stores the effort and lets it out at a steady rate. It is written once, in
+`frontend/src/constants/app.js`; everything else reads it from there.
 
 It started as MyDay, a Monday.com clone someone built as a bootcamp project
 (credits at the bottom). We've been rebuilding it since for our own use. The

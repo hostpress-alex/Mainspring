@@ -60,7 +60,7 @@ export function BoardsOverview(){
         <div className="boards-overview">
             <div className="overview-bar">
                 <div className="overview-bar-user">
-                    <Link to="/profil" className="overview-link overview-user">
+                    <Link to="/profile" className="overview-link overview-user">
                         <Avatar src={user?.imgUrl} className="overview-user-img"/>
                         {user?.fullname}
                     </Link>

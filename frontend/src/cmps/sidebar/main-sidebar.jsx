@@ -75,9 +75,9 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
                 <NotificationBell/>
 
                 <Tooltip title={t('nav.calendar')} arrow placement="right">
-                    <Link to="/kalender" className={`icon-container nav-link${location.pathname === '/kalender'?' is-active':''}`}>
+                    <Link to="/calendar" className={`icon-container nav-link${location.pathname === '/calendar'?' is-active':''}`}>
                         <Icon name='calendar-days'/>
-                        {location.pathname === '/kalender' && <Icon name='caret-left' className="triangle-icon"/>}
+                        {location.pathname === '/calendar' && <Icon name='caret-left' className="triangle-icon"/>}
                     </Link>
                 </Tooltip>
 

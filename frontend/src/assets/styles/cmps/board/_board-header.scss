@@ -118,60 +118,6 @@
         }
     }
 
-    .board-display-btns {
-        margin-top: variables.$spacing-small;
-
-        .type-btn {
-            color: variables.$primary-text-color;
-            position: relative;
-            @include mixins.center-flex();
-            padding: 0px variables.$spacing-small 0px variables.$spacing-small;
-            font-size: functions.rem(14px);
-            height: 32px;
-            white-space: nowrap;
-            cursor: pointer;
-
-            &.active {
-                border-bottom: 2px solid variables.$board-btn;
-            }
-
-            i {
-                font-size: functions.rem(12px);
-            }
-
-            span {
-                font-weight: 500;
-                padding: 0 variables.$spacing-xs;
-
-                &.wide {
-                    display: none;
-                }
-
-                &.mobile {
-                    display: block;
-                }
-            }
-
-            @include mixins.for-narrow-layout() {
-                &:hover {
-                    background-color: variables.$workspace-hover;
-                    border-top-left-radius: 4px;
-                    border-top-right-radius: 4px;
-                }
-
-                span {
-                    &.wide {
-                        display: block;
-                    }
-
-                    &.mobile {
-                        display: none;
-                    }
-                }
-            }
-        }
-    }
-
     .board-border {
         height: 1px;
         width: 100%;

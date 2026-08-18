@@ -8,6 +8,12 @@ const router = express.Router()
 // Every board route needs a logged-in user.
 router.use(requireAuth)
 
+// --- Gespeicherte Filter ---------------------------------------------------
+router.get('/:boardId/view', g.getViews)
+router.post('/:boardId/view', g.postView)
+router.put('/:boardId/view/:viewId', g.putView)
+router.delete('/:boardId/view/:viewId', g.deleteView)
+
 // --- Papierkorb und Archiv -------------------------------------------------
 // Before every /:boardId route below: `bin/boards` would otherwise be read as
 // a board with the id "bin".

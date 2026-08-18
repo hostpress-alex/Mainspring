@@ -62,6 +62,10 @@ export default defineConfig({
     },
     server: {
         port: 3000,
+        // Vite treats `port` as a wish and quietly moves to 3001 if 3000 is
+        // taken. Everything works, which is the problem: the tab on 3000 then
+        // shows a leftover process while the new server sits on 3001.
+        strictPort: true,
         host: true,
         // The frontend is served at http://project.buff:3000.
         // Without this entry Vite blocks the Host header.

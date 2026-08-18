@@ -10,6 +10,7 @@ import {CalendarPage} from './pages/calendar'
 import {AppShell} from './cmps/sidebar/app-shell'
 import {store} from './store/store'
 import {ConfirmHost} from './cmps/confirm-dialog'
+import {ErrorBoundary} from './cmps/error-boundary'
 
 /**
  * Protects a route. Without a logged-in user it redirects to /auth/login; the
@@ -37,6 +38,11 @@ export function RootCmp(){
         <Provider store={store}>
             <div>
                 <main>
+                    {/* The last net. Anything that throws while rendering used
+                        to tear down the whole tree and leave a white page with
+                        no clue on it — the single worst failure mode this app
+                        has, because it looks identical whatever went wrong. */}
+                    <ErrorBoundary>
                     <Routes>
                         <Route path="/auth/login" element={<LoginSignup/>}/>
                         <Route path="/auth/signup" element={<LoginSignup/>}/>
@@ -48,13 +54,21 @@ export function RootCmp(){
                         <Route path="/board/:boardId/:activityLog" element={
                             <RequireAuth><BoardDetails/></RequireAuth>}/>
 
-                        <Route path="/kalender" element={
+                        <Route path="/calendar" element={
                             <RequireAuth><AppShell><CalendarPage/></AppShell></RequireAuth>}/>
-                        <Route path="/profil" element={<RequireAuth><AppShell><ProfilePage/></AppShell></RequireAuth>}/>
+                        <Route path="/profile" element={<RequireAuth><AppShell><ProfilePage/></AppShell></RequireAuth>}/>
+
+                        {/* The paths used to be German. Everything a developer
+                            types is English, but a bookmark from before the
+                            rename should still work — hence the two redirects
+                            rather than a silent break. */}
+                        <Route path="/kalender" element={<Navigate to="/calendar" replace/>}/>
+                        <Route path="/profil" element={<Navigate to="/profile" replace/>}/>
                         <Route path="/admin" element={<RequireAdmin><AppShell><AdminPage/></AppShell></RequireAdmin>}/>
 
                         <Route path="*" element={<Navigate to="/" replace/>}/>
                     </Routes>
+                    </ErrorBoundary>
                 </main>
                 {/* Exactly one confirmation dialog for the whole application. */}
                 <ConfirmHost/>

@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from 'react'
 import {useSelector} from 'react-redux'
-import _ from 'lodash'
 
 import {
     duplicateTask, addSubtaskAction, removeTaskAction, moveTasksToGroup,
@@ -169,8 +168,13 @@ export function TaskToolsModal({tasks, group, board, setSelectedTasks, setIsMain
                     <div className="task-info flex">
                         <span>{t('task.selectedLabel', {n: tasks.length})}</span>
                         <div className="group-color flex">
-                            {_.times(tasks.length, () =>
-                                <Icon name='circle' key={_.uniqueId('KEY_')} className="icon" style={{'--group-color': group.color}}/>)}
+                            {/* One dot per selected task. The key used to be
+                                lodash's uniqueId, which is a new value on every
+                                render and made React throw the dots away and
+                                build them again each time. The position is what
+                                identifies them. */}
+                            {Array.from({length: tasks.length}, (unused, i) =>
+                                <Icon name='circle' key={i} className="icon" style={{'--group-color': group.color}}/>)}
                         </div>
                     </div>
                     <div className="task-btns flex">

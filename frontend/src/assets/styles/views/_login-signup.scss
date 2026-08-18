@@ -68,40 +68,11 @@
         color: #fff;
     }
 
-    .split-line {
-        margin-bottom: variables.$spacing-medium;
-        margin-top: 30px;
-        width: 100%;
-
-        .separator-line {
-            border: .5px solid #c5c7d0;
-            width: 200px;
-            margin: variables.$spacing-medium;
-        }
-    }
-
-    .btn-login-google {
-        @include mixins.center-flex();
-        font-family: roboto-light;
-        padding: 12px variables.$spacing-medium;
-        border: 1px solid #c5c7d0;
-        border-radius: 4px;
-        gap: 8px;
-        margin-bottom: 32px;
-        background-color: variables.$app-bg;
-
-        .img-google-login {
-            width: 16px;
-        }
-
-        span {
-            font-family: tahoma;
-            font-size: functions.rem(14px);
-            color: #000000;
-        }
-    }
-
     .suggest-signup {
+        // The gap under the button used to come from the Google block that sat
+        // between them. That block is gone, so the spacing has to be said here.
+        margin-top: 32px;
+
         .suggest-signup-prefix {
             padding-right: variables.$spacing-xs;
             font-size: functions.rem(16px);

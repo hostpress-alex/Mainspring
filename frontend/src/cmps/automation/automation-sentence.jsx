@@ -6,6 +6,7 @@ import {
     ACTIONS, ACTION_ORDER, TRIGGERS, TRIGGER_ORDER,
     allColumns, columnOf, groupOf, labelColumns
 } from '../../services/automation'
+import {labelsOf} from '../../services/column.service'
 import {t} from '../../i18n'
 
 /**
@@ -74,8 +75,7 @@ const columnOptions = columns => columns.map(c => ({key: c.field, label: c.title
 const groupOptions = board => (board?.groups || []).map(g => ({key: g.id, label: g.title, color: g.color}))
 
 function valueOptions(board, field){
-    const column = columnOf(board, field)
-    return (column?.labels || []).filter(l => l && l.title)
+    return labelsOf(board, columnOf(board, field))
         .map(l => ({key: l.title, label: l.title, color: l.color}))
 }
 

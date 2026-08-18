@@ -13,8 +13,15 @@ import { join, extname } from 'node:path'
 
 const METADATA = 'node_modules/@fortawesome/fontawesome-free/metadata/icon-families.json'
 
-/** `<Icon name='star' style='fa-regular' />` — the usual way. */
-const USE = /<Icon\s+name='([a-z0-9-]+)'(?:\s+style='fa-([a-z-]+)')?/g
+/**
+ * `<Icon name='star' variant='fa-regular' />` — the usual way.
+ *
+ * The prop is `variant`, not `style`: `style` is the DOM attribute and was
+ * renamed in cmps/icon.jsx. This pattern has to be kept in step with that
+ * component, otherwise every icon silently counts as `fa-solid` and a
+ * `fa-brands` icon like github is reported as needing Pro.
+ */
+const USE = /<Icon\s+name='([a-z0-9-]+)'(?:\s+variant='fa-([a-z-]+)')?/g
 
 /**
  * Icons chosen at runtime cannot be read out of the JSX. They are declared in
@@ -48,7 +55,11 @@ export function checkIcons (root = 'src') {
 
     const used = new Map()          // "style/name" -> [files]
     for (const file of sourceFiles(root)) {
+        // Comments hold examples (`<Icon name='github' variant='fa-brands' />`
+        // in icon.jsx) that are documentation, not usage.
         const text = readFileSync(file, 'utf8')
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .replace(/^\s*\/\/.*$/gm, '')
         for (const [pattern, styleFrom] of [[USE, m => m[2] || 'solid'], [TABLE, () => 'solid']]) {
             for (const match of text.matchAll(pattern)) {
                 const key = `${styleFrom(match)}/${match[1]}`

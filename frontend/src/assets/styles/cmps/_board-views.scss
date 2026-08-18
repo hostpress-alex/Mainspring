@@ -1,0 +1,261 @@
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
+/**
+ * The tabs across the top of a board.
+ *
+ * Deliberately the same shape the three display buttons had — an underline on
+ * the open one, nothing else. A tab strip that draws boxes around every tab
+ * competes with the board underneath it, and the board is the point.
+ */
+.board-views {
+    align-items: center;
+    gap: 2px;
+    margin-top: variables.$spacing-small;
+    flex-wrap: wrap;
+}
+
+.view-tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    color: variables.$primary-text-color;
+
+    &.is-active {
+        border-bottom: 2px solid variables.$board-btn;
+    }
+
+    &:hover {
+        background-color: variables.$workspace-hover;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+}
+
+.view-open {
+    @include mixins.center-flex();
+    gap: variables.$spacing-xs;
+    height: 100%;
+    padding: 0 variables.$spacing-small;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: functions.rem(14px);
+    cursor: pointer;
+
+    i {
+        font-size: functions.rem(12px);
+    }
+
+    .view-name {
+        font-weight: 500;
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .view-private {
+        color: variables.$workspace-icon-color;
+    }
+}
+
+/* How many rules the tab carries. Small, because it is a footnote to the
+   name, not a second name. */
+.view-count {
+    min-width: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: variables.$board-btn;
+    color: #fff;
+    font-size: 11px;
+    line-height: 16px;
+    text-align: center;
+}
+
+.view-more {
+    height: 100%;
+    padding: 0 6px 0 0;
+    border: 0;
+    background: none;
+    color: variables.$workspace-icon-color;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.view-new {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.view-add {
+    @include mixins.center-flex();
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: variables.$workspace-icon-color;
+    cursor: pointer;
+
+    &:hover {
+        background-color: variables.$workspace-hover;
+    }
+}
+
+.view-error {
+    padding: 0 variables.$spacing-small;
+    color: #a3283a;
+    font-size: functions.rem(13px);
+}
+
+.view-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--z-popover);
+    min-width: 220px;
+    margin: 4px 0 0;
+    padding: 4px;
+    list-style: none;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+    background: variables.$app-bg;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, .16);
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: variables.$spacing-small;
+        width: 100%;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 6px;
+        background: none;
+        color: variables.$primary-text-color;
+        font: inherit;
+        font-size: functions.rem(14px);
+        text-align: start;
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            background-color: variables.$workspace-hover;
+        }
+
+        &:disabled {
+            color: #a1a3ad;
+            cursor: default;
+        }
+
+        &.is-danger:hover {
+            color: #a3283a;
+        }
+    }
+}
+
+/* The form behind the plus. */
+.view-form {
+    position: absolute;
+    top: 100%;
+    inset-inline-start: 0;
+    z-index: var(--z-popover);
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing-small;
+    width: min(340px, 92vw);
+    margin-top: 4px;
+    padding: variables.$spacing-medium;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+    background: variables.$app-bg;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, .16);
+
+    header {
+        display: flex;
+        align-items: center;
+
+        h4 {
+            margin: 0;
+            font-size: functions.rem(15px);
+        }
+    }
+
+    .view-form-close {
+        margin-inline-start: auto;
+        border: 0;
+        background: none;
+        color: variables.$workspace-icon-color;
+        cursor: pointer;
+    }
+
+    .view-form-title {
+        padding: 8px 10px;
+        border: 1px solid variables.$layout-border-color;
+        border-radius: 6px;
+        font: inherit;
+        font-size: functions.rem(14px);
+    }
+
+    .view-form-displays {
+        display: flex;
+        gap: 4px;
+
+        button {
+            @include mixins.center-flex();
+            gap: 5px;
+            flex: 1;
+            padding: 7px 6px;
+            border: 1px solid variables.$layout-border-color;
+            border-radius: 6px;
+            background: variables.$app-bg;
+            font: inherit;
+            font-size: functions.rem(13px);
+            cursor: pointer;
+
+            &.is-active {
+                border-color: variables.$board-btn;
+                background: variables.$board-btn;
+                color: #fff;
+            }
+        }
+    }
+
+    .view-form-share {
+        display: flex;
+        align-items: center;
+        gap: variables.$spacing-xs;
+        font-size: functions.rem(13px);
+        cursor: pointer;
+
+        &.is-off {
+            color: #9699a6;
+            cursor: default;
+        }
+    }
+
+    .view-form-note {
+        margin: 0;
+        color: #676879;
+        font-size: functions.rem(12px);
+    }
+
+    .view-form-save {
+        padding: 8px 12px;
+        border: 0;
+        border-radius: 6px;
+        background: variables.$board-btn;
+        color: #fff;
+        font: inherit;
+        font-size: functions.rem(14px);
+        cursor: pointer;
+
+        &:disabled {
+            background: #c3c6d4;
+            cursor: default;
+        }
+    }
+}

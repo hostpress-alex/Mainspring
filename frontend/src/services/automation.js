@@ -10,6 +10,7 @@
  *
  *   {trigger: {type, field?, value?}, actions: [{type, field?, value?, groupId?, who?, userIds?}]}
  */
+import {labelsOf} from './column.service'
 export const TRIGGERS = {
     STATUS_CHANGES_TO: 'status_changes_to',
     COLUMN_CHANGES: 'column_changes',
@@ -39,8 +40,7 @@ export function columnOf(board, field){
 
 /** The values a status or priority column can take, in the board's own order. */
 export function valuesOf(board, field){
-    const column = columnOf(board, field)
-    return (column?.labels || []).filter(l => l && l.title).map(l => l.title)
+    return labelsOf(board, columnOf(board, field)).map(l => l.title)
 }
 
 export function groupOf(board, groupId){

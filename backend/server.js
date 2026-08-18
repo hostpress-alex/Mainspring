@@ -15,8 +15,18 @@ app.use(cookieParser())
 // pictures.
 app.use(express.json({limit: '2mb'}))
 
+/**
+ * In production the server hands out the built frontend.
+ *
+ * The path used to be `backend/public`, which held a stale react-scripts build
+ * committed to the repository. Build output belongs to whoever builds it, so
+ * the server now reads where Vite writes — one folder, one owner, and nothing
+ * to keep in sync after a build.
+ */
+const FRONTEND_BUILD = path.resolve(__dirname, '..', 'frontend', 'build')
+
 if(process.env.NODE_ENV === 'production'){
-    app.use(express.static(path.resolve(__dirname, 'public')))
+    app.use(express.static(FRONTEND_BUILD))
 }
 
 // The allowed origins live in config, because the socket needs the very same
@@ -65,7 +75,7 @@ app.use('/api', (req, res) => {
 })
 
 app.get('/*splat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'))
+    res.sendFile(path.join(FRONTEND_BUILD, 'index.html'))
 })
 
 const port = process.env.PORT || 3030

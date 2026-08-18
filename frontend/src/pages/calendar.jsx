@@ -139,7 +139,7 @@ export function CalendarPage(){
                             <button key={v.key} className={view === v.key?'is-active':''} onClick={() => setView(v.key)}>{v.label}</button>
                         ))}
                     </div>
-                    <Link to="/profil" title={t('nav.profile')}>
+                    <Link to="/profile" title={t('nav.profile')}>
                         <Avatar src={user?.imgUrl} className="cal-avatar"/>
                     </Link>
                 </div>

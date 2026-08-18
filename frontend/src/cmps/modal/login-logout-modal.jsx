@@ -15,7 +15,7 @@ export function LoginLogoutModal({setIsLoginModalOpen}){
     }
 
     return <section className="login-logout-modal">
-        {user && <Link to={'/profil'}><span onClick={closeDynamicModal}>{t('nav.profile')}</span></Link>}
+        {user && <Link to={'/profile'}><span onClick={closeDynamicModal}>{t('nav.profile')}</span></Link>}
         {user && <span onClick={onLogout}><Icon name='right-from-bracket' className="logout-icon"/>{t('nav.logout')}</span>}
         {!user &&
             <Link to={'/auth/login'}><span onClick={closeDynamicModal}>{t('nav.login')}<Icon name='right-to-bracket' className="login-icon"/></span></Link>}

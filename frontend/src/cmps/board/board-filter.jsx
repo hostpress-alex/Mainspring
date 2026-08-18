@@ -1,5 +1,5 @@
 import {addTaskOnFirstGroup, setDynamicModalObj} from '../../store/board.actions'
-import {useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useEffectUpdate} from '../../customHooks/useEffectUpdate'
 import {utilService} from '../../services/util.service'
@@ -10,23 +10,76 @@ import {Tooltip} from '@mui/material'
 import { Avatar } from '../avatar'
 import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
+import {FilterPanel} from '../filter/filter-panel'
+import {hasRules} from '../../services/board-filter'
+import {useDismissable} from '../../customHooks/useDismissable'
 
 /** How many faces fit before it turns into a "+3". */
 const SHOWN_MEMBERS = 3
 
-export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
+export function BoardFilter({board, onSetFilter, setIsInviteModalOpen, activeTab, onUpdateView}){
     const filter = useSelector(storeState => storeState.boardModule.filter)
     const [filterBy, setFilterBy] = useState(filter)
     const [memberFilter, setMemberFilter] = useState(null)
+    const [isPanelOpen, setIsPanelOpen] = useState(false)
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
     const elBoardFilter = useRef()
     const elMemberFilter = useRef()
     const navigate = useNavigate()
-    onSetFilter = useRef(utilService.debounce(onSetFilter))
+    const panelRef = useDismissable(isPanelOpen, () => setIsPanelOpen(false))
+
+    /**
+     * One debounced sender for the life of the component, calling whatever
+     * onSetFilter currently is.
+     *
+     * It used to debounce the prop itself into a ref, which froze the first
+     * one. That closure holds the board id from the moment this was first
+     * rendered, and all three /board/... routes share one BoardDetails — so
+     * after switching boards, typing in the search box reloaded the board you
+     * had come from.
+     */
+    const latestSet = useRef(onSetFilter)
+    latestSet.current = onSetFilter
+
+    /**
+     * Two refs decide who last had a say.
+     *
+     * `shown` is what the panel is displaying, `settled` is what has already
+     * been agreed with the outside world — either because we sent it, or
+     * because it arrived from there. The debounced send compares the two and
+     * does nothing when they match, so an outside change cannot be undone a
+     * moment later by a timer that was already running.
+     */
+    const shown = useRef(filterBy)
+    const settled = useRef(filterBy)
+
+    const sendFilter = useRef(utilService.debounce(() => {
+        if(shown.current === settled.current) return
+        settled.current = shown.current
+        latestSet.current(shown.current)
+    }))
+
+    /**
+     * A filter that came from outside — a tab was opened, or another board.
+     *
+     * This used to watch board._id, which meant switching TABS left the panel
+     * showing the rules of the tab before it: the board was filtered
+     * correctly and the panel disagreed with it, which is worse than either
+     * being wrong on its own.
+     */
+    useEffect(() => {
+        if(filter === settled.current) return
+        shown.current = filter
+        settled.current = filter
+        setFilterBy(filter)
+        setIsPanelOpen(false)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filter])
 
     useEffectUpdate(() => {
-        onSetFilter.current(filterBy)
+        shown.current = filterBy
         loadMemberImg()
+        sendFilter.current()
     }, [filterBy])
 
     function loadMemberImg(){
@@ -41,9 +94,8 @@ export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
 
     function onRemovePersonFilter(ev){
         ev.stopPropagation()
-        filter.memberId = ''
-        onSetFilter.current(filter)
         setMemberFilter(null)
+        setFilterBy(prev => ({...prev, memberId: ''}))
     }
 
     function openBoardPanel(type){
@@ -99,6 +151,30 @@ export function BoardFilter({board, onSetFilter, setIsInviteModalOpen}){
                         <input type="text" name="title" value={filterBy.title} placeholder={t('common.search')} onChange={handleChange}/>
                     </div>
                 </Tooltip>
+                {/* The quick filters stay where they are — looking for a
+                    title is the commonest thing anybody does here. The rules
+                    are one click further in. */}
+                {/* Trigger and panel in one box: the panel hangs off this box,
+                    and the outside-click handler counts the button as inside —
+                    otherwise the click that closes the panel is followed by
+                    the button's own onClick, which opens it again. */}
+                <div className="filter-anchor" ref={panelRef}>
+                    <Tooltip title={t('filter.title2')} arrow>
+                        <div className={`filter-btn${hasRules(filterBy.rules)?' active':''}`}
+                            onClick={() => setIsPanelOpen(open => !open)}>
+                            <Icon name='filter'/>
+                            <span className="wide">{t('filter.title2')}</span>
+                            {hasRules(filterBy.rules) &&
+                                <span className="filter-count">{filterBy.rules.filter(r => r && r.field).length}</span>}
+                        </div>
+                    </Tooltip>
+                    {isPanelOpen && (
+                        <FilterPanel board={board} filter={filterBy} me={me}
+                            activeTab={activeTab} onUpdateView={onUpdateView}
+                            onChange={next => setFilterBy(next)}
+                            onClose={() => setIsPanelOpen(false)}/>
+                    )}
+                </div>
                 <Tooltip title={t('task.filterByPerson')} arrow>
                     <div ref={elMemberFilter} onClick={onToggleMemberFilterModal} className={`person-filter ${(isMemberModalOpen() || filterBy.memberId)?' active':''}`}>
                         {!memberFilter && <Icon name='circle-user' className="icon"/>}

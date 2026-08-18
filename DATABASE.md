@@ -130,6 +130,7 @@ session         one row per signed-in browser; the id is the SHA-256 of
                 the value in the cookie
 automation      per board: when this happens, do that
 automation_run  what a rule did, capped at 200 entries per board
+board_view      a tab on a board: which rows, which drawing, who sees it
 ```
 
 Migrations, in order:
@@ -154,6 +155,8 @@ Migrations, in order:
 | `20260816_000016_session_epoch.js` | `user.sessions_valid_from` — sign out everywhere |
 | `20260816_000017_file_board.js` | `file.board_id` — who may download an upload |
 | `20260816_000018_sessions.js` | `session` — the cookie stops being a credential you can mint |
+| `20260816_000019_board_views.js` | `board_view` — a filter with a name, shared with the board |
+| `20260817_000020_view_tabs.js` | `board_view.display` and `.visibility` — a saved filter becomes a tab |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -164,6 +167,31 @@ together as JSON.
 
 Assignments to people are deliberately **not** in the JSON but in
 `task_member` — "which tasks does person X have" is a query you really need.
+
+**A saved filter is JSON, on purpose.** `board_view.rules` is a list of
+`{field, operator, value}` that is read whole, written whole and never
+searched. Rule rows in their own table would buy nothing and cost three joins
+to answer a question nobody asks.
+
+**One row is one tab.** A `board_view` carries both halves of a way of
+looking: `rules` + `mode` say which rows, `display` says which drawing —
+table, kanban or dashboard. `mode` is *not* that: it is `all` or `any`, and
+says whether every rule has to match or just one. Two questions, two columns.
+The three tabs everybody has — the whole board as a table, as a kanban, as a
+dashboard — are not rows at all; a view with no rules needs no storage.
+
+**Private until somebody shares it.** `visibility` is `private` or `board`.
+A chip inside a filter panel could be shared with everybody harmlessly; a tab
+across the top of the board cannot, and a strip that fills up with everybody
+else's tabs is unusable within a week. Which rows come back is decided in the
+query (`visibility = 'board' OR created_by = me`), never by trimming a full
+list afterwards. Sharing needs write rights on the board. Changing a tab is
+the creator's right; an owner may additionally clear up **shared** ones, and
+deliberately not somebody's private ones.
+
+The filter somebody currently has set is **not** in here: that lives in their
+browser, per board *and per tab*. Only the ones that get a name reach the
+server.
 
 **Replies are one level deep.** A comment carrying a `parent_id` is a reply to
 the comment with that id. Deliberately not deeper — nobody reads replies to

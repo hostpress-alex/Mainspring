@@ -15,6 +15,7 @@ const roles = require('./board.roles')
 const notifications = () => require('../notification/notification.service')
 const automations = () => require('../automation/automation.service')
 const automationEngine = require('../automation/automation.engine')
+const viewRepo = require('./board-view.repo')
 const sockets = () => require('../../services/socket.service')
 
 /**
@@ -866,6 +867,97 @@ async function purgeTask(boardId, taskId){
     return String(taskId)
 }
 
+
+/* ================================================= Gespeicherte Filter == */
+
+/**
+ * Saved filters of a board.
+ *
+ * Everybody on the board sees all of them: a filter is a way of looking, not a
+ * secret, and one people cannot share is worth half as much. Changing one
+ * follows the group rule — whoever made it, or an owner. An editor must not be
+ * able to rewrite the view the team looks at every morning.
+ */
+/**
+ * The tabs of a board, for whoever is asking.
+ *
+ * Only membership is required, not write rights: a viewer has tabs of their
+ * own. Which ones come back is decided in the query — see viewRepo.
+ */
+async function views(boardId){
+    await _requireBoard(boardId)
+    return await viewRepo.findByBoard(boardId, _me())
+}
+
+/**
+ * A tab is private unless somebody deliberately shares it, and sharing needs
+ * write rights: the strip across the top of a board is board furniture, and a
+ * viewer moving furniture for everybody is not what read access means.
+ */
+async function addView(boardId, view){
+    const board = await _requireBoard(boardId)
+    if(!view || !String(view.title || '').trim()) throw httpError(400, 'Die Ansicht braucht einen Namen')
+    if(view.visibility === 'board') _requireShareRights(board)
+    return await viewRepo.insert({
+        boardId,
+        title: view.title,
+        mode: view.mode,
+        display: view.display,
+        visibility: view.visibility,
+        rules: view.rules,
+        createdBy: _me()
+    })
+}
+
+async function updateView(boardId, viewId, patch){
+    const board = await _requireBoard(boardId)
+    const existing = await _ownView(board, viewId)
+    if(patch && patch.visibility === 'board' && existing.visibility !== 'board'){
+        _requireShareRights(board)
+    }
+    return await viewRepo.update(viewId, patch || {})
+}
+
+async function removeView(boardId, viewId){
+    const board = await _requireBoard(boardId)
+    await _ownView(board, viewId)
+    await viewRepo.deleteById(viewId)
+    return {ok: true}
+}
+
+/**
+ * The view, if it belongs to this board and you may change it.
+ *
+ * Loaded and checked in one place, because the three callers used to repeat
+ * the same four lines and the check is the only thing standing between a
+ * member and somebody else's tab.
+ */
+async function _ownView(board, viewId){
+    const existing = await viewRepo.findById(viewId)
+    if(!existing || sid(existing.boardId) !== sid(board._id)){
+        throw httpError(404, 'Ansicht nicht gefunden')
+    }
+    _requireOwnView(board, existing)
+    return existing
+}
+
+/** Yours, or you own the board. Same shape as _requireGroupRights. */
+function _requireOwnView(board, view){
+    const user = getLoggedinUser()
+    if(view.createdBy && sid(view.createdBy) === sid(user && user._id)) return
+    // An owner may clear up shared tabs. Somebody's private tab is theirs,
+    // and an owner has no more business in it than in their browser history.
+    if(view.visibility === 'board' && roles.isOwner(board, user)) return
+    throw httpError(403, 'Nur der Ersteller oder ein Owner darf diese Ansicht aendern')
+}
+
+/** Sharing a tab with the board is an edit to the board. */
+function _requireShareRights(board){
+    const user = getLoggedinUser()
+    if(roles.isEditor(board, user)) return
+    throw httpError(403, 'Nur Mitglieder mit Schreibrecht duerfen eine Ansicht teilen')
+}
+
 module.exports = {
     remove,
     query,
@@ -899,6 +991,7 @@ module.exports = {
     moveTask,
     addActivity,
 
+    views, addView, updateView, removeView,
     setBoardState, setGroupState, setTaskState,
     bin, boardsInState,
     purgeBoard, purgeGroup, purgeTask,

@@ -1,5 +1,5 @@
 import {BoardFilter} from '../board/board-filter'
-import {closeDynamicModal, updateBoardMeta, toggleModal, toggleStarred} from '../../store/board.actions'
+import {updateBoardMeta, toggleModal, toggleStarred} from '../../store/board.actions'
 import {loadBoards} from '../../store/board.actions'
 
 import { Icon } from '../icon'
@@ -12,6 +12,7 @@ import {RichTextView} from '../rich-text/rich-text-view'
 import {AutomationPanel} from '../automation/automation-panel'
 import {BinPanel} from '../bin/bin-panel'
 import {boardService} from '../../services/board.service'
+import {BoardViews} from '../view/board-views'
 import {t} from '../../i18n'
 
 export function BoardHeader({
@@ -20,8 +21,13 @@ export function BoardHeader({
     isStarredOpen,
     setIsShowDescription,
     setIsInviteModalOpen,
-    setBoardType,
-    boardType
+    tabs,
+    activeTab,
+    viewErr,
+    onActivateTab,
+    onCreateView,
+    onUpdateView,
+    onRemoveView
 }){
     const isOpen = useSelector(storeState => storeState.boardModule.isBoardModalOpen)
     const navigate = useNavigate()
@@ -48,12 +54,9 @@ export function BoardHeader({
         }
     }
 
-    function onSetBoardType(type){
-        setBoardType(type)
-        closeDynamicModal()
-    }
-
     const me = useSelector(storeState => storeState.userModule.user)
+    const filter = useSelector(storeState => storeState.boardModule.filter)
+    const boardType = activeTab?.display || 'table'
     // The board's own name and description are the frame — owner only.
     const canManage = boardService.canManageBoard(board, me)
 
@@ -117,32 +120,17 @@ export function BoardHeader({
                     </div>
                 )}
             </div>
-            <div className="board-display-btns flex">
-                <Tooltip title={t('board.table')} arrow>
-                    <div className={`type-btn ${boardType === 'table'?' active':''}`} onClick={() => onSetBoardType('table')}>
-                        <Icon name='house' className="icon"/>
-                        <span className="wide" onClick={() => onSetBoardType('table')}>{t('board.table')}</span>
-                        <span className="mobile">{t('board.table')}</span>
-                    </div>
-                </Tooltip>
-                <Tooltip title={t('board.kanban')} arrow>
-                    <div className={`type-btn ${boardType === 'kanban'?' active':''}`} onClick={() => onSetBoardType('kanban')}>
-                        <Icon name='table-columns'/>
-                        <span className="wide">{t('board.kanban')}</span>
-                        <span className="mobile" onClick={() => onSetBoardType('kanban')}>{t('board.kanban')}</span>
-                    </div>
-                </Tooltip>
-                <Tooltip title={t('board.dashboard')} arrow>
-                    <div className={`type-btn ${boardType === 'dashboard'?' active':''}`} onClick={() => onSetBoardType('dashboard')}>
-                        <Icon name='chart-column'/>
-                        <span className="wide">{t('board.dashboard')}</span>
-                        <span className="mobile" onClick={() => onSetBoardType('dashboard')}>{t('board.dashboard')}</span>
-                    </div>
-                </Tooltip>
-            </div>
+            {/* Table, kanban and dashboard used to be three buttons here and a
+                saved filter was a chip inside the filter panel — two strips of
+                the same idea. One strip now: see cmps/view/board-views.jsx. */}
+            <BoardViews board={board} me={me} tabs={tabs} activeId={activeTab?.id}
+                filter={filter} err={viewErr}
+                onActivate={onActivateTab} onCreate={onCreateView}
+                onUpdate={onUpdateView} onRemove={onRemoveView}/>
             <div className="board-border"></div>
             {boardType !== 'dashboard' &&
-                <BoardFilter onSetFilter={onSetFilter} board={board} setIsInviteModalOpen={setIsInviteModalOpen}/>}
+                <BoardFilter onSetFilter={onSetFilter} board={board} setIsInviteModalOpen={setIsInviteModalOpen}
+                    activeTab={activeTab} onUpdateView={onUpdateView}/>}
             {isAutomationOpen && <AutomationPanel board={board} onClose={() => setIsAutomationOpen(false)}/>}
             {isBinOpen && <BinPanel board={board} onClose={() => setIsBinOpen(false)}/>}
         </header>

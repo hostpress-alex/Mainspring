@@ -1,11 +1,7 @@
 import {Link} from 'react-router-dom'
 import {LogoMark} from './logo-mark'
+import {APP_NAME} from '../constants/app'
 
-/**
- * Logo mark with wordmark. The name deliberately sits in exactly one place —
- * here — so a later change does not run through half the application.
- */
-export const APP_NAME = 'myday'
 
 export default function Logo(){
     return (

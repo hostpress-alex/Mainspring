@@ -1,0 +1,277 @@
+@use "../setup/variables";
+
+/**
+ * The advanced filter.
+ *
+ * Anchored under the toolbar rather than in the middle of the screen: it
+ * describes what the board below is showing, and a dialog that covers the
+ * board hides the thing it is talking about.
+ */
+/**
+ * The box the panel hangs off.
+ *
+ * .filter-panel is absolutely positioned, so it needs a positioned ancestor.
+ * Without this it would measure itself against whatever happens to be
+ * positioned further up the page and land somewhere unrelated to the button
+ * that opened it. The toolbar's own padding and hover are cleared here: they
+ * belong to the button inside, which brings its own.
+ */
+.filter-anchor {
+    position: relative;
+}
+
+.board-filter .board-tools > .filter-anchor {
+    padding: 0;
+
+    &:hover { background-color: transparent; }
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover { background: variables.$workspace-hover; }
+    &.active { color: variables.$board-btn; }
+}
+
+.filter-count {
+    min-width: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: variables.$board-btn;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+}
+
+.filter-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--z-popover);
+    width: min(860px, 96vw);
+    margin-top: 6px;
+    padding: variables.$spacing-medium;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+    background: variables.$app-bg;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, .16);
+}
+
+.filter-head {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-medium;
+    margin-bottom: variables.$spacing-medium;
+
+    h3 {
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .filter-close {
+        margin-left: auto;
+        border: 0;
+        background: none;
+        cursor: pointer;
+        color: variables.$workspace-icon-color;
+    }
+
+    .filter-clear {
+        border: 0;
+        background: none;
+        color: variables.$board-btn;
+        cursor: pointer;
+        font: inherit;
+        font-size: 14px;
+
+        &:disabled {
+            color: #a1a3ad;
+            cursor: default;
+        }
+    }
+}
+
+/* All conditions or just one — one switch for the whole set, so there is no
+   question of precedence to get wrong. */
+.filter-mode {
+    display: flex;
+
+    button {
+        padding: 4px 12px;
+        border: 1px solid variables.$layout-border-color;
+        background: variables.$app-bg;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+
+        &:first-child { border-radius: 4px 0 0 4px; }
+        &:last-child { border-radius: 0 4px 4px 0; }
+
+        &.is-active {
+            background: variables.$board-btn;
+            border-color: variables.$board-btn;
+            color: #fff;
+        }
+    }
+}
+
+.filter-rules {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$spacing-small;
+}
+
+/**
+ * One rule. Fixed columns so the three parts line up down the list — a value
+ * field that moves left and right with the length of the column name is
+ * surprisingly hard to read.
+ */
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr auto;
+    gap: variables.$spacing-small;
+    align-items: center;
+}
+
+.filter-select {
+    width: 100%;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 6px;
+    background: variables.$app-bg;
+    font: inherit;
+    font-size: 14px;
+
+    &:disabled { background: #f6f7fb; }
+}
+
+/* The list of choices for isAnyOf / isNoneOf. Wraps rather than scrolls: a
+   board with nine statuses would otherwise hide most of them behind a
+   scrollbar nobody notices inside a row. */
+.filter-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    max-height: 92px;
+    overflow-y: auto;
+    padding: 4px 2px;
+
+    label {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .is-on {
+        font-weight: 500;
+    }
+
+    input {
+        margin: 0;
+        cursor: pointer;
+    }
+}
+
+.filter-value.is-empty {
+    color: #9699a6;
+    text-align: center;
+}
+
+.filter-drop {
+    border: 0;
+    background: none;
+    color: variables.$workspace-icon-color;
+    cursor: pointer;
+
+    &:hover { color: #a3283a; }
+}
+
+.filter-actions {
+    display: flex;
+    gap: variables.$spacing-small;
+    margin-top: variables.$spacing-medium;
+}
+
+.filter-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 6px;
+    background: variables.$app-bg;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: variables.$workspace-hover; }
+
+    &:disabled {
+        color: #a1a3ad;
+        cursor: default;
+    }
+}
+
+.filter-error {
+    margin-bottom: variables.$spacing-small;
+    padding: 8px 12px;
+    border: 1px solid #e2445c;
+    border-radius: 6px;
+    background: #fff0f2;
+    color: #a3283a;
+    font-size: 14px;
+}
+
+/* The saved ones. A chip each, with an x for the ones you may remove. */
+.filter-views {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: variables.$spacing-small;
+    margin-top: variables.$spacing-medium;
+    padding-top: variables.$spacing-medium;
+    border-top: 1px solid variables.$border-color;
+}
+
+.filter-views-label {
+    color: #676879;
+    font-size: 13px;
+}
+
+.filter-view {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.filter-view-use {
+    padding: 4px 10px;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover { background: variables.$workspace-hover; }
+}
+
+.filter-view-drop {
+    padding: 4px 8px 4px 2px;
+    border: 0;
+    background: none;
+    color: variables.$workspace-icon-color;
+    cursor: pointer;
+
+    &:hover { color: #a3283a; }
+}

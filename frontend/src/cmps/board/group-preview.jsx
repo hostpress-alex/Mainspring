@@ -235,8 +235,8 @@ export function GroupPreview({group, board, idx}){
      */
     function handleCheckboxChange(task){
         const id = String(task.id)
-        setSelectedTasks(prev => prev.some(t => String(t.id) === id)
-            ?prev.filter(t => String(t.id) !== id)
+        setSelectedTasks(prev => prev.some(selected => String(selected.id) === id)
+            ?prev.filter(selected => String(selected.id) !== id)
             :[...prev, task])
     }
 

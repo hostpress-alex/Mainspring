@@ -1,582 +1,626 @@
 {
-    "activity": {
-        "action":   {
-            "create":   "created",
-            "date":     "Date",
-            "number":   "Number",
-            "person":   "Person",
-            "priority": "Priority",
-            "status":   "Status",
-            "title":    "Title"
-        },
-        "activity": "Activity",
-        "area":     "The activity log",
-        "lastSeen": "Last seen"
+  "activity": {
+    "action": {
+      "create": "created",
+      "date": "Date",
+      "number": "Number",
+      "person": "Person",
+      "priority": "Priority",
+      "status": "Status",
+      "title": "Title"
     },
-    "admin":    {
-        "admin":               "Admin",
-        "userReactivated": "User “{name}” is active again.",
-        "inactive":       "Deactivated",
-        "reactivate":     "Reactivate",
-        "deactivate":     "Deactivate",
-        "adminGranted":        "{name}: admin rights granted.",
-        "adminRevoked":        "{name}: admin rights revoked.",
-        "chooseUser":          "Choose user…",
-        "createUser":          "Create user",
-        "deleteUser":          "Deactivate user",
-        "deleteUserName":      "The user “{name}”",
-        "deleteUserNote":      "The login stops working at once. Everything they wrote stays, with their name under it, and the account can be switched back on here at any time.",
-        "makeAdmin":           "Make admin",
-        "makeOwner":           "Make owner",
-        "memberAdded":         "{name} added to “{board}”.",
-        "members":             "Members — ★ = owner",
-        "ownerGranted":        "{name}: owner rights for “{board}” granted.",
-        "ownerRequired":       "A board needs at least one owner.",
-        "ownerRevoked":        "{name}: owner rights for “{board}” revoked.",
-        "passwordPlaceholder": "Password (at least 8 characters)",
-        "removeFromBoard":     "Remove from board",
-        "revokeAdmin":         "Revoke admin",
-        "revokeOwner":         "Revoke owner",
-        "signedInAs":          "Signed in as {name}.",
-        "thatIsYou":           "that's you",
-        "userCreated":         "User “{name}” created.",
-        "userDeleted":         "User “{name}” deactivated.",
-        "usersHeading":        "Users ({n})"
+    "activity": "Activity",
+    "area": "The activity log",
+    "lastSeen": "Last seen"
+  },
+  "admin": {
+    "admin": "Admin",
+    "adminGranted": "{name}: admin rights granted.",
+    "adminRevoked": "{name}: admin rights revoked.",
+    "chooseUser": "Choose user…",
+    "createUser": "Create user",
+    "deactivate": "Deactivate",
+    "deleteUser": "Deactivate user",
+    "deleteUserName": "The user “{name}”",
+    "deleteUserNote": "The login stops working at once. Everything they wrote stays, with their name under it, and the account can be switched back on here at any time.",
+    "inactive": "Deactivated",
+    "makeAdmin": "Make admin",
+    "makeOwner": "Make owner",
+    "memberAdded": "{name} added to “{board}”.",
+    "members": "Members — ★ = owner",
+    "ownerGranted": "{name}: owner rights for “{board}” granted.",
+    "ownerRequired": "A board needs at least one owner.",
+    "ownerRevoked": "{name}: owner rights for “{board}” revoked.",
+    "passwordPlaceholder": "Password (at least 8 characters)",
+    "reactivate": "Reactivate",
+    "removeFromBoard": "Remove from board",
+    "revokeAdmin": "Revoke admin",
+    "revokeOwner": "Revoke owner",
+    "signedInAs": "Signed in as {name}.",
+    "thatIsYou": "that's you",
+    "userCreated": "User “{name}” created.",
+    "userDeleted": "User “{name}” deactivated.",
+    "userReactivated": "User “{name}” is active again.",
+    "usersHeading": "Users ({n})"
+  },
+  "automation": {
+    "action": {
+      "move_to_group": {
+        "name": "Move item",
+        "text": "move the item to {group}"
+      },
+      "notify": {
+        "name": "Notify",
+        "text": "notify {who}"
+      },
+      "set_value": {
+        "name": "Set value",
+        "text": "set {column} to {value}"
+      }
     },
-    "automation": {
-        "action":          {
-            "move_to_group": {
-                "name": "Move item",
-                "text": "move the item to {group}"
-            },
-            "notify":        {
-                "name": "Notify",
-                "text": "notify {who}"
-            },
-            "set_value":     {
-                "name": "Set value",
-                "text": "set {column} to {value}"
-            }
-        },
-        "addAction":       "Add action",
-        "create":          "Create automation",
-        "delete":          "Delete automation",
-        "deleteNote":      "What it has done so far stays in the history.",
-        "edit":            "Edit automation",
-        "empty":           "No automations yet.",
-        "noOptions":       "Nothing to choose from",
-        "noRuns":          "Nothing has happened yet.",
-        "open":            "Automations",
-        "outcome":         {
-            "done":    "Ran",
-            "failed":  "Failed",
-            "skipped": "Skipped"
-        },
-        "removeAction":    "Remove action",
-        "runsAs":          "Runs with the rights of",
-        "slot":            {
-            "column": "column",
-            "group":  "group",
-            "value":  "value",
-            "who":    "whom"
-        },
-        "tabCreate":       "Create",
-        "tabEdit":         "Edit",
-        "tabHistory":      "History",
-        "tabManage":       "Manage",
-        "thenPlaceholder": "Then do this",
-        "thisRule":        "This automation",
-        "title":           "Automations",
-        "trigger":         {
-            "column_changes":    {
-                "name": "When a column changes",
-                "text": "When {column} changes"
-            },
-            "item_created":      {
-                "name": "When an item is created",
-                "text": "When an item is created"
-            },
-            "status_changes_to": {
-                "name": "When a status changes",
-                "text": "When {column} changes to {value}"
-            }
-        },
-        "turnOff":         "Turn off",
-        "turnOn":          "Turn on",
-        "updated":         "Updated",
-        "whenPlaceholder": "When this happens",
-        "who":             {
-            "assignees": "the assigned people"
-        }
+    "addAction": "Add action",
+    "create": "Create automation",
+    "delete": "Delete automation",
+    "deleteNote": "What it has done so far stays in the history.",
+    "edit": "Edit automation",
+    "empty": "No automations yet.",
+    "noOptions": "Nothing to choose from",
+    "noRuns": "Nothing has happened yet.",
+    "open": "Automations",
+    "outcome": {
+      "done": "Ran",
+      "failed": "Failed",
+      "skipped": "Skipped"
     },
-    "bin":      {
-        "archive":      "Archive",
-        "board":        "Board",
-        "emptyArchive": "The archive is empty.",
-        "emptyTrash":   "The bin is empty.",
-        "groupWith":    {
-            "one":   "Group with 1 item",
-            "other": "Group with {n} items"
-        },
-        "open":         "Bin and archive",
-        "purge":        "Delete for good",
-        "purgeNote":    "There is no way back from this.",
-        "restore":      "Restore",
-        "title":        "Bin and archive",
-        "trash":        "Bin"
+    "removeAction": "Remove action",
+    "runsAs": "Runs with the rights of",
+    "slot": {
+      "column": "column",
+      "group": "group",
+      "value": "value",
+      "who": "whom"
     },
-    "board":    {
-        "addFavorite":     "Add to favourites",
-        "board":           "Board",
-        "cardMeta":        "{groups} groups · {tasks} tasks",
-        "changeFolder":    "Change folder",
-        "clickToEdit":     "Click to edit",
-        "count":           {
-            "one":   "1 board you are a member or owner of.",
-            "other": "{n} boards you are a member or owner of."
-        },
-        "create":          "Create board",
-        "createFailed":    "Board could not be created.",
-        "createFirst":     "+ Create your first board",
-        "createdAt":       "Created on",
-        "dashboard":       "Dashboard",
-        "delete":          "Delete board",
-        "deleteName":      "The board “{title}”",
-        "deleteNote":      "All groups, tasks, updates and calendar entries of this board go with it.",
-        "descriptionPlaceholder": "What is this board about?",
-        "duplicate":       "Duplicate board",
-        "empty":           "Nothing here yet.",
-        "emptyHint":       "Create your first board — or wait for an owner to invite you to one.",
-        "favorites":       "Favourites",
-        "folderHint":      "empty = no folder",
-        "folderLabel":     "Folder (e.g. IT, Marketing)",
-        "info":            "Board info",
-        "invite":          "Invite members",
-        "inviteWithCount": {
-            "one":   "Invite · 1",
-            "other": "Invite · {n}"
-        },
-        "kanban":          "Kanban",
-        "loadFailed":      "Boards could not be loaded.",
-        "more":            "More",
-        "name":            "Board name",
-        "newButton":       "+ New board",
-        "noDescription":   "No description yet.",
-        "newTitle":        "New board",
-        "noMatch":         "No board matches “{filter}”.",
-        "noMembers":       "no members",
-        "noneYet":         "You are not in any board yet.",
-        "owner":           "Owner",
-        "search":          "Search board…",
-        "showActivity":    "Show board activity",
-        "showDescription": "Show board description",
-        "showMembers":     "Show board members",
-        "table":           "Table",
-        "thisBoard":       "This board",
-        "type":            "Board type",
-        "visibility":      "Every member can see this board.",
-        "workspace":       "Workspace",
-        "workspaceName":   "General",
-        "youAreOwner":     "You are the owner of this board"
+    "tabCreate": "Create",
+    "tabEdit": "Edit",
+    "tabHistory": "History",
+    "tabManage": "Manage",
+    "thenPlaceholder": "Then do this",
+    "thisRule": "This automation",
+    "title": "Automations",
+    "trigger": {
+      "column_changes": {
+        "name": "When a column changes",
+        "text": "When {column} changes"
+      },
+      "item_created": {
+        "name": "When an item is created",
+        "text": "When an item is created"
+      },
+      "status_changes_to": {
+        "name": "When a status changes",
+        "text": "When {column} changes to {value}"
+      }
     },
-    "calendar": {
-        "chooseBoard":       "Choose board…",
-        "chooseBoardFirst":  "Choose a board first",
-        "duration":          "Duration",
-        "edit":              "Edit entry",
-        "end":               "End",
-        "endAfterStart":     "The end must be after the start.",
-        "endBeforeStart":    "End is before the start",
-        "filterPlaceholder": "Title or group…",
-        "maxDuration":       "An entry must not last longer than 24 hours.",
-        "minDuration":       "An entry must last at least 5 minutes.",
-        "new":               "Plan time",
-        "noTaskFound":       "No task found",
-        "note":              "Note (optional)",
-        "openDayView":       "Open day view",
-        "planned":           "Planned: {duration}",
-        "searchTask":        "Search task",
-        "start":             "Start",
-        "taskRequired":      "Please choose a task.",
-        "thisEntry":         "This calendar entry",
-        "today":             "Today"
-    },
-    "chart":    {
-        "bars":   "Bars",
-        "donut":  "Donut",
-        "labels": "Chart: labels",
-        "people": "Chart: people",
-        "pie":    "Pie"
-    },
-    "column":   {
-        "add":        "Add column",
-        "category":   {
-            "overview": "Overview",
-            "useful":   "Very useful"
-        },
-        "customName": "Custom name",
-        "delete":     "Delete column",
-        "deleteName": "The column “{title}”",
-        "deleteNote": "The values of this column are lost in every task of this board.",
-        "dragWidth":  "Drag to resize",
-        "renameHint": "Double-click to rename",
-        "search":     "Search column…",
-        "thisColumn": "This column",
-        "titleHint":  "You can rename it later by double-clicking the column header",
-        "type":       {
-            "checkbox": "Checkbox",
-            "date":     "Date",
-            "dropdown": "Drop-down",
-            "file":     "File",
-            "link":     "Link",
-            "longtext": "Long text",
-            "number":   "Numbers",
-            "person":   "People",
-            "priority": "Priority",
-            "status":   "Status",
-            "text":     "Text",
-            "updated":  "Last updated"
-        }
-    },
-    "common":   {
-        "add":             "Add",
-        "archive":         "Archive",
-        "areaFailed":      "{area} could not be shown.",
-        "areaFailedHint":  "The rest of the page keeps working. Details are in the browser console.",
-        "back":            "Back",
-        "cancel":          "Cancel",
-        "close":           "Close",
-        "confirmTitle":    "Are you sure?",
-        "create":          "Create",
-        "delete":          "Delete",
-        "deleteEntryText": "The entry will be deleted.",
-        "deleteText":      "{what} will be deleted.",
-        "deleteTitle":     "Delete for good?",
-        "done":            "Done",
-        "duplicate":       "Duplicate",
-        "edit":            "Edit",
-        "forward":         "Forward",
-        "loading":         "Loading…",
-        "name":            "Name",
-        "nobody":          "nobody",
-        "open":            "Open",
-        "open2":           "Open",
-        "optional":        "optional",
-        "person":          "Person",
-        "pin":             "Pin",
-        "remove":          "Remove",
-        "retry":           "Try again",
-        "role":            "Role",
-        "save":            "Save",
-        "saveFailed":      "Saving failed",
-        "saving":          "Saving…",
-        "search":          "Search",
-        "thisArea":        "This area",
-        "unknownError":    "Unknown error",
-        "unpin":           "Unpin",
-        "user":            "User",
-        "yes":             "Yes"
-    },
-    "date":     {
-        "dueIn":     {
-            "one":   "due in 1 day",
-            "other": "due in {n} days"
-        },
-        "overdue":   {
-            "one":   "1 day overdue",
-            "other": "{n} days overdue"
-        },
-        "today":     "due today",
-        "tomorrow":  "due tomorrow",
-        "yesterday": "was due yesterday"
-    },
-    "errors":   {
-        "loginFailed":     "Username or password is wrong.",
-        "signupFailed":    "The account could not be created.",
-        "tooManyAttempts": {
-            "one":   "Too many failed attempts. Please try again in a minute.",
-            "other": "Too many failed attempts. Please try again in {n} minutes."
-        }
-    },
-    "file":     {
-        "attach":          "Attach file",
-        "file":            "File",
-        "imageFailed":     "Image could not be processed",
-        "imageReadFailed": "Image could not be read",
-        "noneSelected":    "No file selected",
-        "notAllowed":      "Not allowed to open that file.",
-        "notAnImage":      "That is not an image",
-        "notDecodable":    "That image cannot be opened. It is probably damaged, or not an image.",
-        "notFound":        "File not found. Was it moved or renamed after you picked it?",
-        "notReadable":     "That file cannot be read. Is it in iCloud or on a network drive? Open it once in Finder so it downloads.",
-        "readFailed":      "File could not be read",
-        "readFailedWhy":   "Could not read the file ({reason})",
-        "remove":          "Remove file",
-        "uploadFailed":    "Upload failed"
-    },
-    "group":    {
-        "changeColor": "Change group colour",
-        "collapse":    "Fold group away",
-        "delete":      "Delete group",
-        "deleteName":  "The group “{title}”",
-        "deleteNote":  {
-            "one":   "1 task in it will be deleted with it.",
-            "other": "{n} tasks in it will be deleted with it."
-        },
-        "duplicate":   "Duplicate group",
-        "expand":      "Unfold group",
-        "group":       "Group",
-        "icon":        "Group symbol",
-        "iconNone":    "No symbol",
-        "iconOwn":     "Your own emoji",
-        "new":         "New group",
-        "none":        "No folder",
-        "thisGroup":   "This group"
-    },
-    "label":    {
-        "changeColor":  "Change colour",
-        "edit":         "Edit labels",
-        "editTitle":    "Edit the labels of this column",
-        "meansDone":    "This label means “done”",
-        "nameRequired": "Every label needs a name.",
-        "none":         "No labels yet.",
-        "notAvailable": "Not available for this column",
-        "remove":       "Remove label",
-        "removeUsed":   {
-            "one":   "Remove — 1 task will be cleared",
-            "other": "Remove — {n} tasks will be cleared"
-        },
-        "saveFailed":   "Labels could not be saved.",
-        "usedBy":       {
-            "one":   "1 task uses this label",
-            "other": "{n} tasks use this label"
-        }
-    },
-    "language": {
-        "hint":   "Applies to your account, so the interface follows you into every browser you log in from.",
-        "name":   "English",
-        "saved":  "Language saved.",
-        "select": "Interface language",
-        "title":  "Language"
-    },
-    "login":    {
-        "fullName":     "Full name",
-        "haveAccount":  "Already have an account?",
-        "hintLogin":    "Enter username and password",
-        "hintSignup":   "Enter your full name, username and password",
-        "noAccount":    "No account yet?",
-        "orLoginWith":  "Or log in with",
-        "orSignupWith": "Or sign up with",
-        "password":     "Password",
-        "signup":       "Sign up",
-        "titleLogin":   "Log in to your account",
-        "titleSignup":  "Create an account",
-        "username":     "Username"
-    },
-    "member":   {
-        "ownerOnly":   "Only owners of this board can change members and roles.",
-        "removeNote":  "The person loses access to the board and is removed from all tasks.",
-        "removed":     "Member removed.",
-        "search":      "Search names",
-        "suggestions": "Suggestions",
-        "thisMember":  "This member"
-    },
-    "nav":      {
-        "administration": "Administration",
-        "boards":         "Boards",
-        "calendar":       "Calendar",
-        "collapse":       "Collapse navigation",
-        "expand":         "Expand navigation",
-        "home":           "Home",
-        "login":          "Log in",
-        "logout":         "Log out",
-        "myBoards":       "My boards",
-        "profile":        "My profile",
-        "profileTooltip": "{name} — profile and log out",
-        "workspaces":     "Workspaces"
-    },
-    "notification": {
-        "assigned":    "{actor} assigned something to you",
-        "comment":     "{actor} wrote an update",
-        "empty":       "No notifications.",
-        "emptyUnread": "Nothing unread.",
-        "generic":     "{actor} changed something",
-        "invited":     "{actor} added you to a board",
-        "markAllRead": "Mark all as read",
-        "mention":     "{actor} mentioned you",
-        "onlyUnread":  "Unread only",
-        "section":     {
-            "older":  "Older",
-            "today":  "Today",
-            "week":   "Last 7 days"
-        },
-        "someone":     "Someone",
-        "title":       "Notifications",
-        "unreadCount": {
-            "one":   "1 unread notification",
-            "other": "{n} unread notifications"
-        },
-        "value":       "{actor} changed {column}"
-    },
-    "mention": {
-        "suggestions": "People suggestions"
-    },
-    "panel":    {
-        "width": "Drag to resize — double-click resets"
-    },
-    "preview":  {
-        "download":      "Download",
-        "empty":         "The file is empty",
-        "failed":        "The file could not be loaded",
-        "noPreview":     "No preview for this file type. Download it and open it locally.",
-        "tooBig":        "The file is too large to preview",
-        "truncatedRows": "Showing the first {n} rows. Download the file for the rest.",
-        "truncatedText": "Shortened. Download the file for the full contents."
-    },
-    "profile":  {
-        "changePassword":   "Change password",
-        "endSession":      "Sign out",
-        "lastSeen":        "last used",
-        "noSessions":      "No other sign-ins.",
-        "thisDevice":      "this device",
-        "unknownDevice":   "Unknown device",
-        "logoutAll":       "Sign out everywhere",
-        "logoutAllNote":   "This window too. You will have to sign in again.",
-        "logoutAllWhat":   "Every sign-in of this account",
-        "passwordChangedSignOut": "Password changed. Every sign-in was ended — you will be asked to sign in again.",
-        "sessions":        "Sign-ins",
-        "sessionsHint":    "Ends every sign-in of this account, in every browser. Useful when you left yourself signed in on somebody else\u2019s machine.",
-        "choosePicture":    "Choose picture",
-        "currentPassword":  "Current password",
-        "fullName":         "Full name",
-        "nameHint":         "This is how you appear in boards, tasks and comments.",
-        "nameSaved":        "Name saved.",
-        "newPassword":      "New password",
-        "passwordChanged":  "Password changed.",
-        "passwordHint":     "At least 8 characters. Your current password is needed to confirm.",
-        "passwordMismatch": "The new passwords do not match.",
-        "passwordTooShort": "The new password needs at least 8 characters.",
-        "picture":          "Profile picture",
-        "pictureHint":      "Scaled down to 256×256 in the browser and stored on your own server. You can also just paste an image with Ctrl+V.",
-        "pictureRemoved":   "Profile picture removed.",
-        "pictureSaved":     "Profile picture saved.",
-        "preview":          "Preview — not saved yet.",
-        "repeatPassword":   "Repeat new password",
-        "replacePicture":   "Choose another picture",
-        "saveName":         "Save name",
-        "uploadPicture":    "Upload profile picture",
-        "usernameFixed":    "Username (cannot be changed)"
-    },
-    "richtext": {
-        "toolbar":     "Text formatting",
-        "bold":        "Bold",
-        "italic":      "Italic",
-        "strike":      "Strikethrough",
-        "heading":     "Heading {n}",
-        "bulletList":  "Bullet list",
-        "orderedList": "Numbered list",
-        "taskList":    "Checklist",
-        "quote":       "Quote",
-        "code":        "Code",
-        "codeBlock":   "Code block",
-        "rule":        "Divider",
-        "link":        "Link"
-    },
-    "role":     {
-        "owner":        "Owner",
-        "editor":       "Editor",
-        "viewer":       "Viewer",
-        "forNew":       "Role for new members",
-        "lastOwner":    "A board needs at least one owner",
-        "changeFailed": "The role could not be changed"
-    },
-    "search":   {
-        "kind":        {
-            "board":   "Board",
-            "file":    "File",
-            "person":  "Person",
-            "subtask": "Subtask",
-            "task":    "Task",
-            "update":  "Update"
-        },
-        "nothing":     "Nothing found for “{term}”.",
-        "placeholder": "Search everything …",
-        "start":       "Type to search.",
-        "tab":         {
-            "all":     "All",
-            "boards":  "Boards",
-            "files":   "Files",
-            "people":  "People",
-            "tasks":   "Tasks",
-            "updates": "Updates"
-        },
-        "title":       "Search",
-        "tooShort":    "At least {n} characters."
-    },
-    "task":     {
-        "add":            "+ Add task",
-        "addSubtask":     "+ Add a subtask",
-        "convert":        "Convert",
-        "convertPick":    "Pick the new parent task",
-        "convertSearch":  "Search tasks",
-        "convertTitle":   "Turn into a subtask",
-        "count":          {
-            "one":   "1 task",
-            "other": "{n} tasks"
-        },
-        "createNew":      "Create a new task",
-        "delete":         "Delete task",
-        "deleteMany":     "Delete tasks",
-        "deleteName":     "The task “{title}”",
-        "deleteSubtask":  "Delete subtask",
-        "filterByPerson": "Filter by person",
-        "hasSubtasks":    "Has subtasks of its own",
-        "hideSubtasks":   "Hide subtasks",
-        "moveTo":         "Move to",
-        "moveToTitle":    "Move to another group",
-        "new":            "New task",
-        "newBelow":       "New task below",
-        "newSubtask":     "New subtask",
-        "noOtherGroup":   "There is no other group",
-        "noTarget":       "No other task on this board",
-        "none":           "No tasks",
-        "progress":       "{done}/{total}",
-        "promote":        "Turn into a task",
-        "quickFilter":    "Quick filter: person",
-        "selectedCount":  {
-            "one":   "The selected task",
-            "other": "{n} selected tasks"
-        },
-        "selectedLabel":  {
-            "one":   "task selected",
-            "other": "tasks selected"
-        },
-        "showSubtasks":   "Show subtasks",
-        "subtask":        "Subtask",
-        "subtaskCount":   "{n} subtasks",
-        "subtasks":       "Subtasks",
-        "task":           "Task",
-        "thisTask":       "This task"
-    },
-    "update":   {
-        "area":             "The updates",
-        "attach":           "Attach an image or file",
-        "delete":           "Delete update",
-        "deleteNote":       "The replies to it go with it.",
-        "deleteReply":      "Delete reply",
-        "discard":          "Discard",
-        "dropFiles":        "Drop files here",
-        "none":             "No updates on this task yet",
-        "pinned":           "Pinned",
-        "placeholder":      "Write an update — you can paste images with Ctrl+V",
-        "replies":          "Replies",
-        "repliesCount":     "Replies ({n})",
-        "replyPlaceholder": "Write a reply…",
-        "thisReply":        "This reply",
-        "thisUpdate":       "This update",
-        "update":           "Update",
-        "updates":          "Updates",
-        "uploading":        "Uploading…",
-        "write":            "Write an update"
+    "turnOff": "Turn off",
+    "turnOn": "Turn on",
+    "updated": "Updated",
+    "whenPlaceholder": "When this happens",
+    "who": {
+      "assignees": "the assigned people"
     }
+  },
+  "bin": {
+    "archive": "Archive",
+    "board": "Board",
+    "emptyArchive": "The archive is empty.",
+    "emptyTrash": "The bin is empty.",
+    "groupWith": {
+      "one": "Group with 1 item",
+      "other": "Group with {n} items"
+    },
+    "open": "Bin and archive",
+    "purge": "Delete for good",
+    "purgeNote": "There is no way back from this.",
+    "restore": "Restore",
+    "title": "Bin and archive",
+    "trash": "Bin"
+  },
+  "board": {
+    "addFavorite": "Add to favourites",
+    "board": "Board",
+    "cardMeta": "{groups} groups · {tasks} tasks",
+    "changeFolder": "Change folder",
+    "clickToEdit": "Click to edit",
+    "count": {
+      "one": "1 board you are a member or owner of.",
+      "other": "{n} boards you are a member or owner of."
+    },
+    "create": "Create board",
+    "createFailed": "Board could not be created.",
+    "createFirst": "+ Create your first board",
+    "createdAt": "Created on",
+    "dashboard": "Dashboard",
+    "delete": "Delete board",
+    "deleteName": "The board “{title}”",
+    "deleteNote": "All groups, tasks, updates and calendar entries of this board go with it.",
+    "descriptionPlaceholder": "What is this board about?",
+    "duplicate": "Duplicate board",
+    "empty": "Nothing here yet.",
+    "emptyHint": "Create your first board — or wait for an owner to invite you to one.",
+    "favorites": "Favourites",
+    "folderHint": "empty = no folder",
+    "folderLabel": "Folder (e.g. IT, Marketing)",
+    "info": "Board info",
+    "invite": "Invite members",
+    "inviteWithCount": {
+      "one": "Invite · 1",
+      "other": "Invite · {n}"
+    },
+    "kanban": "Kanban",
+    "loadFailed": "Boards could not be loaded.",
+    "more": "More",
+    "name": "Board name",
+    "newButton": "+ New board",
+    "newTitle": "New board",
+    "noDescription": "No description yet.",
+    "noMatch": "No board matches “{filter}”.",
+    "noMembers": "no members",
+    "noneYet": "You are not in any board yet.",
+    "owner": "Owner",
+    "search": "Search board…",
+    "showActivity": "Show board activity",
+    "showDescription": "Show board description",
+    "showMembers": "Show board members",
+    "table": "Table",
+    "thisBoard": "This board",
+    "type": "Board type",
+    "visibility": "Every member can see this board.",
+    "workspace": "Workspace",
+    "workspaceName": "General",
+    "youAreOwner": "You are the owner of this board"
+  },
+  "calendar": {
+    "chooseBoard": "Choose board…",
+    "chooseBoardFirst": "Choose a board first",
+    "duration": "Duration",
+    "edit": "Edit entry",
+    "end": "End",
+    "endAfterStart": "The end must be after the start.",
+    "endBeforeStart": "End is before the start",
+    "filterPlaceholder": "Title or group…",
+    "maxDuration": "An entry must not last longer than 24 hours.",
+    "minDuration": "An entry must last at least 5 minutes.",
+    "new": "Plan time",
+    "noTaskFound": "No task found",
+    "note": "Note (optional)",
+    "openDayView": "Open day view",
+    "planned": "Planned: {duration}",
+    "searchTask": "Search task",
+    "start": "Start",
+    "taskRequired": "Please choose a task.",
+    "thisEntry": "This calendar entry",
+    "today": "Today"
+  },
+  "chart": {
+    "bars": "Bars",
+    "donut": "Donut",
+    "labels": "Chart: labels",
+    "people": "Chart: people",
+    "pie": "Pie"
+  },
+  "column": {
+    "add": "Add column",
+    "category": {
+      "overview": "Overview",
+      "useful": "Very useful"
+    },
+    "customName": "Custom name",
+    "delete": "Delete column",
+    "deleteName": "The column “{title}”",
+    "deleteNote": "The values of this column are lost in every task of this board.",
+    "dragWidth": "Drag to resize",
+    "renameHint": "Double-click to rename",
+    "search": "Search column…",
+    "thisColumn": "This column",
+    "titleHint": "You can rename it later by double-clicking the column header",
+    "type": {
+      "checkbox": "Checkbox",
+      "date": "Date",
+      "dropdown": "Drop-down",
+      "file": "File",
+      "link": "Link",
+      "longtext": "Long text",
+      "number": "Numbers",
+      "person": "People",
+      "priority": "Priority",
+      "status": "Status",
+      "text": "Text",
+      "updated": "Last updated"
+    }
+  },
+  "common": {
+    "add": "Add",
+    "archive": "Archive",
+    "areaFailed": "{area} could not be shown.",
+    "areaFailedHint": "The rest of the page keeps working. Details are in the browser console.",
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirmTitle": "Are you sure?",
+    "create": "Create",
+    "delete": "Delete",
+    "deleteEntryText": "The entry will be deleted.",
+    "deleteText": "{what} will be deleted.",
+    "deleteTitle": "Delete for good?",
+    "done": "Done",
+    "duplicate": "Duplicate",
+    "edit": "Edit",
+    "forward": "Forward",
+    "loading": "Loading…",
+    "name": "Name",
+    "nobody": "nobody",
+    "open": "Open",
+    "open2": "Open",
+    "optional": "optional",
+    "person": "Person",
+    "pin": "Pin",
+    "remove": "Remove",
+    "retry": "Try again",
+    "role": "Role",
+    "save": "Save",
+    "saveFailed": "Saving failed",
+    "saving": "Saving…",
+    "search": "Search",
+    "thisArea": "This area",
+    "unknownError": "Unknown error",
+    "unpin": "Unpin",
+    "user": "User",
+    "yes": "Yes"
+  },
+  "date": {
+    "dueIn": {
+      "one": "due in 1 day",
+      "other": "due in {n} days"
+    },
+    "overdue": {
+      "one": "1 day overdue",
+      "other": "{n} days overdue"
+    },
+    "today": "due today",
+    "tomorrow": "due tomorrow",
+    "yesterday": "was due yesterday"
+  },
+  "errors": {
+    "loginFailed": "Username or password is wrong.",
+    "signupFailed": "The account could not be created.",
+    "tooManyAttempts": {
+      "one": "Too many failed attempts. Please try again in a minute.",
+      "other": "Too many failed attempts. Please try again in {n} minutes."
+    }
+  },
+  "file": {
+    "attach": "Attach file",
+    "file": "File",
+    "imageFailed": "Image could not be processed",
+    "imageReadFailed": "Image could not be read",
+    "noneSelected": "No file selected",
+    "notAllowed": "Not allowed to open that file.",
+    "notAnImage": "That is not an image",
+    "notDecodable": "That image cannot be opened. It is probably damaged, or not an image.",
+    "notFound": "File not found. Was it moved or renamed after you picked it?",
+    "notReadable": "That file cannot be read. Is it in iCloud or on a network drive? Open it once in Finder so it downloads.",
+    "readFailed": "File could not be read",
+    "readFailedWhy": "Could not read the file ({reason})",
+    "remove": "Remove file",
+    "uploadFailed": "Upload failed"
+  },
+  "filter": {
+    "addRule": "Add filter",
+    "clearAll": "Clear all",
+    "column": "Column",
+    "group": "Group",
+    "modeAll": "All",
+    "modeAny": "Any",
+    "noOptions": "No values available",
+    "op": {
+      "after": "is after",
+      "before": "is before",
+      "contains": "contains",
+      "eq": "equals",
+      "gt": "is greater than",
+      "is": "is",
+      "isAnyOf": "is any of",
+      "isChecked": "is ticked",
+      "isEmpty": "is empty",
+      "isNoneOf": "is none of",
+      "isNot": "is not",
+      "isNotChecked": "is not ticked",
+      "isNotEmpty": "is not empty",
+      "lt": "is less than",
+      "ne": "does not equal",
+      "notContains": "does not contain",
+      "overdue": "is overdue"
+    },
+    "removeRule": "Remove filter",
+    "title": "Title",
+    "title2": "Filter",
+    "updateView": "Update view “{name}”",
+    "value": "Value"
+  },
+  "group": {
+    "changeColor": "Change group colour",
+    "collapse": "Fold group away",
+    "delete": "Delete group",
+    "deleteName": "The group “{title}”",
+    "deleteNote": {
+      "one": "1 task in it will be deleted with it.",
+      "other": "{n} tasks in it will be deleted with it."
+    },
+    "duplicate": "Duplicate group",
+    "expand": "Unfold group",
+    "group": "Group",
+    "icon": "Group symbol",
+    "iconNone": "No symbol",
+    "iconOwn": "Your own emoji",
+    "new": "New group",
+    "none": "No folder",
+    "thisGroup": "This group"
+  },
+  "label": {
+    "changeColor": "Change colour",
+    "edit": "Edit labels",
+    "editTitle": "Edit the labels of this column",
+    "meansDone": "This label means “done”",
+    "nameRequired": "Every label needs a name.",
+    "none": "No labels yet.",
+    "notAvailable": "Not available for this column",
+    "remove": "Remove label",
+    "removeUsed": {
+      "one": "Remove — 1 task will be cleared",
+      "other": "Remove — {n} tasks will be cleared"
+    },
+    "saveFailed": "Labels could not be saved.",
+    "usedBy": {
+      "one": "1 task uses this label",
+      "other": "{n} tasks use this label"
+    }
+  },
+  "language": {
+    "hint": "Applies to your account, so the interface follows you into every browser you log in from.",
+    "name": "English",
+    "saved": "Language saved.",
+    "select": "Interface language",
+    "title": "Language"
+  },
+  "login": {
+    "fullName": "Full name",
+    "haveAccount": "Already have an account?",
+    "hintLogin": "Enter username and password",
+    "hintSignup": "Enter your full name, username and password",
+    "noAccount": "No account yet?",
+    "password": "Password",
+    "signup": "Sign up",
+    "titleLogin": "Log in to your account",
+    "titleSignup": "Create an account",
+    "username": "Username"
+  },
+  "member": {
+    "ownerOnly": "Only owners of this board can change members and roles.",
+    "removeNote": "The person loses access to the board and is removed from all tasks.",
+    "removed": "Member removed.",
+    "search": "Search names",
+    "suggestions": "Suggestions",
+    "thisMember": "This member"
+  },
+  "mention": {
+    "suggestions": "People suggestions"
+  },
+  "nav": {
+    "administration": "Administration",
+    "boards": "Boards",
+    "calendar": "Calendar",
+    "collapse": "Collapse navigation",
+    "expand": "Expand navigation",
+    "home": "Home",
+    "login": "Log in",
+    "logout": "Log out",
+    "myBoards": "My boards",
+    "profile": "My profile",
+    "profileTooltip": "{name} — profile and log out",
+    "workspaces": "Workspaces"
+  },
+  "notification": {
+    "assigned": "{actor} assigned something to you",
+    "comment": "{actor} wrote an update",
+    "empty": "No notifications.",
+    "emptyUnread": "Nothing unread.",
+    "generic": "{actor} changed something",
+    "invited": "{actor} added you to a board",
+    "markAllRead": "Mark all as read",
+    "mention": "{actor} mentioned you",
+    "onlyUnread": "Unread only",
+    "section": {
+      "older": "Older",
+      "today": "Today",
+      "week": "Last 7 days"
+    },
+    "someone": "Someone",
+    "title": "Notifications",
+    "unreadCount": {
+      "one": "1 unread notification",
+      "other": "{n} unread notifications"
+    },
+    "value": "{actor} changed {column}"
+  },
+  "panel": {
+    "width": "Drag to resize — double-click resets"
+  },
+  "preview": {
+    "download": "Download",
+    "empty": "The file is empty",
+    "failed": "The file could not be loaded",
+    "noPreview": "No preview for this file type. Download it and open it locally.",
+    "tooBig": "The file is too large to preview",
+    "truncatedRows": "Showing the first {n} rows. Download the file for the rest.",
+    "truncatedText": "Shortened. Download the file for the full contents."
+  },
+  "profile": {
+    "changePassword": "Change password",
+    "choosePicture": "Choose picture",
+    "currentPassword": "Current password",
+    "endSession": "Sign out",
+    "fullName": "Full name",
+    "lastSeen": "last used",
+    "logoutAll": "Sign out everywhere",
+    "logoutAllNote": "This window too. You will have to sign in again.",
+    "logoutAllWhat": "Every sign-in of this account",
+    "nameHint": "This is how you appear in boards, tasks and comments.",
+    "nameSaved": "Name saved.",
+    "newPassword": "New password",
+    "noSessions": "No other sign-ins.",
+    "passwordChanged": "Password changed.",
+    "passwordChangedSignOut": "Password changed. Every sign-in was ended — you will be asked to sign in again.",
+    "passwordHint": "At least 8 characters. Your current password is needed to confirm.",
+    "passwordMismatch": "The new passwords do not match.",
+    "passwordTooShort": "The new password needs at least 8 characters.",
+    "picture": "Profile picture",
+    "pictureHint": "Scaled down to 256×256 in the browser and stored on your own server. You can also just paste an image with Ctrl+V.",
+    "pictureRemoved": "Profile picture removed.",
+    "pictureSaved": "Profile picture saved.",
+    "preview": "Preview — not saved yet.",
+    "repeatPassword": "Repeat new password",
+    "replacePicture": "Choose another picture",
+    "saveName": "Save name",
+    "sessions": "Sign-ins",
+    "sessionsHint": "Ends every sign-in of this account, in every browser. Useful when you left yourself signed in on somebody else’s machine.",
+    "thisDevice": "this device",
+    "unknownDevice": "Unknown device",
+    "uploadPicture": "Upload profile picture",
+    "usernameFixed": "Username (cannot be changed)"
+  },
+  "richtext": {
+    "bold": "Bold",
+    "bulletList": "Bullet list",
+    "code": "Code",
+    "codeBlock": "Code block",
+    "heading": "Heading {n}",
+    "italic": "Italic",
+    "link": "Link",
+    "orderedList": "Numbered list",
+    "quote": "Quote",
+    "rule": "Divider",
+    "strike": "Strikethrough",
+    "taskList": "Checklist",
+    "toolbar": "Text formatting"
+  },
+  "role": {
+    "changeFailed": "The role could not be changed",
+    "editor": "Editor",
+    "forNew": "Role for new members",
+    "lastOwner": "A board needs at least one owner",
+    "owner": "Owner",
+    "viewer": "Viewer"
+  },
+  "search": {
+    "kind": {
+      "board": "Board",
+      "file": "File",
+      "person": "Person",
+      "subtask": "Subtask",
+      "task": "Task",
+      "update": "Update"
+    },
+    "nothing": "Nothing found for “{term}”.",
+    "placeholder": "Search everything …",
+    "start": "Type to search.",
+    "tab": {
+      "all": "All",
+      "boards": "Boards",
+      "files": "Files",
+      "people": "People",
+      "tasks": "Tasks",
+      "updates": "Updates"
+    },
+    "title": "Search",
+    "tooShort": "At least {n} characters."
+  },
+  "task": {
+    "add": "+ Add task",
+    "addSubtask": "+ Add a subtask",
+    "convert": "Convert",
+    "convertPick": "Pick the new parent task",
+    "convertSearch": "Search tasks",
+    "convertTitle": "Turn into a subtask",
+    "count": {
+      "one": "1 task",
+      "other": "{n} tasks"
+    },
+    "createNew": "Create a new task",
+    "delete": "Delete task",
+    "deleteMany": "Delete tasks",
+    "deleteName": "The task “{title}”",
+    "deleteSubtask": "Delete subtask",
+    "filterByPerson": "Filter by person",
+    "hasSubtasks": "Has subtasks of its own",
+    "hideSubtasks": "Hide subtasks",
+    "moveTo": "Move to",
+    "moveToTitle": "Move to another group",
+    "new": "New task",
+    "newBelow": "New task below",
+    "newSubtask": "New subtask",
+    "noOtherGroup": "There is no other group",
+    "noTarget": "No other task on this board",
+    "none": "No tasks",
+    "progress": "{done}/{total}",
+    "promote": "Turn into a task",
+    "quickFilter": "Quick filter: person",
+    "selectedCount": {
+      "one": "The selected task",
+      "other": "{n} selected tasks"
+    },
+    "selectedLabel": {
+      "one": "task selected",
+      "other": "tasks selected"
+    },
+    "showSubtasks": "Show subtasks",
+    "subtask": "Subtask",
+    "subtaskCount": "{n} subtasks",
+    "subtasks": "Subtasks",
+    "task": "Task",
+    "thisTask": "This task"
+  },
+  "update": {
+    "area": "The updates",
+    "attach": "Attach an image or file",
+    "delete": "Delete update",
+    "deleteNote": "The replies to it go with it.",
+    "deleteReply": "Delete reply",
+    "discard": "Discard",
+    "dropFiles": "Drop files here",
+    "none": "No updates on this task yet",
+    "pinned": "Pinned",
+    "placeholder": "Write an update — you can paste images with Ctrl+V",
+    "replies": "Replies",
+    "repliesCount": "Replies ({n})",
+    "replyPlaceholder": "Write a reply…",
+    "thisReply": "This reply",
+    "thisUpdate": "This update",
+    "update": "Update",
+    "updates": "Updates",
+    "uploading": "Uploading…",
+    "write": "Write an update"
+  },
+  "view": {
+    "add": "Add view",
+    "makePrivate": "Only for me",
+    "menu": "Edit view",
+    "namePlaceholder": "Name of the view",
+    "private": "Only visible to you",
+    "rename": "Rename",
+    "share": "Make visible to everyone",
+    "shareDenied": "Sharing needs write access to the board",
+    "shareHint": "Visible to everyone on the board",
+    "showAs": "Show as {what}",
+    "takesCurrent": "Takes the filter that is currently set ({n})."
+  }
 }

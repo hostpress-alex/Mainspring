@@ -23,7 +23,8 @@
         opacity: 0;
 
         .icon {
-            font-size: functions.rem(40px);
+            font-size: 1.1rem;
+            font-weight: bold;
         }
 
         &.active {

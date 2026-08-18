@@ -1,4 +1,5 @@
 import {httpService} from './http.service.js'
+import {hasRules, matchesTask, MODE_ALL, MODE_ANY} from './board-filter'
 import * as boardRoles from './board-roles'
 import {userService} from './user.service.js'
 import {utilService} from './util.service.js'
@@ -13,6 +14,10 @@ export const boardService = {
     isBoardOwner,
     canManageMembers,
     canManageBoard,
+    getViews,
+    addView,
+    updateView,
+    removeView,
     setBoardState,
     setGroupState,
     setTaskState,
@@ -29,6 +34,8 @@ export const boardService = {
     getDefaultFilterBoard,
     getDefaultFilterBoards,
     getFilterFromSearchParams,
+    loadFilter,
+    saveFilter,
     getEmptyGroup,
     getEmptyTask,
     getEmptyComment,
@@ -126,10 +133,23 @@ function escapeForRegex(text){
 function getFilteredBoard(board, filterBy = getDefaultFilterBoard()){
     if(!board) return board
     const f = filterBy || getDefaultFilterBoard()
-    if(!f.title && !f.memberId) return {...board}
+    const rules = f.rules || []
+    if(!f.title && !f.memberId && !hasRules(rules)) return {...board}
 
     const filteredBoard = structuredClone(board)
     let groups = filteredBoard.groups || []
+
+    // The rules from the filter panel, before the quick search below. That
+    // order matters: a group whose TITLE matches the search keeps all of its
+    // tasks, which would put back exactly what a rule had just removed.
+    if(hasRules(rules)){
+        const columns = filteredBoard.columns || []
+        groups.forEach(group => {
+            group.tasks = (group.tasks || []).filter(task =>
+                matchesTask(task, rules, f.mode, {group, columns}))
+        })
+        groups = groups.filter(group => (group.tasks || []).length > 0)
+    }
 
     if(f.memberId){
         groups.forEach(group => {
@@ -156,6 +176,25 @@ function getById(boardId){
 
 function remove(boardId){
     return httpService.delete(BASE_URL + boardId)
+}
+
+/* ------------------------------------------ Gespeicherte Filter -- */
+
+/** The saved filters of a board. Everybody on it sees all of them. */
+function getViews(boardId){
+    return httpService.get(`${BASE_URL}${boardId}/view`)
+}
+
+function addView(boardId, view){
+    return httpService.post(`${BASE_URL}${boardId}/view`, view)
+}
+
+function updateView(boardId, viewId, patch){
+    return httpService.put(`${BASE_URL}${boardId}/view/${viewId}`, patch)
+}
+
+function removeView(boardId, viewId){
+    return httpService.delete(`${BASE_URL}${boardId}/view/${viewId}`)
 }
 
 /* ------------------------------------------ Papierkorb und Archiv -- */
@@ -337,18 +376,84 @@ function getDefaultFilterBoards(){
 
 function getDefaultFilterBoard(){
     return {
+        // The two quick filters in the toolbar.
         title: '',
-        memberId: ''
+        memberId: '',
+        // The rules from the filter panel, and whether all of them have to
+        // match or just one. See services/board-filter.js.
+        rules: [],
+        mode: MODE_ALL
     }
 }
 
+/**
+ * The two quick filters, from the URL.
+ *
+ * Only those two. The rules are objects, and putting them through
+ * URLSearchParams turns each of them into the string "[object Object]" — the
+ * link would not be shareable, it would be broken. They live in the browser
+ * instead (loadFilter/saveFilter) and, when somebody wants to keep one, in a
+ * saved view on the server.
+ */
 function getFilterFromSearchParams(searchParams){
-    const emptyFilter = getDefaultFilterBoard()
-    const filterBy = {}
-    for(const field in emptyFilter){
-        filterBy[field] = searchParams.get(field) || ''
+    return {
+        title: searchParams.get('title') || '',
+        memberId: searchParams.get('memberId') || ''
     }
-    return filterBy
+}
+
+/* ------------------------------------------ Filter im Browser -- */
+
+const FILTER_KEY = 'boardFilter'
+
+/**
+ * The filter a tab was last left with.
+ *
+ * Per board AND per tab. Per board alone was wrong the moment tabs existed:
+ * a rule set typed into the kanban would follow you into the table, where it
+ * hides rows for a reason that is now two clicks away.
+ *
+ * Only the built-in tabs are kept here. A saved tab carries its own rules on
+ * the server, and a local copy would quietly win over them — you would edit
+ * the tab, come back tomorrow and see yesterday's version with no way of
+ * telling which one you are looking at.
+ *
+ * Read defensively — this is browser storage, and it survives the release in
+ * which a rule shape changes.
+ */
+function loadFilter(boardId, tabId = 'table'){
+    const all = utilService.loadFromStorage(FILTER_KEY) || {}
+    const forBoard = all[boardId]
+    const saved = (forBoard && typeof forBoard === 'object')?forBoard[tabId]:null
+    const filter = getDefaultFilterBoard()
+    if(!saved || typeof saved !== 'object') return filter
+
+    if(typeof saved.title === 'string') filter.title = saved.title
+    if(typeof saved.memberId === 'string') filter.memberId = saved.memberId
+    if(Array.isArray(saved.rules)) filter.rules = saved.rules.filter(r => r && typeof r === 'object')
+    if(saved.mode === MODE_ANY || saved.mode === MODE_ALL) filter.mode = saved.mode
+    return filter
+}
+
+function saveFilter(boardId, tabId, filter){
+    if(!boardId || !tabId) return
+    const all = utilService.loadFromStorage(FILTER_KEY) || {}
+    const forBoard = (all[boardId] && typeof all[boardId] === 'object')?{...all[boardId]}:{}
+    const isEmpty = !filter || (!filter.title && !filter.memberId && !hasRules(filter.rules))
+
+    // An empty filter is not worth a row. Kept as one, the store grows by a
+    // tab every time anybody opens one and never shrinks again.
+    if(isEmpty) delete forBoard[tabId]
+    else forBoard[tabId] = {
+        title: filter.title || '',
+        memberId: filter.memberId || '',
+        rules: filter.rules || [],
+        mode: filter.mode || MODE_ALL
+    }
+
+    if(Object.keys(forBoard).length) all[boardId] = forBoard
+    else delete all[boardId]
+    utilService.saveToStorage(FILTER_KEY, all)
 }
 
 function getEmptyGroup(){

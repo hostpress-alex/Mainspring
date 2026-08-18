@@ -1,582 +1,626 @@
 {
-    "activity": {
-        "action":   {
-            "create":   "angelegt",
-            "date":     "Datum",
-            "number":   "Zahl",
-            "person":   "Person",
-            "priority": "Priorität",
-            "status":   "Status",
-            "title":    "Titel"
-        },
-        "activity": "Verlauf",
-        "area":     "Der Verlauf",
-        "lastSeen": "Zuletzt geöffnet"
+  "activity": {
+    "action": {
+      "create": "angelegt",
+      "date": "Datum",
+      "number": "Zahl",
+      "person": "Person",
+      "priority": "Priorität",
+      "status": "Status",
+      "title": "Titel"
     },
-    "admin":    {
-        "admin":               "Admin",
-        "userReactivated": "Benutzer „{name}“ ist wieder aktiv.",
-        "inactive":       "Deaktiviert",
-        "reactivate":     "Wieder aktivieren",
-        "deactivate":     "Deaktivieren",
-        "adminGranted":        "{name}: Admin-Recht vergeben.",
-        "adminRevoked":        "{name}: Admin-Recht entzogen.",
-        "chooseUser":          "Benutzer wählen…",
-        "createUser":          "Benutzer anlegen",
-        "deleteUser":          "Benutzer deaktivieren",
-        "deleteUserName":      "Der Benutzer „{name}“",
-        "deleteUserNote":      "Die Anmeldung wird sofort ungültig. Alles Geschriebene bleibt mit dem Namen darunter stehen, und das Konto lässt sich hier jederzeit wieder aktivieren.",
-        "makeAdmin":           "Zum Admin machen",
-        "makeOwner":           "Zum Owner machen",
-        "memberAdded":         "{name} zu „{board}“ hinzugefügt.",
-        "members":             "Mitglieder — ★ = Owner",
-        "ownerGranted":        "{name}: Owner-Recht für „{board}“ vergeben.",
-        "ownerRequired":       "Ein Board braucht mindestens einen Owner.",
-        "ownerRevoked":        "{name}: Owner-Recht für „{board}“ entzogen.",
-        "passwordPlaceholder": "Passwort (mindestens 8 Zeichen)",
-        "removeFromBoard":     "Aus Board entfernen",
-        "revokeAdmin":         "Admin entziehen",
-        "revokeOwner":         "Owner-Recht entziehen",
-        "signedInAs":          "Angemeldet als {name}.",
-        "thatIsYou":           "das bist du",
-        "userCreated":         "Benutzer „{name}“ angelegt.",
-        "userDeleted":         "Benutzer „{name}“ deaktiviert.",
-        "usersHeading":        "Benutzer ({n})"
+    "activity": "Verlauf",
+    "area": "Der Verlauf",
+    "lastSeen": "Zuletzt geöffnet"
+  },
+  "admin": {
+    "admin": "Admin",
+    "adminGranted": "{name}: Admin-Recht vergeben.",
+    "adminRevoked": "{name}: Admin-Recht entzogen.",
+    "chooseUser": "Benutzer wählen…",
+    "createUser": "Benutzer anlegen",
+    "deactivate": "Deaktivieren",
+    "deleteUser": "Benutzer deaktivieren",
+    "deleteUserName": "Der Benutzer „{name}“",
+    "deleteUserNote": "Die Anmeldung wird sofort ungültig. Alles Geschriebene bleibt mit dem Namen darunter stehen, und das Konto lässt sich hier jederzeit wieder aktivieren.",
+    "inactive": "Deaktiviert",
+    "makeAdmin": "Zum Admin machen",
+    "makeOwner": "Zum Owner machen",
+    "memberAdded": "{name} zu „{board}“ hinzugefügt.",
+    "members": "Mitglieder — ★ = Owner",
+    "ownerGranted": "{name}: Owner-Recht für „{board}“ vergeben.",
+    "ownerRequired": "Ein Board braucht mindestens einen Owner.",
+    "ownerRevoked": "{name}: Owner-Recht für „{board}“ entzogen.",
+    "passwordPlaceholder": "Passwort (mindestens 8 Zeichen)",
+    "reactivate": "Wieder aktivieren",
+    "removeFromBoard": "Aus Board entfernen",
+    "revokeAdmin": "Admin entziehen",
+    "revokeOwner": "Owner-Recht entziehen",
+    "signedInAs": "Angemeldet als {name}.",
+    "thatIsYou": "das bist du",
+    "userCreated": "Benutzer „{name}“ angelegt.",
+    "userDeleted": "Benutzer „{name}“ deaktiviert.",
+    "userReactivated": "Benutzer „{name}“ ist wieder aktiv.",
+    "usersHeading": "Benutzer ({n})"
+  },
+  "automation": {
+    "action": {
+      "move_to_group": {
+        "name": "Task verschieben",
+        "text": "verschiebe den Task nach {group}"
+      },
+      "notify": {
+        "name": "Benachrichtigen",
+        "text": "benachrichtige {who}"
+      },
+      "set_value": {
+        "name": "Wert setzen",
+        "text": "setze {column} auf {value}"
+      }
     },
-    "automation": {
-        "action":          {
-            "move_to_group": {
-                "name": "Task verschieben",
-                "text": "verschiebe den Task nach {group}"
-            },
-            "notify":        {
-                "name": "Benachrichtigen",
-                "text": "benachrichtige {who}"
-            },
-            "set_value":     {
-                "name": "Wert setzen",
-                "text": "setze {column} auf {value}"
-            }
-        },
-        "addAction":       "Aktion hinzufügen",
-        "create":          "Automatisierung erstellen",
-        "delete":          "Automatisierung löschen",
-        "deleteNote":      "Was sie bisher getan hat, bleibt im Verlauf stehen.",
-        "edit":            "Automatisierung bearbeiten",
-        "empty":           "Noch keine Automatisierungen.",
-        "noOptions":       "Nichts zur Auswahl",
-        "noRuns":          "Bisher ist nichts passiert.",
-        "open":            "Automatisierungen",
-        "outcome":         {
-            "done":    "Ausgeführt",
-            "failed":  "Fehlgeschlagen",
-            "skipped": "Übersprungen"
-        },
-        "removeAction":    "Aktion entfernen",
-        "runsAs":          "Läuft mit den Rechten von",
-        "slot":            {
-            "column": "Spalte",
-            "group":  "Gruppe",
-            "value":  "Wert",
-            "who":    "wen"
-        },
-        "tabCreate":       "Erstellen",
-        "tabEdit":         "Bearbeiten",
-        "tabHistory":      "Verlauf",
-        "tabManage":       "Verwalten",
-        "thenPlaceholder": "Dann tu dies",
-        "thisRule":        "Diese Automatisierung",
-        "title":           "Automatisierungen",
-        "trigger":         {
-            "column_changes":    {
-                "name": "Wenn sich eine Spalte ändert",
-                "text": "Wenn sich {column} ändert"
-            },
-            "item_created":      {
-                "name": "Wenn ein Task angelegt wird",
-                "text": "Wenn ein Task angelegt wird"
-            },
-            "status_changes_to": {
-                "name": "Wenn ein Status wechselt",
-                "text": "Wenn {column} auf {value} wechselt"
-            }
-        },
-        "turnOff":         "Ausschalten",
-        "turnOn":          "Einschalten",
-        "updated":         "Geändert",
-        "whenPlaceholder": "Wenn dies geschieht",
-        "who":             {
-            "assignees": "die zugewiesenen Personen"
-        }
+    "addAction": "Aktion hinzufügen",
+    "create": "Automatisierung erstellen",
+    "delete": "Automatisierung löschen",
+    "deleteNote": "Was sie bisher getan hat, bleibt im Verlauf stehen.",
+    "edit": "Automatisierung bearbeiten",
+    "empty": "Noch keine Automatisierungen.",
+    "noOptions": "Nichts zur Auswahl",
+    "noRuns": "Bisher ist nichts passiert.",
+    "open": "Automatisierungen",
+    "outcome": {
+      "done": "Ausgeführt",
+      "failed": "Fehlgeschlagen",
+      "skipped": "Übersprungen"
     },
-    "bin":      {
-        "archive":      "Archiv",
-        "board":        "Board",
-        "emptyArchive": "Das Archiv ist leer.",
-        "emptyTrash":   "Der Papierkorb ist leer.",
-        "groupWith":    {
-            "one":   "Gruppe mit 1 Task",
-            "other": "Gruppe mit {n} Tasks"
-        },
-        "open":         "Papierkorb und Archiv",
-        "purge":        "Endgültig löschen",
-        "purgeNote":    "Das lässt sich nicht rückgängig machen.",
-        "restore":      "Wiederherstellen",
-        "title":        "Papierkorb und Archiv",
-        "trash":        "Papierkorb"
+    "removeAction": "Aktion entfernen",
+    "runsAs": "Läuft mit den Rechten von",
+    "slot": {
+      "column": "Spalte",
+      "group": "Gruppe",
+      "value": "Wert",
+      "who": "wen"
     },
-    "board":    {
-        "addFavorite":     "Zu den Favoriten",
-        "board":           "Board",
-        "cardMeta":        "{groups} Gruppen · {tasks} Tasks",
-        "changeFolder":    "Gruppe ändern",
-        "clickToEdit":     "Zum Bearbeiten klicken",
-        "count":           {
-            "one":   "1 Board, in dem du Mitglied oder Owner bist.",
-            "other": "{n} Boards, in denen du Mitglied oder Owner bist."
-        },
-        "create":          "Board anlegen",
-        "createFailed":    "Board konnte nicht angelegt werden.",
-        "createFirst":     "+ Erstes Board anlegen",
-        "createdAt":       "Erstellt am",
-        "dashboard":       "Auswertung",
-        "delete":          "Board löschen",
-        "deleteName":      "Das Board „{title}“",
-        "deleteNote":      "Alle Gruppen, Tasks, Updates und Kalendereinträge dieses Boards gehen mit.",
-        "descriptionPlaceholder": "Worum geht es in diesem Board?",
-        "duplicate":       "Board duplizieren",
-        "empty":           "Hier ist noch nichts.",
-        "emptyHint":       "Leg dein erstes Board an — oder lass dich von einem Owner zu einem bestehenden einladen.",
-        "favorites":       "Favoriten",
-        "folderHint":      "leer = Ohne Gruppe",
-        "folderLabel":     "Gruppe (z.B. IT, Marketing)",
-        "info":            "Board-Info",
-        "invite":          "Mitglieder einladen",
-        "inviteWithCount": {
-            "one":   "Einladen · 1",
-            "other": "Einladen · {n}"
-        },
-        "kanban":          "Kanban",
-        "loadFailed":      "Boards konnten nicht geladen werden.",
-        "more":            "Mehr",
-        "name":            "Board-Name",
-        "newButton":       "+ Neues Board",
-        "noDescription":   "Noch keine Beschreibung.",
-        "newTitle":        "Neues Board",
-        "noMatch":         "Kein Board passt zu „{filter}“.",
-        "noMembers":       "keine Mitglieder",
-        "noneYet":         "Du bist noch in keinem Board.",
-        "owner":           "Owner",
-        "search":          "Board suchen…",
-        "showActivity":    "Board-Verlauf anzeigen",
-        "showDescription": "Board-Beschreibung anzeigen",
-        "showMembers":     "Board-Mitglieder anzeigen",
-        "table":           "Tabelle",
-        "thisBoard":       "Dieses Board",
-        "type":            "Board-Typ",
-        "visibility":      "Dieses Board sehen alle Mitglieder.",
-        "workspace":       "Bereich",
-        "workspaceName":   "Allgemein",
-        "youAreOwner":     "Du bist Owner dieses Boards"
+    "tabCreate": "Erstellen",
+    "tabEdit": "Bearbeiten",
+    "tabHistory": "Verlauf",
+    "tabManage": "Verwalten",
+    "thenPlaceholder": "Dann tu dies",
+    "thisRule": "Diese Automatisierung",
+    "title": "Automatisierungen",
+    "trigger": {
+      "column_changes": {
+        "name": "Wenn sich eine Spalte ändert",
+        "text": "Wenn sich {column} ändert"
+      },
+      "item_created": {
+        "name": "Wenn ein Task angelegt wird",
+        "text": "Wenn ein Task angelegt wird"
+      },
+      "status_changes_to": {
+        "name": "Wenn ein Status wechselt",
+        "text": "Wenn {column} auf {value} wechselt"
+      }
     },
-    "calendar": {
-        "chooseBoard":       "Board wählen…",
-        "chooseBoardFirst":  "Erst ein Board wählen",
-        "duration":          "Dauer",
-        "edit":              "Eintrag bearbeiten",
-        "end":               "Ende",
-        "endAfterStart":     "Das Ende muss nach dem Beginn liegen.",
-        "endBeforeStart":    "Ende liegt vor dem Beginn",
-        "filterPlaceholder": "Titel oder Gruppe…",
-        "maxDuration":       "Der Eintrag darf höchstens 24 Stunden dauern.",
-        "minDuration":       "Der Eintrag muss mindestens 5 Minuten lang sein.",
-        "new":               "Zeit einplanen",
-        "noTaskFound":       "Kein Task gefunden",
-        "note":              "Notiz (optional)",
-        "openDayView":       "Tagesansicht öffnen",
-        "planned":           "Geplant: {duration}",
-        "searchTask":        "Task suchen",
-        "start":             "Beginn",
-        "taskRequired":      "Bitte einen Task auswählen.",
-        "thisEntry":         "Dieser Kalendereintrag",
-        "today":             "Heute"
-    },
-    "chart":    {
-        "bars":   "Balken",
-        "donut":  "Ring",
-        "labels": "Diagramm: Labels",
-        "people": "Diagramm: Personen",
-        "pie":    "Kreis"
-    },
-    "column":   {
-        "add":        "Spalte hinzufügen",
-        "category":   {
-            "overview": "Überblick",
-            "useful":   "Sehr nützlich"
-        },
-        "customName": "Eigener Name",
-        "delete":     "Spalte löschen",
-        "deleteName": "Die Spalte „{title}“",
-        "deleteNote": "Die Werte dieser Spalte gehen bei allen Tasks des Boards verloren.",
-        "dragWidth":  "Breite ziehen",
-        "renameHint": "Doppelklick zum Umbenennen",
-        "search":     "Spalte suchen…",
-        "thisColumn": "Diese Spalte",
-        "titleHint":  "Titel später per Doppelklick auf den Spaltenkopf änderbar",
-        "type":       {
-            "checkbox": "Checkbox",
-            "date":     "Datum",
-            "dropdown": "Drop-down",
-            "file":     "Datei",
-            "link":     "Link",
-            "longtext": "Langer Text",
-            "number":   "Zahlen",
-            "person":   "Personen",
-            "priority": "Priorität",
-            "status":   "Status",
-            "text":     "Text",
-            "updated":  "Zuletzt aktualisiert"
-        }
-    },
-    "common":   {
-        "add":             "Hinzufügen",
-        "archive":         "Archivieren",
-        "areaFailed":      "{area} konnte nicht angezeigt werden.",
-        "areaFailedHint":  "Der Rest der Seite funktioniert weiter. Einzelheiten stehen in der Browser-Konsole.",
-        "back":            "Zurück",
-        "cancel":          "Abbrechen",
-        "close":           "Schließen",
-        "confirmTitle":    "Wirklich?",
-        "create":          "Anlegen",
-        "delete":          "Löschen",
-        "deleteEntryText": "Der Eintrag wird gelöscht.",
-        "deleteText":      "{what} wird gelöscht.",
-        "deleteTitle":     "Wirklich löschen?",
-        "done":            "Erledigt",
-        "duplicate":       "Duplizieren",
-        "edit":            "Bearbeiten",
-        "forward":         "Weiter",
-        "loading":         "Lädt…",
-        "name":            "Name",
-        "nobody":          "niemand",
-        "open":            "Öffnen",
-        "open2":           "Offen",
-        "optional":        "optional",
-        "person":          "Person",
-        "pin":             "Anheften",
-        "remove":          "Entfernen",
-        "retry":           "Nochmal versuchen",
-        "role":            "Rolle",
-        "save":            "Speichern",
-        "saveFailed":      "Speichern fehlgeschlagen",
-        "saving":          "Speichert…",
-        "search":          "Suchen",
-        "thisArea":        "Dieser Bereich",
-        "unknownError":    "Unbekannter Fehler",
-        "unpin":           "Nicht mehr anheften",
-        "user":            "Benutzer",
-        "yes":             "Ja"
-    },
-    "date":     {
-        "dueIn":     {
-            "one":   "in 1 Tag fällig",
-            "other": "in {n} Tagen fällig"
-        },
-        "overdue":   {
-            "one":   "1 Tag überfällig",
-            "other": "{n} Tage überfällig"
-        },
-        "today":     "heute fällig",
-        "tomorrow":  "morgen fällig",
-        "yesterday": "gestern fällig"
-    },
-    "errors":   {
-        "loginFailed":     "Benutzername oder Passwort stimmt nicht.",
-        "signupFailed":    "Das Konto konnte nicht angelegt werden.",
-        "tooManyAttempts": {
-            "one":   "Zu viele Fehlversuche. Bitte in einer Minute erneut probieren.",
-            "other": "Zu viele Fehlversuche. Bitte in {n} Minuten erneut probieren."
-        }
-    },
-    "file":     {
-        "attach":          "Datei anhängen",
-        "file":            "Datei",
-        "imageFailed":     "Bild konnte nicht verarbeitet werden",
-        "imageReadFailed": "Bild konnte nicht gelesen werden",
-        "noneSelected":    "Keine Datei ausgewählt",
-        "notAllowed":      "Zugriff auf die Datei nicht erlaubt.",
-        "notAnImage":      "Das ist kein Bild",
-        "notDecodable":    "Das Bild lässt sich nicht öffnen. Vermutlich ist die Datei beschädigt oder gar kein Bild.",
-        "notFound":        "Die Datei wurde nicht gefunden. Wurde sie nach dem Auswählen verschoben oder umbenannt?",
-        "notReadable":     "Die Datei lässt sich nicht lesen. Liegt sie in iCloud oder auf einem Netzlaufwerk? Dann im Finder einmal öffnen, damit sie geladen wird.",
-        "readFailed":      "Datei konnte nicht gelesen werden",
-        "readFailedWhy":   "Datei konnte nicht gelesen werden ({reason})",
-        "remove":          "Datei entfernen",
-        "uploadFailed":    "Upload fehlgeschlagen"
-    },
-    "group":    {
-        "changeColor": "Gruppenfarbe ändern",
-        "collapse":    "Gruppe einklappen",
-        "delete":      "Gruppe löschen",
-        "deleteName":  "Die Gruppe „{title}“",
-        "deleteNote":  {
-            "one":   "1 Task darin wird mit gelöscht.",
-            "other": "{n} Tasks darin werden mit gelöscht."
-        },
-        "duplicate":   "Gruppe duplizieren",
-        "expand":      "Gruppe ausklappen",
-        "group":       "Gruppe",
-        "icon":        "Symbol der Gruppe",
-        "iconNone":    "Kein Symbol",
-        "iconOwn":     "Eigenes Emoji",
-        "new":         "Neue Gruppe",
-        "none":        "Ohne Gruppe",
-        "thisGroup":   "Diese Gruppe"
-    },
-    "label":    {
-        "changeColor":  "Farbe ändern",
-        "edit":         "Labels bearbeiten",
-        "editTitle":    "Labels dieser Spalte bearbeiten",
-        "meansDone":    "Dieses Label bedeutet „erledigt“",
-        "nameRequired": "Jedes Label braucht einen Namen.",
-        "none":         "Noch keine Labels.",
-        "notAvailable": "Für diese Spalte nicht verfügbar",
-        "remove":       "Label entfernen",
-        "removeUsed":   {
-            "one":   "Entfernen — 1 Task wird dabei geleert",
-            "other": "Entfernen — {n} Tasks werden dabei geleert"
-        },
-        "saveFailed":   "Labels konnten nicht gespeichert werden.",
-        "usedBy":       {
-            "one":   "1 Task benutzt dieses Label",
-            "other": "{n} Tasks benutzen dieses Label"
-        }
-    },
-    "language": {
-        "hint":   "Gilt für dein Konto — die Oberfläche folgt dir in jeden Browser, in dem du dich anmeldest.",
-        "name":   "Deutsch",
-        "saved":  "Sprache gespeichert.",
-        "select": "Sprache der Oberfläche",
-        "title":  "Sprache"
-    },
-    "login":    {
-        "fullName":     "Vollständiger Name",
-        "haveAccount":  "Du hast schon ein Konto?",
-        "hintLogin":    "Benutzername und Passwort eingeben",
-        "hintSignup":   "Vollständigen Namen, Benutzernamen und Passwort eingeben",
-        "noAccount":    "Noch kein Konto?",
-        "orLoginWith":  "Oder anmelden mit",
-        "orSignupWith": "Oder registrieren mit",
-        "password":     "Passwort",
-        "signup":       "Registrieren",
-        "titleLogin":   "Bei deinem Konto anmelden",
-        "titleSignup":  "Konto anlegen",
-        "username":     "Benutzername"
-    },
-    "member":   {
-        "ownerOnly":   "Nur Owner dieses Boards können Mitglieder und Rollen ändern.",
-        "removeNote":  "Die Person verliert den Zugriff auf das Board und wird aus allen Tasks ausgetragen.",
-        "removed":     "Mitglied entfernt.",
-        "search":      "Namen suchen",
-        "suggestions": "Vorschläge",
-        "thisMember":  "Dieses Mitglied"
-    },
-    "nav":      {
-        "administration": "Administration",
-        "boards":         "Boards",
-        "calendar":       "Kalender",
-        "collapse":       "Navigation schließen",
-        "expand":         "Navigation öffnen",
-        "home":           "Startseite",
-        "login":          "Anmelden",
-        "logout":         "Abmelden",
-        "myBoards":       "Meine Boards",
-        "profile":        "Mein Profil",
-        "profileTooltip": "{name} — Profil und Abmelden",
-        "workspaces":     "Bereiche"
-    },
-    "notification": {
-        "assigned":    "{actor} hat dir etwas zugewiesen",
-        "comment":     "{actor} hat einen Kommentar geschrieben",
-        "empty":       "Keine Benachrichtigungen.",
-        "emptyUnread": "Nichts Ungelesenes.",
-        "generic":     "{actor} hat etwas geändert",
-        "invited":     "{actor} hat dich zu einem Board hinzugefügt",
-        "markAllRead": "Alle als gelesen markieren",
-        "mention":     "{actor} hat dich erwähnt",
-        "onlyUnread":  "Nur ungelesen",
-        "section":     {
-            "older":  "Älter",
-            "today":  "Heute",
-            "week":   "Letzte 7 Tage"
-        },
-        "someone":     "Jemand",
-        "title":       "Benachrichtigungen",
-        "unreadCount": {
-            "one":   "1 ungelesene Benachrichtigung",
-            "other": "{n} ungelesene Benachrichtigungen"
-        },
-        "value":       "{actor} hat {column} geändert"
-    },
-    "mention": {
-        "suggestions": "Personen vorschlagen"
-    },
-    "panel":    {
-        "width": "Breite ziehen — Doppelklick setzt zurück"
-    },
-    "preview":  {
-        "download":      "Herunterladen",
-        "empty":         "Die Datei ist leer",
-        "failed":        "Die Datei konnte nicht geladen werden",
-        "noPreview":     "Für diesen Dateityp gibt es keine Vorschau. Herunterladen und lokal öffnen.",
-        "tooBig":        "Die Datei ist zu groß für eine Vorschau",
-        "truncatedRows": "Es werden die ersten {n} Zeilen gezeigt. Für alles Weitere die Datei herunterladen.",
-        "truncatedText": "Gekürzt. Für den vollständigen Inhalt die Datei herunterladen."
-    },
-    "profile":  {
-        "changePassword":   "Passwort ändern",
-        "endSession":      "Abmelden",
-        "lastSeen":        "zuletzt",
-        "noSessions":      "Keine weiteren Anmeldungen.",
-        "thisDevice":      "dieses Gerät",
-        "unknownDevice":   "Unbekanntes Gerät",
-        "logoutAll":       "Überall abmelden",
-        "logoutAllNote":   "Auch dieses Fenster. Danach musst du dich neu anmelden.",
-        "logoutAllWhat":   "Alle Anmeldungen dieses Kontos",
-        "passwordChangedSignOut": "Passwort geändert. Alle Anmeldungen wurden beendet — du wirst neu angemeldet.",
-        "sessions":        "Anmeldungen",
-        "sessionsHint":    "Beendet jede Anmeldung dieses Kontos, in jedem Browser. Sinnvoll, wenn du dich an einem fremden Rechner nicht abgemeldet hast.",
-        "choosePicture":    "Bild wählen",
-        "currentPassword":  "Aktuelles Passwort",
-        "fullName":         "Voller Name",
-        "nameHint":         "So erscheinst du in Boards, Tasks und Kommentaren.",
-        "nameSaved":        "Name gespeichert.",
-        "newPassword":      "Neues Passwort",
-        "passwordChanged":  "Passwort geändert.",
-        "passwordHint":     "Mindestens 8 Zeichen. Dein aktuelles Passwort wird zur Bestätigung gebraucht.",
-        "passwordMismatch": "Die neuen Passwörter stimmen nicht überein.",
-        "passwordTooShort": "Das neue Passwort braucht mindestens 8 Zeichen.",
-        "picture":          "Profilbild",
-        "pictureHint":      "Wird im Browser auf 256×256 verkleinert und auf deinem Server gespeichert. Du kannst ein Bild auch einfach mit Strg+V einfügen.",
-        "pictureRemoved":   "Profilbild entfernt.",
-        "pictureSaved":     "Profilbild gespeichert.",
-        "preview":          "Vorschau — noch nicht gespeichert.",
-        "repeatPassword":   "Neues Passwort wiederholen",
-        "replacePicture":   "Anderes Bild wählen",
-        "saveName":         "Name speichern",
-        "uploadPicture":    "Profilbild hochladen",
-        "usernameFixed":    "Benutzername (nicht änderbar)"
-    },
-    "richtext": {
-        "toolbar":     "Textformatierung",
-        "bold":        "Fett",
-        "italic":      "Kursiv",
-        "strike":      "Durchgestrichen",
-        "heading":     "Überschrift {n}",
-        "bulletList":  "Aufzählung",
-        "orderedList": "Nummerierte Liste",
-        "taskList":    "Checkliste",
-        "quote":       "Zitat",
-        "code":        "Code",
-        "codeBlock":   "Code-Block",
-        "rule":        "Trennlinie",
-        "link":        "Link"
-    },
-    "role":     {
-        "owner":        "Owner",
-        "editor":       "Editor",
-        "viewer":       "Viewer",
-        "forNew":       "Rolle für neue Mitglieder",
-        "lastOwner":    "Ein Board braucht mindestens einen Owner",
-        "changeFailed": "Die Rolle konnte nicht geändert werden"
-    },
-    "search":   {
-        "kind":        {
-            "board":   "Board",
-            "file":    "Datei",
-            "person":  "Person",
-            "subtask": "Subtask",
-            "task":    "Task",
-            "update":  "Update"
-        },
-        "nothing":     "Nichts gefunden für „{term}“.",
-        "placeholder": "Alles durchsuchen …",
-        "start":       "Tippen, um zu suchen.",
-        "tab":         {
-            "all":     "Alle",
-            "boards":  "Boards",
-            "files":   "Dateien",
-            "people":  "Personen",
-            "tasks":   "Tasks",
-            "updates": "Updates"
-        },
-        "title":       "Suche",
-        "tooShort":    "Mindestens {n} Zeichen."
-    },
-    "task":     {
-        "add":            "+ Task hinzufügen",
-        "addSubtask":     "+ Subtask hinzufügen",
-        "convert":        "Konvertieren",
-        "convertPick":    "Neuen übergeordneten Task wählen",
-        "convertSearch":  "Task suchen",
-        "convertTitle":   "In Subtask umwandeln",
-        "count":          {
-            "one":   "1 Task",
-            "other": "{n} Tasks"
-        },
-        "createNew":      "Neuen Task anlegen",
-        "delete":         "Task löschen",
-        "deleteMany":     "Tasks löschen",
-        "deleteName":     "Der Task „{title}“",
-        "deleteSubtask":  "Subtask löschen",
-        "filterByPerson": "Nach Person filtern",
-        "hasSubtasks":    "Hat selbst Subtasks",
-        "hideSubtasks":   "Subtasks ausblenden",
-        "moveTo":         "Verschieben nach",
-        "moveToTitle":    "In eine andere Gruppe verschieben",
-        "new":            "Neuer Task",
-        "newBelow":       "Neuen Task darunter",
-        "newSubtask":     "Neuer Subtask",
-        "noOtherGroup":   "Es gibt keine andere Gruppe",
-        "noTarget":       "Kein anderer Task auf diesem Board",
-        "none":           "Keine Tasks",
-        "progress":       "{done}/{total}",
-        "promote":        "In Task umwandeln",
-        "quickFilter":    "Schnellfilter Person",
-        "selectedCount":  {
-            "one":   "Der markierte Task",
-            "other": "{n} markierte Tasks"
-        },
-        "selectedLabel":  {
-            "one":   "Task ausgewählt",
-            "other": "Tasks ausgewählt"
-        },
-        "showSubtasks":   "Subtasks anzeigen",
-        "subtask":        "Subtask",
-        "subtaskCount":   "{n} Subtasks",
-        "subtasks":       "Subtasks",
-        "task":           "Task",
-        "thisTask":       "Dieser Task"
-    },
-    "update":   {
-        "area":             "Die Updates",
-        "attach":           "Bild oder Datei anhängen",
-        "delete":           "Update löschen",
-        "deleteNote":       "Die Antworten darauf verschwinden mit.",
-        "deleteReply":      "Antwort löschen",
-        "discard":          "Verwerfen",
-        "dropFiles":        "Dateien hier ablegen",
-        "none":             "Noch keine Updates zu diesem Task",
-        "pinned":           "Angeheftet",
-        "placeholder":      "Update schreiben — Bilder kannst du mit Strg+V einfügen",
-        "replies":          "Antworten",
-        "repliesCount":     "Antworten ({n})",
-        "replyPlaceholder": "Antwort schreiben…",
-        "thisReply":        "Diese Antwort",
-        "thisUpdate":       "Dieses Update",
-        "update":           "Update",
-        "updates":          "Updates",
-        "uploading":        "Wird hochgeladen…",
-        "write":            "Update schreiben"
+    "turnOff": "Ausschalten",
+    "turnOn": "Einschalten",
+    "updated": "Geändert",
+    "whenPlaceholder": "Wenn dies geschieht",
+    "who": {
+      "assignees": "die zugewiesenen Personen"
     }
+  },
+  "bin": {
+    "archive": "Archiv",
+    "board": "Board",
+    "emptyArchive": "Das Archiv ist leer.",
+    "emptyTrash": "Der Papierkorb ist leer.",
+    "groupWith": {
+      "one": "Gruppe mit 1 Task",
+      "other": "Gruppe mit {n} Tasks"
+    },
+    "open": "Papierkorb und Archiv",
+    "purge": "Endgültig löschen",
+    "purgeNote": "Das lässt sich nicht rückgängig machen.",
+    "restore": "Wiederherstellen",
+    "title": "Papierkorb und Archiv",
+    "trash": "Papierkorb"
+  },
+  "board": {
+    "addFavorite": "Zu den Favoriten",
+    "board": "Board",
+    "cardMeta": "{groups} Gruppen · {tasks} Tasks",
+    "changeFolder": "Gruppe ändern",
+    "clickToEdit": "Zum Bearbeiten klicken",
+    "count": {
+      "one": "1 Board, in dem du Mitglied oder Owner bist.",
+      "other": "{n} Boards, in denen du Mitglied oder Owner bist."
+    },
+    "create": "Board anlegen",
+    "createFailed": "Board konnte nicht angelegt werden.",
+    "createFirst": "+ Erstes Board anlegen",
+    "createdAt": "Erstellt am",
+    "dashboard": "Auswertung",
+    "delete": "Board löschen",
+    "deleteName": "Das Board „{title}“",
+    "deleteNote": "Alle Gruppen, Tasks, Updates und Kalendereinträge dieses Boards gehen mit.",
+    "descriptionPlaceholder": "Worum geht es in diesem Board?",
+    "duplicate": "Board duplizieren",
+    "empty": "Hier ist noch nichts.",
+    "emptyHint": "Leg dein erstes Board an — oder lass dich von einem Owner zu einem bestehenden einladen.",
+    "favorites": "Favoriten",
+    "folderHint": "leer = Ohne Gruppe",
+    "folderLabel": "Gruppe (z.B. IT, Marketing)",
+    "info": "Board-Info",
+    "invite": "Mitglieder einladen",
+    "inviteWithCount": {
+      "one": "Einladen · 1",
+      "other": "Einladen · {n}"
+    },
+    "kanban": "Kanban",
+    "loadFailed": "Boards konnten nicht geladen werden.",
+    "more": "Mehr",
+    "name": "Board-Name",
+    "newButton": "+ Neues Board",
+    "newTitle": "Neues Board",
+    "noDescription": "Noch keine Beschreibung.",
+    "noMatch": "Kein Board passt zu „{filter}“.",
+    "noMembers": "keine Mitglieder",
+    "noneYet": "Du bist noch in keinem Board.",
+    "owner": "Owner",
+    "search": "Board suchen…",
+    "showActivity": "Board-Verlauf anzeigen",
+    "showDescription": "Board-Beschreibung anzeigen",
+    "showMembers": "Board-Mitglieder anzeigen",
+    "table": "Tabelle",
+    "thisBoard": "Dieses Board",
+    "type": "Board-Typ",
+    "visibility": "Dieses Board sehen alle Mitglieder.",
+    "workspace": "Bereich",
+    "workspaceName": "Allgemein",
+    "youAreOwner": "Du bist Owner dieses Boards"
+  },
+  "calendar": {
+    "chooseBoard": "Board wählen…",
+    "chooseBoardFirst": "Erst ein Board wählen",
+    "duration": "Dauer",
+    "edit": "Eintrag bearbeiten",
+    "end": "Ende",
+    "endAfterStart": "Das Ende muss nach dem Beginn liegen.",
+    "endBeforeStart": "Ende liegt vor dem Beginn",
+    "filterPlaceholder": "Titel oder Gruppe…",
+    "maxDuration": "Der Eintrag darf höchstens 24 Stunden dauern.",
+    "minDuration": "Der Eintrag muss mindestens 5 Minuten lang sein.",
+    "new": "Zeit einplanen",
+    "noTaskFound": "Kein Task gefunden",
+    "note": "Notiz (optional)",
+    "openDayView": "Tagesansicht öffnen",
+    "planned": "Geplant: {duration}",
+    "searchTask": "Task suchen",
+    "start": "Beginn",
+    "taskRequired": "Bitte einen Task auswählen.",
+    "thisEntry": "Dieser Kalendereintrag",
+    "today": "Heute"
+  },
+  "chart": {
+    "bars": "Balken",
+    "donut": "Ring",
+    "labels": "Diagramm: Labels",
+    "people": "Diagramm: Personen",
+    "pie": "Kreis"
+  },
+  "column": {
+    "add": "Spalte hinzufügen",
+    "category": {
+      "overview": "Überblick",
+      "useful": "Sehr nützlich"
+    },
+    "customName": "Eigener Name",
+    "delete": "Spalte löschen",
+    "deleteName": "Die Spalte „{title}“",
+    "deleteNote": "Die Werte dieser Spalte gehen bei allen Tasks des Boards verloren.",
+    "dragWidth": "Breite ziehen",
+    "renameHint": "Doppelklick zum Umbenennen",
+    "search": "Spalte suchen…",
+    "thisColumn": "Diese Spalte",
+    "titleHint": "Titel später per Doppelklick auf den Spaltenkopf änderbar",
+    "type": {
+      "checkbox": "Checkbox",
+      "date": "Datum",
+      "dropdown": "Drop-down",
+      "file": "Datei",
+      "link": "Link",
+      "longtext": "Langer Text",
+      "number": "Zahlen",
+      "person": "Personen",
+      "priority": "Priorität",
+      "status": "Status",
+      "text": "Text",
+      "updated": "Zuletzt aktualisiert"
+    }
+  },
+  "common": {
+    "add": "Hinzufügen",
+    "archive": "Archivieren",
+    "areaFailed": "{area} konnte nicht angezeigt werden.",
+    "areaFailedHint": "Der Rest der Seite funktioniert weiter. Einzelheiten stehen in der Browser-Konsole.",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "confirmTitle": "Wirklich?",
+    "create": "Anlegen",
+    "delete": "Löschen",
+    "deleteEntryText": "Der Eintrag wird gelöscht.",
+    "deleteText": "{what} wird gelöscht.",
+    "deleteTitle": "Wirklich löschen?",
+    "done": "Erledigt",
+    "duplicate": "Duplizieren",
+    "edit": "Bearbeiten",
+    "forward": "Weiter",
+    "loading": "Lädt…",
+    "name": "Name",
+    "nobody": "niemand",
+    "open": "Öffnen",
+    "open2": "Offen",
+    "optional": "optional",
+    "person": "Person",
+    "pin": "Anheften",
+    "remove": "Entfernen",
+    "retry": "Nochmal versuchen",
+    "role": "Rolle",
+    "save": "Speichern",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "saving": "Speichert…",
+    "search": "Suchen",
+    "thisArea": "Dieser Bereich",
+    "unknownError": "Unbekannter Fehler",
+    "unpin": "Nicht mehr anheften",
+    "user": "Benutzer",
+    "yes": "Ja"
+  },
+  "date": {
+    "dueIn": {
+      "one": "in 1 Tag fällig",
+      "other": "in {n} Tagen fällig"
+    },
+    "overdue": {
+      "one": "1 Tag überfällig",
+      "other": "{n} Tage überfällig"
+    },
+    "today": "heute fällig",
+    "tomorrow": "morgen fällig",
+    "yesterday": "gestern fällig"
+  },
+  "errors": {
+    "loginFailed": "Benutzername oder Passwort stimmt nicht.",
+    "signupFailed": "Das Konto konnte nicht angelegt werden.",
+    "tooManyAttempts": {
+      "one": "Zu viele Fehlversuche. Bitte in einer Minute erneut probieren.",
+      "other": "Zu viele Fehlversuche. Bitte in {n} Minuten erneut probieren."
+    }
+  },
+  "file": {
+    "attach": "Datei anhängen",
+    "file": "Datei",
+    "imageFailed": "Bild konnte nicht verarbeitet werden",
+    "imageReadFailed": "Bild konnte nicht gelesen werden",
+    "noneSelected": "Keine Datei ausgewählt",
+    "notAllowed": "Zugriff auf die Datei nicht erlaubt.",
+    "notAnImage": "Das ist kein Bild",
+    "notDecodable": "Das Bild lässt sich nicht öffnen. Vermutlich ist die Datei beschädigt oder gar kein Bild.",
+    "notFound": "Die Datei wurde nicht gefunden. Wurde sie nach dem Auswählen verschoben oder umbenannt?",
+    "notReadable": "Die Datei lässt sich nicht lesen. Liegt sie in iCloud oder auf einem Netzlaufwerk? Dann im Finder einmal öffnen, damit sie geladen wird.",
+    "readFailed": "Datei konnte nicht gelesen werden",
+    "readFailedWhy": "Datei konnte nicht gelesen werden ({reason})",
+    "remove": "Datei entfernen",
+    "uploadFailed": "Upload fehlgeschlagen"
+  },
+  "filter": {
+    "addRule": "Filter hinzufügen",
+    "clearAll": "Alle entfernen",
+    "column": "Spalte",
+    "group": "Gruppe",
+    "modeAll": "Alle",
+    "modeAny": "Beliebige",
+    "noOptions": "Keine Werte vorhanden",
+    "op": {
+      "after": "ist nach",
+      "before": "ist vor",
+      "contains": "enthält",
+      "eq": "ist gleich",
+      "gt": "ist größer als",
+      "is": "ist",
+      "isAnyOf": "ist eines von",
+      "isChecked": "ist angehakt",
+      "isEmpty": "ist leer",
+      "isNoneOf": "ist keines von",
+      "isNot": "ist nicht",
+      "isNotChecked": "ist nicht angehakt",
+      "isNotEmpty": "ist nicht leer",
+      "lt": "ist kleiner als",
+      "ne": "ist ungleich",
+      "notContains": "enthält nicht",
+      "overdue": "ist überfällig"
+    },
+    "removeRule": "Filter entfernen",
+    "title": "Titel",
+    "title2": "Filter",
+    "updateView": "Ansicht „{name}“ aktualisieren",
+    "value": "Wert"
+  },
+  "group": {
+    "changeColor": "Gruppenfarbe ändern",
+    "collapse": "Gruppe einklappen",
+    "delete": "Gruppe löschen",
+    "deleteName": "Die Gruppe „{title}“",
+    "deleteNote": {
+      "one": "1 Task darin wird mit gelöscht.",
+      "other": "{n} Tasks darin werden mit gelöscht."
+    },
+    "duplicate": "Gruppe duplizieren",
+    "expand": "Gruppe ausklappen",
+    "group": "Gruppe",
+    "icon": "Symbol der Gruppe",
+    "iconNone": "Kein Symbol",
+    "iconOwn": "Eigenes Emoji",
+    "new": "Neue Gruppe",
+    "none": "Ohne Gruppe",
+    "thisGroup": "Diese Gruppe"
+  },
+  "label": {
+    "changeColor": "Farbe ändern",
+    "edit": "Labels bearbeiten",
+    "editTitle": "Labels dieser Spalte bearbeiten",
+    "meansDone": "Dieses Label bedeutet „erledigt“",
+    "nameRequired": "Jedes Label braucht einen Namen.",
+    "none": "Noch keine Labels.",
+    "notAvailable": "Für diese Spalte nicht verfügbar",
+    "remove": "Label entfernen",
+    "removeUsed": {
+      "one": "Entfernen — 1 Task wird dabei geleert",
+      "other": "Entfernen — {n} Tasks werden dabei geleert"
+    },
+    "saveFailed": "Labels konnten nicht gespeichert werden.",
+    "usedBy": {
+      "one": "1 Task benutzt dieses Label",
+      "other": "{n} Tasks benutzen dieses Label"
+    }
+  },
+  "language": {
+    "hint": "Gilt für dein Konto — die Oberfläche folgt dir in jeden Browser, in dem du dich anmeldest.",
+    "name": "Deutsch",
+    "saved": "Sprache gespeichert.",
+    "select": "Sprache der Oberfläche",
+    "title": "Sprache"
+  },
+  "login": {
+    "fullName": "Vollständiger Name",
+    "haveAccount": "Du hast schon ein Konto?",
+    "hintLogin": "Benutzername und Passwort eingeben",
+    "hintSignup": "Vollständigen Namen, Benutzernamen und Passwort eingeben",
+    "noAccount": "Noch kein Konto?",
+    "password": "Passwort",
+    "signup": "Registrieren",
+    "titleLogin": "Bei deinem Konto anmelden",
+    "titleSignup": "Konto anlegen",
+    "username": "Benutzername"
+  },
+  "member": {
+    "ownerOnly": "Nur Owner dieses Boards können Mitglieder und Rollen ändern.",
+    "removeNote": "Die Person verliert den Zugriff auf das Board und wird aus allen Tasks ausgetragen.",
+    "removed": "Mitglied entfernt.",
+    "search": "Namen suchen",
+    "suggestions": "Vorschläge",
+    "thisMember": "Dieses Mitglied"
+  },
+  "mention": {
+    "suggestions": "Personen vorschlagen"
+  },
+  "nav": {
+    "administration": "Administration",
+    "boards": "Boards",
+    "calendar": "Kalender",
+    "collapse": "Navigation schließen",
+    "expand": "Navigation öffnen",
+    "home": "Startseite",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "myBoards": "Meine Boards",
+    "profile": "Mein Profil",
+    "profileTooltip": "{name} — Profil und Abmelden",
+    "workspaces": "Bereiche"
+  },
+  "notification": {
+    "assigned": "{actor} hat dir etwas zugewiesen",
+    "comment": "{actor} hat einen Kommentar geschrieben",
+    "empty": "Keine Benachrichtigungen.",
+    "emptyUnread": "Nichts Ungelesenes.",
+    "generic": "{actor} hat etwas geändert",
+    "invited": "{actor} hat dich zu einem Board hinzugefügt",
+    "markAllRead": "Alle als gelesen markieren",
+    "mention": "{actor} hat dich erwähnt",
+    "onlyUnread": "Nur ungelesen",
+    "section": {
+      "older": "Älter",
+      "today": "Heute",
+      "week": "Letzte 7 Tage"
+    },
+    "someone": "Jemand",
+    "title": "Benachrichtigungen",
+    "unreadCount": {
+      "one": "1 ungelesene Benachrichtigung",
+      "other": "{n} ungelesene Benachrichtigungen"
+    },
+    "value": "{actor} hat {column} geändert"
+  },
+  "panel": {
+    "width": "Breite ziehen — Doppelklick setzt zurück"
+  },
+  "preview": {
+    "download": "Herunterladen",
+    "empty": "Die Datei ist leer",
+    "failed": "Die Datei konnte nicht geladen werden",
+    "noPreview": "Für diesen Dateityp gibt es keine Vorschau. Herunterladen und lokal öffnen.",
+    "tooBig": "Die Datei ist zu groß für eine Vorschau",
+    "truncatedRows": "Es werden die ersten {n} Zeilen gezeigt. Für alles Weitere die Datei herunterladen.",
+    "truncatedText": "Gekürzt. Für den vollständigen Inhalt die Datei herunterladen."
+  },
+  "profile": {
+    "changePassword": "Passwort ändern",
+    "choosePicture": "Bild wählen",
+    "currentPassword": "Aktuelles Passwort",
+    "endSession": "Abmelden",
+    "fullName": "Voller Name",
+    "lastSeen": "zuletzt",
+    "logoutAll": "Überall abmelden",
+    "logoutAllNote": "Auch dieses Fenster. Danach musst du dich neu anmelden.",
+    "logoutAllWhat": "Alle Anmeldungen dieses Kontos",
+    "nameHint": "So erscheinst du in Boards, Tasks und Kommentaren.",
+    "nameSaved": "Name gespeichert.",
+    "newPassword": "Neues Passwort",
+    "noSessions": "Keine weiteren Anmeldungen.",
+    "passwordChanged": "Passwort geändert.",
+    "passwordChangedSignOut": "Passwort geändert. Alle Anmeldungen wurden beendet — du wirst neu angemeldet.",
+    "passwordHint": "Mindestens 8 Zeichen. Dein aktuelles Passwort wird zur Bestätigung gebraucht.",
+    "passwordMismatch": "Die neuen Passwörter stimmen nicht überein.",
+    "passwordTooShort": "Das neue Passwort braucht mindestens 8 Zeichen.",
+    "picture": "Profilbild",
+    "pictureHint": "Wird im Browser auf 256×256 verkleinert und auf deinem Server gespeichert. Du kannst ein Bild auch einfach mit Strg+V einfügen.",
+    "pictureRemoved": "Profilbild entfernt.",
+    "pictureSaved": "Profilbild gespeichert.",
+    "preview": "Vorschau — noch nicht gespeichert.",
+    "repeatPassword": "Neues Passwort wiederholen",
+    "replacePicture": "Anderes Bild wählen",
+    "saveName": "Name speichern",
+    "sessions": "Anmeldungen",
+    "sessionsHint": "Beendet jede Anmeldung dieses Kontos, in jedem Browser. Sinnvoll, wenn du dich an einem fremden Rechner nicht abgemeldet hast.",
+    "thisDevice": "dieses Gerät",
+    "unknownDevice": "Unbekanntes Gerät",
+    "uploadPicture": "Profilbild hochladen",
+    "usernameFixed": "Benutzername (nicht änderbar)"
+  },
+  "richtext": {
+    "bold": "Fett",
+    "bulletList": "Aufzählung",
+    "code": "Code",
+    "codeBlock": "Code-Block",
+    "heading": "Überschrift {n}",
+    "italic": "Kursiv",
+    "link": "Link",
+    "orderedList": "Nummerierte Liste",
+    "quote": "Zitat",
+    "rule": "Trennlinie",
+    "strike": "Durchgestrichen",
+    "taskList": "Checkliste",
+    "toolbar": "Textformatierung"
+  },
+  "role": {
+    "changeFailed": "Die Rolle konnte nicht geändert werden",
+    "editor": "Editor",
+    "forNew": "Rolle für neue Mitglieder",
+    "lastOwner": "Ein Board braucht mindestens einen Owner",
+    "owner": "Owner",
+    "viewer": "Viewer"
+  },
+  "search": {
+    "kind": {
+      "board": "Board",
+      "file": "Datei",
+      "person": "Person",
+      "subtask": "Subtask",
+      "task": "Task",
+      "update": "Update"
+    },
+    "nothing": "Nichts gefunden für „{term}“.",
+    "placeholder": "Alles durchsuchen …",
+    "start": "Tippen, um zu suchen.",
+    "tab": {
+      "all": "Alle",
+      "boards": "Boards",
+      "files": "Dateien",
+      "people": "Personen",
+      "tasks": "Tasks",
+      "updates": "Updates"
+    },
+    "title": "Suche",
+    "tooShort": "Mindestens {n} Zeichen."
+  },
+  "task": {
+    "add": "+ Task hinzufügen",
+    "addSubtask": "+ Subtask hinzufügen",
+    "convert": "Konvertieren",
+    "convertPick": "Neuen übergeordneten Task wählen",
+    "convertSearch": "Task suchen",
+    "convertTitle": "In Subtask umwandeln",
+    "count": {
+      "one": "1 Task",
+      "other": "{n} Tasks"
+    },
+    "createNew": "Neuen Task anlegen",
+    "delete": "Task löschen",
+    "deleteMany": "Tasks löschen",
+    "deleteName": "Der Task „{title}“",
+    "deleteSubtask": "Subtask löschen",
+    "filterByPerson": "Nach Person filtern",
+    "hasSubtasks": "Hat selbst Subtasks",
+    "hideSubtasks": "Subtasks ausblenden",
+    "moveTo": "Verschieben nach",
+    "moveToTitle": "In eine andere Gruppe verschieben",
+    "new": "Neuer Task",
+    "newBelow": "Neuen Task darunter",
+    "newSubtask": "Neuer Subtask",
+    "noOtherGroup": "Es gibt keine andere Gruppe",
+    "noTarget": "Kein anderer Task auf diesem Board",
+    "none": "Keine Tasks",
+    "progress": "{done}/{total}",
+    "promote": "In Task umwandeln",
+    "quickFilter": "Schnellfilter Person",
+    "selectedCount": {
+      "one": "Der markierte Task",
+      "other": "{n} markierte Tasks"
+    },
+    "selectedLabel": {
+      "one": "Task ausgewählt",
+      "other": "Tasks ausgewählt"
+    },
+    "showSubtasks": "Subtasks anzeigen",
+    "subtask": "Subtask",
+    "subtaskCount": "{n} Subtasks",
+    "subtasks": "Subtasks",
+    "task": "Task",
+    "thisTask": "Dieser Task"
+  },
+  "update": {
+    "area": "Die Updates",
+    "attach": "Bild oder Datei anhängen",
+    "delete": "Update löschen",
+    "deleteNote": "Die Antworten darauf verschwinden mit.",
+    "deleteReply": "Antwort löschen",
+    "discard": "Verwerfen",
+    "dropFiles": "Dateien hier ablegen",
+    "none": "Noch keine Updates zu diesem Task",
+    "pinned": "Angeheftet",
+    "placeholder": "Update schreiben — Bilder kannst du mit Strg+V einfügen",
+    "replies": "Antworten",
+    "repliesCount": "Antworten ({n})",
+    "replyPlaceholder": "Antwort schreiben…",
+    "thisReply": "Diese Antwort",
+    "thisUpdate": "Dieses Update",
+    "update": "Update",
+    "updates": "Updates",
+    "uploading": "Wird hochgeladen…",
+    "write": "Update schreiben"
+  },
+  "view": {
+    "add": "Ansicht hinzufügen",
+    "makePrivate": "Nur für mich",
+    "menu": "Ansicht bearbeiten",
+    "namePlaceholder": "Name der Ansicht",
+    "private": "Nur für dich sichtbar",
+    "rename": "Umbenennen",
+    "share": "Für alle sichtbar machen",
+    "shareDenied": "Teilen braucht Schreibrecht auf dem Board",
+    "shareHint": "Für alle auf dem Board sichtbar",
+    "showAs": "Als {what} zeigen",
+    "takesCurrent": "Übernimmt den Filter, der gerade gesetzt ist ({n})."
+  }
 }
