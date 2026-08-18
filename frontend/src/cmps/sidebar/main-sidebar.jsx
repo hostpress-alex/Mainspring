@@ -52,7 +52,7 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
 
             <Link to={'/'} className="icon-link">
                 <Tooltip title={t('nav.home')} arrow placement="right">
-                    <LogoMark className="home-img" size={26} tone="light" title={t('nav.home')} onClick={closeDynamicModal}/>
+                    <LogoMark className="home-img" size={26} tone="light" onClick={closeDynamicModal}/>
                 </Tooltip>
             </Link>
 

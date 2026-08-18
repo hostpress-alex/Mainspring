@@ -22,6 +22,8 @@ $reply-quiet: #676879;
     border-top: 1px solid $reply-border;
     background: $reply-bg;
     padding: 8px 12px 10px;
+    // The card no longer clips, so the band rounds its own bottom corners.
+    border-radius: 0 0 7px 7px;
 }
 
 .comments-list .comment-replies .reply-list {

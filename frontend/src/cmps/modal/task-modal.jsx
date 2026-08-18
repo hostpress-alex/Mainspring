@@ -24,7 +24,7 @@ import noUpdate from '../../assets/img/empty-update.png'
 import {uploadFile} from '../../services/upload.service'
 import {AttachmentStrip} from '../task/attachment-strip'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
-import {isEmpty as isRichEmpty} from '../../services/rich-text'
+import {isEmpty as isRichEmpty, toPlainText} from '../../services/rich-text'
 import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
 
@@ -32,7 +32,6 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
     const user = useSelector(storeState => storeState.userModule.user)
     const [comment, setComment] = useState(boardService.getEmptyComment())
     const [isWriteNewUpdate, setIsWriteNewUpdate] = useState(false)
-    const [taskActivities, setTaskActivities] = useState([])
     /**
      * Which of the three panels is open.
      *
@@ -59,8 +58,24 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
     }, [task])
 
 
+    /**
+     * Derived, not stored.
+     *
+     * This used to be state filled once when the dialog opened, so anything
+     * that happened afterwards — including the update you had just written —
+     * only appeared after a reload. There is nothing here that the board does
+     * not already know; keeping a second copy of it was the whole bug.
+     *
+     * 'check' was the marking for multi-select and is no longer produced. Old
+     * entries are hidden here and rotate out on their own (40 per board).
+     */
+    const taskActivities = useMemo(
+        () => (board.activities || [])
+            .filter(activity => activity && activity.task && activity.task.id === task.id)
+            .filter(activity => activity.action !== 'check'),
+        [board.activities, task.id])
+
     useEffect(() => {
-        loadTaskActivity()
         socketService.emit(SOCKET_EMIT_SET_TOPIC, task.id)
         socketService.on(SOCKET_EVENT_ADD_MSG, addComment)
 
@@ -114,17 +129,10 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
             reply.byMember = {_id: user._id, fullname: user.fullname, imgUrl: user.imgUrl || ''}
         }
         const next = {...currTask, comments: [reply, ...(currTask.comments || [])]}
-        await updateTaskAction(board, groupId, next)
+        await updateTaskAction(board, groupId, next, updateActivity('reply', clean))
         setCurrTask(next)
     }
 
-    function loadTaskActivity(){
-        // 'check' was the marking for multi-select — it is no longer
-        // produced. Old entries are hidden here and rotate out of the list
-        // on their own over time (max. 40 entries per board).
-        const taskActivities = (board.activities || []).filter(activity => activity && activity.task && activity.task.id === task.id).filter(activity => activity.action !== 'check')
-        setTaskActivities(taskActivities)
-    }
 
     function onCloseModal(){
         navigate(`/board/${board._id}`)
@@ -148,6 +156,29 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         }
     }
 
+    /**
+     * The first line of an update, for the history.
+     *
+     * The log is a list of short lines capped at forty entries per board — a
+     * whole update with its formatting does not belong in it, and "somebody
+     * wrote something" without a hint of what is a line nobody can use. So: the
+     * text, flattened, cut off.
+     */
+    function excerptOf(txt){
+        const plain = toPlainText(txt || '').replace(/\s+/g, ' ').trim()
+        return plain.length > 80?plain.slice(0, 79) + '…':plain
+    }
+
+    /** An entry for something that happened to the updates of this task. */
+    function updateActivity(action, txt){
+        const activity = boardService.getEmptyActivity()
+        activity.action = action
+        activity.task = {id: currTask.id, title: currTask.title}
+        activity.from = null
+        activity.to = excerptOf(txt)
+        return activity
+    }
+
     async function onAddComment(){
         if(isUploading) return
         if(isRichEmpty(comment.txt) && !(comment.attachments || []).length) return
@@ -163,7 +194,7 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
             }
             const next = {...currTask, comments: [comment, ...(currTask.comments || [])]}
             socketService.emit(SOCKET_EMIT_SEND_MSG, comment)
-            await updateTaskAction(board, groupId, next)
+            await updateTaskAction(board, groupId, next, updateActivity('update', comment.txt))
             setIsWriteNewUpdate(false)
             setCurrTask(next)
             setComment(boardService.getEmptyComment())
@@ -230,12 +261,14 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
 
     async function onRemoveComment(commentId){
         try {
+            const removed = (currTask.comments || []).find(c => c.id === commentId)
             // Replies without their update would not be visible anywhere.
             const next = {
                 ...currTask,
                 comments: currTask.comments.filter(c => c.id !== commentId && c.parentId !== commentId)
             }
-            await updateTaskAction(board, groupId, next)
+            await updateTaskAction(board, groupId, next,
+                updateActivity(removed?.parentId?'replyDelete':'updateDelete', removed?.txt))
             setCurrTask(next)
         } catch(err) {
             console.log('err:', err)
@@ -251,7 +284,12 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
     async function onEditComment(saveComment){
         try {
             const next = {...currTask, comments: currTask.comments.map(c => (c.id === saveComment.id)?saveComment:c)}
-            await updateTaskAction(board, groupId, next)
+            // Pinning goes through here too, and "pinned" is not "rewritten" —
+            // only a changed text is worth a line in the history.
+            const before = (currTask.comments || []).find(c => c.id === saveComment.id)
+            const changed = before && before.txt !== saveComment.txt
+            await updateTaskAction(board, groupId, next,
+                changed?updateActivity(saveComment.parentId?'replyEdit':'updateEdit', saveComment.txt):undefined)
             setCurrTask(next)
         } catch(err) {
             console.log('err:', err)
@@ -341,7 +379,7 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
                         threads.map(({comment, replies}) => {
                             return (
                                 <li key={comment.id}>
-                                    <CommentPreview onRemoveComment={onRemoveComment} comment={comment} replies={replies} onReply={onAddReply} onEditComment={onEditComment} members={board.members}/>
+                                    <CommentPreview taskId={currTask.id} onRemoveComment={onRemoveComment} comment={comment} replies={replies} onReply={onAddReply} onEditComment={onEditComment} members={board.members}/>
                                 </li>
                             )
                         })

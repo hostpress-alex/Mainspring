@@ -197,3 +197,22 @@
         white-space: nowrap;
     }
 }
+
+/*
+ * The line of an update in the history.
+ *
+ * Quiet and on one line: the log is scanned, not read. Whoever wants the whole
+ * text opens the update — this is only enough to recognise which one.
+ */
+.activity-preview .from-to.excerpt-container {
+    min-width: 0;
+
+    .excerpt {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #676879;
+        font-style: italic;
+    }
+}

@@ -329,6 +329,20 @@ async function syncTaskMembers(trx, boardId, taskId, memberIds){
 
 async function syncTaskComments(trx, boardId, taskId, comments){
     await trx('task_comment').where({board_id: boardId, task_id: taskId}).del()
+
+    /**
+     * Reactions belong to comment ids, not to comment rows.
+     *
+     * The rows above are deleted and written again on every task write, with
+     * the same ids — so reactions must not hang off them by a foreign key or
+     * they would vanish on an unrelated edit. They are kept in step here
+     * instead: whatever no longer has a comment to point at goes.
+     */
+    const keptIds = comments.map(c => sid(c && c.id)).filter(Boolean)
+    const orphans = trx('comment_reaction').where({board_id: boardId, task_id: taskId})
+    if(keptIds.length) orphans.whereNotIn('comment_id', keptIds)
+    await orphans.del()
+
     if(!comments.length) return
     const seen = new Set()
     const rows = []
@@ -1001,6 +1015,28 @@ async function findBin(boardId, state){
  * a whole board with its groups, tasks and comments to answer "may they" would
  * turn every image on a board into a full board read.
  */
+/**
+ * One person's role on one board, without assembling the board.
+ *
+ * `roleOf` in board.roles.js answers the same question from a board that has
+ * already been read. This is for the callers that have not read one and should
+ * not have to: a ticking timer or a click on an emoji must not cost a full
+ * board with its groups, tasks and comments to find out whether it is allowed.
+ */
+async function roleOnBoard(boardId, userId){
+    let id
+    try {
+        id = checkBoardId(boardId)
+    } catch(err) {
+        return null
+    }
+    const row = await db()('board_member')
+        .where({board_id: id, user_id: sid(userId), state: ACTIVE})
+        .first('role', 'is_owner')
+    if(!row) return null
+    return row.role || (row.is_owner?'owner':'editor')
+}
+
 async function isMember(boardId, userId){
     let id
     try {
@@ -1078,7 +1114,7 @@ module.exports = {
     addTask, addSubtask, setSubtasks, setTaskParent, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,
     addActivity,
     setBoardState, setGroupState, setTaskState, findBin, findBoardsByState,
-    findGroupRow, findTaskRow, purgeGroup, purgeTask, isMember,
+    findGroupRow, findTaskRow, purgeGroup, purgeTask, isMember, roleOnBoard,
     ACTIVE, ARCHIVED, TRASHED, STATES,
     MAX_ACTIVITIES
 }

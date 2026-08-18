@@ -45,6 +45,7 @@ const notificationRoutes = require('./api/notification/notification.routes')
 const automationRoutes = require('./api/automation/automation.routes')
 const searchRoutes = require('./api/search/search.routes')
 const timeRoutes = require('./api/time/time.routes')
+const reactionRoutes = require('./api/reaction/reaction.routes')
 const {setupSocketAPI} = require('./services/socket.service')
 
 // routes
@@ -61,6 +62,7 @@ app.use('/api/notification', notificationRoutes)
 app.use('/api/automation', automationRoutes)
 app.use('/api/search', searchRoutes)
 app.use('/api/time', timeRoutes)
+app.use('/api/reaction', reactionRoutes)
 setupSocketAPI(http)
 
 /**

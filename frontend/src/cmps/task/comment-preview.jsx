@@ -3,9 +3,12 @@ import {useSelector} from 'react-redux'
 
 import { Icon } from '../icon'
 import {CommentMenuModal} from '../modal/modal-comment'
-import {formatRelative} from '../../services/date.util'
+import {Tooltip} from '@mui/material'
+import {formatRelative, formatExact} from '../../services/date.util'
 import { Avatar } from '../avatar'
 import {AttachmentStrip} from './attachment-strip'
+import {CommentReactions} from './comment-reactions'
+import {useTaskReactions} from './use-task-reactions'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
 import {RichTextView} from '../rich-text/rich-text-view'
 import {isEmpty as isRichEmpty} from '../../services/rich-text'
@@ -43,6 +46,12 @@ export function CommentPreview({
     const [editComment, setEditComment] = useState({...comment})
     const [isReplyOpen, setIsReplyOpen] = useState(false)
     const [isThreadOpen, setIsThreadOpen] = useState(false)
+
+    // Shared across the whole thread — one request for the task, not one per
+    // comment. A viewer may react: an emoji says less than the reply they are
+    // already allowed to write.
+    const {reactions, toggle: onToggleReaction} = useTaskReactions(board?._id, taskId)
+    const canReact = Boolean(me) && boardRoles.canView(board, me)
 
     // Oldest first in the list, so the ones that fold are the ones at the top.
     const foldFrom = isThreadOpen?0:Math.max(0, replies.length - VISIBLE_REPLIES)
@@ -90,10 +99,11 @@ export function CommentPreview({
             <div className="comment-head">
                 <Avatar src={comment.byMember?.imgUrl} className="comment-avatar"/>
                 <span className="comment-author">{comment.byMember?.fullname || t('update.someone')}</span>
-                <time className="comment-when" dateTime={new Date(comment.archivedAt || 0).toISOString()}
-                    title={new Date(comment.archivedAt || 0).toLocaleString()}>
-                    {formatRelative(comment.archivedAt)}
-                </time>
+                <Tooltip title={formatExact(comment.archivedAt)} arrow placement="top">
+                    <time className="comment-when" dateTime={new Date(comment.archivedAt || 0).toISOString()}>
+                        {formatRelative(comment.archivedAt)}
+                    </time>
+                </Tooltip>
                 {/* Said in the list itself, not only in the menu: an update at
                     the top for no visible reason looks like a sorting bug. */}
                 {isPinned && <span className="pinned-badge">
@@ -129,17 +139,29 @@ export function CommentPreview({
                 <button className="cancel" onMouseDown={onCancelEdit}>{t('common.cancel')}</button>
             </div>}
 
-            {!isReply && !isEditOpen && (
-                <div className="comment-replies">
-                    {/* The button first, the thread after it. On a long thread
-                        the way to answer used to be at the bottom, so replying
-                        meant scrolling past everything already said. */}
-                    {!isReplyOpen && (
+            {/* One row for everything you can do with this comment, and it sits
+                directly under the text — above the thread, so answering a long
+                discussion does not mean scrolling past all of it first. */}
+            {!isEditOpen && (
+                <div className="comment-actions">
+                    <CommentReactions
+                        reactions={reactions[comment.id] || {}}
+                        people={board?.members || members}
+                        canReact={canReact}
+                        onToggle={emoji => onToggleReaction(comment.id, emoji)}/>
+                    {!isReply && !isReplyOpen && (
                         <button type="button" className="reply-btn" onClick={() => setIsReplyOpen(true)}>
                             <Icon name='reply'/>
                             <span>{t('update.replies')}</span>
                         </button>
                     )}
+                </div>
+            )}
+
+            {/* Only when it holds something: an empty band under every update
+                is a grey stripe that means nothing. */}
+            {!isReply && !isEditOpen && (isReplyOpen || replies.length > 0) && (
+                <div className="comment-replies">
 
                     {isReplyOpen && (
                         <form className="reply-form" onSubmit={onSendReply}>

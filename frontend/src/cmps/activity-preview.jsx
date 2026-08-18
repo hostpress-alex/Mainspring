@@ -46,7 +46,13 @@ const ACTION_LABELS = {
     person: t('activity.action.person'),
     number: t('activity.action.number'),
     create: t('activity.action.create'),
-    title: t('activity.action.title')
+    title: t('activity.action.title'),
+    update: t('activity.action.update'),
+    reply: t('activity.action.reply'),
+    updateEdit: t('activity.action.updateEdit'),
+    replyEdit: t('activity.action.replyEdit'),
+    updateDelete: t('activity.action.updateDelete'),
+    replyDelete: t('activity.action.replyDelete')
 }
 
 /**
@@ -78,6 +84,16 @@ export function ActivityPreview({activity, taskTitle = null}){
                 return <Icon name='hashtag' className="icon"/>
             case 'title':
                 return <Icon name='pencil' className="icon"/>
+            case 'update':
+                return <Icon name='comment' variant='fa-regular' className="icon"/>
+            case 'reply':
+                return <Icon name='reply' className="icon"/>
+            case 'updateEdit':
+            case 'replyEdit':
+                return <Icon name='pen' className="icon"/>
+            case 'updateDelete':
+            case 'replyDelete':
+                return <Icon name='trash-can' variant='fa-regular' className="icon"/>
             default:
                 return null
         }
@@ -100,6 +116,13 @@ export function ActivityPreview({activity, taskTitle = null}){
                 return <FromToNumber activity={activity}/>
             case 'title':
                 return <FromToTitle activity={activity}/>
+            case 'update':
+            case 'reply':
+            case 'updateEdit':
+            case 'replyEdit':
+            case 'updateDelete':
+            case 'replyDelete':
+                return <FromToExcerpt activity={activity}/>
             default:
                 return null
         }
@@ -185,6 +208,24 @@ function FromToCheck({activity}){
         <div className="from-to check-container">
             <span>{on(activity.from)?<Icon name='check'/>:'    '}</span>
             <span>{on(activity.to)?<Icon name='check'/>:'    '}</span>
+        </div>
+    )
+}
+
+/**
+ * The first line of what was written.
+ *
+ * No arrow and no "before": an update is written or removed, it does not move
+ * from one value to another. What it said is the only thing that identifies it
+ * in a list, so that is what stands here — cut short in the writing, not with
+ * a text-overflow that would hide it from anyone copying the line out.
+ */
+function FromToExcerpt({activity}){
+    const excerpt = text(activity.to)
+    if(!excerpt) return null
+    return (
+        <div className="from-to excerpt-container">
+            <span className="excerpt">{excerpt}</span>
         </div>
     )
 }

@@ -4,6 +4,8 @@ import {userService} from './user.service'
 export const SOCKET_EVENT_ADD_MSG = 'chat-add-msg'
 export const SOCKET_EMIT_SEND_MSG = 'chat-send-msg'
 export const SOCKET_EVENT_ADD_UPDATE_BOARD = 'board-add-update'
+// Somebody reacted to an update or a reply of the task this socket has open.
+export const SOCKET_EVENT_REACTION_CHANGED = 'reaction-changed'
 // 'board-send-update' was here: a client handing the others its own idea of a
 // board. The server emits the board it has read back instead — see _pushed in
 // backend/api/board/board.service.js. Nothing listens for this any more.

@@ -240,7 +240,11 @@ export function formatRelative(ms){
 
     if(abs < 60) return t('time.justNow')
 
-    const relative = new Intl.RelativeTimeFormat(language, {numeric: 'auto'})
+    // `numeric: 'always'`, so it says "vor 1 Tag" and "vor 2 Tagen" rather
+    // than "gestern" and "vorgestern". The words read nicely and are worse to
+    // work with: a thread mixing "gestern" with "vor 3 Tagen" cannot be put in
+    // order by eye, and "gestern" says nothing about what time it was.
+    const relative = new Intl.RelativeTimeFormat(language, {numeric: 'always'})
     if(abs < 60 * 60) return relative.format(Math.round(seconds / 60), 'minute')
     if(abs < 60 * 60 * 24) return relative.format(Math.round(seconds / 3600), 'hour')
     if(abs < 60 * 60 * 24 * 7) return relative.format(Math.round(seconds / 86400), 'day')
@@ -250,4 +254,13 @@ export function formatRelative(ms){
     return new Intl.DateTimeFormat(language, sameYear
         ?{day: 'numeric', month: 'short'}
         :{month: 'short', year: 'numeric'}).format(date)
+}
+
+/** The full date and time, in the interface language — for a tooltip. */
+export function formatExact(ms){
+    const then = Number(ms)
+    if(!Number.isFinite(then) || then <= 0) return ''
+    return new Intl.DateTimeFormat(getLanguage(), {
+        dateStyle: 'long', timeStyle: 'short'
+    }).format(new Date(then))
 }

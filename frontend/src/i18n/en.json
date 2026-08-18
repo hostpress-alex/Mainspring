@@ -6,8 +6,14 @@
       "number": "Number",
       "person": "Person",
       "priority": "Priority",
+      "reply": "wrote a reply",
+      "replyDelete": "deleted a reply",
+      "replyEdit": "edited a reply",
       "status": "Status",
-      "title": "Title"
+      "title": "Title",
+      "update": "wrote an update",
+      "updateDelete": "deleted an update",
+      "updateEdit": "edited an update"
     },
     "activity": "Activity",
     "area": "The activity log",
@@ -643,6 +649,9 @@
       "one": "Previous reply",
       "other": "{n} previous replies"
     },
+    "react": "React",
+    "reactionAdd": "Add reaction",
+    "reactionRemove": "Take reaction back",
     "replies": "Replies",
     "repliesCount": "Replies ({n})",
     "replyPlaceholder": "Write a reply…",

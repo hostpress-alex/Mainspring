@@ -298,6 +298,20 @@ function emitToBoard({type, boardId, args = []}){
 }
 
 /**
+ * To everyone who has this task open.
+ *
+ * A socket is in exactly one room at a time, and a client with a task dialog
+ * open is in that task's room rather than the board's (see resolveRoom). So
+ * anything that only matters inside the dialog — a reaction, for instance —
+ * has to go here; sending it to the board would reach precisely the people who
+ * cannot see it.
+ */
+function emitToTask({type, boardId, taskId, args = []}){
+    if(!gIo) return
+    gIo.to(TASK_ROOM + String(boardId) + ':' + String(taskId)).emit(type, ...args)
+}
+
+/**
  * Send to everyone but the given user — in one room, or everywhere.
  *
  * Unused today. It is the way out of the client-to-client relay described at
@@ -323,6 +337,7 @@ module.exports = {
     setupSocketAPI,
     emitToUser,
     emitToBoard,
+    emitToTask,
     disconnectUser,
     broadcast,
     USER_ROOM,

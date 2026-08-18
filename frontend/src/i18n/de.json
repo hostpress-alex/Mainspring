@@ -6,8 +6,14 @@
       "number": "Zahl",
       "person": "Person",
       "priority": "Priorität",
+      "reply": "Antwort geschrieben",
+      "replyDelete": "Antwort gelöscht",
+      "replyEdit": "Antwort bearbeitet",
       "status": "Status",
-      "title": "Titel"
+      "title": "Titel",
+      "update": "Update geschrieben",
+      "updateDelete": "Update gelöscht",
+      "updateEdit": "Update bearbeitet"
     },
     "activity": "Verlauf",
     "area": "Der Verlauf",
@@ -643,6 +649,9 @@
       "one": "Vorherige Antwort",
       "other": "Vorherige {n} Antworten"
     },
+    "react": "Reagieren",
+    "reactionAdd": "Reaktion hinzufügen",
+    "reactionRemove": "Reaktion zurücknehmen",
     "replies": "Antworten",
     "repliesCount": "Antworten ({n})",
     "replyPlaceholder": "Antwort schreiben…",

@@ -113,16 +113,34 @@ async function signup(userCred){
  * tell it apart from "the server is down".
  */
 async function restore(){
+    let user
     try {
-        const user = await httpService.get('auth/me')
-        if(!user || !user._id) return null
-        // Same as after a real login: the socket handshake was made before we
-        // knew who this was, so it has to be made again.
-        socketService.login(user._id)
-        return saveLocalUser(user)
+        user = await httpService.get('auth/me')
     } catch(err) {
+        // No session, or the server is not answering. Either way: nobody is
+        // signed in as far as this browser is concerned.
         return null
     }
+    if(!user || !user._id) return null
+
+    const local = saveLocalUser(user)
+
+    /**
+     * The socket is a second chance, not a condition.
+     *
+     * Same as after a real login: the handshake was made before we knew who
+     * this was, so it has to be made again. But it happens while the app is
+     * still starting, and if it throws, the whole restore used to fail — a
+     * valid session thrown away because a websocket was not ready yet, which
+     * shows up as "logged out for no reason" and is near impossible to place.
+     */
+    try {
+        socketService.login(user._id)
+    } catch(err) {
+        console.warn('socket could not be told who is signed in', err)
+    }
+
+    return local
 }
 
 async function logout(){

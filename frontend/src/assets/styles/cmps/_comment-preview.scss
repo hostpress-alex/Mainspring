@@ -27,7 +27,10 @@ $comment-thread-bg: #f5f6f8;
         background: #fff;
         padding: 0;
         margin: 0;
-        overflow: hidden;
+        // NOT overflow: hidden. It rounded the reply band's corners neatly and
+        // cut the "…" menu off at the card edge — a dropdown has to be allowed
+        // to leave the box it belongs to. The band rounds its own corners
+        // instead, see _comment-replies.scss.
         transition: box-shadow .15s, border-color .15s;
 
         &:hover {
@@ -126,4 +129,140 @@ $comment-thread-bg: #f5f6f8;
 .comment-preview .input-container,
 .comment-preview .button-container {
     padding: 0 16px 12px 58px;
+}
+
+/* --- what you can do with a comment ----------------------------------- */
+
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 16px 10px 58px;
+}
+
+.comment-reactions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/*
+ * A chip is a count first and a picture second — the emoji says what, the
+ * number says how many agreed, and the number is the reason anybody looks.
+ * Yours is outlined, so "have I already?" is answered without counting.
+ */
+.reaction-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border: 1px solid $comment-border;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: functions.rem(13px);
+    line-height: 1.6;
+    width: auto;
+    color: $comment-quiet;
+
+    &:hover:not(:disabled) { background: #f5f6f8; }
+    &:disabled { cursor: default; }
+
+    &.is-mine {
+        border-color: variables.$board-btn;
+        background: #eaf2fd;
+        color: variables.$board-btn;
+        font-weight: 600;
+    }
+
+    .reaction-emoji { font-size: functions.rem(14px); line-height: 1; }
+}
+
+.reaction-picker-anchor {
+    position: relative;
+    display: inline-flex;
+}
+
+.reaction-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: transparent;
+    color: $comment-quiet;
+    cursor: pointer;
+    font-size: functions.rem(14px);
+
+    &:hover { background: #f0f1f4; border-color: $comment-border; }
+}
+
+.reaction-picker {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    display: flex;
+    gap: 2px;
+    padding: 6px;
+    border: 1px solid $comment-border;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .14);
+
+    .reaction-option {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: transparent;
+        cursor: pointer;
+        font-size: functions.rem(18px);
+        line-height: 1;
+        transition: transform .1s, background-color .1s;
+
+        &:hover { background: #f0f1f4; transform: scale(1.15); }
+        &.is-mine { background: #eaf2fd; }
+    }
+}
+
+/* In a reply the row lines up under its smaller picture. */
+.comments-list .comment-replies .comment-preview.is-reply .comment-actions {
+    padding: 0 10px 8px 42px;
+}
+
+/*
+ * Who gave a reaction, inside the tooltip.
+ *
+ * A face and a name per line, not a comma-separated run: at five or six people
+ * a sentence stops being readable, and the faces are what most people
+ * recognise before they have read anything.
+ */
+.reaction-who {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 0;
+
+    .reaction-who-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: functions.rem(13px);
+        white-space: nowrap;
+
+        img {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    }
 }

@@ -124,17 +124,10 @@ async function remove(id){
 /**
  * One person's role on one board, without assembling the board.
  *
- * A timer ticks; loading a whole board with its groups, tasks and comments to
- * answer "may this person write here" would be the most expensive thing this
- * feature does.
+ * Lives in board.repo now, because reactions ask the same question and two
+ * copies of a permission lookup is one copy too many.
  */
-async function roleOnBoard(boardId, userId){
-    const row = await db()('board_member')
-        .where({board_id: sid(boardId), user_id: sid(userId), state: 'active'})
-        .first('role', 'is_owner')
-    if(!row) return null
-    return row.role || (row.is_owner?'owner':'editor')
-}
+const roleOnBoard = (boardId, userId) => require('../board/board.repo').roleOnBoard(boardId, userId)
 
 /**
  * Does this task exist on this board, what is it called, and where does it sit.
