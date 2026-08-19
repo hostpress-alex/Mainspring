@@ -3,6 +3,7 @@ import {useMemo, useState} from 'react'
 import {Icon} from '../icon'
 import {canManageTab} from '../../services/board-view'
 import {labelOptions} from '../../services/column.service'
+import {tagsOf} from '../../services/tags'
 import {
     GROUP_FIELD, TITLE_FIELD, MODE_ALL, MODE_ANY,
     emptyRule, hasRules, needsValue, operatorsFor, takesList
@@ -230,6 +231,11 @@ function optionsFor(column, board){
     }
     if(column.type === 'person'){
         return (board.members || []).map(m => ({key: m._id, label: m.fullname}))
+    }
+    // The list belongs to the column, and the task stores ids — so the key is
+    // the id and only the label carries the hash.
+    if(column.type === 'tags'){
+        return tagsOf(column).map(tag => ({key: tag.id, label: '#' + tag.title}))
     }
     if(column.type === 'status' || column.type === 'priority' || column.type === 'dropdown'){
         // key is what the task stores, label is what the person reads. For a

@@ -12,8 +12,10 @@
       "status": "Status",
       "title": "Titel",
       "update": "Update geschrieben",
+      "updateCheck": "abgehakt",
       "updateDelete": "Update gelöscht",
-      "updateEdit": "Update bearbeitet"
+      "updateEdit": "Update bearbeitet",
+      "updateUncheck": "Haken entfernt"
     },
     "activity": "Verlauf",
     "area": "Der Verlauf",
@@ -243,6 +245,7 @@
     "titleHint": "Titel später per Doppelklick auf den Spaltenkopf änderbar",
     "type": {
       "checkbox": "Checkbox",
+      "created": "Erstellt",
       "date": "Datum",
       "dropdown": "Drop-down",
       "estimate": "Geschätzte Zeit",
@@ -253,8 +256,9 @@
       "person": "Personen",
       "priority": "Priorität",
       "status": "Status",
+      "tags": "Tags",
       "text": "Text",
-      "updated": "Zuletzt aktualisiert"
+      "updated": "Letztes Update"
     }
   },
   "common": {
@@ -298,6 +302,10 @@
     "usage": "Verwendung",
     "user": "Benutzer",
     "yes": "Ja"
+  },
+  "created": {
+    "unknown": "Kein Erstelldatum hinterlegt",
+    "unknownPerson": "Unbekannt"
   },
   "date": {
     "dueIn": {
@@ -601,6 +609,28 @@
     "title": "Suche",
     "tooShort": "Mindestens {n} Zeichen."
   },
+  "tags": {
+    "addTitle": "Tags hinzufügen",
+    "color": "Farbe",
+    "create": "+ Neues Tag erstellen",
+    "createNamed": "+ „{name}\" anlegen",
+    "deleteQuestion": {
+      "one": "„{name}\" löschen? Das Tag verschwindet von 1 Task.",
+      "other": "„{name}\" löschen? Das Tag verschwindet von {n} Tasks."
+    },
+    "manage": "Tags verwalten",
+    "manageTitle": "Tags verwalten",
+    "merge": "Zusammenführen",
+    "mergeQuestion": {
+      "one": "„{name}\" wird von 1 Task benutzt. Womit soll es zusammengeführt werden?",
+      "other": "„{name}\" wird von {n} Tasks benutzt. Womit soll es zusammengeführt werden?"
+    },
+    "nameTaken": "Ein Tag mit diesem Namen gibt es schon.",
+    "none": "Noch keine Tags.",
+    "removeFromTask": "Von diesem Task entfernen",
+    "search": "Suchen oder neu anlegen",
+    "tooMany": "Mehr als {n} Tags pro Task sind nicht vorgesehen."
+  },
   "task": {
     "add": "+ Task hinzufügen",
     "addSubtask": "+ Subtask hinzufügen",
@@ -620,7 +650,7 @@
     "filterByPerson": "Nach Person filtern",
     "hasSubtasks": "Hat selbst Subtasks",
     "hideSubtasks": "Subtasks ausblenden",
-    "moveTo": "Verschieben nach",
+    "moveTo": "Verschieben",
     "moveToTitle": "In eine andere Gruppe verschieben",
     "new": "Neuer Task",
     "newBelow": "Neuen Task darunter",
@@ -707,6 +737,10 @@
     "replies": "Antworten",
     "repliesCount": "Antworten ({n})",
     "replyPlaceholder": "Antwort schreiben…",
+    "seenBy": {
+      "one": "Von 1 Person gesehen",
+      "other": "Von {n} Personen gesehen"
+    },
     "sending": "Sendet…",
     "someone": "Unbekannt",
     "thisReply": "Diese Antwort",

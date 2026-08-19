@@ -179,7 +179,6 @@ export function RichTextEditor({
                 <span className="rich-text-sep"/>
                 <Tool on={is('bulletList')} title={t('richtext.bulletList')} icon="list-ul" onClick={() => chain().toggleBulletList().run()}/>
                 <Tool on={is('orderedList')} title={t('richtext.orderedList')} icon="list-ol" onClick={() => chain().toggleOrderedList().run()}/>
-                <Tool on={is('taskList')} title={t('richtext.taskList')} icon="list-check" onClick={() => chain().toggleTaskList().run()}/>
 
                 <span className="rich-text-sep"/>
                 <Tool on={is('blockquote')} title={t('richtext.quote')} icon="quote-right" onClick={() => chain().toggleBlockquote().run()}/>
@@ -189,6 +188,14 @@ export function RichTextEditor({
                 <span className="rich-text-sep"/>
                 <Tool on={is('link')} title={t('richtext.link')} icon="link"
                       onClick={() => setLinkDraft({url: editor.getAttributes('link').href || ''})}/>
+
+                {/* Last, and with the round mark — where Monday keeps it. A
+                    checklist is the one thing in this bar that is not a way of
+                    writing but a way of working, so it stands apart from the
+                    two ordinary lists. */}
+                <span className="rich-text-sep"/>
+                <Tool on={is('taskList')} title={t('richtext.taskList')} icon="circle-check"
+                      onClick={() => chain().toggleTaskList().run()}/>
             </div>
 
             {linkDraft && (

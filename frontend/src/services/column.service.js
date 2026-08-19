@@ -30,10 +30,12 @@ export const COLUMN_CATALOG = [
     {type: 'file', label: t('column.type.file'), category: USEFUL, icon: 'file', emptyValue: ''},
     {type: 'checkbox', label: t('column.type.checkbox'), category: USEFUL, icon: 'checkbox', emptyValue: false},
     {type: 'link', label: t('column.type.link'), category: USEFUL, icon: 'link', emptyValue: ''},
+    {type: 'tags', label: t('column.type.tags'), category: USEFUL, icon: 'tags', emptyValue: []},
     {type: 'priority', label: t('column.type.priority'), category: USEFUL, icon: 'priority', emptyValue: ''},
     {type: 'estimate', label: t('column.type.estimate'), category: USEFUL, icon: 'estimate', emptyValue: ''},
     {type: 'longtext', label: t('column.type.longtext'), category: USEFUL, icon: 'longtext', emptyValue: ''},
-    {type: 'updated', label: t('column.type.updated'), category: USEFUL, icon: 'updated', emptyValue: null}
+    {type: 'updated', label: t('column.type.updated'), category: USEFUL, icon: 'updated', emptyValue: null},
+    {type: 'created', label: t('column.type.created'), category: USEFUL, icon: 'created', emptyValue: null}
 ]
 
 // Order of the headings in the add-column dialog.
@@ -51,11 +53,21 @@ export function catalogEntry(type){
     return COLUMN_CATALOG.find(c => c.type === type) || null
 }
 
+/**
+ * Fields that are not a column value but a property of the task itself.
+ *
+ * A Created column does not hold anything — it shows when the row began, and
+ * that is written once by the database. So it points at the task's own field
+ * instead of getting a private one, and two of them on the same board show
+ * the same fact rather than two empty cells.
+ */
+const FIXED_FIELD = {created: 'createdAt'}
+
 /** A new column. The value lands in task[<id>], not in a fixed field. */
 export function makeColumn(type, title){
     const entry = catalogEntry(type)
     const id = makeColumnId()
-    return {id, type, title: title || (entry?entry.label:type), field: id}
+    return {id, type, title: title || (entry?entry.label:type), field: FIXED_FIELD[type] || id}
 }
 
 /**

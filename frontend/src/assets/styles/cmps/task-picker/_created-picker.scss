@@ -1,0 +1,35 @@
+@use "../../setup/mixins";
+
+/**
+ * The Created column: who began this, and when.
+ *
+ * A picture and a date on one line, both quiet — the column is context, not a
+ * value anybody acts on. Nothing here reacts to the pointer, because nothing
+ * here can be clicked: the cell is written by the database when the row is
+ * inserted and never again.
+ */
+.created-picker {
+    align-items: center;
+    display: flex;
+    font-size: 13px;
+    gap: 8px;
+    justify-content: center;
+    padding: 0 8px;
+
+    .created-avatar,
+    img {
+        @include mixins.members;
+        flex: none;
+    }
+
+    .created-date {
+        color: #323338;
+        white-space: nowrap;
+    }
+
+    /* A task from before this column existed. The dash is the honest answer;
+       see the migration for why nothing was made up for these. */
+    &.is-empty .created-dash {
+        color: #c4c4c4;
+    }
+}

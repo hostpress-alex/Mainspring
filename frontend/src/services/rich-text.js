@@ -236,3 +236,88 @@ export function mentionedIds(value){
     for(const match of String(value || '').matchAll(MENTION_TOKEN)) ids.add(match[2])
     return [...ids]
 }
+
+/* ------------------------------------------------------------ checklist -- */
+
+/** The one shape tiptap writes for a checklist item. */
+const TASK_ITEM = 'li[data-type="taskItem"]'
+
+/** Does this text contain a checklist at all? */
+export function hasTaskItems(value){
+    return /data-type=("|')taskItem\1/.test(String(value || ''))
+}
+
+/**
+ * Give the checkboxes of a checklist back their teeth.
+ *
+ * The sanitizer disables every input it lets through, on every path, and that
+ * stays the default — see the hook in `ensureHooks`. This undoes it for one
+ * case, on already-cleaned markup, and only for the boxes that belong to a
+ * checklist item.
+ *
+ * Done to the STRING before it is put on screen rather than to the elements
+ * afterwards. The first attempt enabled them in an effect once the markup was
+ * in the DOM, and it worked until React re-rendered the surrounding dialog:
+ * the innerHTML was written again from the same string, the boxes came back
+ * disabled, and the effect did not run because nothing it depends on had
+ * changed. A property set on a node React owns is a property React can take
+ * away again at any moment.
+ */
+export function enableTaskBoxes(html){
+    const text = String(html || '')
+    if(!hasTaskItems(text)) return text
+    const doc = new DOMParser().parseFromString(`<body>${text}</body>`, 'text/html')
+    doc.body.querySelectorAll(`${TASK_ITEM} input[type="checkbox"]`).forEach(box => {
+        box.removeAttribute('disabled')
+    })
+    return doc.body.innerHTML
+}
+
+/**
+ * Tick or untick the nth item of a checklist, and give back the whole text.
+ *
+ * Works on the STORED markup rather than on what is on screen, and identifies
+ * the item by its position among the checklist items. Two alternatives were
+ * considered and are worse:
+ *
+ *   - An id per item would have to be written by the editor, be preserved
+ *     through every edit, and be migrated onto the checklists that already
+ *     exist. Position is stable for exactly as long as it needs to be: the
+ *     click happens on markup that was rendered from this same string.
+ *   - Editing the DOM that is on screen and reading it back would hand
+ *     whatever the browser made of it — including anything a future feature
+ *     adds to that node — straight back into the database.
+ *
+ * Returns null when there is nothing at that position, so a caller cannot
+ * save a change that did not happen. Otherwise the new text, the item's own
+ * words and its new state — the last two because the history should be able
+ * to say *which* box was ticked rather than printing the whole update again.
+ */
+export function toggleTaskItem(value, index){
+    const html = String(value || '')
+    if(!hasTaskItems(html)) return null
+
+    const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html')
+    const items = doc.body.querySelectorAll(TASK_ITEM)
+    const item = items[index]
+    if(!item) return null
+
+    const wasChecked = item.getAttribute('data-checked') === 'true'
+    item.setAttribute('data-checked', wasChecked?'false':'true')
+
+    // The attribute is what tiptap reads back when the comment is edited
+    // again; the input is what a reader sees. Both, or the two disagree the
+    // moment somebody opens the editor.
+    const box = item.querySelector('input[type="checkbox"]')
+    if(box){
+        if(wasChecked) box.removeAttribute('checked')
+        else box.setAttribute('checked', 'checked')
+    }
+
+    // The words of the item without its own checkbox: the label holds the
+    // control, the div next to it holds the text.
+    const body = item.querySelector('div') || item
+    const label = String(body.textContent || '').replace(/\s+/g, ' ').trim()
+
+    return {html: doc.body.innerHTML, label, isChecked: !wasChecked}
+}

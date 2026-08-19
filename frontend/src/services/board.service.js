@@ -481,13 +481,15 @@ function getEmptyTask(){
 }
 
 function getEmptyComment(){
+    const me = userService.getLoggedinUser()
     return {
         'archivedAt': Date.now(),
-        'byMember': {
-            '_id': null,
-            'fullname': 'Guest',
-            'imgUrl': GUEST_IMG
-        },
+        // Whoever is signed in, id first. The placeholder that used to sit
+        // here carried `_id: null` into the database on every new update, and
+        // an update without an author cannot be attributed afterwards.
+        'byMember': me
+            ?{'_id': me._id, 'fullname': me.fullname, 'imgUrl': me.imgUrl || GUEST_IMG}
+            :{'_id': null, 'fullname': 'Guest', 'imgUrl': GUEST_IMG},
         // null = standalone update, otherwise the id of the update being
         // replied to. Deliberately only one level deep.
         'parentId': null,
@@ -577,7 +579,7 @@ function getEmptyBoard(){
             {id: makeColumnId(), type: 'person', title: 'Person', field: 'memberIds'},
             {id: makeColumnId(), type: 'date', title: 'Date', field: 'dueDate'},
             {id: makeColumnId(), type: 'priority', title: 'Priority', field: 'priority'},
-            {id: makeColumnId(), type: 'updated', title: 'Zuletzt aktualisiert', field: 'updatedBy'}
+            {id: makeColumnId(), type: 'updated', title: 'Letztes Update', field: 'updatedBy'}
         ],
         'description': ''
     }

@@ -80,9 +80,59 @@
         label { flex: 0 0 auto; margin-top: .15em; }
         div { flex: 1 1 auto; min-width: 0; }
 
+        /* A round mark, as in Monday. The browser's own square box is
+           replaced rather than hidden behind a drawn one: `appearance: none`
+           keeps the input — and with it the keyboard, the focus ring and
+           the state — and only takes away how it looks.
+
+           The tick is a background image rather than a pseudo-element,
+           because an <input> is a replaced element and ::after on it is a
+           thing some browsers allow and none promise. */
+        input[type="checkbox"] {
+            appearance: none;
+            background-color: #fff;
+            border: 1.5px solid #c3c6d4;
+            border-radius: 50%;
+            flex: none;
+            height: 16px;
+            margin: 0;
+            width: 16px;
+
+            &:checked {
+                background-color: variables.$board-btn;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5l3 3 6-6'/%3E%3C/svg%3E");
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: 12px 12px;
+                border-color: variables.$board-btn;
+            }
+
+            &:disabled {
+                /* Not greyed out: in a read comment the state is the point,
+                   and a pale tick reads as "not really ticked". Only the
+                   cursor says that it cannot be operated. */
+                opacity: 1;
+            }
+        }
+
         li[data-checked="true"] > div {
             color: variables.$workspace-icon-color;
             text-decoration: line-through;
+        }
+    }
+
+    /* A box that can actually be ticked says so with the cursor. Everywhere
+       else the sanitizer leaves it disabled, and a disabled box already looks
+       like what it is — see rich-text-view. */
+    &.is-checkable ul[data-type="taskList"] {
+        input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        li:hover > label {
+            /* Enough to notice under the pointer, not enough to make a read
+               comment look like a form. */
+            opacity: .75;
         }
     }
 

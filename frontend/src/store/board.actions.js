@@ -295,6 +295,56 @@ export async function saveColumnLabels(board, column, labels, renames = {}, remo
 }
 
 
+/**
+ * Save the tag list of a column, and repair the tasks that used what changed.
+ *
+ * Three shapes of change, and only the last two touch tasks at all:
+ *
+ *   - adding, renaming, recolouring: the column alone. That is the whole
+ *     reason a task stores the tag's ID and not its word — a rename is one
+ *     entry here and no task is written.
+ *   - `mergeFrom`/`mergeInto`: every task carrying the first gets the second
+ *     instead, and keeps its other tags. A task that already had both ends up
+ *     with it once, not twice.
+ *   - `removed`: the ids are dropped from every task that held them.
+ *
+ * The tasks first, the column last. The other way round would leave a moment
+ * where a task points at a tag the column no longer defines — and if the
+ * second write failed, that moment would be permanent.
+ */
+export async function saveColumnTags(board, column, tags, {mergeFrom = null, mergeInto = null, removed = []} = {}){
+    const boardId = board._id
+    const field = column.field || column.id
+    const source = _serverStateOf(boardId) || _currBoard() || board
+    const removedSet = new Set(removed || [])
+
+    try {
+        if(mergeFrom || removedSet.size){
+            for(const group of source.groups || []){
+                for(const task of group.tasks || []){
+                    const value = Array.isArray(task?task[field]:null)?task[field]:[]
+                    if(!value.length) continue
+
+                    let next = value.filter(id => !removedSet.has(id))
+                    if(mergeFrom && next.includes(mergeFrom)){
+                        next = next.filter(id => id !== mergeFrom)
+                        if(mergeInto && !next.includes(mergeInto)) next.push(mergeInto)
+                    }
+                    if(next.length === value.length && next.every((id, i) => id === value[i])) continue
+
+                    await boardService.patchTask(boardId, group.id, task.id, {[field]: next})
+                }
+            }
+        }
+
+        const columns = (source.columns || []).map(c => c.id === column.id?{...c, tags}:c)
+        return _applyBoard(await boardService.setColumns(boardId, columns))
+    } catch(err) {
+        console.error('cant save tags:', err)
+        throw err
+    }
+}
+
 export async function addGroup(filteredBoard){
     try {
         const group = boardService.getEmptyGroup()

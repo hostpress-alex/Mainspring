@@ -45,8 +45,14 @@ const BY_TYPE = {
     status: ['isAnyOf', 'isNoneOf', 'isEmpty', 'isNotEmpty'],
     priority: ['isAnyOf', 'isNoneOf', 'isEmpty', 'isNotEmpty'],
     person: ['isAnyOf', 'isNoneOf', 'isEmpty', 'isNotEmpty'],
+    // A task carries several, so the same questions as the person
+    // column — anyOf already understands a list on both sides.
+    tags: ['isAnyOf', 'isNoneOf', 'isEmpty', 'isNotEmpty'],
     date: ['is', 'before', 'after', 'overdue', 'isEmpty', 'isNotEmpty'],
     updated: ['before', 'after'],
+    // A moment, and one that never changes — so only the two questions
+    // worth asking about it: newer than, older than.
+    created: ['before', 'after'],
     number: ['eq', 'ne', 'gt', 'lt', 'isEmpty', 'isNotEmpty'],
     // Stored as minutes, so the same comparisons as a number — the
     // person types 90 and means an hour and a half.
@@ -114,7 +120,7 @@ export function matchesRule(task, rule, {group, columns = []} = {}){
     // `is` means different things to different columns: the same text, or the
     // same DAY. Routed here rather than inside the switch, because the switch
     // is on the operator and this difference is about the column.
-    const isDate = column.type === 'date' || column.type === 'updated'
+    const isDate = column.type === 'date' || column.type === 'updated' || column.type === 'created'
     if(isDate && rule.operator === 'is') return sameDay(dateOf(raw), rule.value)
 
     switch(rule.operator){

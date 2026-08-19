@@ -188,10 +188,13 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
             // node with the id already in it, so there is no "shown form" that
             // has to be matched against the member list at the last moment —
             // and with it goes the case of two members with the same name.
-            if(user){
-                comment.byMember.fullname = user.fullname
-                comment.byMember.imgUrl = user.imgUrl
-            }
+            // The whole person, id included. Setting only the name and the
+            // picture left `_id: null` from getEmptyComment in the row, so the
+            // update looked right for as long as this tab stayed open and
+            // turned into "Unbekannt" the moment it was read back from the
+            // server — which nothing did until ticking a checklist started
+            // re-reading it.
+            if(user) comment.byMember = {_id: user._id, fullname: user.fullname, imgUrl: user.imgUrl || ''}
             const next = {...currTask, comments: [comment, ...(currTask.comments || [])]}
             socketService.emit(SOCKET_EMIT_SEND_MSG, comment)
             await updateTaskAction(board, groupId, next, updateActivity('update', comment.txt))
@@ -281,15 +284,25 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
         setComment((prevComment) => ({...prevComment, [field]: value}))
     }
 
-    async function onEditComment(saveComment){
+    /**
+     * `note` lets the caller say what kind of change this was.
+     *
+     * Ticking a box changes the text of a comment, so without it the history
+     * would call it a rewrite and print the whole update again. What somebody
+     * reading the log wants to know is which item was ticked — see
+     * onToggleTask in comment-preview.
+     */
+    async function onEditComment(saveComment, _taskId, note = null){
         try {
             const next = {...currTask, comments: currTask.comments.map(c => (c.id === saveComment.id)?saveComment:c)}
             // Pinning goes through here too, and "pinned" is not "rewritten" —
             // only a changed text is worth a line in the history.
             const before = (currTask.comments || []).find(c => c.id === saveComment.id)
             const changed = before && before.txt !== saveComment.txt
-            await updateTaskAction(board, groupId, next,
-                changed?updateActivity(saveComment.parentId?'replyEdit':'updateEdit', saveComment.txt):undefined)
+            const activity = note
+                ?updateActivity(note.action, note.txt)
+                :(changed?updateActivity(saveComment.parentId?'replyEdit':'updateEdit', saveComment.txt):undefined)
+            await updateTaskAction(board, groupId, next, activity)
             setCurrTask(next)
         } catch(err) {
             console.log('err:', err)

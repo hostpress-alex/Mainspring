@@ -52,7 +52,11 @@ const ACTION_LABELS = {
     updateEdit: t('activity.action.updateEdit'),
     replyEdit: t('activity.action.replyEdit'),
     updateDelete: t('activity.action.updateDelete'),
-    replyDelete: t('activity.action.replyDelete')
+    replyDelete: t('activity.action.replyDelete'),
+    // Ticking a box is not "the update was rewritten", even though it is the
+    // same write underneath. The excerpt carries the item, not the update.
+    updateCheck: t('activity.action.updateCheck'),
+    updateUncheck: t('activity.action.updateUncheck')
 }
 
 /**
@@ -94,6 +98,10 @@ export function ActivityPreview({activity, taskTitle = null}){
             case 'updateDelete':
             case 'replyDelete':
                 return <Icon name='trash-can' variant='fa-regular' className="icon"/>
+            case 'updateCheck':
+                return <Icon name='circle-check' className="icon"/>
+            case 'updateUncheck':
+                return <Icon name='circle' variant='fa-regular' className="icon"/>
             default:
                 return null
         }
@@ -122,6 +130,8 @@ export function ActivityPreview({activity, taskTitle = null}){
             case 'replyEdit':
             case 'updateDelete':
             case 'replyDelete':
+            case 'updateCheck':
+            case 'updateUncheck':
                 return <FromToExcerpt activity={activity}/>
             default:
                 return null

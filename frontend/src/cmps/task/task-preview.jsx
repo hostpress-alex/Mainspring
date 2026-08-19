@@ -10,6 +10,8 @@ import {setDynamicModalObj, toggleModal, updateTaskAction} from '../../store/boa
 import {boardService} from '../../services/board.service'
 import {singleLineEditable, isOnText} from '../../services/editable'
 import {UpdatedPicker} from './updated-picker'
+import {CreatedPicker} from './created-picker'
+import {TagsPicker} from './tags-picker'
 import {NumberPicker} from './number-picker'
 import {EstimatePicker} from './estimate-picker'
 import {FilePicker} from './file-picker'
@@ -244,6 +246,8 @@ export function DynamicCmp({column, info, onUpdate, board, width, readOnly = fal
                 return <FilePicker {...props} />
             case 'updated':
                 return <UpdatedPicker {...props} />
+            case 'created':
+                return <CreatedPicker {...props} />
             case 'text':
                 return <TextPicker {...props} />
             case 'longtext':
@@ -252,6 +256,8 @@ export function DynamicCmp({column, info, onUpdate, board, width, readOnly = fal
                 return <CheckboxPicker {...props} />
             case 'link':
                 return <LinkPicker {...props} />
+            case 'tags':
+                return <TagsPicker {...props} />
             case 'dropdown':
                 return <DropdownPicker {...props} board={board}/>
             default:

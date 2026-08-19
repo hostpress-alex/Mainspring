@@ -12,8 +12,10 @@
       "status": "Status",
       "title": "Title",
       "update": "wrote an update",
+      "updateCheck": "ticked off",
       "updateDelete": "deleted an update",
-      "updateEdit": "edited an update"
+      "updateEdit": "edited an update",
+      "updateUncheck": "unticked"
     },
     "activity": "Activity",
     "area": "The activity log",
@@ -243,6 +245,7 @@
     "titleHint": "You can rename it later by double-clicking the column header",
     "type": {
       "checkbox": "Checkbox",
+      "created": "Created",
       "date": "Date",
       "dropdown": "Drop-down",
       "estimate": "Estimated time",
@@ -253,6 +256,7 @@
       "person": "People",
       "priority": "Priority",
       "status": "Status",
+      "tags": "Tags",
       "text": "Text",
       "updated": "Last updated"
     }
@@ -298,6 +302,10 @@
     "usage": "Usage",
     "user": "User",
     "yes": "Yes"
+  },
+  "created": {
+    "unknown": "No creation date recorded",
+    "unknownPerson": "Unknown"
   },
   "date": {
     "dueIn": {
@@ -601,6 +609,28 @@
     "title": "Search",
     "tooShort": "At least {n} characters."
   },
+  "tags": {
+    "addTitle": "Add tags",
+    "color": "Colour",
+    "create": "+ Create a new tag",
+    "createNamed": "+ Create “{name}”",
+    "deleteQuestion": {
+      "one": "Delete “{name}”? It disappears from 1 task.",
+      "other": "Delete “{name}”? It disappears from {n} tasks."
+    },
+    "manage": "Manage tags",
+    "manageTitle": "Manage tags",
+    "merge": "Merge",
+    "mergeQuestion": {
+      "one": "“{name}” is used by 1 task. Which tag should it get?",
+      "other": "“{name}” is used by {n} tasks. Which tag should they get?"
+    },
+    "nameTaken": "A tag with that name already exists.",
+    "none": "No tags yet.",
+    "removeFromTask": "Remove from this task",
+    "search": "Search or create",
+    "tooMany": "More than {n} tags on one task is not supported."
+  },
   "task": {
     "add": "+ Add task",
     "addSubtask": "+ Add a subtask",
@@ -620,7 +650,7 @@
     "filterByPerson": "Filter by person",
     "hasSubtasks": "Has subtasks of its own",
     "hideSubtasks": "Hide subtasks",
-    "moveTo": "Move to",
+    "moveTo": "Move",
     "moveToTitle": "Move to another group",
     "new": "New task",
     "newBelow": "New task below",
@@ -707,6 +737,10 @@
     "replies": "Replies",
     "repliesCount": "Replies ({n})",
     "replyPlaceholder": "Write a reply…",
+    "seenBy": {
+      "one": "Seen by 1 person",
+      "other": "Seen by {n} people"
+    },
     "sending": "Sending…",
     "someone": "Unknown",
     "thisReply": "This reply",

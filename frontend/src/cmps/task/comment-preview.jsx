@@ -11,7 +11,9 @@ import {CommentReactions} from './comment-reactions'
 import {useTaskReactions} from './use-task-reactions'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
 import {RichTextView} from '../rich-text/rich-text-view'
-import {isEmpty as isRichEmpty} from '../../services/rich-text'
+import {toggleTaskItem, isEmpty as isRichEmpty} from '../../services/rich-text'
+import {CommentSeen} from './comment-seen'
+import {useCommentSeen} from './use-comment-seen'
 import {useDismissable} from '../../customHooks/useDismissable'
 import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
@@ -42,6 +44,11 @@ export function CommentPreview({
     // Pinning decides what everybody reads first, so it is not an edit of your
     // own text — an editor may, a viewer may not, and the server says the same.
     const canPin = !isReply && boardRoles.canEdit(board, me)
+    // Deliberately not canWriteComment: ticking is not rewriting somebody's
+    // words, and the server allows an editor to save any comment on a task
+    // anyway — a box that ticks and then bounces back is worse than one that
+    // is not offered.
+    const canCheck = boardRoles.canEdit(board, me)
     const isPinned = Boolean(comment.pinnedAt)
     const [editComment, setEditComment] = useState({...comment})
     const [isReplyOpen, setIsReplyOpen] = useState(false)
@@ -51,6 +58,9 @@ export function CommentPreview({
     // comment. A viewer may react: an emoji says less than the reply they are
     // already allowed to write.
     const {reactions, toggle: onToggleReaction} = useTaskReactions(board?._id, taskId)
+    // One request for the whole task, like the reactions above — see
+    // use-comment-seen for why this is not per comment.
+    const seenByComment = useCommentSeen(board?._id, taskId)
     const canReact = Boolean(me) && boardRoles.canView(board, me)
 
     // Oldest first in the list, so the ones that fold are the ones at the top.
@@ -68,6 +78,31 @@ export function CommentPreview({
     function onSaveEdit(){
         onEditComment({...editComment}, taskId)
         setIsEditOpen(false)
+    }
+
+    /**
+     * Ticking a box in an update that has already been posted.
+     *
+     * It goes through the same save as an edit, because that is what it is:
+     * the text of the comment changes. So it lands in the history as an edit
+     * as well, without a second kind of event having to be invented for it.
+     *
+     * Anybody who may write on the board may tick — including on somebody
+     * else's update. A checklist in an update is a list of work, and a list
+     * of work only earns its keep if the person doing the work can cross
+     * things off it.
+     */
+    function onToggleTask(index){
+        const change = toggleTaskItem(comment.txt, index)
+        if(!change || change.html === comment.txt) return
+        // Its own kind of entry in the history, carrying the item rather than
+        // the update: "abgehakt: Angebot verschickt" is the line somebody
+        // reading the log wants, and re-printing the whole update every time a
+        // box moves is how a log stops being read.
+        onEditComment({...comment, txt: change.html}, taskId, {
+            action: change.isChecked?'updateCheck':'updateUncheck',
+            txt: change.label
+        })
     }
 
     /** Pin or unpin. The moment is stored, so several pins keep an order. */
@@ -122,7 +157,7 @@ export function CommentPreview({
                 {/* No `style` any more: it carried the whole-comment
                     formatting that this round replaced. Old comments still
                     hold it in the database and it is simply not read. */}
-                <RichTextView value={comment.txt}/>
+                <RichTextView value={comment.txt} onToggleTask={canCheck?onToggleTask:null}/>
                 <AttachmentStrip attachments={comment.attachments}/>
             </div>}
             {isEditOpen && <form className="input-container">
@@ -144,6 +179,19 @@ export function CommentPreview({
                 discussion does not mean scrolling past all of it first. */}
             {!isEditOpen && (
                 <div className="comment-actions">
+                    {/* Sits in the same row as the reactions and left of the
+                        reply button, where Monday puts it — and it is the
+                        element the visibility is measured on, so it has to be
+                        at the bottom of the card rather than at the top: an
+                        update is read from the top down. */}
+                    <CommentSeen
+                        boardId={board?._id}
+                        taskId={taskId}
+                        commentId={comment.id}
+                        authorId={comment.byMember && comment.byMember._id}
+                        myId={me && me._id}
+                        members={board?.members || members}
+                        seen={seenByComment[comment.id] || []}/>
                     <CommentReactions
                         reactions={reactions[comment.id] || {}}
                         people={board?.members || members}

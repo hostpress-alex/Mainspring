@@ -137,6 +137,7 @@ async function enrichPeople(boards){
 function fillTask(task, fill){
     if(!task) return
     if(task.updatedBy && task.updatedBy._id) task.updatedBy = fill(task.updatedBy)
+    if(task.createdBy && task.createdBy._id) task.createdBy = fill(task.createdBy)
     if(Array.isArray(task.comments)){
         task.comments = task.comments.map(c => (c?{...c, byMember: fill(c.byMember)}:c))
     }
@@ -637,7 +638,7 @@ async function addTask(boardId, groupId, task, index = null){
     const board = await _requireBoard(boardId, {editor: true})
     _findGroup(board, groupId)
     if(!task || !task.id) throw httpError(400, 'task.id fehlt')
-    await boardRepo.addTask(boardId, groupId, task, index)
+    await boardRepo.addTask(boardId, groupId, task, index, getLoggedinUser())
     await notifications().taskAdded({board, groupId, task, actor: getLoggedinUser()})
     // Only a task, never a subtask: "when an item is created" is about the
     // board's own list. A subtask appearing under a task is a different
@@ -682,6 +683,24 @@ async function _checkColumnValues(board, patch){
             if(!await priorities().isAllowedValue(value)){
                 throw httpError(400, 'Unknown priority')
             }
+        }
+
+        /**
+         * Tags are a list of ids, and that is all this checks.
+         *
+         * Deliberately NOT "every id exists in the column": the list is
+         * board-local and anybody may add to it, so a tag created in one tab
+         * and used in another would fail a membership test for the seconds
+         * between the two writes. An id that names nothing simply draws no
+         * chip — which is recoverable, unlike a refused save.
+         */
+        if(column.type === 'tags'){
+            if(value === null || value === undefined || value === '') continue
+            const list = Array.isArray(value)?value:null
+            if(!list || list.some(v => typeof v !== 'string' || !v)){
+                throw httpError(400, 'Tags are a list of ids')
+            }
+            if(list.length > 20) throw httpError(400, 'Too many tags on one task')
         }
 
         if(column.type === 'estimate'){
@@ -746,7 +765,7 @@ async function addSubtask(boardId, groupId, parentId, subtask, index = null){
     const parent = _findTask(group, parentId)
     if(!parent.subtasks) throw httpError(400, 'Ein Subtask kann keine Subtasks haben')
     if(!subtask || !subtask.id) throw httpError(400, 'task.id fehlt')
-    await boardRepo.addSubtask(boardId, parentId, subtask, index)
+    await boardRepo.addSubtask(boardId, parentId, subtask, index, getLoggedinUser())
     await notifications().taskAdded({board, groupId, task: subtask, parentId, actor: getLoggedinUser()})
     return await _pushed(boardId)
 }

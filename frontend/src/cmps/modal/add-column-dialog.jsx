@@ -13,10 +13,12 @@ const ICONS = {
     file: {el: <Icon name='file' variant='fa-regular'/>, bg: '#e2445c'},
     checkbox: {el: <Icon name='square-check' variant='fa-regular'/>, bg: '#fdab3d'},
     link: {el: <Icon name='link'/>, bg: '#0073ea'},
+    tags: {el: <Icon name='tags'/>, bg: '#00a9a5'},
     priority: {el: <Icon name='flag' variant='fa-regular'/>, bg: '#ffcb00'},
     estimate: {el: <Icon name='hourglass-half'/>, bg: '#00a9a5'},
     longtext: {el: <Icon name='align-left'/>, bg: '#7f5347'},
-    updated: {el: <Icon name='clock-rotate-left'/>, bg: '#9d99b9'}
+    updated: {el: <Icon name='clock-rotate-left'/>, bg: '#9d99b9'},
+    created: {el: <Icon name='calendar-plus' variant='fa-regular'/>, bg: '#579bfc'}
 }
 
 /**

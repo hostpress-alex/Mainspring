@@ -266,3 +266,42 @@ $comment-thread-bg: #f5f6f8;
         }
     }
 }
+
+/* --------------------------------------------------------- read receipt -- */
+
+/* Quiet, and to the left of everything else in the action row: it is the one
+   thing there that reports rather than invites. Nothing about it is a button
+   — it says who has read this, and there is nothing to press. */
+.comment-seen {
+    align-items: center;
+    display: inline-flex;
+    margin-right: 4px;
+}
+
+.comment-seen-count {
+    align-items: center;
+    color: #676879;
+    cursor: default;
+    display: inline-flex;
+    font-size: 12px;
+    gap: 4px;
+}
+
+.comment-seen-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.comment-seen-person {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.comment-seen-avatar {
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+}

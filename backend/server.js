@@ -49,6 +49,7 @@ const reactionRoutes = require('./api/reaction/reaction.routes')
 const priorityRoutes = require('./api/priority/priority.routes')
 const workHoursRoutes = require('./api/workhours/workhours.routes')
 const calendarRoutes = require('./api/calendar/calendar.routes')
+const seenRoutes = require('./api/seen/seen.routes')
 const {setupSocketAPI} = require('./services/socket.service')
 
 // routes
@@ -69,6 +70,7 @@ app.use('/api/reaction', reactionRoutes)
 app.use('/api/priority', priorityRoutes)
 app.use('/api/workhours', workHoursRoutes)
 app.use('/api/calendar', calendarRoutes)
+app.use('/api/seen', seenRoutes)
 setupSocketAPI(http)
 
 /**

@@ -52,7 +52,10 @@ const COLUMN_OWN = new Set(['id', 'type', 'title', 'field'])
 // as well as being rows, and the two copies would drift apart within a day.
 const ROLE_NAMES = new Set(['owner', 'editor', 'viewer'])
 
-const TASK_OWN = new Set(['id', 'title', 'memberIds', 'comments', 'subtasks'])
+// `createdAt`/`createdBy` are read back out of the task's own columns, so
+// they must not be swept into col_values when a client echoes them back —
+// that would leave two copies, and the stale one would win on the next write.
+const TASK_OWN = new Set(['id', 'title', 'memberIds', 'comments', 'subtasks', 'createdAt', 'createdBy'])
 
 function buildColumn(row){
     return {id: row.id, type: row.type, title: row.title, field: row.field, ...(parseJson(row.settings, {}) || {})}
@@ -67,6 +70,12 @@ function buildColumn(row){
 function buildTask(row, memberIds, comments, subtasks){
     const values = parseJson(row.col_values, {}) || {}
     const task = {...values, id: row.id, title: row.title === null?'':row.title, memberIds, comments}
+    // After the spread, so a stray col_values entry of the same name cannot
+    // overwrite what the row itself says.
+    task.createdAt = row.created_at === null || row.created_at === undefined?null:Number(row.created_at)
+    // The id alone; the name and the picture are filled in when the board is
+    // read — same as every other person in this file.
+    task.createdBy = row.created_by_id?{_id: row.created_by_id}:null
     if(subtasks) task.subtasks = subtasks
     return task
 }
@@ -339,9 +348,14 @@ async function syncTaskComments(trx, boardId, taskId, comments){
      * instead: whatever no longer has a comment to point at goes.
      */
     const keptIds = comments.map(c => sid(c && c.id)).filter(Boolean)
-    const orphans = trx('comment_reaction').where({board_id: boardId, task_id: taskId})
-    if(keptIds.length) orphans.whereNotIn('comment_id', keptIds)
-    await orphans.del()
+    // Both tables hang off comment ids without a foreign key, and for the same
+    // reason. Adding a third one means adding it here — that is the price of
+    // the rewrite above, and it is cheaper than the cascade would be.
+    for(const table of ['comment_reaction', 'comment_seen']){
+        const orphans = trx(table).where({board_id: boardId, task_id: taskId})
+        if(keptIds.length) orphans.whereNotIn('comment_id', keptIds)
+        await orphans.del()
+    }
 
     if(!comments.length) return
     const seen = new Set()
@@ -375,7 +389,7 @@ async function syncTaskComments(trx, boardId, taskId, comments){
  * subtask's own `subtasks` is ignored rather than followed, so a client that
  * sends a deeper tree gets it flattened instead of silently stored.
  */
-async function writeTask(trx, boardId, groupId, task, position, parentId = null){
+async function writeTask(trx, boardId, groupId, task, position, parentId = null, createdBy = null){
     const s = splitTask(task)
     const id = sid(task && task.id) || newShortId()
     await trx('task').insert({
@@ -383,6 +397,17 @@ async function writeTask(trx, boardId, groupId, task, position, parentId = null)
         title: s.title, col_values: toJson(s.values),
         updated_at: s.updatedAt, updated_by_id: s.updatedById
     }).onConflict(['board_id', 'id']).merge()
+
+    /**
+     * Stamped once, and only when it is still empty.
+     *
+     * This function is also the one that rewrites a whole task, so setting
+     * the creation data with the insert above would move it every time
+     * somebody saved. A separate write guarded by `whereNull` says what is
+     * meant: this is the moment the row began, and a moment does not change.
+     */
+    await trx('task').where({board_id: boardId, id}).whereNull('created_at')
+        .update({created_at: Date.now(), created_by_id: createdBy?sid(createdBy._id || createdBy):null})
     await syncTaskMembers(trx, boardId, id, s.memberIds)
     await syncTaskComments(trx, boardId, id, s.comments)
     if(!parentId) await syncSubtasks(trx, boardId, groupId, id, task && task.subtasks)
@@ -696,7 +721,7 @@ async function reorderGroups(boardId, groups){
 
 /* ================================================================ Tasks == */
 
-async function addTask(boardId, groupId, task, index = null){
+async function addTask(boardId, groupId, task, index = null, createdBy = null){
     await tx(async trx => {
         const id = await requireBoardRow(trx, boardId)
         await requireGroupRow(trx, id, groupId)
@@ -707,7 +732,7 @@ async function addTask(boardId, groupId, task, index = null){
             position = Number(index)
             await shiftPositions(trx, 'task', topLevelOf(id, groupId), position)
         }
-        await writeTask(trx, id, groupId, task, position)
+        await writeTask(trx, id, groupId, task, position, null, createdBy)
     })
 }
 
@@ -719,7 +744,7 @@ async function removeTask(boardId, groupId, taskId){
 
 /* ------------------------------------------------------------ Subtasks -- */
 
-async function addSubtask(boardId, parentId, subtask, index = null){
+async function addSubtask(boardId, parentId, subtask, index = null, createdBy = null){
     await tx(async trx => {
         const id = await requireBoardRow(trx, boardId)
         const parent = await trx('task').where({board_id: id, id: parentId}).first()
@@ -733,7 +758,7 @@ async function addSubtask(boardId, parentId, subtask, index = null){
             position = Number(index)
             await shiftPositions(trx, 'task', childrenOf(id, parentId), position)
         }
-        await writeTask(trx, id, parent.group_id, subtask, position, parentId)
+        await writeTask(trx, id, parent.group_id, subtask, position, parentId, createdBy)
     })
 }
 
