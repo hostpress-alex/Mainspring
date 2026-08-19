@@ -25,6 +25,10 @@ function out(row){
         start: row.start_at,
         end: row.end_at,
         note: row.note || '',
+        // Who put it there. The calendar draws the planner's own blocks
+        // differently and lets a person take one over by moving it.
+        source: row.source || 'manual',
+        isAssumed: Boolean(row.is_assumed),
         createdAt: row.created_at,
         updatedAt: row.updated_at
     }
@@ -43,6 +47,11 @@ function toRow(entry){
         start_at: new Date(entry.start),
         end_at: new Date(entry.end),
         note: entry.note || '',
+        // Anything written through the ordinary calendar routes belongs to a
+        // person, and the planner leaves it alone from then on. Its own
+        // blocks are written past this function — see planner.repo.
+        source: 'manual',
+        is_assumed: false,
         created_at: entry.createdAt?new Date(entry.createdAt):new Date(),
         updated_at: entry.updatedAt?new Date(entry.updatedAt):new Date()
     }

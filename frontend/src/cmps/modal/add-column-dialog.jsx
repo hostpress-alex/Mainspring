@@ -8,6 +8,7 @@ const ICONS = {
     dropdown: {el: <Icon name='circle-chevron-down'/>, bg: '#00a9a5'},
     text: {el: <Icon name='font'/>, bg: '#fdab3d'},
     date: {el: <Icon name='calendar-days' variant='fa-regular'/>, bg: '#a25ddc'},
+    deadline: {el: <Icon name='flag-checkered'/>, bg: '#e2445c'},
     person: {el: <Icon name='user' variant='fa-regular'/>, bg: '#41b0f5'},
     number: {el: <Icon name='hashtag'/>, bg: '#ffcb00'},
     file: {el: <Icon name='file' variant='fa-regular'/>, bg: '#e2445c'},

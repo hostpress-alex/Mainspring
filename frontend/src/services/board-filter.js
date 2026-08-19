@@ -49,6 +49,7 @@ const BY_TYPE = {
     // column — anyOf already understands a list on both sides.
     tags: ['isAnyOf', 'isNoneOf', 'isEmpty', 'isNotEmpty'],
     date: ['is', 'before', 'after', 'overdue', 'isEmpty', 'isNotEmpty'],
+    deadline: ['is', 'before', 'after', 'overdue', 'isEmpty', 'isNotEmpty'],
     updated: ['before', 'after'],
     // A moment, and one that never changes — so only the two questions
     // worth asking about it: newer than, older than.
@@ -120,7 +121,7 @@ export function matchesRule(task, rule, {group, columns = []} = {}){
     // `is` means different things to different columns: the same text, or the
     // same DAY. Routed here rather than inside the switch, because the switch
     // is on the operator and this difference is about the column.
-    const isDate = column.type === 'date' || column.type === 'updated' || column.type === 'created'
+    const isDate = ['date', 'deadline', 'updated', 'created'].includes(column.type)
     if(isDate && rule.operator === 'is') return sameDay(dateOf(raw), rule.value)
 
     switch(rule.operator){

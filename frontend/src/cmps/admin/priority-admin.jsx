@@ -110,6 +110,9 @@ export function PriorityAdmin({onError}){
         <div className="admin-card">
             <h2 className="admin-section-title">{t('priority.sectionTitle')}</h2>
             <p className="admin-sub">{t('priority.sectionHelp')}</p>
+            {/* Said here rather than left to be remembered: the arrows below
+                are not decoration, they are the planning order. */}
+            <p className="admin-sub is-footnote">{t('priority.orderHint')}</p>
 
             <table className="admin-table priority-table">
                 <thead>

@@ -188,6 +188,101 @@ function makeLabelId(){
     return id
 }
 
+/**
+ * The one status that means finished.
+ *
+ * Every status column gets exactly one label marked `done`, and it cannot be
+ * deleted or lose that meaning. Two things need it: the planner, which must
+ * not schedule work on a task that is finished, and anybody reading a board
+ * who wants "how far along is this" to mean the same thing everywhere.
+ *
+ * Why a marked label rather than a fixed word: a board is as likely to be
+ * called "wtf / yea / lol" as "Done / Stuck", and the columns here are
+ * already a mixture of English and German. The MARK is what is guaranteed;
+ * the word stays the board's own business, so the same feature works in both
+ * languages and nobody is frozen into a spelling.
+ *
+ * An existing label is promoted rather than a second one added — otherwise
+ * every board that already says "Done" would get a "Done" next to its "Done".
+ * The promotion looks at four spellings and at nothing else; a board whose
+ * finished state is called something else gets a new label and can rename it.
+ */
+const DONE_LABEL_ID = 'lb_done'
+const DONE_TITLE = 'Done'
+const DONE_COLOR = '#00c875'
+const DONE_TITLES = new Set(['done', 'fertig', 'erledigt', 'abgeschlossen'])
+
+function ensureDoneLabel(board){
+    if(!board || !Array.isArray(board.columns)) return board
+
+    for(const column of board.columns){
+        if(!column || column.type !== 'status' || !Array.isArray(column.labels)) continue
+
+        const labels = column.labels
+        let done = labels.find(l => l && l.done === true)
+        if(!done) done = labels.find(l => l && DONE_TITLES.has(String(l.title || '').trim().toLowerCase()))
+
+        // Exactly one, whatever the state before: a second one would make
+        // "is this finished" a question with two answers.
+        const cleared = labels.map(l => (l && l.done && l !== done)?{...l, done: false, locked: false}:l)
+
+        if(done){
+            column.labels = cleared.map(l => (l === done?{...l, done: true, locked: true}:l))
+            continue
+        }
+
+        const fresh = {id: DONE_LABEL_ID, title: DONE_TITLE, color: DONE_COLOR, done: true, locked: true}
+        // In front of the empty entry, which has to stay last — it is how a
+        // value is taken off a task.
+        const emptyAt = cleared.findIndex(l => l && !l.title)
+        column.labels = emptyAt >= 0
+            ?[...cleared.slice(0, emptyAt), fresh, ...cleared.slice(emptyAt)]
+            :[...cleared, fresh]
+    }
+    return board
+}
+
+/** The label a status column uses for "finished", or null. */
+function doneLabelOf(column){
+    if(!column || !Array.isArray(column.labels)) return null
+    return column.labels.find(l => l && l.done === true) || null
+}
+
+/**
+ * The TITLE that means finished, worked out from a raw label list.
+ *
+ * The planner reads columns straight out of the database, where the mark may
+ * not have been written yet — `ensureDoneLabel` runs when a board is read, so
+ * a board nobody has opened since this feature arrived still has unmarked
+ * labels. Rather than depend on somebody having opened it, the same two rules
+ * are applied here: the mark first, then the four spellings.
+ *
+ * Deliberately in this file and not in the planner: one rule, one home.
+ */
+function doneTitleOfLabels(labels){
+    if(!Array.isArray(labels)) return null
+    const marked = labels.find(l => l && l.done === true)
+    if(marked) return marked.title || null
+    const named = labels.find(l => l && DONE_TITLES.has(String(l.title || '').trim().toLowerCase()))
+    return named?named.title:null
+}
+
+/**
+ * Does this status value mean finished, without a label list to ask?
+ *
+ * A status column only has a stored label list once somebody has edited one.
+ * Until then the list is derived when the board is read and never written —
+ * so the planner, which reads the database directly, finds a column with no
+ * labels at all and would conclude that nothing is ever finished. It did
+ * exactly that on the first live run.
+ *
+ * So there are two questions and both have to be asked: does the marked label
+ * match, and failing that, is the value one of the words that mean finished.
+ */
+function isDoneTitle(value){
+    return DONE_TITLES.has(String(value || '').trim().toLowerCase())
+}
+
 function ensureColumnLabels(board){
     if(!board || !Array.isArray(board.columns)) return board
     const boardLabels = Array.isArray(board.labels)?board.labels:[]
@@ -246,6 +341,7 @@ async function query(filterBy = {}){
     try {
         const boards = await boardRepo.findForUser(user, filterBy)
         boards.forEach(ensureColumnLabels)
+        boards.forEach(ensureDoneLabel)
         return await enrichPeople(boards)
     } catch(err) {
         logger.error('cannot find boards', err)
@@ -265,6 +361,7 @@ async function getById(boardId){
         if(!board) throw httpError(404, 'Board not found')
         if(!hasAccess(board, user)) throw httpError(403, 'Kein Zugriff auf dieses Board')
         ensureColumnLabels(board)
+        ensureDoneLabel(board)
         return await enrichPeople(board)
     } catch(err) {
         if(!err.status) logger.error(`while finding board ${boardId}`, err)
@@ -1036,6 +1133,10 @@ module.exports = {
     enrichMembers,
     enrichPeople,
     ensureColumnLabels,
+    ensureDoneLabel,
+    doneLabelOf,
+    doneTitleOfLabels,
+    isDoneTitle,
 
     updateMeta,
     setColumns,

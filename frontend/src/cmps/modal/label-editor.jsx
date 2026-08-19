@@ -44,9 +44,14 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
         color: l.color || '#c4c4c4',
         // Which label means finished. Boards are named "wtf / yea / lol" as
         // readily as "Done / Stuck", so nothing can work this out by reading
-        // the word — somebody has to say so. The subtask counter on a task is
-        // what reads it.
+        // the word — the mark says so.
+        //
+        // It is no longer a switch on every row: the server guarantees exactly
+        // one such label per status column and sends it back marked `locked`.
+        // That is what the planner reads, and what a second "means finished"
+        // label would make ambiguous.
         done: l.done === true,
+        locked: l.locked === true,
         original: l.title
     })))
     const [openPalette, setOpenPalette] = useState(null)
@@ -110,7 +115,10 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
         const removed = source.filter(l => l && l.title && !kept.has(l.title)).map(l => l.title)
 
         const labels = [
-            ...cleaned.map(r => ({id: r.id, title: r.title, color: r.color, ...(r.done?{done: true}:{})})),
+            ...cleaned.map(r => ({
+                id: r.id, title: r.title, color: r.color,
+                ...(r.done?{done: true}:{}), ...(r.locked?{locked: true}:{})
+            })),
             emptyLabel
         ]
         onSave({labels, renames, removed})
@@ -137,19 +145,25 @@ export function LabelEditor({column, board, onSave, onCancel, isSaving = false, 
                                             {used}
                                         </span>
                                     )}
-                                    <button
-                                        type="button"
-                                        className={`label-editor-done${row.done?' is-on':''}`}
-                                        aria-pressed={row.done}
-                                        title={t('label.meansDone')}
-                                        onClick={() => setRow(row.id, {done: !row.done})}>
-                                        <Icon name='circle-check' variant={row.done?'fa-solid':'fa-regular'}/>
-                                    </button>
+                                    {/* Not a switch any more — a statement. This is the
+                                        one label that means finished, it is on every
+                                        status column, and it cannot be taken away. */}
+                                    {row.locked && (
+                                        <span className="label-editor-done is-on is-locked" title={t('label.meansDoneFixed')}>
+                                            <Icon name='circle-check'/>
+                                        </span>
+                                    )}
+                                    {row.locked?(
+                                        <span className="label-editor-remove is-locked" title={t('label.cannotRemoveDone')}>
+                                            <Icon name='lock'/>
+                                        </span>
+                                    ):(
                                     <button type="button" className="label-editor-remove" title={used
                                         ?t('label.removeUsed', {n: used})
                                         :t('label.remove')} onClick={() => onRemove(row.id)}>
                                         <Icon name='trash-can' variant='fa-regular'/>
                                     </button>
+                                    )}
                                 </div>
                                 {/* The palette deliberately sits IN the flow below the row.
                                     Absolutely positioned it got cut off by the

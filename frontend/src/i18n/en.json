@@ -247,6 +247,7 @@
       "checkbox": "Checkbox",
       "created": "Created",
       "date": "Date",
+      "deadline": "Deadline",
       "dropdown": "Drop-down",
       "estimate": "Estimated time",
       "file": "File",
@@ -409,10 +410,12 @@
     "thisGroup": "This group"
   },
   "label": {
+    "cannotRemoveDone": "This status means “finished” and exists on every board — it cannot be deleted.",
     "changeColor": "Change colour",
     "edit": "Edit labels",
     "editTitle": "Edit the labels of this column",
     "meansDone": "This label means “done”",
+    "meansDoneFixed": "This status means “finished”. The planner stops scheduling such tasks.",
     "nameRequired": "Every label needs a name.",
     "none": "No labels yet.",
     "notAvailable": "Not available for this column",
@@ -525,6 +528,7 @@
     "moveTo": "Move them to",
     "name": "Name",
     "none": "No priority",
+    "orderHint": "The order is the urgency: what is at the top is planned first. Reordering is safe — tasks store the priority itself, not its name or place.",
     "sectionHelp": "This list is the same on every board. People pick from it when they edit a task; adding and renaming happens only here.",
     "sectionTitle": "Priorities",
     "unused": "unused"

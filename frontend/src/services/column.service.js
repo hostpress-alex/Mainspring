@@ -25,6 +25,10 @@ export const COLUMN_CATALOG = [
     {type: 'dropdown', label: t('column.type.dropdown'), category: OVERVIEW, icon: 'dropdown', emptyValue: ''},
     {type: 'text', label: t('column.type.text'), category: OVERVIEW, icon: 'text', emptyValue: ''},
     {type: 'date', label: t('column.type.date'), category: OVERVIEW, icon: 'date', emptyValue: ''},
+    // A date like any other to look at, and a fact to the planner: this
+    // is the one the work has to be finished by. Recognised by TYPE and
+    // never by its title — a title is a thing people rename.
+    {type: 'deadline', label: t('column.type.deadline'), category: OVERVIEW, icon: 'deadline', emptyValue: ''},
     {type: 'person', label: t('column.type.person'), category: OVERVIEW, icon: 'person', emptyValue: []},
     {type: 'number', label: t('column.type.number'), category: OVERVIEW, icon: 'number', emptyValue: ''},
     {type: 'file', label: t('column.type.file'), category: USEFUL, icon: 'file', emptyValue: ''},

@@ -235,6 +235,9 @@ export function DynamicCmp({column, info, onUpdate, board, width, readOnly = fal
             case 'person':
                 return <MemberPicker {...props} />
             case 'date':
+            // The same cell. What makes a deadline different is not how it is
+            // typed in but who reads it — see the planner.
+            case 'deadline':
                 return <DueDate {...props} />
             case 'priority':
                 return <PriorityPicker {...props} />

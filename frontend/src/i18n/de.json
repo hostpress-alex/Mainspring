@@ -247,6 +247,7 @@
       "checkbox": "Checkbox",
       "created": "Erstellt",
       "date": "Datum",
+      "deadline": "Deadline",
       "dropdown": "Drop-down",
       "estimate": "Geschätzte Zeit",
       "file": "Datei",
@@ -409,10 +410,12 @@
     "thisGroup": "Diese Gruppe"
   },
   "label": {
+    "cannotRemoveDone": "Dieser Status bedeutet „fertig\" und ist auf jedem Board vorhanden — er lässt sich nicht löschen.",
     "changeColor": "Farbe ändern",
     "edit": "Labels bearbeiten",
     "editTitle": "Labels dieser Spalte bearbeiten",
     "meansDone": "Dieses Label bedeutet „erledigt“",
+    "meansDoneFixed": "Dieser Status bedeutet „fertig\". Der Planer plant solche Tasks nicht mehr ein.",
     "nameRequired": "Jedes Label braucht einen Namen.",
     "none": "Noch keine Labels.",
     "notAvailable": "Für diese Spalte nicht verfügbar",
@@ -525,6 +528,7 @@
     "moveTo": "Umstellen auf",
     "name": "Name",
     "none": "Keine Priorität",
+    "orderHint": "Die Reihenfolge ist die Dringlichkeit: was oben steht, plant der Kalender zuerst. Umsortieren ist gefahrlos — Tasks speichern die Priorität, nicht ihren Namen oder Platz.",
     "sectionHelp": "Diese Liste gilt für alle Boards. Wer einen Task bearbeitet, wählt daraus — anlegen und umbenennen kann sie nur hier.",
     "sectionTitle": "Prioritäten",
     "unused": "unbenutzt"

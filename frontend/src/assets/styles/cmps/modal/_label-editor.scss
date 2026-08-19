@@ -259,3 +259,19 @@
 .label-editor-palette button {
     background-color: var(--label-color);
 }
+
+/* The one label that means finished: shown, not offered. Both marks are
+   plain text rather than buttons, so nothing about them invites a click. */
+.label-editor-done.is-locked,
+.label-editor-remove.is-locked {
+    align-items: center;
+    color: #9699a6;
+    cursor: help;
+    display: inline-flex;
+    justify-content: center;
+    padding: 4px;
+}
+
+.label-editor-done.is-locked {
+    color: #00c875;
+}
