@@ -10,7 +10,7 @@
  *
  *   {trigger: {type, field?, value?}, actions: [{type, field?, value?, groupId?, who?, userIds?}]}
  */
-import {labelsOf} from './column.service'
+import {labelOptions} from './column.service'
 export const TRIGGERS = {
     STATUS_CHANGES_TO: 'status_changes_to',
     COLUMN_CHANGES: 'column_changes',
@@ -38,9 +38,13 @@ export function columnOf(board, field){
     return allColumns(board).find(c => String(c.field) === String(field)) || null
 }
 
-/** The values a status or priority column can take, in the board's own order. */
+/**
+ * The values a status or priority column can take, in the order it offers
+ * them — as they are STORED, because that is what a rule compares against.
+ * For a priority that is the id, not the word.
+ */
 export function valuesOf(board, field){
-    return labelsOf(board, columnOf(board, field)).map(l => l.title)
+    return labelOptions(board, columnOf(board, field)).map(o => o.key)
 }
 
 export function groupOf(board, groupId){

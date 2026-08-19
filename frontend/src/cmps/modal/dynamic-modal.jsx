@@ -6,6 +6,7 @@ import {GroupMenuModal} from './group-menu-modal'
 import {RemoveColumnModal} from './remove-column-modal'
 import {TaskMenuModal} from './task-menu-modal'
 import {ModalMember} from './modal-member'
+import {ModalEstimate} from './modal-estimate'
 import {ModalStatusPriority} from './modal-status-priority'
 import {AddGroupModal} from './add-group-modal'
 import {MemberFilterModal} from './member-filter-modal'
@@ -61,6 +62,8 @@ export function DynamicModal(){
             case 'status':
             case 'priority':
                 return <ModalStatusPriority dynamicModalObj={dynamicModalObj}/>
+            case 'estimate':
+                return <ModalEstimate dynamicModalObj={dynamicModalObj}/>
             case 'add-group':
                 return <AddGroupModal dynamicModalObj={dynamicModalObj}/>
             case 'member-filter':

@@ -233,6 +233,7 @@
       "checkbox": "Checkbox",
       "date": "Datum",
       "dropdown": "Drop-down",
+      "estimate": "Geschätzte Zeit",
       "file": "Datei",
       "link": "Link",
       "longtext": "Langer Text",
@@ -263,6 +264,8 @@
     "edit": "Bearbeiten",
     "forward": "Weiter",
     "loading": "Lädt…",
+    "moveDown": "Nach unten",
+    "moveUp": "Nach oben",
     "name": "Name",
     "nobody": "niemand",
     "open": "Öffnen",
@@ -280,6 +283,7 @@
     "thisArea": "Dieser Bereich",
     "unknownError": "Unbekannter Fehler",
     "unpin": "Nicht mehr anheften",
+    "usage": "Verwendung",
     "user": "Benutzer",
     "yes": "Ja"
   },
@@ -302,6 +306,18 @@
     "tooManyAttempts": {
       "one": "Zu viele Fehlversuche. Bitte in einer Minute erneut probieren.",
       "other": "Zu viele Fehlversuche. Bitte in {n} Minuten erneut probieren."
+    }
+  },
+  "estimate": {
+    "amount": "Menge",
+    "cellTitle": "{spent} von {estimate} erfasst",
+    "clear": "Leeren",
+    "dayNote": "Ein Tag sind 8 Stunden.",
+    "notANumber": "Bitte eine Zahl eingeben.",
+    "unit": {
+      "days": "Tage",
+      "hours": "Std.",
+      "minutes": "Min."
     }
   },
   "file": {
@@ -471,6 +487,27 @@
     "tooBig": "Die Datei ist zu groß für eine Vorschau",
     "truncatedRows": "Es werden die ersten {n} Zeilen gezeigt. Für alles Weitere die Datei herunterladen.",
     "truncatedText": "Gekürzt. Für den vollständigen Inhalt die Datei herunterladen."
+  },
+  "priority": {
+    "add": "Priorität hinzufügen",
+    "color": "Farbe",
+    "deleteTitle": "Priorität „{title}“ löschen",
+    "deleteUsed": {
+      "one": "1 Task nutzt diese Priorität. Auf welche soll er umgestellt werden?",
+      "other": "{n} Tasks nutzen diese Priorität. Auf welche sollen sie umgestellt werden?"
+    },
+    "inUse": {
+      "one": "1 Task",
+      "other": "{n} Tasks"
+    },
+    "lastOne": "Die letzte Priorität kann nicht gelöscht werden.",
+    "managedGlobally": "Prioritäten pflegt ein Admin für alle Boards.",
+    "moveTo": "Umstellen auf",
+    "name": "Name",
+    "none": "Keine Priorität",
+    "sectionHelp": "Diese Liste gilt für alle Boards. Wer einen Task bearbeitet, wählt daraus — anlegen und umbenennen kann sie nur hier.",
+    "sectionTitle": "Prioritäten",
+    "unused": "unbenutzt"
   },
   "profile": {
     "changePassword": "Passwort ändern",

@@ -312,6 +312,23 @@ function emitToTask({type, boardId, taskId, args = []}){
 }
 
 /**
+ * To everybody, in every room, including the person who caused it.
+ *
+ * For the few things that are not about one board: the global priority list
+ * is the first of them. A renamed priority has to reach fifteen open boards
+ * at once, and those clients are each in their own room — there is no room
+ * that contains all of them, so this deliberately does not use one.
+ *
+ * Nothing but a nudge goes out. Every client fetches the new list itself,
+ * for the same reason the reactions do it: a delta applied on fifteen
+ * machines is fifteen chances to end up with a different list.
+ */
+function emitToAll({type, args = []}){
+    if(!gIo) return
+    gIo.emit(type, ...args)
+}
+
+/**
  * Send to everyone but the given user — in one room, or everywhere.
  *
  * Unused today. It is the way out of the client-to-client relay described at
@@ -338,6 +355,7 @@ module.exports = {
     emitToUser,
     emitToBoard,
     emitToTask,
+    emitToAll,
     disconnectUser,
     broadcast,
     USER_ROOM,

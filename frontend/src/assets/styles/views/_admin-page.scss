@@ -177,4 +177,66 @@
         margin-bottom: 0;
         font-size: 13px;
     }
+
+    /* ------------------------------------------------- priorities ------ */
+
+    /* The colour swatch is the browser's own picker with its chrome taken
+       off: a round chip that opens the system colour dialog. Reimplementing
+       that dialog to make it look like the rest of the page would be a lot of
+       work for a control an admin opens twice a year. */
+    .priority-color {
+        appearance: none;
+        background: none;
+        border: 1px solid #c3c6d4;
+        border-radius: 50%;
+        cursor: pointer;
+        height: 22px;
+        padding: 0;
+        width: 22px;
+
+        &::-webkit-color-swatch-wrapper { padding: 2px; }
+        &::-webkit-color-swatch { border: none; border-radius: 50%; }
+        &::-moz-color-swatch { border: none; border-radius: 50%; }
+    }
+
+    .priority-table {
+        .priority-color-cell { width: 40px; }
+        .priority-usage { color: #676879; font-size: 13px; white-space: nowrap; }
+        .priority-tools { text-align: right; white-space: nowrap; }
+        .priority-name { margin-right: 0; width: 100%; max-width: 320px; }
+    }
+
+    .priority-add {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    /* Deliberately in the flow rather than in a dialog over the list: the
+       question it asks is "which of these", and the answer is easier to give
+       with the list still on screen. */
+    .priority-delete {
+        background: #fff8f8;
+        border: 1px solid #e2445c;
+        border-radius: 6px;
+        margin-top: 12px;
+        padding: 14px 16px;
+
+        h3 { font-size: 15px; margin: 0 0 6px; }
+        p { font-size: 13px; margin: 0 0 10px; }
+    }
+
+    .priority-move {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .priority-delete-tools {
+        display: flex;
+        gap: 8px;
+    }
 }

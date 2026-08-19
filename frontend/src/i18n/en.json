@@ -233,6 +233,7 @@
       "checkbox": "Checkbox",
       "date": "Date",
       "dropdown": "Drop-down",
+      "estimate": "Estimated time",
       "file": "File",
       "link": "Link",
       "longtext": "Long text",
@@ -263,6 +264,8 @@
     "edit": "Edit",
     "forward": "Forward",
     "loading": "Loading…",
+    "moveDown": "Move down",
+    "moveUp": "Move up",
     "name": "Name",
     "nobody": "nobody",
     "open": "Open",
@@ -280,6 +283,7 @@
     "thisArea": "This area",
     "unknownError": "Unknown error",
     "unpin": "Unpin",
+    "usage": "Usage",
     "user": "User",
     "yes": "Yes"
   },
@@ -302,6 +306,18 @@
     "tooManyAttempts": {
       "one": "Too many failed attempts. Please try again in a minute.",
       "other": "Too many failed attempts. Please try again in {n} minutes."
+    }
+  },
+  "estimate": {
+    "amount": "Amount",
+    "cellTitle": "{spent} of {estimate} recorded",
+    "clear": "Clear",
+    "dayNote": "A day is 8 hours.",
+    "notANumber": "Please enter a number.",
+    "unit": {
+      "days": "days",
+      "hours": "hrs",
+      "minutes": "min"
     }
   },
   "file": {
@@ -472,6 +488,27 @@
     "truncatedRows": "Showing the first {n} rows. Download the file for the rest.",
     "truncatedText": "Shortened. Download the file for the full contents."
   },
+  "priority": {
+    "add": "Add priority",
+    "color": "Colour",
+    "deleteTitle": "Delete the priority “{title}”",
+    "deleteUsed": {
+      "one": "1 task uses this priority. Which one should it get instead?",
+      "other": "{n} tasks use this priority. Which one should they get instead?"
+    },
+    "inUse": {
+      "one": "1 task",
+      "other": "{n} tasks"
+    },
+    "lastOne": "The last priority cannot be deleted.",
+    "managedGlobally": "Priorities are kept by an admin, for every board.",
+    "moveTo": "Move them to",
+    "name": "Name",
+    "none": "No priority",
+    "sectionHelp": "This list is the same on every board. People pick from it when they edit a task; adding and renaming happens only here.",
+    "sectionTitle": "Priorities",
+    "unused": "unused"
+  },
   "profile": {
     "changePassword": "Change password",
     "choosePicture": "Choose picture",
@@ -602,6 +639,7 @@
     "alsoPost": "Post this as an update on the task",
     "auto": "ended automatically",
     "autoHint": "The timer ran past the limit and was closed. Please check the times.",
+    "beforeTime": "{time} ago",
     "dayShort": "d",
     "errorOrder": "The end has to come after the start.",
     "errorTimes": "Please give a start and an end.",

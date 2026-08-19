@@ -1,0 +1,146 @@
+@use "../../setup/variables";
+
+/**
+ * Estimated time, and the time actually recorded against it.
+ *
+ * The recorded half is the one people look at, so it carries the weight; the
+ * estimate stands behind a slash in the quieter grey. When the recorded time
+ * passes the estimate the whole cell turns, rather than just the number —
+ * a single red digit in a wide table is not something anybody notices while
+ * scrolling.
+ */
+.estimate-picker {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    justify-content: center;
+    padding: 0 6px;
+
+    &.is-readonly {
+        cursor: default;
+    }
+
+    .estimate-value {
+        align-items: baseline;
+        display: flex;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .estimate-spent {
+        font-weight: 500;
+    }
+
+    .estimate-sep,
+    .estimate-total {
+        color: #676879;
+    }
+
+    .estimate-empty {
+        color: #c4c4c4;
+    }
+
+    &.is-over {
+        background-color: #fff0f2;
+
+        .estimate-spent {
+            color: #d83a52;
+            font-weight: 600;
+        }
+    }
+}
+
+/**
+ * The input: a number and the unit it was typed in.
+ *
+ * The unit is not stored — see estimate-picker.jsx — so the three buttons are
+ * a way of typing, not a setting. That is why they look like a segmented
+ * control and not like a form field.
+ */
+.modal-estimate {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .16);
+    padding: 12px;
+    width: 250px;
+
+    .modal-estimate-row {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+    }
+
+    .modal-estimate-amount {
+        border: 1px solid #c3c6d4;
+        border-radius: 4px;
+        font-size: 14px;
+        padding: 6px 8px;
+        width: 70px;
+    }
+
+    .modal-estimate-units {
+        border: 1px solid #c3c6d4;
+        border-radius: 4px;
+        display: flex;
+        overflow: hidden;
+    }
+
+    .modal-estimate-unit {
+        background: #fff;
+        border: 0;
+        border-right: 1px solid #c3c6d4;
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        padding: 6px 8px;
+
+        &:last-child {
+            border-right: 0;
+        }
+
+        &.is-active {
+            background: variables.$board-btn;
+            color: #fff;
+        }
+    }
+
+    .modal-estimate-err {
+        color: #d83a52;
+        font-size: 12px;
+        margin: 8px 0 0;
+    }
+
+    .modal-estimate-tools {
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+        margin-top: 12px;
+    }
+
+    .modal-estimate-clear,
+    .modal-estimate-save {
+        border-radius: 4px;
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        padding: 6px 12px;
+    }
+
+    .modal-estimate-clear {
+        background: #fff;
+        border: 1px solid #c3c6d4;
+    }
+
+    .modal-estimate-save {
+        background: variables.$board-btn;
+        border: 1px solid variables.$board-btn;
+        color: #fff;
+    }
+
+    .modal-estimate-note {
+        color: #676879;
+        font-size: 12px;
+        margin: 10px 0 0;
+    }
+}

@@ -48,6 +48,9 @@ const BY_TYPE = {
     date: ['is', 'before', 'after', 'overdue', 'isEmpty', 'isNotEmpty'],
     updated: ['before', 'after'],
     number: ['eq', 'ne', 'gt', 'lt', 'isEmpty', 'isNotEmpty'],
+    // Stored as minutes, so the same comparisons as a number — the
+    // person types 90 and means an hour and a half.
+    estimate: ['eq', 'ne', 'gt', 'lt', 'isEmpty', 'isNotEmpty'],
     checkbox: ['isChecked', 'isNotChecked'],
     file: ['isEmpty', 'isNotEmpty']
 }

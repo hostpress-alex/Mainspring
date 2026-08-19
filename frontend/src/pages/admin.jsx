@@ -5,6 +5,7 @@ import {Link} from 'react-router-dom'
 import {userService} from '../services/user.service'
 import {boardService} from '../services/board.service'
 import {confirmDelete} from '../cmps/confirm-dialog'
+import {PriorityAdmin} from '../cmps/admin/priority-admin'
 import {t} from '../i18n'
 
 const EMPTY_FORM = {fullname: '', username: '', password: '', isAdmin: false}
@@ -161,6 +162,10 @@ export function AdminPage(){
 
             {err && <div className="admin-error">{err}</div>}
             {msg && <div className="admin-success">{msg}</div>}
+
+            {/* First, because it is the one list on this page that everybody
+                on every board sees the moment it changes. */}
+            <PriorityAdmin onError={e => setErr(readErr(e))}/>
 
             <div className="admin-card">
                 <h2 className="admin-section-title">{t('admin.createUser')}</h2>

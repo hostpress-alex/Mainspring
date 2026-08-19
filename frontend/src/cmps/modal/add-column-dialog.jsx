@@ -14,6 +14,7 @@ const ICONS = {
     checkbox: {el: <Icon name='square-check' variant='fa-regular'/>, bg: '#fdab3d'},
     link: {el: <Icon name='link'/>, bg: '#0073ea'},
     priority: {el: <Icon name='flag' variant='fa-regular'/>, bg: '#ffcb00'},
+    estimate: {el: <Icon name='hourglass-half'/>, bg: '#00a9a5'},
     longtext: {el: <Icon name='align-left'/>, bg: '#7f5347'},
     updated: {el: <Icon name='clock-rotate-left'/>, bg: '#9d99b9'}
 }

@@ -11,6 +11,7 @@ import {boardService} from '../../services/board.service'
 import {singleLineEditable, isOnText} from '../../services/editable'
 import {UpdatedPicker} from './updated-picker'
 import {NumberPicker} from './number-picker'
+import {EstimatePicker} from './estimate-picker'
 import {FilePicker} from './file-picker'
 import {TextPicker, LongTextPicker, CheckboxPicker, LinkPicker, DropdownPicker} from './simple-pickers'
 
@@ -237,6 +238,8 @@ export function DynamicCmp({column, info, onUpdate, board, width, readOnly = fal
                 return <PriorityPicker {...props} />
             case 'number':
                 return <NumberPicker {...props} />
+            case 'estimate':
+                return <EstimatePicker {...props} />
             case 'file':
                 return <FilePicker {...props} />
             case 'updated':

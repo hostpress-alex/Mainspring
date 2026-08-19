@@ -10,6 +10,7 @@ import {CalendarPage} from './pages/calendar'
 import {AppShell} from './cmps/sidebar/app-shell'
 import {store} from './store/store'
 import {ensureSession} from './store/user.actions'
+import {ensureLoaded as ensurePriorities} from './services/priority.store'
 import {ConfirmHost} from './cmps/confirm-dialog'
 import {ErrorBoundary} from './cmps/error-boundary'
 
@@ -28,6 +29,12 @@ function useSession(){
     useEffect(() => {
         if(user){
             setIsAsking(false)
+            // The global priority list, once per session. Fetched here rather
+            // than by the first cell that needs it, because the helpers that
+            // read it — the filter, the summary row — are plain functions
+            // that cannot wait for a request and would answer "no such
+            // priority" until one arrived.
+            ensurePriorities()
             return
         }
         let alive = true

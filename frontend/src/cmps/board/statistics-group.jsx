@@ -1,13 +1,16 @@
+import {formatEstimate} from '../task/estimate-picker'
+import {labelFor} from '../../services/column.service'
 export function StatisticGroup({column, group, board}){
     const cmpType = column?.type
     const field = column?.field || column?.id
 
     function getStatisticsStatus(cmp){
-        // Labels are matched by TITLE, not by id.
+        // What a value refers to is a question with two answers — a status
+        // stores its text, a priority stores an id — so it is asked in one
+        // place (labelFor) rather than guessed here.
         // A task with an unknown status returned undefined here and tore down
         // the entire React tree without an error boundary.
-        const source = Array.isArray(column?.labels)?column.labels:(board.labels || [])
-        const labels = group.tasks.map(task => source.find(label => label.title === task[cmp])).filter(Boolean)
+        const labels = group.tasks.map(task => labelFor(board, column, task[cmp])).filter(Boolean)
         if(!labels.length) return []
         const mapLabel = labels.reduce((acc, label) => {
             if(acc[label.color]) acc[label.color]++
@@ -44,6 +47,16 @@ export function StatisticGroup({column, group, board}){
                 return <GetStatisticsLabel statisticLabels={getStatisticsStatus(field)}/>
             case 'number':
                 return <GetStatisticsNumber statisticNumber={getStatisticsNumber()}/>
+            // The one summary here that is not a bare number: minutes added
+            // up and read back as hours, because "1350" answers nothing.
+            case 'estimate': {
+                const minutes = getStatisticsNumber()
+                // Nothing rather than "0 Sek.": a column where nobody has
+                // estimated yet has no sum, and printing one suggests
+                // somebody said the work takes no time.
+                if(!minutes) return null
+                return <GetStatisticsNumber statisticNumber={formatEstimate(minutes)}/>
+            }
             case 'checkbox':
                 return <GetStatisticsNumber statisticNumber={getCheckedRatio()}/>
             default:

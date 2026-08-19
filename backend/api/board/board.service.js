@@ -14,6 +14,7 @@ const roles = require('./board.roles')
  */
 const notifications = () => require('../notification/notification.service')
 const automations = () => require('../automation/automation.service')
+const priorities = () => require('../priority/priority.service')
 const automationEngine = require('../automation/automation.engine')
 const viewRepo = require('./board-view.repo')
 const sockets = () => require('../../services/socket.service')
@@ -192,7 +193,11 @@ function ensureColumnLabels(board){
     const byTitle = new Map(boardLabels.filter(l => l && l.title).map(l => [l.title, l]))
 
     for(const column of board.columns){
-        if(!column || (column.type !== 'status' && column.type !== 'priority')) continue
+        // Priority is not on this list any more. Its values are ids into the
+        // global table, so deriving labels from what is in use produced
+        // labels whose titles were ids — visible nonsense, and a copy of a
+        // list that now has exactly one home.
+        if(!column || column.type !== 'status') continue
         if(Array.isArray(column.labels)) continue
 
         const field = column.field || column.id
@@ -648,6 +653,47 @@ async function removeTask(boardId, groupId, taskId){
     return await _pushed(boardId)
 }
 
+/**
+ * Is this value allowed in that cell?
+ *
+ * For most column types the answer is "anything" and always has been: the
+ * value lands in a JSON blob and only the browser ever decides what it means.
+ * That is tolerable for a number or a piece of text, where a wrong value is
+ * visibly wrong to the person who typed it.
+ *
+ * It is not tolerable for a closed list. A priority is picked from a list an
+ * admin maintains, so "the user cannot invent one" has to be true on the
+ * server as well — otherwise it is a claim about the interface, and anybody
+ * with a console can put whatever they like in that column and nothing on
+ * this side would notice.
+ *
+ * Only the two types that have a rule are checked. Everything else passes,
+ * exactly as before, because inventing rules for the other columns here would
+ * break boards that are already full of data.
+ */
+async function _checkColumnValues(board, patch){
+    const columns = Array.isArray(board.columns)?board.columns:[]
+    for(const column of columns){
+        const field = column.field || column.id
+        if(!Object.prototype.hasOwnProperty.call(patch, field)) continue
+        const value = patch[field]
+
+        if(column.type === 'priority'){
+            if(!await priorities().isAllowedValue(value)){
+                throw httpError(400, 'Unknown priority')
+            }
+        }
+
+        if(column.type === 'estimate'){
+            if(value === null || value === undefined || value === '') continue
+            const minutes = Number(value)
+            if(!Number.isFinite(minutes) || minutes < 0){
+                throw httpError(400, 'An estimate is a number of minutes')
+            }
+        }
+    }
+}
+
 /** Der haeufigste Schreibvorgang ueberhaupt: einzelne Felder eines Tasks. */
 async function updateTaskFields(boardId, groupId, taskId, patch){
     const board = await _requireBoard(boardId)
@@ -658,6 +704,7 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
     const parent = _findParent(group, taskId)
     if(!patch || typeof patch !== 'object') throw httpError(400, 'Keine Aenderungen uebergeben')
     _requireTaskWrite(board, oldTask, patch)
+    await _checkColumnValues(board, patch)
     await boardRepo.updateTaskFields(boardId, groupId, taskId, patch)
     await notifications().taskPatched({
         board, groupId, oldTask, patch, parentId: parent?parent.id:null, actor: getLoggedinUser()})
@@ -674,6 +721,7 @@ async function replaceTask(boardId, groupId, taskId, task){
     const parent = _findParent(group, taskId)
     // A whole-task write is a patch of everything, so it is checked as one.
     _requireTaskWrite(board, oldTask, task || {})
+    await _checkColumnValues(board, task || {})
     await boardRepo.replaceTask(boardId, groupId, taskId, {...task, id: taskId})
     // A whole-task write is a patch of everything, so the same comparison
     // works — otherwise this path would silently notify nobody.

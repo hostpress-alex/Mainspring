@@ -2,7 +2,7 @@ import {useMemo, useState} from 'react'
 
 import {Icon} from '../icon'
 import {canManageTab} from '../../services/board-view'
-import {labelsOf} from '../../services/column.service'
+import {labelOptions} from '../../services/column.service'
 import {
     GROUP_FIELD, TITLE_FIELD, MODE_ALL, MODE_ANY,
     emptyRule, hasRules, needsValue, operatorsFor, takesList
@@ -232,7 +232,9 @@ function optionsFor(column, board){
         return (board.members || []).map(m => ({key: m._id, label: m.fullname}))
     }
     if(column.type === 'status' || column.type === 'priority' || column.type === 'dropdown'){
-        return labelsOf(board, column).map(l => ({key: l.title, label: l.title}))
+        // key is what the task stores, label is what the person reads. For a
+        // priority those differ — the stored value is an id.
+        return labelOptions(board, column).map(o => ({key: o.key, label: o.label}))
     }
     return null
 }
