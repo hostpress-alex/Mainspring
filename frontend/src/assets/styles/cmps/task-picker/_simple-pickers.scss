@@ -71,26 +71,31 @@
 }
 
 // The link column shows a link; while it is being edited it is a plain input.
-.link-picker.is-view {
+.link-picker {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    flex-direction: row;
 
-    a {
-        color: #0073ea;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 80%;
-    }
+    &.is-view {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
 
-    .link-icon {
-        color: #0073ea;
-        flex-shrink: 0;
-    }
+        a {
+            color: #0073ea;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80%;
+        }
 
-    .link-empty {
-        opacity: .45;
+        .link-icon {
+            color: #0073ea;
+            flex-shrink: 0;
+        }
+
+        .link-empty {
+            opacity: .45;
+        }
     }
 }

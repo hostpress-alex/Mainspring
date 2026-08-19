@@ -19,6 +19,12 @@
     background-color: #fbfbfd;
 }
 
+/* Same reason for the hover tint: a child row that goes white under the
+   pointer would look like it had left its parent. */
+.task-preview.is-subtask:hover .sticky-div {
+    background-color: #f1f2f6;
+}
+
 /* The indent sits INSIDE the title cell as padding, not as an element in
    front of it. An extra element would add width to the sticky part and push
    every column of the row out of line with the task above — which is exactly

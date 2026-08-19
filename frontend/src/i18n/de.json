@@ -445,6 +445,8 @@
     "markAllRead": "Alle als gelesen markieren",
     "mention": "{actor} hat dich erwähnt",
     "onlyUnread": "Nur ungelesen",
+    "reaction": "{actor} hat mit {emoji} auf dein Update reagiert",
+    "reactionReply": "{actor} hat mit {emoji} auf deine Antwort reagiert",
     "section": {
       "older": "Älter",
       "today": "Heute",
@@ -620,6 +622,7 @@
     "runningSince": "Läuft",
     "secondShort": "Sek.",
     "since": "seit",
+    "beforeTime": "vor {time}",
     "someone": "Jemand",
     "start": "Arbeit beginnen",
     "stop": "Beenden",

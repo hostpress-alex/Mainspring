@@ -10,7 +10,7 @@ import { Avatar } from '../avatar'
 export function UpdatedPicker({info, onUpdate, field = 'updatedBy', readOnly = false}){
     return (
         <section className="updated-picker picker">
-            <div className="updated-picker-content flex align-center space-between">
+            <div className="updated-picker-content flex">
                 {info[field]?.imgUrl && <Avatar src={info[field]?.imgUrl}/>}
                 {!info[field]?.imgUrl && <Icon name='circle-user' className="icon-person"/>}
                 <span className="updated-date">

@@ -4,17 +4,18 @@
 
 .task-preview, .kanban-field-value {
     .task-person {
+        border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+        border-right: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         cursor: pointer;
         height: 36px;
         min-width: variables.$cell-width-person;
         position: relative;
-        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         @include mixins.center-flex();
 
         .members-imgs {
-            width: variables.$cell-width-person;
             height: 100%;
-            @include mixins.member-img(#323338, white, 30px, 30px);
+            width: variables.$cell-width-person;
+            @include mixins.member-img(#323338, white, 1.75rem, 1.75rem);
             @include mixins.center-flex();
         }
 

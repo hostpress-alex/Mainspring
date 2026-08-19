@@ -13,6 +13,7 @@ $login-bg: #f7f7f7;
 
 //board page
 $border-color: #d0d4e466;
+$border-color-darker: #CCC;
 $sidebar-workspace-bg: #F6F7FB;
 $sidebar-main-bg: #292f4c;
 // The narrow icon rail on the left. Named because more than one thing has to
@@ -23,6 +24,12 @@ $workspace-width: 255px;
 $workspace-icon-color: #676879;
 $workspace-hover: #dcdfec;
 $workspace-board-active: #cce5ff;
+// The row under the pointer. Light enough that a full table of them is not
+// a stripe pattern, dark enough to find on a 27" screen.
+$row-hover: #f5f6f8;
+// The frame around a cell that is being edited. Grey rather than the accent
+// colour: it marks where you are typing, it does not ask for attention.
+$field-border: #9699a6;
 $board-btn: #0073ea;
 $link-color: #1f76c2;
 $primary-hover-color: #0060b9;
@@ -80,10 +87,10 @@ $spacing-xxl: 48px;
 $spacing-xxxl: 64px;
 
 // - Font family
-$font-family: "Figtree", "Roboto", "Rubik", "Noto Kufi Arabic", "Noto Sans JP", "sans-serif";
+$font-family: "Poppins", "Roboto", "Rubik", "Noto Kufi Arabic", "Noto Sans JP", "sans-serif";
 $title-font-family: "Poppins", "Roboto", "Rubik", "Noto Kufi Arabic", "Noto Sans JP", "sans-serif";
 
-$body-rem: 15px;
+$body-rem: 13px;
 
 // Breakpoints
 $mobile-breakpoint: 460px;

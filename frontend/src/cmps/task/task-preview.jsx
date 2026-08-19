@@ -8,7 +8,7 @@ import {PriorityPicker} from './priority-picker'
 import {StatusPicker} from './status-picker'
 import {setDynamicModalObj, toggleModal, updateTaskAction} from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
-import {singleLineEditable} from '../../services/editable'
+import {singleLineEditable, isOnText} from '../../services/editable'
 import {UpdatedPicker} from './updated-picker'
 import {NumberPicker} from './number-picker'
 import {FilePicker} from './file-picker'
@@ -75,6 +75,11 @@ export function TaskPreview({
 
     async function onUpdateTaskTitle(ev){
         const value = ev.target.innerText
+        // Off first, whatever happens next. The old code toggled the typing
+        // state inside the save, so leaving a title untouched left the row
+        // marked as being edited — with nothing editing it — until the page
+        // was reloaded.
+        setTyping(false)
         if(!canWork || value === task.title) return
         const activity = boardService.getEmptyActivity()
         activity.action = 'title'
@@ -82,7 +87,6 @@ export function TaskPreview({
         activity.from = task.title
         activity.to = value
         try {
-            toggleOnTyping()
             await updateTaskAction(board, group.id, {...task, title: value}, activity)
         } catch(err) {
             console.log('saving failed')
@@ -92,6 +96,31 @@ export function TaskPreview({
     function onOpenModal(){
         // The URL drives the dialog — no extra toggling needed.
         navigate(`/board/${board._id}/${group.id}/${task.id}`)
+    }
+
+    /**
+     * The title cell means two things, and where you click decides which.
+     *
+     * On the words: put the caret in, rename the task. Anywhere else in the
+     * cell: open the task. Before this, the whole cell was one big text field,
+     * so the ordinary thing to want — see the task — cost a click into the
+     * empty space, a caret nobody asked for, and a click back out.
+     *
+     * mousedown rather than click, because the caret is placed on mousedown:
+     * by the time a click event arrives the field is already focused and the
+     * row is already in its typing state.
+     */
+    function onTitleMouseDown(ev){
+        const el = ev.currentTarget
+        // Once the caret is in there, every click is a caret click — moving it
+        // through the text must not throw the dialog open.
+        if(el === document.activeElement || el.contains(document.activeElement)) return
+        // A viewer cannot rename anything, so for them the whole cell opens
+        // the task rather than half of it doing nothing.
+        if(canWork && isOnText(el, ev.clientX)) return
+        // No caret, no focus, no typing state.
+        ev.preventDefault()
+        onOpenModal()
     }
 
     /**
@@ -111,9 +140,13 @@ export function TaskPreview({
         setDynamicModalObj({isOpen, pos: {x: (x - 10), y: (y + height)}, type: 'menu-task', group: group, task: task})
     }
 
-    function toggleOnTyping(){
-        elMenuTask.current.classList.toggle('on-typing')
-        elTaskPreview.current.classList.toggle('on-typing')
+    /**
+     * Set, not toggled. A toggle only stays right as long as both halves of
+     * every path fire, and they did not — see onUpdateTaskTitle.
+     */
+    function setTyping(isTyping){
+        if(elMenuTask.current) elMenuTask.current.classList.toggle('on-typing', isTyping)
+        if(elTaskPreview.current) elTaskPreview.current.classList.toggle('on-typing', isTyping)
     }
 
     return (
@@ -147,7 +180,8 @@ export function TaskPreview({
                     {/* A heading you can type into and cannot save is the
                         same trap as the tick box above. */}
                     <blockquote contentEditable={canWork} onBlur={onUpdateTaskTitle} suppressContentEditableWarning={true}
-                                {...singleLineEditable({onFocus: toggleOnTyping})}>
+                                onMouseDown={onTitleMouseDown}
+                                {...singleLineEditable({onFocus: () => setTyping(true)})}>
                         <span>{task.title}</span>
                     </blockquote>
                     {/* Only the fact that something is running. Operating it

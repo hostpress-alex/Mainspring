@@ -1,4 +1,5 @@
 import {t} from '../i18n'
+import {formatClock} from './time.service.js';
 export const utilService = {
     makeId,
     makeLorem,
@@ -10,6 +11,7 @@ export const utilService = {
     getColors,
     getRandomColor,
     calculateTime,
+    calculateTimeWithBefore,
     getFormattedDate
 }
 
@@ -91,14 +93,6 @@ function getRandomColor(){
     return `#${randColor.toUpperCase()}`
 }
 
-/**
- * The short form, for places a sentence does not fit — a table cell, a line in
- * the search results. Where there is room, use formatRelative from
- * services/date.util.js instead; it writes the words out.
- *
- * The units used to be English letters in a German interface, and "12m" could
- * be read as twelve months as easily as twelve minutes.
- */
 function calculateTime(time){
     const timeDiff = Math.floor((Date.now() - time) / 60000)
     if(timeDiff >= 60 * 24 * 7) return `${Math.floor(timeDiff / (60 * 24 * 7))} ${t('time.weekShort')}`
@@ -106,6 +100,18 @@ function calculateTime(time){
     if(timeDiff >= 60) return `${Math.floor(timeDiff / 60)} ${t('time.hourShort')}`
     if(timeDiff >= 2) return `${timeDiff} ${t('time.minuteShort')}`
     return t('time.justNow')
+}
+
+function calculateTimeWithBefore(time){
+    var timeReturn = '';
+    const timeDiff = Math.floor((Date.now() - time) / 60000)
+    if(timeDiff >= 60 * 24 * 7) timeReturn =  `1${Math.floor(timeDiff / (60 * 24 * 7))} ${t('time.weekShort')}`
+    if(timeDiff >= 60 * 24) timeReturn =  `2${Math.floor(timeDiff / (60 * 24))} ${t('time.dayShort')}`
+    if(timeDiff >= 60) timeReturn =  `3${Math.floor(timeDiff / 60)} ${t('time.hourShort')}`
+    if(timeDiff >= 2) timeReturn =  `4` + timeDiff + ` ${t('time.minuteShort')}`
+    else return t('time.justNow')
+
+    return `${t('time.beforeTime', {time: timeReturn})}`;
 }
 
 function getFormattedDate(timestamp){

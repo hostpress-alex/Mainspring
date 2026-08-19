@@ -56,6 +56,22 @@ async function findForUser(userId, {before = null, limit = 30} = {}){
     return rows.map(out)
 }
 
+/**
+ * Recent rows of one kind for one person — enough to tell whether an event is
+ * a repeat of one already sent. Only the two fields that identify it come
+ * back; this runs on the write path and has no business reading whole rows.
+ */
+async function findRecent(userId, kind, since){
+    const rows = await db()('notification')
+        .where({user_id: sid(userId), kind})
+        .where('created_at', '>=', Number(since))
+        .select('actor_id', 'detail')
+    return rows.map(row => ({
+        actorId: row.actor_id || null,
+        detail: parseJson(row.detail, {}) || {}
+    }))
+}
+
 async function countUnread(userId){
     const row = await db()('notification')
         .where({user_id: sid(userId)}).whereNull('read_at')
@@ -119,6 +135,7 @@ async function isMuted(boardId, taskId, userId){
 module.exports = {
     insertMany,
     findForUser,
+    findRecent,
     countUnread,
     markRead,
     markAllRead,

@@ -41,7 +41,7 @@ export function MemberPicker({info, onUpdate, field = 'memberIds', readOnly = fa
         <section className={`task-person${readOnly?' is-readonly':''}`} ref={elMemberSection}
             onClick={readOnly?undefined:onToggleMenuModal}>
             <div className="members-imgs">
-                {members.length === 0 && <Icon name='circle-user' className="icon-person"/>}
+                {members.length === 0 && ""}
                 {members.length > 0 &&
                     <Avatar className="member-img1" src={members[0]?.imgUrl} alt="member" onClick={() => setIsModalOpen(!isModalOpen)}/>}
                 {members.length === 2 &&

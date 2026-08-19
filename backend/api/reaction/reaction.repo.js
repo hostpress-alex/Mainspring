@@ -44,4 +44,40 @@ async function commentExists(boardId, taskId, commentId){
     return Boolean(row)
 }
 
-module.exports = {findForTask, toggle, commentExists}
+/**
+ * Everything a notification about this reaction needs, in three reads.
+ *
+ * Who wrote the comment, whether it was a reply, and where the task sits —
+ * the route to a task is /board/:boardId/:groupId/:taskId, so the group has to
+ * travel with the notification or the click can only reach the board.
+ *
+ * Two different parents, and mixing them up sends people to the wrong place:
+ * `replyTo` is the *comment* this one hangs under, and only says whether the
+ * reaction landed on an update or on a reply. `taskParentId` is the task above
+ * this one — a subtask has no dialog of its own, so a link to it has to open
+ * the parent task instead.
+ */
+async function commentContext(boardId, taskId, commentId){
+    const comment = await db()('task_comment')
+        .where({board_id: sid(boardId), task_id: sid(taskId), id: sid(commentId)})
+        .first('by_user_id', 'parent_id', 'txt')
+    if(!comment) return null
+
+    const task = await db()('task')
+        .where({board_id: sid(boardId), id: sid(taskId)})
+        .first('title', 'group_id', 'parent_id')
+
+    const board = await db()('board').where({id: sid(boardId)}).first('title')
+
+    return {
+        authorId: comment.by_user_id || null,
+        replyTo: comment.parent_id || null,
+        txt: comment.txt || '',
+        taskTitle: task?(task.title || ''):'',
+        groupId: task?task.group_id:null,
+        taskParentId: task?(task.parent_id || null):null,
+        boardTitle: board?(board.title || ''):''
+    }
+}
+
+module.exports = {findForTask, toggle, commentExists, commentContext}

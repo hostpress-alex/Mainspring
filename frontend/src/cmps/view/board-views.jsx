@@ -68,8 +68,6 @@ function Tab({tab, board, me, isActive, onActivate, onUpdate, onRemove}){
                 <span className="view-name">{tab.title}</span>
                 {!tab.builtin && tab.visibility !== 'board' &&
                     <Icon name='lock' className="view-private" title={t('view.private')}/>}
-                {!tab.builtin && hasRules(tab.rules) &&
-                    <span className="view-count">{tab.rules.filter(r => r && r.field).length}</span>}
             </button>
 
             {/* The menu only exists on a tab you may change, and only while

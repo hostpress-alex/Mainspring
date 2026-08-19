@@ -22,6 +22,7 @@
  * board change is the real work, this is commentary on it.
  */
 const notificationRepo = require('./notification.repo')
+const reactionRepo = require('../reaction/reaction.repo')
 const userRepo = require('../user/user.repo')
 const socketService = require('../../services/socket.service')
 const logger = require('../../services/logger.service')
@@ -33,6 +34,16 @@ const NOTIFIED_COLUMN_TYPES = new Set(['status', 'priority'])
 
 /** How much of a comment goes into the list before it is cut. */
 const COMMENT_PREVIEW = 140
+
+/**
+ * How long the same reaction stays a repeat.
+ *
+ * A reaction is a toggle, and a toggle invites fiddling: off, on, off, on.
+ * Each "on" is a fresh row in the table and would be a fresh notification
+ * without this. Inside the window the same person putting the same emoji back
+ * on the same comment is silent.
+ */
+const REACTION_REPEAT_MS = 24 * 60 * 60 * 1000
 
 /**
  * `@[Name](id)` — the stored form of a mention.
@@ -341,6 +352,57 @@ async function automationFired({board, groupId, taskId, subject, userIds, summar
     })
 }
 
+/**
+ * Somebody reacted to an update or a reply.
+ *
+ * One recipient only: whoever wrote the thing. A reaction is addressed to the
+ * author and to nobody else — sending it to the task's subscribers would mean
+ * fifteen people hearing about every thumb, which is exactly how a
+ * notification list becomes something people switch off.
+ *
+ * Reacting to your own update is silent. `deliver` would drop it anyway, but
+ * the early return saves two reads on the common case of somebody clicking a
+ * thumb on their own line to see what it does.
+ *
+ * Removing a reaction sends nothing — the caller only rings on the way on.
+ */
+async function commentReacted({boardId, taskId, commentId, emoji, actor}){
+    return await safely('commentReacted', async () => {
+        const context = await reactionRepo.commentContext(boardId, taskId, commentId)
+        if(!context) return []
+
+        const authorId = sid(context.authorId)
+        const actorId = sid(actor && actor._id)
+        if(!authorId || authorId === actorId) return []
+
+        const recent = await notificationRepo.findRecent(authorId, 'reaction', Date.now() - REACTION_REPEAT_MS)
+        const isRepeat = recent.some(row =>
+            sid(row.actorId) === actorId &&
+            sid(row.detail.commentId) === sid(commentId) &&
+            row.detail.emoji === emoji)
+        if(isRepeat) return []
+
+        return await deliver([authorId], {
+            boardId: sid(boardId),
+            boardTitle: context.boardTitle,
+            taskId: sid(taskId),
+            subject: context.taskTitle,
+            groupId: sid(context.groupId),
+            // The task above this one, if this is a subtask — not the comment
+            // this reply hangs under. See commentContext.
+            parentId: context.taskParentId?sid(context.taskParentId):null,
+            kind: 'reaction',
+            detail: {
+                emoji,
+                commentId: sid(commentId),
+                text: preview(context.txt),
+                // So the line can say "your reply" instead of "your update".
+                isReply: Boolean(context.replyTo)
+            }
+        }, actor)
+    })
+}
+
 async function boardMembersChanged({board, members, actor}){
     return await safely('boardMembersChanged', async () => {
         const invited = addedMembers(board.members, members)
@@ -356,6 +418,7 @@ module.exports = {
     withPeople,
     taskPatched,
     taskAdded,
+    commentReacted,
     boardMembersChanged,
     automationFired,
     // exported for the tests
@@ -367,5 +430,6 @@ module.exports = {
     changedColumns,
     preview,
     NOTIFIED_COLUMN_TYPES,
-    COMMENT_PREVIEW
+    COMMENT_PREVIEW,
+    REACTION_REPEAT_MS
 }

@@ -7,9 +7,10 @@
     padding: variables.$spacing-small 0 variables.$spacing-small 0;
     border-bottom: 1px solid variables.$task-box-shadow-color;
     margin: 0 25px 0 25px;
-    gap: 5%;
-    font-size: functions.rem(16px);
-    height: 60px;
+    gap: .75rem;
+    font-size: 1rem;
+    line-height: 1.3rem;
+    height: 5rem;
     color: variables.$primary-text-color;
 
     @include mixins.for-mobile-layout() {
@@ -24,7 +25,8 @@
     }
 
     .time-title {
-        width: 200px;
+        gap: .5rem;
+        width: 25%;
 
         @include mixins.for-mobile-layout() {
             & {
@@ -34,7 +36,15 @@
         }
 
         .time {
-            width: 60px;
+            flex-grow: 1;
+            font-size: 1rem;
+            line-height: 1.3rem;
+            gap: 6px;
+
+            i {
+                font-size: 1rem;
+                line-height: 1.3rem;
+            }
 
             @include mixins.for-mobile-layout() {
                 & {
@@ -42,7 +52,6 @@
                 }
             }
         }
-
 
         .title {
             height: 100%;
@@ -74,8 +83,9 @@
     }
 
     .action {
+        font-size: 1rem;
         gap: variables.$spacing-small;
-        width: 80px;
+        width: 30%;
 
         @include mixins.for-mobile-layout() {
             & {
@@ -91,16 +101,17 @@
         }
 
         .icon {
-            font-size: functions.rem(20px);
+            font-size: 1rem;
         }
     }
 
     .from-to {
-        display: flex;
         align-items: center;
+        display: flex;
         height: 100%;
+        justify-content: center;
         margin-left: auto;
-        width: 200px;
+        width: 45%;
 
         @include mixins.for-mobile-layout() {
             & {
@@ -109,25 +120,26 @@
         }
 
         span {
-            height: 100%;
+            //height: 100%;
             @include mixins.center-flex();
-            width: 90px;
+            min-width: 4rem;
+            width: max-content;
 
             @include mixins.for-mobile-layout() {
                 & {
-                    width: 40px;
+                    width: 2rem;
                 }
             }
 
             @include mixins.for-narrow-layout() {
                 & {
-                    min-width: 80px;
+                    min-width: 4rem;
                 }
             }
         }
 
         .icon {
-            font-size: functions.rem(35px);
+            font-size: 1.25rem;
             color: variables.$color-explosive;
             margin: 0 variables.$spacing-xs;
         }

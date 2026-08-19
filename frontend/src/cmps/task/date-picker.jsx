@@ -1,11 +1,22 @@
-import DatePicker from 'react-datepicker'
+import {forwardRef} from 'react'
+import DatePicker, {registerLocale} from 'react-datepicker'
+import {de} from 'date-fns/locale/de'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import {boardService} from '../../services/board.service'
 import {Icon} from '../icon'
 import {dueFill, dueLabel, dueTone} from '../../services/due-date'
+import {getLanguage} from '../../i18n'
 
-export function DueDate({info, onUpdate, field = 'dueDate', readOnly = false}){
+/**
+ * The month names in the calendar itself come from date-fns, which speaks
+ * English until a locale is handed to it. One import for the one other
+ * language this application has; anything else falls back to English, which
+ * is what it did for every language before.
+ */
+registerLocale('de', de)
+
+export function DueDate({info, onUpdate, field = 'dueDate', column, readOnly = false}){
 
     const activity = boardService.getEmptyActivity()
     activity.action = 'date'
@@ -40,10 +51,44 @@ export function DueDate({info, onUpdate, field = 'dueDate', readOnly = false}){
     return (
         <section className={cellClass} title={label || undefined}>
             {mark}
-            <DatePicker popperClassName="date-picker-input" dateFormat="MMM d" selected={info[field] || null} onChange={onChange}/>
+            <DatePicker
+                popperClassName="date-picker-input"
+                locale={getLanguage() === 'de'?'de':undefined}
+                selected={info[field] || null}
+                onChange={onChange}
+                customInput={<DateTrigger value={info[field]} label={(column && column.title) || undefined}/>}
+            />
         </section>
     )
 }
+
+/**
+ * What opens the calendar.
+ *
+ * A button rather than the input react-datepicker brings along, for one
+ * reason that is not cosmetic: an input is a replaced element, so its width
+ * comes from the `size` attribute and `width: max-content` does nothing to
+ * it. Fitting a cell to its date meant either counting characters in `ch` or
+ * measuring a hidden copy of the text. A button just fits.
+ *
+ * A button and not a div: focusable by tab, opens on Enter and Space, and
+ * announces itself — all of which a div would have to be given back by hand
+ * with tabIndex, a role and two key handlers.
+ *
+ * The price, and it is a real one: the date can no longer be typed. It is
+ * picked. `value` from react-datepicker is ignored on purpose — it is
+ * formatted by date-fns in its own idea of the language, and this cell has to
+ * agree with every other date in the application.
+ */
+const DateTrigger = forwardRef(function DateTrigger({value, label, onClick}, ref){
+    const text = formatDate(value)
+    return (
+        <button type="button" ref={ref} onClick={onClick} aria-label={label}
+                className={`date-trigger${text?'':' is-empty'}`}>
+            {text || '—'}
+        </button>
+    )
+})
 /**
  * The symbol in front of the date.
  *
@@ -65,10 +110,16 @@ function DueMark({value}){
     )
 }
 
-/** The same "MMM d" the picker itself shows, in the browser's language. */
+/**
+ * "14. Sep", in the language of the account.
+ *
+ * Not `toLocaleDateString(undefined, …)`: that follows the operating system,
+ * so a German account on an English laptop read its dates in English while
+ * everything around them was German.
+ */
 function formatDate(value){
     if(!value) return ''
     const date = new Date(value)
     if(Number.isNaN(date.getTime())) return ''
-    return date.toLocaleDateString(undefined, {month: 'short', day: 'numeric'})
+    return new Intl.DateTimeFormat(getLanguage(), {month: 'short', day: 'numeric'}).format(date)
 }

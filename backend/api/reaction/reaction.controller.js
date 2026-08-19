@@ -19,6 +19,7 @@ const logger = require('../../services/logger.service')
  * while the routes are being wired must not drag that graph in with it.
  */
 const sockets = () => require('../../services/socket.service')
+const notifications = () => require('../notification/notification.service')
 
 /** Everyone with this task open hears that its reactions moved. */
 const REACTION_CHANGED = 'reaction-changed'
@@ -109,11 +110,24 @@ module.exports = {
          * client applying an edit that crossed with its own — the same
          * client-to-client relay this codebase removed from the board once
          * already. One extra request per reaction, for fifteen people.
+         *
+         * **Both rooms, and that is not belt-and-braces.** A socket is only
+         * ever in one of them, and which one depends on the order two effects
+         * happened to run in on that client: opening a task from the board
+         * leaves the socket in the task's room, but a reload or a direct link
+         * puts the board back on top of it. So one browser hears task events
+         * and the next one board events, with nothing to tell them apart from
+         * the outside. Sending to both costs one line and stops the feature
+         * from depending on that race. The proper repair — one socket holding
+         * both rooms — is HANDOVER §6 and a job of its own.
          */
-        sockets().emitToTask({
-            type: REACTION_CHANGED, boardId, taskId,
-            args: [{boardId, taskId, commentId, emoji, by: String(user._id)}]
-        })
+        const payload = [{boardId, taskId, commentId, emoji, by: String(user._id)}]
+        sockets().emitToTask({type: REACTION_CHANGED, boardId, taskId, args: payload})
+        sockets().emitToBoard({type: REACTION_CHANGED, boardId, args: payload})
+
+        // Only when it goes on. Being told that somebody took a thumb back is
+        // a notification nobody wants.
+        if(on) await notifications().commentReacted({boardId, taskId, commentId, emoji, actor: user})
 
         return {emoji, on}
     }, 'Could not save the reaction')

@@ -4,10 +4,12 @@
 @use "../setup/variables";
 
 .task-preview {
+    font-size: 1rem;
+    line-height: 1rem;
     position: relative;
-    font-size: functions.rem(14px);
 
     .empty-div {
+        border-right: 1px solid variables.$border-color-darker;
         @include mixins.empty-div()
     }
 
@@ -17,8 +19,46 @@
         }
     }
 
+    &:hover .sticky-div {
+        background-color: variables.$row-hover;
+    }
+
     .sticky-div.on-typing {
-        background-color: variables.$workspace-board-active;
+        .task-title {
+            background-color: white;
+            box-shadow: inset 0 0 0 1px variables.$field-border;
+        }
+
+        .chat-icon {
+            background-color: white;
+            border-left-color: variables.$field-border;
+        }
+
+        .open-task-details {
+            display: none;
+        }
+
+        .task-running-dot {
+            display: none;
+        }
+
+        .subtask-toggle.is-empty {
+            opacity: 0;
+        }
+
+        blockquote {
+            margin-left: 0;
+            padding-left: 4px;
+
+            > span {
+                outline: none;
+                padding: 2px 3px;
+            }
+
+            &:hover > span {
+                outline: none;
+            }
+        }
     }
 
     .task-menu {
@@ -61,60 +101,47 @@
     .picker {
         min-width: variables.$cell-width;
         height: variables.$cell-height;
-        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+        border-bottom: 1px solid variables.$border-color-darker;
+        border-right: 1px solid variables.$border-color-darker;
     }
 
-    /**
-     * A cell a viewer may read and not change.
-     *
-     * Only the pointer changes, not the colour: the value is what the person
-     * came for, and a greyed-out board says "broken" rather than "yours to
-     * read". Each picker leaves out its own machinery — see DynamicCmp.
-     */
     .picker.is-readonly,
     .task-person.is-readonly {
         cursor: default;
     }
 
-    /**
-     * Three states worth noticing at a glance. Everything further out than a
-     * week stays plain — if every date is coloured, none of them is a warning.
-     *
-     * The dates keep their weight; only the colour changes. The full sentence
-     * ("87 Tage überfällig") is the tooltip on the cell.
-     */
-    .date-picker.is-overdue input,
+    .date-picker.is-overdue .date-trigger,
     .date-picker.is-overdue .date-readonly {
         color: #d83a52;
         font-weight: 600;
     }
 
-    .date-picker.is-today input,
+    .date-picker.is-today .date-trigger,
     .date-picker.is-today .date-readonly {
         color: #c98a00;
         font-weight: 600;
     }
 
-    .date-picker.is-soon input,
+    .date-picker.is-soon .date-trigger,
     .date-picker.is-soon .date-readonly {
         color: variables.$primary-text-color;
     }
 
     .date-readonly,
     .number-readonly {
-        display: flex;
         align-items: center;
-        justify-content: center;
-        height: 100%;
-        padding: 0 variables.$spacing-small;
-        // The date shares its cell with the symbol in front of it.
+        display: flex;
         flex: 1 1 auto;
+        height: 100%;
+        justify-content: center;
         min-width: 0;
+        padding: 0 variables.$spacing-small;
     }
 
     .task-title {
-        width: variables.$cell-width-task;
         cursor: pointer;
+        line-height: 1rem;
+        width: variables.$cell-width-task;
 
         &:hover {
             .open-task-details {
@@ -123,14 +150,14 @@
         }
 
         blockquote {
-            height: 70%;
+            height: 100%;
         }
 
         .open-task-details {
             @include mixins.center-flex();
-            opacity: 0;
-            margin: 0 variables.$spacing-small;
             color: variables.$workspace-icon-color;
+            margin: 0 variables.$spacing-small;
+            opacity: 0;
 
             @include mixins.for-mobile-layout() {
                 & .open-btn {
@@ -140,11 +167,11 @@
         }
 
         .chat-icon {
-            font-size: functions.rem(24px);
-            padding: 0 variables.$spacing-medium;
-            height: 100%;
-            border-left: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+            border-left: 1px solid variables.$border-color-darker;
             color: variables.$chat-icon-color;
+            font-size: 1.6rem;
+            height: 100%;
+            padding: 0 variables.$spacing-medium;
             @include mixins.center-flex();
             position: relative;
 
@@ -154,23 +181,24 @@
             }
 
             div {
-                display: flex;
                 align-items: center;
+                display: flex;
             }
 
             .count-comment {
                 @include mixins.center-flex();
-                position: absolute;
-                top: 15px;
-                right: 15px;
                 background-color: variables.$board-btn;
-                color: white;
-                font-size: functions.rem(10px);
                 border-radius: 50%;
-                width: 14px;
+                color: white;
+                cursor: pointer;
+                font-size: .75rem;
+                line-height: .7rem;
                 height: 13px;
                 margin: 0;
-                cursor: pointer;
+                position: absolute;
+                right: 15px;
+                top: 15px;
+                width: 14px;
             }
 
             .comment-chat {
@@ -179,18 +207,14 @@
         }
     }
 
-    &.on-typing {
-        background-color: variables.$workspace-board-active;
-    }
-
     blockquote {
-        padding-right: 40px;
         border-radius: 5px;
-        width: 200px;
+        cursor: pointer;
+        flex-grow: 1;
         overflow: hidden;
+        padding-right: 1rem;
         white-space: nowrap;
-        margin-left: .25rem;
-        cursor: text;
+        //width: 200px;
 
         @include mixins.for-mobile-layout() {
             & {
@@ -198,17 +222,22 @@
             }
         }
 
-        &:focus-visible {
-            outline: 1px solid variables.$board-btn;
+        > span {
+            border-radius: 5px;
+            cursor: text;
+            font-size: 1rem;
+            line-height: 1rem;
+            //margin: 0 -4px;
+            padding: 2px 4px;
         }
 
-        &:hover {
-            outline: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+        &:focus-visible {
+            outline: none;
         }
     }
 
     .empty-div {
-        border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+        border-bottom: 1px solid variables.$border-color-darker;
         flex-grow: 0;
         padding-right: calc(.5rem + 28px);
         width: fit-content;

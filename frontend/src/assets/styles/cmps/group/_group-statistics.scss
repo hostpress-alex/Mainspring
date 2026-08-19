@@ -15,37 +15,23 @@
     .title.status-picker,
     .title.priority-picker {
         border-top: 0;
-        padding: 0 variables.$spacing-small;
+        padding: 0;
 
         > * {
-            height: 80%;
+            height: 100%;
 
             &:hover {
-                height: 90%;
+                height: 120%;
             }
         }
     }
 
-    /* Nothing here any more. The summary row uses `.sticky-div`, the same
-       class as the header and every task row, so it gets the same sticky
-       behaviour, the same background AND the same 6px colour bar on its left
-       edge. That bar was the last of the difference: a rule of its own can
-       reproduce a width, but it reproduces it as a second number that has to
-       be kept in step. */
-
     .statistic-number {
-        font-size: functions.rem(14px);
+        font-size: 1rem;
         position: relative;
 
         .number {
-            position: absolute;
-            top: -15px;
-        }
-
-        .sum {
-            color: variables.$board-btn;
-            font-size: functions.rem(12px);
-            position: absolute;
+            display: block;
         }
     }
 }

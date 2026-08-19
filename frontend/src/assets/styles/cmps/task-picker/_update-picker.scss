@@ -7,7 +7,10 @@
     @include mixins.center-flex();
 
     &-content {
-        width: 60px;
+        align-items: center;
+        gap: .75rem;
+        padding: 0 .75rem;
+        width: 100%;
     }
 
     img {
@@ -15,7 +18,7 @@
     }
 
     .icon-person {
-        font-size: functions.rem(26px);
         color: color.adjust(variables.$border-color, $lightness: -20%);
+        font-size: functions.rem(26px);
     }
 }

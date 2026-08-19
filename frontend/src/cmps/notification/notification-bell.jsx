@@ -84,6 +84,11 @@ function describe(item){
         case 'mention': return t('notification.mention', {actor})
         case 'comment': return t('notification.comment', {actor})
         case 'value': return t('notification.value', {actor, column: item.detail.column || ''})
+        // Update or reply, because "reacted to your update" pointing at a
+        // reply three levels down is a small lie that costs a scroll.
+        case 'reaction': return t(
+            item.detail.isReply?'notification.reactionReply':'notification.reaction',
+            {actor, emoji: item.detail.emoji || ''})
         default: return t('notification.generic', {actor})
     }
 }
@@ -244,7 +249,7 @@ export function NotificationBell(){
                                         <span className="notification-body">
                                             <span className="notification-text">{describe(item)}</span>
                                             <span className="notification-subject">{item.subject}</span>
-                                            {(item.kind === 'comment' || item.kind === 'mention') && item.detail.text && (
+                                            {(item.kind === 'comment' || item.kind === 'mention' || item.kind === 'reaction') && item.detail.text && (
                                                 <span className="notification-detail">{item.detail.text}</span>
                                             )}
                                             {item.kind === 'value' && (

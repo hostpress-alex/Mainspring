@@ -54,17 +54,18 @@
     }
 
     .file-picker-link {
-        display: flex;
         align-items: center;
+        background: none;
+        color: #0073ea;
+        display: flex;
         gap: 4px;
         min-width: 0;
         text-decoration: none;
-        color: #0073ea;
     }
 
     .file-img {
-        max-width: 19px;
-        max-height: 19px;
+        max-width: 1.75rem;
+        max-height: 1.75rem;
         display: block;
     }
 
@@ -72,7 +73,7 @@
     // everybody already reads without thinking: red PDF, blue Word, green
     // spreadsheet. Everything unknown stays grey and does not shout.
     .file-icon {
-        font-size: functions.rem(17px);
+        font-size: 1.33rem;
         color: #676879;
 
         &.is-pdf        { color: #d32b2b; }
@@ -88,14 +89,16 @@
     // The cross only on hover — otherwise every filled cell carries a delete
     // button around with it and the eye reads it before the file itself.
     .file-picker-clear {
-        border: none;
         background: transparent;
+        border: none;
         color: #676879;
         cursor: pointer;
-        padding: 0;
-        line-height: 1;
-        font-size: 13px;
+        font-size: 1.25rem;
+        line-height: 1rem;
         opacity: 0;
+        padding: 0;
+        position: absolute;
+        right: .5rem;
         transition: opacity .12s;
     }
 

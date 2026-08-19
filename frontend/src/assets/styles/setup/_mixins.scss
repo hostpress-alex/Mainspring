@@ -29,8 +29,8 @@
 }
 
 @mixin members() {
-    height: functions.rem(26px);
-    width: functions.rem(26px);
+    height: 1.75rem;
+    width: 1.75rem;
     border-radius: 50%;
 }
 
@@ -46,15 +46,17 @@
     }
 
     .member-img1 {
-        margin-right: -5px;
+        border: 1px solid variables.$app-bg;
+        margin-right: -4px;
         margin-left: 0;
         width: $imgSize;
         height: $imgSize;
     }
 
     .member-img2 {
-        margin-left: -5px;
-        margin-right: -5px;
+        border: 1px solid variables.$app-bg;
+        margin-left: -4px;
+        margin-right: -4px;
         height: $imgSize;
         width: $imgSize;
     }

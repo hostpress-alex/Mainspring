@@ -70,7 +70,6 @@ function GetStatisticsNumber({statisticNumber}){
     return (
         <div role="contentinfo" className="statistic-number flex column align-center">
             <span className="number">{statisticNumber}</span>
-            <span className="sum">sum</span>
         </div>
     )
 }

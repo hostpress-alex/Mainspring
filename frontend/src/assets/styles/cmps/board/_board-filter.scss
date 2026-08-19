@@ -162,7 +162,7 @@
 
     .members-last-seen {
         width: max-content;
-        gap: variables.$spacing-xs;
+        gap: variables.$spacing-medium;
         height: functions.rem(32px);
 
         &:hover {
@@ -198,6 +198,12 @@
     }
 
     .members-imgs {
-        @include mixins.member-img(white, #323338, 24px, 26px);
+        @include mixins.member-img(white, #323338, 1rem, 1rem);
+
+        .member-img {
+            border: 1px solid variables.$app-bg;
+            margin-left: -4px;
+            margin-right: -4px;
+        }
     }
 }

@@ -133,17 +133,16 @@ export function ActivityPreview({activity, taskTitle = null}){
             <div className="time-title flex align-center">
                 <div className="time flex align-center">
                     <Icon name='clock' variant='fa-regular'/>
-                    <span>{activity.createdAt?utilService.calculateTime(activity.createdAt):''}</span>
+                    <span>{activity.createdAt?utilService.calculateTimeWithBefore(activity.createdAt):''}</span>
                 </div>
                 <div className="who-what">
                     <div className="title flex align-center">
                         <Avatar src={imgOf(byMember.imgUrl)}/>
-                        <span>{text(byMember.fullname)}</span>
                     </div>
                     {taskTitle && <div className="activity-task" title={taskTitle}>{taskTitle}</div>}
                 </div>
             </div>
-            <div className="action flex align-center space-between">
+            <div className="action flex align-center">
                 {getIconAction()}
                 <div>{ACTION_LABELS[action] || action}</div>
             </div>

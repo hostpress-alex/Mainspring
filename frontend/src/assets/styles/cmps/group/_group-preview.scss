@@ -65,25 +65,25 @@
         }
 
         .add-picker-task {
-            border-top: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-            border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-            width: fit-content;
+            border-bottom: 1px solid variables.$border-color-darker;
+            border-right: 1px solid variables.$border-color-darker;
+            border-top: 1px solid variables.$border-color-darker;
             transition: transform .2s, color .1s ease;
-            padding-right: .5rem;
+            width: calc(0.5rem + 29px);
 
             .add-btn {
-                display: flex;
                 align-items: center;
-                padding: 3px variables.$spacing-xs;
-                margin-left: variables.$spacing-xs;
                 border-radius: variables.$spacing-xs;
                 cursor: pointer;
+                display: flex;
+                justify-content: center;
                 position: relative;
+                width: 100%;
 
                 .plus {
-                    transition: transform .2s ease, color .1s ease;
-                    transform: rotate(45deg);
                     color: variables.$primary-hover-color;
+                    transform: rotate(45deg);
+                    transition: transform .2s ease, color .1s ease;
                 }
 
                 .close {
@@ -104,10 +104,14 @@
 
     .title {
         @include mixins.center-flex();
-        min-width: variables.$cell-width;
+        border-bottom: 1px solid variables.$border-color-darker;
+        border-right: 1px solid variables.$border-color-darker;
+        border-top: 1px solid variables.$border-color-darker;
+        font-size: 1.1rem;
+        font-weight: 500;
+        line-height: 1.1rem;
         height: variables.$cell-height;
-        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-        font-size: functions.rem(14px);
+        min-width: variables.$cell-width;
 
         &.task {
             min-width: variables.$cell-width-task;
@@ -125,13 +129,13 @@
     }
 
     .group-header {
-        position: sticky;
-        top: 182px;
-        z-index: 2;
         background-color: white;
         height: 40px;
-        width: 100%;
         line-height: 24px;
+        position: sticky;
+        top: 182px;
+        width: 100%;
+        z-index: 2;
 
         @include mixins.for-narrow-layout() {
             &.not-des {
@@ -146,6 +150,8 @@
         }
 
         .group-title-info {
+            padding-left: 1rem;
+
             &:hover {
                 .task-count {
                     opacity: 1;
@@ -155,7 +161,7 @@
             .task-count {
                 color: variables.$workspace-icon-color;
                 white-space: nowrap;
-                font-size: functions.rem(14px);
+                font-size: .9rem;
                 line-height: 19px;
                 margin-left: variables.$spacing-small;
                 transition: .2s;
@@ -193,9 +199,8 @@
         }
 
         .group-title {
-            width: 200px;
-            white-space: nowrap;
             overflow: hidden;
+            white-space: nowrap;
         }
 
         &:hover {
@@ -205,15 +210,15 @@
         }
 
         .arrow-icon {
-            font-size: functions.rem(16px);
-            margin-left: 13px;
             cursor: pointer;
+            font-size: 1rem;
+            margin-left: 1rem;
         }
 
         h4 {
             cursor: text;
             font-weight: 600;
-            font-size: functions.rem(18px);
+            font-size: 1.25rem;
             padding: variables.$spacing-xs;
         }
 
@@ -229,7 +234,7 @@
                 display: none;
                 cursor: pointer;
                 border-radius: 4px;
-                font-size: functions.rem(20px);
+                font-size: 1.5rem;
             }
 
             .icon:hover {
@@ -247,37 +252,33 @@
     .check-box {
         min-width: 33px;
         @include mixins.center-flex();
-        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+        border-bottom: 1px solid variables.$border-color-darker;
+        border-right: 1px solid variables.$border-color-darker;
 
         input {
-            width: 15px;
-            height: 16px;
+            height: 1.1rem;
+            margin: 0;
+            width: 1.1rem;
         }
     }
 
     .add-task {
         width: 100%;
 
-        /* As narrow as the "+" column above it, exactly like the task rows.
-           It was `width: 100%`, so the last row of a group drew an empty box
-           across whatever space was left to the right of the table. The task
-           rows were given this treatment at some point and this one was
-           missed — the numbers are the same on purpose, so the two lines end
-           in the same place. */
         .empty-div {
-            width: fit-content;
+            border-bottom: 1px solid variables.$border-color-darker;
+            display: none;
             flex-grow: 0;
             padding-right: calc(.5rem + 28px);
-            border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+            width: fit-content;
         }
 
         .add-task-form {
             width: 100%;
             outline: none;
             height: 36px;
-            border-bottom: 1px solid rgba(143, 153, 191, 0.4);
-            border-top: 1px solid rgba(143, 153, 191, 0.4);
-            border-left: 1px solid rgba(143, 153, 191, 0.4);
+            border-bottom: 1px solid variables.$border-color-darker;
+            border-left: 1px solid variables.$border-color-darker;
             border-right: none;
         }
 
@@ -306,6 +307,11 @@
                 padding: variables.$spacing-small;
             }
         }
+
+        .sticky-div {
+            border-right: 1px solid variables.$border-color-darker;
+            width: 100%;
+        }
     }
 
     .sticky-div {
@@ -326,6 +332,10 @@
         &.titles {
             border-top-left-radius: 6px;
             z-index: 11;
+
+            > .check-box {
+                border-top: 1px solid variables.$border-color-darker;
+            }
         }
     }
 
@@ -338,22 +348,47 @@
         cursor: pointer;
         transition: transform .15s;
     }
+
+    .group-preview-content {
+        width: max-content;
+
+        > div:not(.title-container):not(.statistic){
+            box-shadow: -6px 6px 7px -11px #000;
+        }
+
+        > .statistic {
+            &:has(> .statistic-container) {
+                > .sticky-div {
+                    opacity: 0;
+                }
+
+                .title {
+                    border-top: 0;
+
+                    &.first {
+                        border-left: 1px solid variables.$border-color-darker;
+                    }
+                }
+
+                .statistic-container {
+                    background: #fff;
+                    box-shadow: -6px 6px 7px -11px #000;
+                }
+
+                .empty-div {
+                    border-bottom: 1px solid variables.$border-color-darker;
+                    border-right: 1px solid variables.$border-color-darker;
+                    padding-left: calc(0.5rem + 28px);
+                }
+            }
+        }
+    }
 }
 
-/**
- * Group colour.
- *
- * The colour itself belongs to the data, so it comes in from the JSX as a
- * custom property. The rule that uses it — text here, border there — stays
- * where every other rule is.
- */
 .group-header {
     color: var(--group-color);
 }
 
-// The 6px stripe on the left is set further up as `border-left: 6px solid`
-// without a colour, so it took the colour from the inline style. That rule is
-// nested and therefore more specific — this one has to match it.
 .group-preview .sticky-div,
 .task-preview .sticky-div {
     border-left-color: var(--group-color);
@@ -376,12 +411,10 @@
     border-left: 6px solid var(--group-color);
     background: #fff;
     color: #676879;
-    font-size: 13px;
+    font-size: .9rem;
     cursor: pointer;
 }
 
-// The task column carries a grabber like every other column. The header cell
-// needs a positioning context for it and room for the label beside it.
 .group-preview .title-container .task.title {
     position: relative;
     display: flex;
