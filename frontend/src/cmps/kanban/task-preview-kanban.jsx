@@ -2,7 +2,7 @@ import {Fragment} from 'react'
 import {useSelector} from 'react-redux'
 
 import {updateTaskAction} from '../../store/board.actions'
-import {GUEST_IMG} from '../../services/avatar'
+import {touchedBy} from '../../services/updated-by'
 import {DynamicCmp} from '../task/task-preview'
 import {filledColumns} from '../board/column-value'
 import * as boardRoles from '../../services/board-roles'
@@ -43,11 +43,7 @@ export function TaskPreviewKanban({task, group, board}){
         if(!canWork) return
         const next = structuredClone(task)
         next[cmpType] = data
-        next.updatedBy = {
-            ...(next.updatedBy || {}),
-            date: Date.now(),
-            imgUrl: (user && user.imgUrl) || GUEST_IMG
-        }
+        next.updatedBy = touchedBy(next, user)
         try {
             await updateTaskAction(board, group.id, next, activity)
         } catch(err) {

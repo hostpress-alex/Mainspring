@@ -18,7 +18,7 @@ import {FilePicker} from './file-picker'
 import {TextPicker, LongTextPicker, CheckboxPicker, LinkPicker, DropdownPicker} from './simple-pickers'
 
 import { Icon } from '../icon'
-import {GUEST_IMG} from '../../services/avatar'
+import {touchedBy} from '../../services/updated-by'
 import * as boardRoles from '../../services/board-roles'
 import {widthOf, widthStyle, TASK_COLUMN} from '../board/column-width'
 import {TaskRunningDot} from '../time/task-timer'
@@ -67,12 +67,11 @@ export function TaskPreview({
         if(!canWork) return
         const taskToUpdate = structuredClone(task)
         taskToUpdate[cmpType] = data
-        taskToUpdate.updatedBy.date = Date.now()
-        taskToUpdate.updatedBy.imgUrl = (user && user.imgUrl) || GUEST_IMG
+        taskToUpdate.updatedBy = touchedBy(taskToUpdate, user)
         try {
             await updateTaskAction(board, group.id, taskToUpdate, activity)
         } catch(err) {
-            console.log(err)
+            console.error('cannot save the task', err)
         }
     }
 

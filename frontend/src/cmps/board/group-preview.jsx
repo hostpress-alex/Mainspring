@@ -32,7 +32,7 @@ import {isCollapsed, toggleCollapsed} from './group-collapse'
 import {StatisticGroup} from './statistics-group'
 
 import { Icon } from '../icon'
-import {GUEST_IMG} from '../../services/avatar'
+import {touchedBy} from '../../services/updated-by'
 import {t} from '../../i18n'
 
 export function GroupPreview({group, board, idx}){
@@ -202,8 +202,7 @@ export function GroupPreview({group, board, idx}){
         const activity = boardService.getEmptyActivity()
         activity.from = {color: group.color, title: group.title}
         activity.action = 'create'
-        taskToEdit.updatedBy.date = Date.now()
-        taskToEdit.updatedBy.imgUrl = user?.imgUrl || GUEST_IMG
+        taskToEdit.updatedBy = touchedBy(taskToEdit, user)
         addTask(taskToEdit, group, board, activity)
         setTaskToEdit(boardService.getEmptyTask())
     }
