@@ -6,6 +6,7 @@ import {userService} from '../services/user.service'
 import {boardService} from '../services/board.service'
 import {confirmDelete} from '../cmps/confirm-dialog'
 import {PriorityAdmin} from '../cmps/admin/priority-admin'
+import {TeamAdmin} from '../cmps/admin/team-admin'
 import {t} from '../i18n'
 
 const EMPTY_FORM = {fullname: '', username: '', password: '', isAdmin: false}
@@ -166,6 +167,9 @@ export function AdminPage(){
             {/* First, because it is the one list on this page that everybody
                 on every board sees the moment it changes. */}
             <PriorityAdmin onError={e => setErr(readErr(e))}/>
+
+            {/* After the users are loaded, because it is a row per person. */}
+            {users.length > 0 && <TeamAdmin users={users} onError={e => setErr(readErr(e))}/>}
 
             <div className="admin-card">
                 <h2 className="admin-section-title">{t('admin.createUser')}</h2>

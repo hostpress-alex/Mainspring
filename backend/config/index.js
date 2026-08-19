@@ -46,4 +46,33 @@ config.sessionSecret = process.env.SECRET1 || null
 // world as one visitor.
 config.trustProxy = process.env.TRUST_PROXY === 'true'
 
+/**
+ * Reading Google calendars, if this installation does that at all.
+ *
+ * Absent means the feature is simply off: no link can be set up, the sync
+ * never runs, and the calendar shows what it always showed. Nothing here has
+ * a default — a half-configured integration that silently talks to the wrong
+ * Google project is worse than one that says it is not set up.
+ *
+ * A key FILE is the intended way. The private key is a PEM with newlines in
+ * it, and an .env file mangles those often enough that the variable form
+ * exists mainly for people who already know that and escape them.
+ *
+ *   GOOGLE_SA_KEY_FILE=/etc/mainspring/google-service-account.json
+ * or
+ *   GOOGLE_SA_CLIENT_EMAIL=…iam.gserviceaccount.com
+ *   GOOGLE_SA_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n…"
+ *
+ * Keep the file outside the repository. It is the credential for reading
+ * every calendar in the domain.
+ */
+config.googleKeyFile = process.env.GOOGLE_SA_KEY_FILE || null
+config.googleClientEmail = process.env.GOOGLE_SA_CLIENT_EMAIL || null
+config.googlePrivateKey = process.env.GOOGLE_SA_PRIVATE_KEY || null
+
+// How often the background sync runs, in minutes. 0 switches it off, which is
+// what the tests and any second instance of the server want — two processes
+// syncing the same calendars is duplicated work, not faster work.
+config.googleSyncMinutes = Number(process.env.GOOGLE_SYNC_MINUTES || 15)
+
 module.exports = config

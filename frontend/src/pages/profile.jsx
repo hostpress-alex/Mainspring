@@ -1,4 +1,5 @@
 import {useState, useRef} from 'react'
+import {WorkHoursEditor} from '../cmps/workhours/work-hours-editor'
 import {useSelector} from 'react-redux'
 import {Link, useNavigate} from 'react-router-dom'
 
@@ -240,6 +241,14 @@ export function ProfilePage(){
                         </div>
                         <button className="profile-btn" type="submit" disabled={busy || !fullname.trim()}>{t('profile.saveName')}</button>
                     </form>
+                </div>
+
+                {/* Between the name and the sessions: it is a fact about the
+                    person, like their name, and not a security setting. */}
+                <div className="profile-card">
+                    <h2 className="profile-section-title">{t('workhours.title')}</h2>
+                    <p className="profile-hint">{t('workhours.profileHint')}</p>
+                    <WorkHoursEditor userId={user._id}/>
                 </div>
 
                 <div className="profile-card">

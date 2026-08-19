@@ -31,7 +31,7 @@
 
     @include mixins.for-narrow-layout() {
         & {
-            left: 60px;
+            left: 0;
             bottom: 15px;
         }
     }

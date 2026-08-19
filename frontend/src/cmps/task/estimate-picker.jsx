@@ -31,35 +31,32 @@ export const ESTIMATE_UNITS = [
 ]
 
 /**
- * Minutes -> the largest unit that divides them cleanly.
+ * Minutes -> what the dialog should show when it opens again.
  *
- * So 480 comes back as "1 day" rather than "480 minutes", and 90 stays "90
- * minutes" instead of becoming "1.5 hours" — a field that rounds what
+ * Hours when they divide cleanly, minutes otherwise. Days are deliberately
+ * not offered back: they are a shortcut for typing, and reading "1 Tag" where
+ * the cell says "8 Std." makes the two look like different values. 90 stays
+ * "90 minutes" rather than becoming 1.5 hours — a field that rounds what
  * somebody typed is a field they stop trusting.
  */
 export function splitEstimate(minutes){
     const total = Math.max(0, Math.round(Number(minutes) || 0))
     if(!total) return {amount: '', unit: 'hours'}
-    for(const unit of [...ESTIMATE_UNITS].reverse()){
-        if(total % unit.minutes === 0) return {amount: total / unit.minutes, unit: unit.key}
-    }
+    if(total % 60 === 0) return {amount: total / 60, unit: 'hours'}
     return {amount: total, unit: 'minutes'}
 }
 
 /**
- * An estimate, read back in the unit it was most likely given in.
+ * An estimate, read back as an amount of time.
  *
- * formatDuration stops at hours, which is right for time that was measured —
- * sixteen hours on a stopwatch are sixteen hours. An estimate of two days is
- * not: it was typed as two days, and reading it back as "16 Std." makes
- * people check whether it saved what they meant.
+ * Always hours and minutes, never days — even when it was typed as days. The
+ * unit in the dialog is a way of typing, not a property of the value: what is
+ * stored is a number of minutes, and the cell next to it shows recorded time
+ * in hours. "5 Std. 12 Min. / 1 Tg." asks the reader to convert in their head
+ * before they can tell whether it fits.
  */
 export function formatEstimate(minutes){
-    const total = Math.max(0, Math.round(Number(minutes) || 0))
-    if(total >= WORKDAY_MINUTES && total % WORKDAY_MINUTES === 0){
-        return `${total / WORKDAY_MINUTES} ${t('time.dayShort')}`
-    }
-    return formatDuration(total * 60000)
+    return formatDuration(Math.max(0, Math.round(Number(minutes) || 0)) * 60000)
 }
 
 export function toMinutes(amount, unitKey){

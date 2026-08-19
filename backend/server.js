@@ -47,6 +47,8 @@ const searchRoutes = require('./api/search/search.routes')
 const timeRoutes = require('./api/time/time.routes')
 const reactionRoutes = require('./api/reaction/reaction.routes')
 const priorityRoutes = require('./api/priority/priority.routes')
+const workHoursRoutes = require('./api/workhours/workhours.routes')
+const calendarRoutes = require('./api/calendar/calendar.routes')
 const {setupSocketAPI} = require('./services/socket.service')
 
 // routes
@@ -65,6 +67,8 @@ app.use('/api/search', searchRoutes)
 app.use('/api/time', timeRoutes)
 app.use('/api/reaction', reactionRoutes)
 app.use('/api/priority', priorityRoutes)
+app.use('/api/workhours', workHoursRoutes)
+app.use('/api/calendar', calendarRoutes)
 setupSocketAPI(http)
 
 /**
@@ -114,6 +118,10 @@ async function start(){
     }
     http.listen(port, () => {
         logger.info('Server is running on port: ' + port)
+        // Only once the server is up, and only if a Google key is configured
+        // — see calendar.service. Nothing happens on an installation that
+        // does not use it.
+        require('./api/calendar/calendar.service').startSyncTimer(config.googleSyncMinutes)
     })
 }
 

@@ -1,0 +1,142 @@
+/**
+ * The weekly hours editor, and the team table it sits inside.
+ *
+ * Used in two places with the same markup — the profile and the admin screen
+ * — so the rules hang off `.work-hours` rather than off either page.
+ */
+.work-hours {
+    max-width: 640px;
+
+    .work-hours-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td {
+        border-bottom: 1px solid #eceef5;
+        padding: 6px 4px;
+        vertical-align: middle;
+    }
+
+    tr.is-off td {
+        color: #9699a6;
+    }
+
+    .work-hours-day {
+        width: 130px;
+
+        label {
+            align-items: center;
+            cursor: pointer;
+            display: flex;
+            gap: 8px;
+        }
+    }
+
+    .work-hours-times {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+
+        .admin-input {
+            margin-right: 0;
+            padding: 4px 6px;
+        }
+    }
+
+    .work-hours-break {
+        align-items: center;
+        color: #676879;
+        display: flex;
+        font-size: 12px;
+        gap: 6px;
+        margin-left: 10px;
+
+        input {
+            width: 70px;
+        }
+    }
+
+    .work-hours-dash {
+        color: #676879;
+    }
+
+    .work-hours-free {
+        color: #9699a6;
+        font-size: 13px;
+    }
+
+    .work-hours-sum {
+        color: #676879;
+        font-size: 13px;
+        text-align: right;
+        white-space: nowrap;
+        width: 90px;
+    }
+
+    .work-hours-foot {
+        align-items: center;
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .work-hours-total {
+        font-weight: 600;
+    }
+
+    .work-hours-tools {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .work-hours-saved {
+        color: #00854d;
+        font-size: 13px;
+    }
+}
+
+/* The row per person on the admin screen. */
+.team-table {
+    .team-hours {
+        display: table-cell;
+    }
+
+    .team-hours-days {
+        margin-right: 8px;
+    }
+
+    .team-hours-total {
+        color: #676879;
+        font-size: 12px;
+    }
+
+    .team-email {
+        margin-right: 0;
+        min-width: 220px;
+    }
+
+    .team-sync {
+        color: #676879;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    /* Not hidden behind a tooltip alone: a calendar that stopped arriving is
+       the kind of thing nobody notices until somebody misses a meeting. */
+    .team-sync-error {
+        color: #d83a52;
+        cursor: help;
+    }
+
+    .team-tools {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .team-editor-row > td {
+        background: #fbfbfd;
+    }
+}

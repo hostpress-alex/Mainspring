@@ -107,6 +107,8 @@
 // arrived after everything here, and the cascade decides ties by order.
 @use "cmps/board/board-columns";
 @use "cmps/calendar";
+@use "cmps/calendar-external";
+@use "cmps/work-hours";
 @use "cmps/confirm-dialog";
 @use "cmps/comment-replies";
 @use "cmps/modal/add-column-dialog";

@@ -3,6 +3,7 @@ import {
     addDays, isToday, isSameDay, layoutDay, minutesOfDay, snapMinutes,
     startOfDay, fmtTime, fmtDuration, pad, WEEKDAYS_SHORT, MS_MIN
 } from '../../services/date.util'
+import {t} from '../../i18n'
 
 const SNAP = 15                 // minute grid for dragging and creating
 const MIN_DRAG_MINUTES = 15     // below this it counts as a click, not as a drag
@@ -19,7 +20,39 @@ const GUTTER_PX = 58           // width of the hour rail, see calendar.css
  *  - dragging the bottom edge changes the duration
  *  - clicking without moving opens the edit dialog
  */
-export function TimeGrid({days, entries, onCreate, onMove, onOpen}){
+/**
+ * Entries that came from outside, in the shape the layout already
+ * understands.
+ *
+ * They are given an `_id` with a prefix so that nothing can confuse one with
+ * a schedule entry — the drag code keys on `_id`, and an external entry that
+ * matched would become draggable, which is exactly what must not happen.
+ */
+function asEntries(external, noTitle){
+    return (external || []).filter(e => !e.isAllDay).map(e => ({
+        _id: 'ext:' + e.id,
+        isExternal: true,
+        source: e.source,
+        taskTitle: e.title || noTitle,
+        boardTitle: '',
+        groupTitle: '',
+        color: '#9699a6',
+        start: new Date(e.start),
+        end: new Date(e.end)
+    }))
+}
+
+/** The shaded bands of a day: everything outside the working hours. */
+function offHoursOf(workHours, day){
+    const hours = (workHours || []).find(h => h.weekday === day.getDay())
+    if(!hours) return [{topPct: 0, heightPct: 100}]
+    const bands = []
+    if(hours.startMin > 0) bands.push({topPct: 0, heightPct: (hours.startMin / 1440) * 100})
+    if(hours.endMin < 1440) bands.push({topPct: (hours.endMin / 1440) * 100, heightPct: ((1440 - hours.endMin) / 1440) * 100})
+    return bands
+}
+
+export function TimeGrid({days, entries, external = [], workHours = [], onCreate, onMove, onOpen}){
     const elGrid = useRef()
     const elBody = useRef()
     const [drag, setDrag] = useState(null)
@@ -171,7 +204,11 @@ export function TimeGrid({days, entries, onCreate, onMove, onOpen}){
         return {...entry, start: drag.origStart, end: new Date(base.getTime() + drag.endMin * MS_MIN)}
     }
 
-    const shown = entries.map(e => previewFor(e) || e)
+    const shown = [...entries.map(e => previewFor(e) || e), ...asEntries(external, t('calendar.noTitle'))]
+    // Whole-day events would otherwise fill a column from top to bottom and
+    // bury everything under them, so they get a row of their own above the
+    // grid — the same place every calendar puts them.
+    const allDay = (external || []).filter(e => e.isAllDay)
 
     return (
         <div className="cal-body" ref={elBody}>
@@ -187,6 +224,22 @@ export function TimeGrid({days, entries, onCreate, onMove, onOpen}){
                     )
                 })}
             </div>
+
+            {allDay.length > 0 && (
+                <div className="cal-allday" style={{'--cal-cols': days.length}}>
+                    <div className="cal-allday-gutter">{t('calendar.allDay')}</div>
+                    {days.map(day => (
+                        <div className="cal-allday-col" key={+day}>
+                            {allDay.filter(e => e.start < +addDays(startOfDay(day), 1) && e.end > +startOfDay(day)).map(e => (
+                                <div className="cal-allday-chip is-external" key={e.id}
+                                    title={`${e.title || t('calendar.noTitle')}\n${t('calendar.fromGoogle')}`}>
+                                    {e.title || t('calendar.noTitle')}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            )}
 
             <div className="cal-grid" ref={elGrid} style={{'--cal-cols': days.length}}>
                 <div className="cal-gutter">
@@ -210,6 +263,15 @@ export function TimeGrid({days, entries, onCreate, onMove, onOpen}){
 
                         return (
                             <div key={+day} className={`cal-col${weekend?' is-weekend':''}${today?' is-today':''}`} onMouseDown={ev => onGridMouseDown(ev, dayIdx)}>
+                                {/* Outside the working hours. Drawn first and
+                                    without pointer events, so it changes how
+                                    the day reads and nothing else. */}
+                                {offHoursOf(workHours, day).map((band, i) => (
+                                    <div key={'off' + i} className="cal-offhours" style={{
+                                        '--top': `${band.topPct}%`, '--height': `${band.heightPct}%`
+                                    }}/>
+                                ))}
+
                                 {Array.from({length: 48}, (_, i) => (
                                     <div key={i} className={`cal-hourline${i % 2 === 1?' is-hour':''}`}/>
                                 ))}
@@ -232,6 +294,43 @@ export function TimeGrid({days, entries, onCreate, onMove, onOpen}){
                                     const isDragging = drag?.entry?._id === item.entry._id && drag.moved
                                     const width = 100 / item.cols
                                     const short = item.heightPct < 3.2
+                                    const isExternal = Boolean(item.entry.isExternal)
+
+                                    /**
+                                     * An entry from Google is shown and nothing else.
+                                     *
+                                     * No drag, no resize handle, no dialog — it belongs to
+                                     * another system and this one only holds a copy. The
+                                     * mousedown is swallowed all the same: without that,
+                                     * pressing on it would fall through to the column
+                                     * underneath and start creating an entry.
+                                     */
+                                    if(isExternal) return (
+                                        <div key={item.entry._id} className="cal-event is-external"
+                                            title={`${item.entry.taskTitle}\n${fmtTime(item.start)}–${fmtTime(item.end)}\n${t('calendar.fromGoogle')}`}
+                                            onMouseDown={ev => ev.stopPropagation()}
+                                            style={{
+                                                '--top': `${item.topPct}%`,
+                                                '--height': `${item.heightPct}%`,
+                                                '--left': `${item.col * width}%`,
+                                                '--width': `${width}%`
+                                            }}>
+                                            {short?(
+                                                <div className="cal-event-short">
+                                                    <span className="cal-event-title">{item.entry.taskTitle}</span>
+                                                    <span className="cal-event-sub">{fmtTime(item.start)}</span>
+                                                </div>
+                                            ):(
+                                                <>
+                                                    <div className="cal-event-title">{item.entry.taskTitle}</div>
+                                                    <div className="cal-event-sub">
+                                                        {fmtTime(item.start)}–{fmtTime(item.end)}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    )
+
                                     return (
                                         <div key={item.entry._id} className={`cal-event${isDragging?' is-dragging':''}` +
                                             `${item.continuesBefore?' is-continues-before':''}` +

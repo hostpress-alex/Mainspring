@@ -3,6 +3,9 @@ import {useSelector} from 'react-redux'
 import {Link} from 'react-router-dom'
 
 import {scheduleService} from '../services/schedule.service'
+import {externalEvents} from '../services/calendar-sync.service'
+import {myWorkHours, weekSummary} from '../services/workhours.service'
+import {WeekBar} from '../cmps/calendar/week-bar'
 import {boardService} from '../services/board.service'
 import { Avatar } from '../cmps/avatar'
 import {TimeGrid} from '../cmps/calendar/time-grid'
@@ -27,6 +30,11 @@ export function CalendarPage(){
     const [view, setView] = useState(() => localStorage.getItem('calView') || 'week')
     const [anchor, setAnchor] = useState(() => startOfDay(new Date()))
     const [entries, setEntries] = useState([])
+    // Everything that comes from outside: read-only, and kept apart from the
+    // entries so that nothing can accidentally save one of them.
+    const [external, setExternal] = useState([])
+    const [workHours, setWorkHours] = useState([])
+    const [summary, setSummary] = useState(null)
     const [tasks, setTasks] = useState([])
     const [draft, setDraft] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -44,6 +52,9 @@ export function CalendarPage(){
     const load = useCallback(async() => {
         setErr(null)
         try {
+            // Own entries first and alone in the error path: a calendar
+            // without the Google mirror is still a calendar, but one without
+            // its own entries is broken and has to say so.
             const list = await scheduleService.query(range.from, range.to)
             setEntries(list)
         } catch(e) {
@@ -51,7 +62,23 @@ export function CalendarPage(){
         } finally {
             setIsLoading(false)
         }
+
+        // The three below are additions to the picture. A server that has
+        // never seen a Google key answers them with nothing, and the page
+        // looks exactly as it did before this feature existed.
+        externalEvents(range.from, range.to)
+            .then(res => setExternal(res.events || []))
+            .catch(() => setExternal([]))
+        weekSummary(range.from, range.to)
+            .then(setSummary)
+            .catch(() => setSummary(null))
     }, [range.from.getTime(), range.to.getTime()])
+
+    // Working hours change about twice a year, so they are not part of the
+    // window load.
+    useEffect(() => {
+        myWorkHours().then(res => setWorkHours(res.days || [])).catch(() => setWorkHours([]))
+    }, [])
 
     useEffect(() => {
         setIsLoading(true);
@@ -145,16 +172,20 @@ export function CalendarPage(){
                 </div>
             </div>
 
-            {err && <div className="cal-error" className="cal-error">{err}</div>}
+            {err && <div className="cal-error">{err}</div>}
+
+            <WeekBar summary={summary} view={view}/>
             {isLoading && <div className="cal-loading">{t('common.loading')}</div>}
 
             {view === 'month'?(
-                <MonthGrid date={anchor} entries={entries} onCreate={setDraft} onOpen={setDraft} onPickDay={day => {
+                <MonthGrid date={anchor} entries={entries} external={external} workHours={workHours} onCreate={setDraft} onOpen={setDraft} onPickDay={day => {
                     setAnchor(startOfDay(day));
                     setView('day')
                 }}/>
             ):(
-                <TimeGrid days={view === 'day'?[startOfDay(anchor)]:weekDays(anchor)} entries={entries} onCreate={setDraft} onMove={onMove} onOpen={setDraft}/>
+                <TimeGrid days={view === 'day'?[startOfDay(anchor)]:weekDays(anchor)} entries={entries}
+                    external={external} workHours={workHours}
+                    onCreate={setDraft} onMove={onMove} onOpen={setDraft}/>
             )}
 
             {draft && (
