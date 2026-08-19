@@ -33,17 +33,31 @@ const sid = v => (v === undefined || v === null)?'':String(v)
  * decides the rest of it.
  */
 async function busyFor(userId, from, to){
-    const [entries, events] = await Promise.all([
+    const now = new Date()
+    const [entries, started, events] = await Promise.all([
         db()('schedule')
             .where({user_id: sid(userId), source: 'manual'})
             .where('start_at', '<', new Date(to)).where('end_at', '>', new Date(from))
+            .select('start_at', 'end_at'),
+        /**
+         * The planner's own blocks that have already begun.
+         *
+         * Those are the ones `replaceAuto` deliberately leaves alone — nobody
+         * wants the hour they are sitting in rewritten. But leaving them
+         * standing while not counting them as taken is how the planner ends
+         * up laying a second block over the one it just spared, which is
+         * exactly what it did on the first run with a button behind it.
+         */
+        db()('schedule')
+            .where({user_id: sid(userId), source: 'auto'})
+            .where('start_at', '<', now).where('end_at', '>', new Date(from))
             .select('start_at', 'end_at'),
         db()('external_event')
             .where({user_id: sid(userId)})
             .where('start_at', '<', new Date(to)).where('end_at', '>', new Date(from))
             .select('start_at', 'end_at')
     ])
-    return [...entries, ...events].map(row => ({
+    return [...entries, ...started, ...events].map(row => ({
         start: new Date(row.start_at).getTime(),
         end: new Date(row.end_at).getTime()
     }))

@@ -15,6 +15,7 @@ const roles = require('./board.roles')
 const notifications = () => require('../notification/notification.service')
 const automations = () => require('../automation/automation.service')
 const priorities = () => require('../priority/priority.service')
+const planning = () => require('../planner/planner.triggers')
 const automationEngine = require('../automation/automation.engine')
 const viewRepo = require('./board-view.repo')
 const sockets = () => require('../../services/socket.service')
@@ -741,6 +742,7 @@ async function addTask(boardId, groupId, task, index = null){
     // board's own list. A subtask appearing under a task is a different
     // sentence and would need a trigger of its own.
     await automations().fire({board, kind: 'created', groupId, task, changes: []})
+    planning().onTaskAdded({task})
     return await _pushed(boardId)
 }
 
@@ -827,6 +829,9 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
     await automations().fire({
         board, kind: 'changed', groupId, task: {...oldTask, ...patch},
         changes: automationEngine.changesOf(patch, oldTask, board.columns)})
+    // Not awaited and never able to throw: the calendar redoing itself is a
+    // consequence of this write, not a part of it.
+    planning().onTaskChanged({board, oldTask, patch})
     return await _pushed(boardId)
 }
 

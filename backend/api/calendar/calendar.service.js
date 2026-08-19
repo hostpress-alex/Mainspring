@@ -86,6 +86,8 @@ async function syncUser(userId){
         const events = raw.map(google.normalise).filter(Boolean).filter(e => !e.isCancelled)
         const written = await linkRepo.replaceWindow(userId, from, to, events)
         await linkRepo.noteSync(userId, {error: null})
+        // What is free has moved, so what was planned into it may be wrong.
+        require('../planner/planner.triggers').onCalendarSynced(userId)
         return {ok: true, count: written}
     } catch(err) {
         logger.error(`google sync failed for ${link.externalEmail}`, err)

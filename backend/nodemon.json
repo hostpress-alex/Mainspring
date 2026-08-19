@@ -1,0 +1,22 @@
+{
+    "_comment": [
+        "What nodemon may restart for, and — the point of this file — what not.",
+        "Without it nodemon watches everything under backend/, and the server",
+        "writes into two of those folders while it runs: every logged line in",
+        "logs/ and every uploaded file in uploads/ restarted it. In the middle",
+        "of an upload that is a request the browser never gets an answer to, and",
+        "a test run, which logs thousands of lines, holds the server down for as",
+        "long as it takes.",
+        "Restarts belong to source changes. Nothing here is a source change."
+    ],
+    "watch": ["."],
+    "ext": "js,json",
+    "ignore": [
+        "logs/*",
+        "uploads/*",
+        "test/*",
+        "node_modules/*",
+        "db/migrations/*"
+    ],
+    "delay": 300
+}

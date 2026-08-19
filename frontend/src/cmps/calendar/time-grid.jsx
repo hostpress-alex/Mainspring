@@ -333,6 +333,11 @@ export function TimeGrid({days, entries, external = [], workHours = [], onCreate
 
                                     return (
                                         <div key={item.entry._id} className={`cal-event${isDragging?' is-dragging':''}` +
+                                            // Laid by the planner. Still movable — and
+                                            // moving one makes it yours, which the server
+                                            // records. See schedule.repo.
+                                            `${item.entry.source === 'auto'?' is-planned':''}` +
+                                            `${item.entry.isAssumed?' is-assumed':''}` +
                                             `${item.continuesBefore?' is-continues-before':''}` +
                                             `${item.continuesAfter?' is-continues-after':''}`} title={`${item.entry.taskTitle}\n${fmtTime(item.start)}–${fmtTime(item.end)}\n${item.entry.boardTitle} · ${item.entry.groupTitle}`} style={{
                                             '--entry-color': item.entry.color || '#0073ea',

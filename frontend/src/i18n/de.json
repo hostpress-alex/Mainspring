@@ -502,6 +502,37 @@
   "panel": {
     "width": "Breite ziehen — Doppelklick setzt zurück"
   },
+  "planner": {
+    "allFits": "Alles untergebracht.",
+    "assumed": {
+      "one": "1 Block beruht auf einer angenommenen Stunde — dort fehlt eine geschätzte Zeit.",
+      "other": "{n} Blöcke beruhen auf einer angenommenen Stunde — dort fehlt eine geschätzte Zeit."
+    },
+    "nothingToDo": "Nichts zu planen.",
+    "planWeek": "Diese Woche planen",
+    "reason": {
+      "alreadyPlanned": "steht schon im Kalender",
+      "alreadyWorked": "Zeit bereits erfasst",
+      "deadline": "{hours} Std. passen nicht mehr vor die Deadline",
+      "done": "erledigt",
+      "hasSubtasks": "hat Subtasks",
+      "horizon": "{hours} Std. passen diese Woche nicht mehr — kommt nächste Woche dran",
+      "noWorkHours": "keine Arbeitszeiten hinterlegt"
+    },
+    "result": {
+      "one": "1 Block geplant · {hours} Std.",
+      "other": "{n} Blöcke geplant · {hours} Std."
+    },
+    "running": "Plane …",
+    "skippedTitle": {
+      "one": "1 Task übersprungen",
+      "other": "{n} Tasks übersprungen"
+    },
+    "unplacedTitle": {
+      "one": "1 Task passt nicht",
+      "other": "{n} Tasks passen nicht"
+    }
+  },
   "preview": {
     "download": "Herunterladen",
     "empty": "Die Datei ist leer",

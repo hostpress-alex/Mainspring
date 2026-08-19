@@ -502,6 +502,37 @@
   "panel": {
     "width": "Drag to resize — double-click resets"
   },
+  "planner": {
+    "allFits": "Everything fits.",
+    "assumed": {
+      "one": "1 block rests on an assumed hour — no duration was estimated there.",
+      "other": "{n} blocks rest on an assumed hour — no duration was estimated there."
+    },
+    "nothingToDo": "Nothing to plan.",
+    "planWeek": "Plan this week",
+    "reason": {
+      "alreadyPlanned": "already in the calendar",
+      "alreadyWorked": "time already recorded",
+      "deadline": "{hours} hrs no longer fit before the deadline",
+      "done": "finished",
+      "hasSubtasks": "has subtasks",
+      "horizon": "{hours} hrs do not fit this week — next week then",
+      "noWorkHours": "no working hours set"
+    },
+    "result": {
+      "one": "1 block planned · {hours} hrs",
+      "other": "{n} blocks planned · {hours} hrs"
+    },
+    "running": "Planning …",
+    "skippedTitle": {
+      "one": "1 task skipped",
+      "other": "{n} tasks skipped"
+    },
+    "unplacedTitle": {
+      "one": "1 task does not fit",
+      "other": "{n} tasks do not fit"
+    }
+  },
   "preview": {
     "download": "Download",
     "empty": "The file is empty",

@@ -89,7 +89,7 @@ export function MonthGrid({date, entries, external = [], workHours = [], onCreat
                                             <span className="cal-chip-title">{e.taskTitle}</span>
                                         </div>
                                     ):(
-                                        <div key={e._id} className="cal-chip" style={{'--entry-color': e.color || '#0073ea'}} title={`${e.taskTitle}\n${e.boardTitle} · ${e.groupTitle}`} onMouseDown={ev => {
+                                        <div key={e._id} className={`cal-chip${e.source === 'auto'?' is-planned':''}`} style={{'--entry-color': e.color || '#0073ea'}} title={`${e.taskTitle}\n${e.boardTitle} · ${e.groupTitle}`} onMouseDown={ev => {
                                             ev.stopPropagation();
                                             onOpen(e)
                                         }}>

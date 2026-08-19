@@ -6,6 +6,8 @@ import {scheduleService} from '../services/schedule.service'
 import {externalEvents} from '../services/calendar-sync.service'
 import {myWorkHours, weekSummary} from '../services/workhours.service'
 import {WeekBar} from '../cmps/calendar/week-bar'
+import {PlanReport} from '../cmps/calendar/plan-report'
+import {runPlan} from '../services/planner.service'
 import {boardService} from '../services/board.service'
 import { Avatar } from '../cmps/avatar'
 import {TimeGrid} from '../cmps/calendar/time-grid'
@@ -38,8 +40,33 @@ export function CalendarPage(){
     const [tasks, setTasks] = useState([])
     const [draft, setDraft] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [report, setReport] = useState(null)
+    const [isPlanning, setIsPlanning] = useState(false)
     const [busy, setBusy] = useState(false)
     const [err, setErr] = useState(null)
+
+    /**
+     * Plan this week.
+     *
+     * The plan is written and then the window is loaded again rather than
+     * being patched in from the answer: the planner touches entries outside
+     * the visible range as well, and a calendar that shows a mixture of what
+     * it was told and what is stored is the bug that took the board weeks to
+     * get rid of.
+     */
+    async function onPlanWeek(){
+        if(isPlanning) return
+        setIsPlanning(true)
+        setErr(null)
+        try {
+            setReport(await runPlan())
+            await load()
+        } catch(e) {
+            setErr(readErr(e))
+        } finally {
+            setIsPlanning(false)
+        }
+    }
 
     /** Visible time range — decides what gets loaded. */
     const range = useMemo(() => {
@@ -161,6 +188,12 @@ export function CalendarPage(){
                         setDraft({start, end: new Date(start.getTime() + 60 * MS_MIN)})
                     }}>+ Zeit einplanen
                     </button>
+                    {/* Plans this week and no further — see the planner. The
+                        report below says what did not fit; the calendar behind
+                        it already shows what did. */}
+                    <button className="cal-plan-btn" disabled={isPlanning} onClick={onPlanWeek}>
+                        {isPlanning?t('planner.running'):t('planner.planWeek')}
+                    </button>
                     <div className="cal-switch">
                         {VIEWS.map(v => (
                             <button key={v.key} className={view === v.key?'is-active':''} onClick={() => setView(v.key)}>{v.label}</button>
@@ -175,6 +208,8 @@ export function CalendarPage(){
             {err && <div className="cal-error">{err}</div>}
 
             <WeekBar summary={summary} view={view}/>
+
+            <PlanReport report={report} onClose={() => setReport(null)}/>
             {isLoading && <div className="cal-loading">{t('common.loading')}</div>}
 
             {view === 'month'?(
