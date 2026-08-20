@@ -3,12 +3,15 @@
     "private":         true,
     "description":     "Convenience wrapper. The real projects are backend/ and frontend/.",
     "scripts":         {
-        "predev": "npm run stop --silent",
-        "dev":    "concurrently -n api,web -c blue,magenta --kill-others \"npm --prefix backend start\" \"npm --prefix frontend start\"",
-        "stop":   "sh scripts/stop-ports.sh",
-        "build":  "npm --prefix frontend run build",
-        "test":   "npm --prefix backend test && npm --prefix frontend test -- --run",
-        "setup":  "npm --prefix backend install && npm --prefix frontend install"
+        "predev":   "npm run stop --silent",
+        "dev":      "concurrently -n api,web -c blue,magenta --kill-others \"npm --prefix backend start\" \"npm --prefix frontend start\"",
+        "stop":     "sh scripts/stop-ports.sh",
+        "build":    "npm --prefix frontend run build",
+        "test":     "npm --prefix backend test && npm --prefix frontend test -- --run",
+        "test:api": "npm --prefix backend test",
+        "test:web": "npm --prefix frontend test -- --run",
+        "test:log": "npm test > test.log 2>&1; echo \"-> test.log\"; tail -30 test.log",
+        "setup":    "npm --prefix backend install && npm --prefix frontend install"
     },
     "devDependencies": {
         "concurrently": "^10.0.5"

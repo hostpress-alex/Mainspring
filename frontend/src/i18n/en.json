@@ -322,7 +322,11 @@
     "yesterday": "was due yesterday"
   },
   "errors": {
+    "loadFailed": "Could not be loaded.",
     "loginFailed": "Username or password is wrong.",
+    "notAllowed": "You are not allowed to do that. The change was not saved.",
+    "offline": "No connection to the server. The change was not saved.",
+    "saveFailed": "Could not be saved.",
     "signupFailed": "The account could not be created.",
     "tooManyAttempts": {
       "one": "Too many failed attempts. Please try again in a minute.",

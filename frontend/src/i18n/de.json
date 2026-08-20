@@ -322,7 +322,11 @@
     "yesterday": "gestern fällig"
   },
   "errors": {
+    "loadFailed": "Konnte nicht geladen werden.",
     "loginFailed": "Benutzername oder Passwort stimmt nicht.",
+    "notAllowed": "Dafür fehlt die Berechtigung. Die Änderung wurde nicht gespeichert.",
+    "offline": "Keine Verbindung zum Server. Die Änderung wurde nicht gespeichert.",
+    "saveFailed": "Konnte nicht gespeichert werden.",
     "signupFailed": "Das Konto konnte nicht angelegt werden.",
     "tooManyAttempts": {
       "one": "Zu viele Fehlversuche. Bitte in einer Minute erneut probieren.",

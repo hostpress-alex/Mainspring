@@ -12,6 +12,7 @@ import {store} from './store/store'
 import {ensureSession} from './store/user.actions'
 import {ensureLoaded as ensurePriorities} from './services/priority.store'
 import {ConfirmHost} from './cmps/confirm-dialog'
+import {UserMsgHost} from './cmps/user-msg'
 import {ErrorBoundary} from './cmps/error-boundary'
 
 /**
@@ -111,6 +112,10 @@ export function RootCmp(){
                 </main>
                 {/* Exactly one confirmation dialog for the whole application. */}
                 <ConfirmHost/>
+                {/* And exactly one place where a failure is admitted to.
+                    Outside the routes on purpose: a message that disappears
+                    because the page changed underneath it has said nothing. */}
+                <UserMsgHost/>
             </div>
         </Provider>
     )

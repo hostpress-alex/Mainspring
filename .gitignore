@@ -45,3 +45,6 @@ HANDOVER.md
 CLAUDE.md
 
 .DS_Store
+# Output of `npm run test:log` — a scratch file, never a record.
+test.log
+/logs/

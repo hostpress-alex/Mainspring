@@ -1,0 +1,104 @@
+@use "../setup/variables";
+
+/**
+ * Bottom left, clear of the rail.
+ *
+ * Top right is where this app puts the account menu, the invite button and
+ * the notification bell — a box that appears there covers the controls
+ * somebody reaches for straight after a failure. Bottom left is empty on
+ * every screen, EXCEPT for the last 70 pixels: the icon rail runs down the
+ * left edge and ends in the profile picture, which sat right on top of the
+ * first message this component ever showed. Hence the offset rather than the
+ * corner. Pages without the rail simply start a little further in, which
+ * nobody notices.
+ */
+.user-msg-stack {
+    position: fixed;
+    left: 90px;
+    bottom: 24px;
+    z-index: var(--z-message);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: min(420px, calc(100vw - 110px));
+}
+
+.user-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    box-sizing: border-box;
+    padding: 12px 12px 12px 14px;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .22);
+    background: variables.$app-bg;
+    color: variables.$primary-text-color;
+    font-size: 14px;
+    line-height: 1.45;
+    /* The colour is the second signal, never the only one — hence the icon
+       and the wording. A red bar alone is unreadable to a part of the team. */
+    border-left: 4px solid #d83a52;
+}
+
+.user-msg.is-success {
+    border-left-color: #00c875;
+}
+
+.user-msg-icon {
+    margin-top: 2px;
+    color: #d83a52;
+}
+
+.user-msg.is-success .user-msg-icon {
+    color: #00c875;
+}
+
+.user-msg-txt {
+    flex: 1;
+    /* A server message can be one long unbroken string. Without this it
+       pushes the close button off the edge of the box. */
+    overflow-wrap: anywhere;
+}
+
+.user-msg-count {
+    align-self: center;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: variables.$workspace-hover;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.user-msg-close {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: variables.$workspace-icon-color;
+    font: inherit;
+    cursor: pointer;
+}
+
+.user-msg-close:hover {
+    background: variables.$workspace-hover;
+    color: variables.$primary-text-color;
+}
+
+.user-msg-close:focus-visible {
+    outline: 2px solid variables.$primary-text-color;
+    outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .user-msg {
+        animation: user-msg-in 140ms ease-out;
+    }
+}
+
+@keyframes user-msg-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+}

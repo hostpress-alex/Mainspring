@@ -44,4 +44,12 @@
      * "are you sure" and a buried question is an unanswerable one.
      */
     --z-confirm: 600;
+
+    /**
+     * Telling somebody a thing failed. Above the confirmation, because the
+     * write that failed is often the one a confirmation had just approved —
+     * and a failure hidden behind the dialog that caused it is the one
+     * message nobody would ever see.
+     */
+    --z-message: 700;
 }
