@@ -735,7 +735,12 @@ async function reorderGroups(boardId, groupIds){
 async function addTask(boardId, groupId, task, index = null){
     const board = await _requireBoard(boardId, {editor: true})
     _findGroup(board, groupId)
-    if(!task || !task.id) throw httpError(400, 'task.id fehlt')
+    if(!task) throw httpError(400, 'task fehlt')
+    // The browser makes its own id — it has to, because it draws the row
+    // before the answer comes back. A caller over the API has no reason to
+    // invent one, and asking it to would mean asking it to guarantee
+    // uniqueness in a format it cannot see. So: bring one or get one.
+    if(!task.id) task = {...task, id: boardRepo.newTaskId()}
     await boardRepo.addTask(boardId, groupId, task, index, getLoggedinUser())
     await notifications().taskAdded({board, groupId, task, actor: getLoggedinUser()})
     // Only a task, never a subtask: "when an item is created" is about the
@@ -743,6 +748,41 @@ async function addTask(boardId, groupId, task, index = null){
     // sentence and would need a trigger of its own.
     await automations().fire({board, kind: 'created', groupId, task, changes: []})
     planning().onTaskAdded({task})
+    return await _pushed(boardId)
+}
+
+/**
+ * One update on a task.
+ *
+ * Its own path rather than a task write with a longer `comments` array. Two
+ * callers posting at the same moment through the task write would each send
+ * their own idea of the whole list and one of the two updates would simply be
+ * gone — which is invisible, because the list still looks plausible.
+ *
+ * A viewer may do this. Reading the board and writing updates is exactly what
+ * that role is, so this deliberately does NOT ask for editing rights.
+ */
+async function addComment(boardId, groupId, taskId, {txt = '', parentId = null} = {}){
+    const board = await _requireBoard(boardId)
+    const clean = String(txt || '').trim()
+    if(!clean) throw httpError(400, 'txt fehlt')
+    const user = getLoggedinUser()
+    const written = await boardRepo.addComment(boardId, taskId, {
+        txt: clean,
+        parentId,
+        byUserId: user && user._id?user._id:null,
+        archivedAt: Date.now()
+    })
+    const group = (board.groups || []).find(g => g.id === written.groupId)
+    const task = group?(group.tasks || []).find(t => t.id === String(taskId)):null
+    await notifications().commentAdded({
+        board,
+        groupId: written.groupId,
+        taskId,
+        subject: task?task.title || '':'',
+        comment: {id: written.id, txt: clean},
+        actor: user
+    })
     return await _pushed(boardId)
 }
 
@@ -1128,6 +1168,7 @@ function _requireShareRights(board){
 }
 
 module.exports = {
+    addComment,
     remove,
     query,
     getById,

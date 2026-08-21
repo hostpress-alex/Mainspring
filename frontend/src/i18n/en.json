@@ -194,6 +194,7 @@
     "chooseBoardFirst": "Choose a board first",
     "duration": "Duration",
     "edit": "Edit entry",
+    "editEntry": "Edit calendar entry",
     "end": "End",
     "endAfterStart": "The end must be after the start.",
     "endBeforeStart": "End is before the start",
@@ -214,11 +215,15 @@
     "openDayView": "Open day view",
     "planned": "Planned: {duration}",
     "searchTask": "Search task",
+    "spentOf": "{spent} of {estimate} recorded",
+    "spentOnly": "{spent} recorded, no estimate",
+    "spentOver": "{spent} of {estimate} recorded — over the estimate",
     "start": "Start",
     "syncFailed": "Failed",
     "syncNow": "Fetch now",
     "taskRequired": "Please choose a task.",
     "thisEntry": "This calendar entry",
+    "timerHere": "The timer is running on this task",
     "today": "Today"
   },
   "chart": {

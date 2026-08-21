@@ -1,7 +1,8 @@
 import {useState} from 'react'
-import {useNavigate} from 'react-router-dom'
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom'
 import {Icon} from '../icon'
 import {t} from '../../i18n'
+import {withTaskParams} from '../../services/task-link'
 import {timeService, formatClock} from '../../services/time.service'
 import {useRunningTimer, useRunningSpan, setRunning, refreshRunning, notifyTimesChanged} from './use-running-timer'
 import {TimeNoteDialog} from './time-note-dialog'
@@ -21,22 +22,31 @@ export function RunningTimer(){
     const running = useRunningTimer()
     const [dialog, setDialog] = useState(null)
     const navigate = useNavigate()
+    const location = useLocation()
+    const [searchParams] = useSearchParams()
 
     const elapsed = useRunningSpan(running)
 
     if(!running) return null
 
     /**
-     * Straight to the task, not just to its board.
+     * Straight to the task, and without leaving the page.
      *
-     * The route to a task is /board/:boardId/:groupId/:taskId, which is why
-     * the running entry carries its group — the server sends it along, so this
-     * does not have to go looking for a board it may not have loaded.
+     * This sits in the sidebar, so it is clicked from the calendar and the
+     * profile as often as from a board — the two places where being thrown
+     * onto a board is most jarring. The running entry carries its group; the
+     * server sends it along, so this does not have to go looking for a board
+     * it may not have loaded.
      */
     function onOpenTask(){
-        navigate(running.groupId
-            ?`/board/${running.boardId}/${running.groupId}/${running.taskId}`
-            :`/board/${running.boardId}`)
+        if(!running.groupId){
+            navigate(`/board/${running.boardId}`)
+            return
+        }
+        navigate({
+            pathname: location.pathname,
+            search: `?${withTaskParams(searchParams, running).toString()}`
+        })
     }
 
     async function onConfirm({mode, note, postUpdate, endedAt}){

@@ -289,26 +289,65 @@ async function taskPatched({board, groupId, oldTask, patch, parentId = null, act
             const onBoard = new Set((board.members || []).filter(Boolean).map(m => sid(m._id)))
 
             for(const comment of comments){
-                const mentioned = mentionedIds(comment.txt).map(sid).filter(id => onBoard.has(id))
-                const detail = {text: preview(comment.txt), commentId: sid(comment.id) || null}
-
-                // A mention reaches you whether or not you follow the task —
-                // that is the entire point of typing somebody's name. It also
-                // subscribes you, so you hear the answer.
-                if(mentioned.length){
-                    await notificationRepo.subscribe(base.boardId, base.taskId, mentioned, now)
-                    out.push(...await deliver(mentioned, {...base, kind: 'mention', detail}, actor))
-                }
-
-                // and everyone else who was already listening, minus the
-                // mentioned — one comment must not arrive twice.
-                out.push(...await deliver(
-                    listeners.filter(id => !mentioned.includes(id)),
-                    {...base, kind: 'comment', detail}, actor))
+                out.push(...await tellAboutComment({base, listeners, onBoard, comment, actor, now}))
             }
         }
 
         return out
+    })
+}
+
+/**
+ * Who hears about one comment.
+ *
+ * Lifted out of taskPatched when the API grew a route that appends a single
+ * update without rewriting the task. Two copies of this would have drifted,
+ * and the way they drift is silent: one path notifies mentions and the other
+ * stops doing it after somebody edits only the copy they were looking at.
+ */
+async function tellAboutComment({base, listeners, onBoard, comment, actor, now}){
+    const out = []
+    const mentioned = mentionedIds(comment.txt).map(sid).filter(id => onBoard.has(id))
+    const detail = {text: preview(comment.txt), commentId: sid(comment.id) || null}
+
+    // A mention reaches you whether or not you follow the task — that is the
+    // entire point of typing somebody's name. It also subscribes you, so you
+    // hear the answer.
+    if(mentioned.length){
+        await notificationRepo.subscribe(base.boardId, base.taskId, mentioned, now)
+        out.push(...await deliver(mentioned, {...base, kind: 'mention', detail}, actor))
+    }
+
+    // and everyone else who was already listening, minus the mentioned — one
+    // comment must not arrive twice.
+    out.push(...await deliver(
+        listeners.filter(id => !mentioned.includes(id)),
+        {...base, kind: 'comment', detail}, actor))
+    return out
+}
+
+/**
+ * One update, appended through the API rather than written with the task.
+ *
+ * Same rules as the browser path, reached from `board.service.addComment`.
+ */
+async function commentAdded({board, groupId, taskId, subject = '', comment, actor}){
+    return await safely('commentAdded', async () => {
+        const base = {
+            boardId: sid(board._id),
+            boardTitle: board.title || '',
+            taskId: sid(taskId),
+            subject: subject || '',
+            groupId: sid(groupId),
+            parentId: null
+        }
+        const now = Date.now()
+        // Writing on a task subscribes you to it, same as in the browser.
+        if(actor && actor._id) await notificationRepo.subscribe(base.boardId, base.taskId, [sid(actor._id)], now)
+        const listeners = (await notificationRepo.subscribersOf(base.boardId, base.taskId))
+            .filter(id => !actor || sid(id) !== sid(actor._id))
+        const onBoard = new Set((board.members || []).filter(Boolean).map(m => sid(m._id)))
+        return await tellAboutComment({base, listeners, onBoard, comment, actor, now})
     })
 }
 
@@ -418,6 +457,7 @@ module.exports = {
     withPeople,
     taskPatched,
     taskAdded,
+    commentAdded,
     commentReacted,
     boardMembersChanged,
     automationFired,

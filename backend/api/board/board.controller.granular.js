@@ -102,6 +102,12 @@ module.exports = {
     /* A subtask is a task, so it is only created and reordered through routes
        of its own. Changing and deleting one goes through the ordinary task
        routes — the service finds a subtask there as well. */
+    /* One update on a task, appended. Its own route rather than a task write
+       with a longer comments array — see board.service.addComment. */
+    postComment: handler(req =>
+        boardService.addComment(req.params.boardId, req.params.groupId, req.params.taskId, req.body || {}),
+        'Update konnte nicht gespeichert werden'),
+
     postSubtask: handler(req =>
         boardService.addSubtask(req.params.boardId, req.params.groupId, req.params.taskId,
             req.body.task, req.body.index ?? null), 'Subtask konnte nicht angelegt werden'),

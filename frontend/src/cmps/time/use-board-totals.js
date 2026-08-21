@@ -74,3 +74,42 @@ export function useBoardTotals(boardId){
 
     return (cache.get(boardId) || {}).totals || {}
 }
+
+/**
+ * The same, for several boards at once.
+ *
+ * The calendar needs it: one week can hold blocks from three boards, and the
+ * totals endpoint answers per board. Every id goes through the same cache and
+ * the same epoch as `useBoardTotals`, so a board already loaded by a row on
+ * screen is not fetched a second time.
+ *
+ * Returns one flat map, keyed `boardId:taskId`. NOT keyed by task id alone:
+ * task ids are only unique within their board, and a calendar is the one place
+ * where two boards' tasks sit in the same list.
+ */
+export function useTotalsForBoards(boardIds = []){
+    const changed = useTimesChanged()
+    const [, bump] = useState(0)
+    // A stable key, so a new array of the same ids does not re-fetch.
+    const key = [...new Set(boardIds.filter(Boolean).map(String))].sort().join(',')
+
+    useEffect(() => {
+        const notify = () => bump(n => n + 1)
+        listeners.add(notify)
+        return () => { listeners.delete(notify) }
+    }, [])
+
+    useEffect(() => {
+        if(!key) return
+        for(const boardId of key.split(',')) load(boardId, changed)
+    }, [key, changed])
+
+    const out = {}
+    if(key){
+        for(const boardId of key.split(',')){
+            const totals = (cache.get(boardId) || {}).totals || {}
+            for(const [taskId, ms] of Object.entries(totals)) out[`${boardId}:${taskId}`] = ms
+        }
+    }
+    return out
+}

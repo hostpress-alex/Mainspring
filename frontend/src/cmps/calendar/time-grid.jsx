@@ -4,6 +4,9 @@ import {
     startOfDay, fmtTime, fmtDuration, pad, WEEKDAYS_SHORT, MS_MIN
 } from '../../services/date.util'
 import {t} from '../../i18n'
+import {EntryMarks} from './entry-marks'
+import {taskKey} from '../../services/task-progress'
+import {Icon} from '../icon'
 
 const SNAP = 15                 // minute grid for dragging and creating
 const MIN_DRAG_MINUTES = 15     // below this it counts as a click, not as a drag
@@ -18,7 +21,16 @@ const GUTTER_PX = 58           // width of the hour rail, see calendar.css
  *  - clicking the empty grid creates an entry of DEFAULT_MINUTES
  *  - dragging an entry moves it (onto another day as well)
  *  - dragging the bottom edge changes the duration
- *  - clicking without moving opens the edit dialog
+ *  - clicking without moving opens the TASK
+ *  - the pencil in the corner opens the entry itself
+ *
+ * The last two used to be one thing, and the wrong one won. An entry in this
+ * calendar is a block of time reserved for a task, and what somebody wants
+ * when they click it is almost always the task — what is it, what has been
+ * said about it, is it done. Its start and end are already changed by dragging
+ * the block, which is the whole reason the grid can be dragged; the dialog
+ * behind them was the rarer of the two answers sitting in the commoner one's
+ * place.
  */
 /**
  * Entries that came from outside, in the shape the layout already
@@ -52,7 +64,7 @@ function offHoursOf(workHours, day){
     return bands
 }
 
-export function TimeGrid({days, entries, external = [], workHours = [], onCreate, onMove, onOpen}){
+export function TimeGrid({days, entries, external = [], workHours = [], taskInfo = {}, onCreate, onMove, onOpen, onOpenTask}){
     const elGrid = useRef()
     const elBody = useRef()
     const [drag, setDrag] = useState(null)
@@ -169,8 +181,9 @@ export function TimeGrid({days, entries, external = [], workHours = [], onCreate
             return
         }
 
+        // A press that did not move is a click, and a click is about the task.
         if(!d.moved){
-            onOpen(d.entry);
+            onOpenTask(d.entry);
             return
         }
 
@@ -345,7 +358,33 @@ export function TimeGrid({days, entries, external = [], workHours = [], onCreate
                                             '--height': `${item.heightPct}%`,
                                             '--left': `${item.col * width}%`,
                                             '--width': `${width}%`
-                                        }} onMouseDown={ev => onEventMouseDown(ev, item, 'move')}>
+                                        }} onMouseDown={ev => onEventMouseDown(ev, item, 'move')}
+                                        // Reachable without a mouse. The block
+                                        // itself cannot be a <button> — it is
+                                        // dragged, and a button swallows that —
+                                        // so it carries the role instead, and
+                                        // the pencil inside it is a real one.
+                                        role="button" tabIndex={0}
+                                        onKeyDown={ev => {
+                                            if(ev.key !== 'Enter' && ev.key !== ' ') return
+                                            ev.preventDefault()
+                                            onOpenTask(item.entry)
+                                        }}>
+                                            <button type="button" className="cal-event-edit"
+                                                title={t('calendar.editEntry')}
+                                                aria-label={t('calendar.editEntry')}
+                                                // Swallowed here, not in onClick:
+                                                // without this the press starts a
+                                                // drag on the block underneath and
+                                                // the click never arrives.
+                                                onMouseDown={ev => ev.stopPropagation()}
+                                                onClick={ev => {
+                                                    ev.stopPropagation()
+                                                    onOpen(item.entry)
+                                                }}>
+                                                <Icon name="pen"/>
+                                            </button>
+                                            <EntryMarks info={taskInfo[taskKey(item.entry.boardId, item.entry.taskId)]}/>
                                             {short?(
                                                 <div className="cal-event-short">
                                                     <span className="cal-event-title">{item.entry.taskTitle}</span>

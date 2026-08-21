@@ -194,6 +194,7 @@
     "chooseBoardFirst": "Erst ein Board wählen",
     "duration": "Dauer",
     "edit": "Eintrag bearbeiten",
+    "editEntry": "Kalendereintrag bearbeiten",
     "end": "Ende",
     "endAfterStart": "Das Ende muss nach dem Beginn liegen.",
     "endBeforeStart": "Ende liegt vor dem Beginn",
@@ -214,11 +215,15 @@
     "openDayView": "Tagesansicht öffnen",
     "planned": "Geplant: {duration}",
     "searchTask": "Task suchen",
+    "spentOf": "{spent} von {estimate} erfasst",
+    "spentOnly": "{spent} erfasst, keine Schätzung",
+    "spentOver": "{spent} von {estimate} erfasst — über der Schätzung",
     "start": "Beginn",
     "syncFailed": "Fehler",
     "syncNow": "Jetzt holen",
     "taskRequired": "Bitte einen Task auswählen.",
     "thisEntry": "Dieser Kalendereintrag",
+    "timerHere": "Der Timer läuft auf diesem Task",
     "today": "Heute"
   },
   "chart": {

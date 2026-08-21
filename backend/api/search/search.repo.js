@@ -114,6 +114,14 @@ async function updates(user, term, limit = PER_TYPE){
             this.on('t.board_id', 'c.board_id').andOn('t.id', 'c.task_id')
         })
         .join('board as b', 'b.id', 'c.board_id')
+        // The author's name is read from the user table, not from a copy on
+        // the comment. There WAS such a copy — `c.by_user_name` — and this
+        // query still selected it after migration 000015 dropped it, so every
+        // search answered 500 with "Unknown column 'c.by_user_name'". Not the
+        // update search: the WHOLE search, because the five kinds are gathered
+        // in one call. A LEFT join, because the author may be null on updates
+        // written before the author was recorded at all.
+        .leftJoin('user as u', 'u.id', 'c.by_user_id')
         .where('t.state', ACTIVE)
         .where('b.state', ACTIVE)
         .whereRaw('LOWER(c.txt) LIKE ?', [needle(term)])
@@ -121,7 +129,7 @@ async function updates(user, term, limit = PER_TYPE){
         // More than asked for: the service throws away the ones that only
         // matched inside a tag, and would otherwise come back short.
         .limit(limit * 4)
-        .select('c.id', 'c.txt', 'c.created_at', 'c.by_user_name', 'c.task_id',
+        .select('c.id', 'c.txt', 'c.created_at', 'u.fullname as by_name', 'c.task_id',
             'c.board_id', 't.title as task_title', 't.group_id', 'b.title as board_title')
     const rows = await onlyMine(q, user)
     return rows.map(r => ({
@@ -129,7 +137,7 @@ async function updates(user, term, limit = PER_TYPE){
         taskId: r.task_id, taskTitle: r.task_title || '',
         groupId: r.group_id,
         boardId: r.board_id, boardTitle: r.board_title || '',
-        byName: r.by_user_name || '',
+        byName: r.by_name || '',
         at: r.created_at === null?null:Number(r.created_at)
     }))
 }

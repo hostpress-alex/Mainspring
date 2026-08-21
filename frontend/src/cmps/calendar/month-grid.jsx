@@ -9,15 +9,20 @@ import {
     MS_MIN
 } from '../../services/date.util'
 import {t} from '../../i18n'
+import {EntryMarks} from './entry-marks'
+import {taskKey} from '../../services/task-progress'
+import {Icon} from '../icon'
 
 const MAX_CHIPS = 3
 
 /**
  * Month view: 6 fixed week rows, so the grid does not jump while paging. A
- * click on a cell creates an entry starting at 09:00, a click on a chip opens
- * it.
+ * click on a cell creates an entry starting at 09:00; a click on a chip opens
+ * the TASK, and the pencil on the chip opens the entry — same split as in the
+ * day and week view, and it has to be the same or the calendar teaches two
+ * different lessons about the same click.
  */
-export function MonthGrid({date, entries, external = [], workHours = [], onCreate, onOpen, onPickDay}){
+export function MonthGrid({date, entries, external = [], workHours = [], taskInfo = {}, onCreate, onOpen, onOpenTask, onPickDay}){
     const days = monthGrid(date)
     const rows = Array.from({length: 6}, (_, i) => days.slice(i * 7, i * 7 + 7))
     const month = date.getMonth()
@@ -89,12 +94,34 @@ export function MonthGrid({date, entries, external = [], workHours = [], onCreat
                                             <span className="cal-chip-title">{e.taskTitle}</span>
                                         </div>
                                     ):(
-                                        <div key={e._id} className={`cal-chip${e.source === 'auto'?' is-planned':''}`} style={{'--entry-color': e.color || '#0073ea'}} title={`${e.taskTitle}\n${e.boardTitle} · ${e.groupTitle}`} onMouseDown={ev => {
-                                            ev.stopPropagation();
-                                            onOpen(e)
-                                        }}>
+                                        <div key={e._id} className={`cal-chip${e.source === 'auto'?' is-planned':''}`} style={{'--entry-color': e.color || '#0073ea'}} title={`${e.taskTitle}\n${e.boardTitle} · ${e.groupTitle}`}
+                                            role="button" tabIndex={0}
+                                            onMouseDown={ev => {
+                                                ev.stopPropagation();
+                                                onOpenTask(e)
+                                            }}
+                                            onKeyDown={ev => {
+                                                if(ev.key !== 'Enter' && ev.key !== ' ') return
+                                                ev.preventDefault()
+                                                onOpenTask(e)
+                                            }}>
                                             <span className="cal-chip-time">{fmtTime(new Date(e.start))}</span>
                                             <span className="cal-chip-title">{e.taskTitle}</span>
+                                            <EntryMarks info={taskInfo[taskKey(e.boardId, e.taskId)]}/>
+                                            <button type="button" className="cal-chip-edit"
+                                                title={t('calendar.editEntry')}
+                                                aria-label={t('calendar.editEntry')}
+                                                onMouseDown={ev => {
+                                                    // The chip opens the task on
+                                                    // mousedown, so the pencil has to
+                                                    // stop it there and not wait for
+                                                    // the click — by then the page has
+                                                    // already changed underneath.
+                                                    ev.stopPropagation()
+                                                    onOpen(e)
+                                                }}>
+                                                <Icon name="pen"/>
+                                            </button>
                                         </div>
                                     ))}
                                     {list.length > MAX_CHIPS && (

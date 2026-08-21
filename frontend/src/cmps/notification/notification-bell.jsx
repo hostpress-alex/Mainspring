@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState, useCallback} from 'react'
 import {createPortal} from 'react-dom'
-import {useNavigate} from 'react-router-dom'
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom'
 import {Tooltip} from '@mui/material'
 
 import {Icon} from '../icon'
@@ -8,6 +8,7 @@ import {Avatar} from '../avatar'
 import {notificationService} from '../../services/notification.service'
 import {socketService} from '../../services/socket.service'
 import {fmtRelative} from '../../services/date.util'
+import {UNKNOWN_GROUP, withTaskParams} from '../../services/task-link'
 import {t} from '../../i18n'
 
 /**
@@ -60,19 +61,20 @@ function sectionOf(createdAt, now){
  */
 
 /**
- * The group segment of the route when the notification does not know one.
+ * The task a notification is about, or null when it is about a whole board.
  *
- * Only rows written before the group travelled along are missing it. The
- * dialog looks the task up across the whole board and treats the group in the
- * URL as a hint, so a placeholder still opens the right task — where sending
- * the person to the board and letting them search would not.
+ * The group is missing on rows written before it travelled along. That is what
+ * UNKNOWN_GROUP is for: the panel looks the task up across the whole board and
+ * treats the group as a hint, so a placeholder still opens the right task —
+ * where sending the person to the board and letting them search would not.
  */
-const UNKNOWN_GROUP = '-'
-
-function targetOf(item){
-    if(!item.taskId) return `/board/${item.boardId}`
-    const groupId = (item.detail && item.detail.groupId) || UNKNOWN_GROUP
-    return `/board/${item.boardId}/${groupId}/${item.taskId}`
+function taskOf(item){
+    if(!item.taskId) return null
+    return {
+        boardId: item.boardId,
+        groupId: (item.detail && item.detail.groupId) || UNKNOWN_GROUP,
+        taskId: item.taskId
+    }
 }
 
 /** The sentence shown for one entry. Every kind has its own key. */
@@ -103,6 +105,8 @@ export function NotificationBell(){
     const bellRef = useRef(null)
     const panelRef = useRef(null)
     const navigate = useNavigate()
+    const location = useLocation()
+    const [searchParams] = useSearchParams()
 
     const load = useCallback(async () => {
         setIsLoading(true)
@@ -178,7 +182,18 @@ export function NotificationBell(){
             setUnread(n => Math.max(0, n - 1))
             notificationService.markRead([item.id]).catch(() => {})
         }
-        navigate(targetOf(item))
+        // A notification about a task opens it over the page that is already
+        // there. Only one about a whole board still goes to the board — there
+        // is nothing smaller to show.
+        const task = taskOf(item)
+        if(!task){
+            navigate(`/board/${item.boardId}`)
+            return
+        }
+        navigate({
+            pathname: location.pathname,
+            search: `?${withTaskParams(searchParams, task).toString()}`
+        })
     }
 
     async function onMarkAll(){

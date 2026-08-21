@@ -1,11 +1,12 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {useEffect, useMemo} from 'react'
 import {useSelector} from 'react-redux'
 import {useParams} from 'react-router-dom'
 
 import {TaskModal} from '../modal/task-modal'
 import {BoardActivityModal} from './board-activity-modal'
 import {setModalOpen} from '../../store/board.actions'
-import {loadPanelWidth, savePanelWidth, clampPanelWidth} from './panel-width'
+import {usePanelWidth} from './use-panel-width'
+import {findTaskInBoard} from '../../services/task-link'
 import {t} from '../../i18n'
 
 /**
@@ -21,112 +22,29 @@ import {t} from '../../i18n'
  * Now everything is derived from the route parameters; the store flag is only
  * kept in step because the background dimming and the socket effect read it.
  *
- * The width can be dragged at the left edge and is remembered per browser.
+ * This one is the board's own panel and handles the path form of the address,
+ * `/board/:boardId/:groupId/:taskId`, plus the board activity log which only
+ * exists here. The same task panel opened from anywhere ELSE — the calendar,
+ * the search, the bell, the timer — is `task-panel-host`, which hangs off the
+ * query string instead. Both render the same `TaskModal` at the same width;
+ * see `services/task-link` for why there are two forms and not one.
  */
 export function BoardModal(){
     const {groupId, taskId, activityLog} = useParams()
     const board = useSelector((storeState) => storeState.boardModule.board)
 
     const isOpen = Boolean((groupId && taskId) || activityLog)
+    const {width, isResizing, onGrabStart, onGrabDoubleClick} = usePanelWidth()
 
-    const [width, setWidth] = useState(loadPanelWidth)
-    const [isResizing, setIsResizing] = useState(false)
-    const startRef = useRef({x: 0, width: 0})
-
-    /**
-     * Find the task the URL names, and the group it is really in.
-     *
-     * The group in the URL is a hint, not the answer. A link can be older than
-     * the board it points into — a notification written this morning still
-     * carries the group the task was in at the time, and moving that task since
-     * is enough to make the link dead. It used to look in that one group and
-     * give up, so clicking the notification changed the address bar and opened
-     * nothing at all, which reads as a broken button.
-     *
-     * So: try the named group first, then the rest of the board. And return
-     * the group it was actually found in — the dialog writes through that id,
-     * and a write into the wrong group is worse than not opening.
-     *
-     * A subtask opens the same dialog a task does — it is a task, it is only
-     * listed under another one. Hence the second level.
-     */
-    const found = useMemo(() => {
-        if(!board || !taskId) return null
-        const groups = board.groups || []
-        const ordered = [
-            ...groups.filter(group => group.id === groupId),
-            ...groups.filter(group => group.id !== groupId)
-        ]
-        for(const group of ordered){
-            for(const task of group.tasks || []){
-                if(task.id === taskId) return {task, groupId: group.id}
-                const child = (task.subtasks || []).find(sub => sub.id === taskId)
-                if(child) return {task: child, groupId: group.id}
-            }
-        }
-        return null
-    }, [board, groupId, taskId])
+    const found = useMemo(
+        () => (board && taskId)?findTaskInBoard(board, groupId, taskId):null,
+        [board, groupId, taskId])
 
     const currTask = found?.task || null
 
     useEffect(() => {
         setModalOpen(isOpen)
     }, [isOpen])
-
-    // If the browser window gets smaller, the panel must not stick out beyond it.
-    useEffect(() => {
-        function onWindowResize(){
-            setWidth(w => clampPanelWidth(w))
-        }
-
-        window.addEventListener('resize', onWindowResize)
-        return () => window.removeEventListener('resize', onWindowResize)
-    }, [])
-
-    const onGrabStart = useCallback(ev => {
-        ev.preventDefault()
-        startRef.current = {x: ev.clientX, width}
-        setIsResizing(true)
-    }, [width])
-
-    useEffect(() => {
-        if(!isResizing) return
-
-        // The panel sits on the right: dragging left makes it wider.
-        function onMove(ev){
-            setWidth(clampPanelWidth(startRef.current.width + (startRef.current.x - ev.clientX)))
-        }
-
-        function onUp(){
-            setIsResizing(false)
-            setWidth(w => {
-                savePanelWidth(w);
-                return w
-            })
-        }
-
-        // While dragging, select nothing and do not let the cursor change.
-        const prevSelect = document.body.style.userSelect
-        const prevCursor = document.body.style.cursor
-        document.body.style.userSelect = 'none'
-        document.body.style.cursor = 'col-resize'
-
-        window.addEventListener('pointermove', onMove)
-        window.addEventListener('pointerup', onUp)
-        return () => {
-            window.removeEventListener('pointermove', onMove)
-            window.removeEventListener('pointerup', onUp)
-            document.body.style.userSelect = prevSelect
-            document.body.style.cursor = prevCursor
-        }
-    }, [isResizing])
-
-    /** Double-click on the handle: back to the base width. */
-    function onGrabDoubleClick(){
-        const next = clampPanelWidth(640)
-        setWidth(next)
-        savePanelWidth(next)
-    }
 
     if(!currTask && !activityLog) return <div></div>
 

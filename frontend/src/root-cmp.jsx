@@ -13,6 +13,7 @@ import {ensureSession} from './store/user.actions'
 import {ensureLoaded as ensurePriorities} from './services/priority.store'
 import {ConfirmHost} from './cmps/confirm-dialog'
 import {UserMsgHost} from './cmps/user-msg'
+import {TaskPanelHost} from './cmps/task/task-panel-host'
 import {ErrorBoundary} from './cmps/error-boundary'
 
 /**
@@ -116,6 +117,10 @@ export function RootCmp(){
                     Outside the routes on purpose: a message that disappears
                     because the page changed underneath it has said nothing. */}
                 <UserMsgHost/>
+                {/* A task opened from somewhere that is not its board — the
+                    calendar, the search, the bell, the timer. Renders nothing
+                    until the address asks for it. */}
+                <TaskPanelHost/>
             </div>
         </Provider>
     )

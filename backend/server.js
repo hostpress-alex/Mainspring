@@ -51,12 +51,22 @@ const workHoursRoutes = require('./api/workhours/workhours.routes')
 const calendarRoutes = require('./api/calendar/calendar.routes')
 const seenRoutes = require('./api/seen/seen.routes')
 const plannerRoutes = require('./api/planner/planner.routes')
+const tokenRoutes = require('./api/token/token.routes')
 const {setupSocketAPI} = require('./services/socket.service')
 
 // routes
 const logger = require('./services/logger.service')
 const setupAsyncLocalStorage = require('./middlewares/setupAls.middleware')
 app.all('/*splat', setupAsyncLocalStorage)
+
+/**
+ * The ceiling for callers holding a token. Before the routes and before the
+ * authentication, so a wrong key is counted like a right one — otherwise the
+ * limit protects only the callers who already got in, and guessing is free.
+ * A browser passes straight through; see the middleware.
+ */
+const {apiRateLimit} = require('./middlewares/rateLimit.middleware')
+app.use('/api', apiRateLimit)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
@@ -73,6 +83,7 @@ app.use('/api/workhours', workHoursRoutes)
 app.use('/api/calendar', calendarRoutes)
 app.use('/api/seen', seenRoutes)
 app.use('/api/planner', plannerRoutes)
+app.use('/api/token', tokenRoutes)
 setupSocketAPI(http)
 
 /**

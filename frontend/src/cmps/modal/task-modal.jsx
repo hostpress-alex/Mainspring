@@ -28,7 +28,7 @@ import {isEmpty as isRichEmpty, toPlainText} from '../../services/rich-text'
 import * as boardRoles from '../../services/board-roles'
 import {t} from '../../i18n'
 
-export function TaskModal({task, board, groupId, setModalCurrTask}){
+export function TaskModal({task, board, groupId, setModalCurrTask, onClose = null}){
     const user = useSelector(storeState => storeState.userModule.user)
     const [comment, setComment] = useState(boardService.getEmptyComment())
     const [isWriteNewUpdate, setIsWriteNewUpdate] = useState(false)
@@ -134,8 +134,16 @@ export function TaskModal({task, board, groupId, setModalCurrTask}){
     }
 
 
+    /**
+     * Closing means "back to what was behind this", and what that is depends
+     * on who opened it. The board's own panel drops the task off the address
+     * and leaves you on the board; opened over the calendar or the search, the
+     * caller passes what to do instead — otherwise closing a task you opened
+     * from the calendar would land you on a board you never asked to see.
+     */
     function onCloseModal(){
-        navigate(`/board/${board._id}`)
+        if(onClose) onClose()
+        else navigate(`/board/${board._id}`)
         setComment(boardService.getEmptyComment())
     }
 

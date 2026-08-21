@@ -1,12 +1,13 @@
 import {useEffect, useMemo, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
-import {useNavigate} from 'react-router-dom'
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom'
 
 import {Icon} from '../icon'
 import {Avatar} from '../avatar'
 import {searchService, MIN_TERM} from '../../services/search.service'
 import {fileSize} from '../task/file-type'
 import {utilService} from '../../services/util.service'
+import {withTaskParams} from '../../services/task-link'
 import {t} from '../../i18n'
 
 /**
@@ -33,6 +34,8 @@ export function SearchPanel({onClose}){
     const [isLoading, setIsLoading] = useState(false)
     const [err, setErr] = useState(null)
     const navigate = useNavigate()
+    const location = useLocation()
+    const [searchParams] = useSearchParams()
     const inputRef = useRef(null)
 
     useEffect(() => {
@@ -67,7 +70,12 @@ export function SearchPanel({onClose}){
         const timer = setTimeout(async () => {
             try {
                 const answer = await searchService.query(clean, tab)
-                if(isCurrent) setResult(answer)
+                if(!isCurrent) return
+                // Cleared on the way IN, not only on the way out: a failed
+                // search left its red line standing above the results of the
+                // next one, which then read as "these results are wrong".
+                setErr(null)
+                setResult(answer)
             } catch(e) {
                 if(isCurrent) setErr(readErr(e))
             } finally {
@@ -84,6 +92,20 @@ export function SearchPanel({onClose}){
     function go(path){
         onClose()
         navigate(path)
+    }
+
+    /**
+     * A search result that IS a task opens over whatever is behind the search
+     * panel, instead of throwing the page away. Typing a search from the
+     * calendar and being put on a board was the old behaviour, and it cost the
+     * week you were looking at to read one update.
+     */
+    function goTask({boardId, groupId, taskId}){
+        onClose()
+        navigate({
+            pathname: location.pathname,
+            search: `?${withTaskParams(searchParams, {boardId, groupId, taskId}).toString()}`
+        })
     }
 
     const counts = useMemo(() => ({
@@ -139,7 +161,7 @@ export function SearchPanel({onClose}){
 
                     {result?.tasks?.map(task => (
                         <button key={'t' + task.id} type="button" className="search-row"
-                            onClick={() => go(`/board/${task.boardId}/${task.groupId}/${task.id}`)}>
+                            onClick={() => goTask({boardId: task.boardId, groupId: task.groupId, taskId: task.id})}>
                             <Icon name={task.isSubtask?'diagram-next':'square-check'} className="search-row-icon"/>
                             <span className="search-row-title">{task.title}</span>
                             <span className="search-row-where">{task.boardTitle} · {task.groupTitle}</span>
@@ -151,7 +173,7 @@ export function SearchPanel({onClose}){
 
                     {result?.updates?.map(update => (
                         <button key={'u' + update.id} type="button" className="search-row"
-                            onClick={() => go(`/board/${update.boardId}/${update.groupId}/${update.taskId}`)}>
+                            onClick={() => goTask({boardId: update.boardId, groupId: update.groupId, taskId: update.taskId})}>
                             <Icon name='comment' variant='fa-regular' className="search-row-icon"/>
                             <span className="search-row-title">{update.preview}</span>
                             <span className="search-row-where">
@@ -165,7 +187,7 @@ export function SearchPanel({onClose}){
 
                     {result?.files?.map(file => (
                         <button key={'f' + file.id} type="button" className="search-row"
-                            onClick={() => go(`/board/${file.boardId}/${file.groupId}/${file.taskId}`)}>
+                            onClick={() => goTask({boardId: file.boardId, groupId: file.groupId, taskId: file.taskId})}>
                             <Icon name='paperclip' className="search-row-icon"/>
                             <span className="search-row-title">{file.name}</span>
                             <span className="search-row-where">

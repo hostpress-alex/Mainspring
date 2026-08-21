@@ -1,8 +1,12 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 import {useSelector} from 'react-redux'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate, useLocation, useSearchParams} from 'react-router-dom'
 
 import {scheduleService} from '../services/schedule.service'
+import {withTaskParams} from '../services/task-link'
+import {estimatesFromBoards, progressOf, taskKey} from '../services/task-progress'
+import {useTotalsForBoards} from '../cmps/time/use-board-totals'
+import {useRunningTimer} from '../cmps/time/use-running-timer'
 import {externalEvents} from '../services/calendar-sync.service'
 import {myWorkHours, weekSummary} from '../services/workhours.service'
 import {WeekBar} from '../cmps/calendar/week-bar'
@@ -29,6 +33,9 @@ const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownEr
 
 export function CalendarPage(){
     const user = useSelector(storeState => storeState.userModule.user)
+    const navigate = useNavigate()
+    const location = useLocation()
+    const [searchParams] = useSearchParams()
     const [view, setView] = useState(() => localStorage.getItem('calView') || 'week')
     const [anchor, setAnchor] = useState(() => startOfDay(new Date()))
     const [entries, setEntries] = useState([])
@@ -38,6 +45,7 @@ export function CalendarPage(){
     const [workHours, setWorkHours] = useState([])
     const [summary, setSummary] = useState(null)
     const [tasks, setTasks] = useState([])
+    const [estimates, setEstimates] = useState({})
     const [draft, setDraft] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const [report, setReport] = useState(null)
@@ -76,6 +84,37 @@ export function CalendarPage(){
         return {from: startOfWeek(startOfMonth(anchor)), to: addDays(startOfWeek(startOfMonth(anchor)), 42)}
     }, [view, anchor])
 
+    /**
+     * What is on each block besides its title: the timer, and how much has
+     * been recorded against the task.
+     *
+     * The totals endpoint answers per board, and one week can hold blocks from
+     * three of them — so this is one request per board in view, not one per
+     * block. They share the cache with the board rows, so a board that is
+     * already open costs nothing here.
+     */
+    const running = useRunningTimer()
+    const boardIds = useMemo(
+        () => [...new Set([...entries].map(e => e.boardId).filter(Boolean))],
+        [entries])
+    const totals = useTotalsForBoards(boardIds)
+
+    const taskInfo = useMemo(() => {
+        const out = {}
+        for(const entry of entries){
+            if(!entry.boardId || !entry.taskId) continue
+            const key = taskKey(entry.boardId, entry.taskId)
+            if(out[key]) continue
+            out[key] = {
+                progress: progressOf({spentMs: totals[key], estimateMinutes: estimates[key]}),
+                isRunning: Boolean(running)
+                    && String(running.boardId) === String(entry.boardId)
+                    && String(running.taskId) === String(entry.taskId)
+            }
+        }
+        return out
+    }, [entries, totals, estimates, running])
+
     const load = useCallback(async() => {
         setErr(null)
         try {
@@ -113,7 +152,13 @@ export function CalendarPage(){
     }, [load])
 
     useEffect(() => {
-        boardService.query().then(boards => setTasks(scheduleService.tasksFromBoards(boards))).catch(e => setErr(readErr(e)))
+        boardService.query().then(boards => {
+            setTasks(scheduleService.tasksFromBoards(boards))
+            // The same answer, read a second way. The picker wants a flat list
+            // of tasks; the blocks want the estimate behind each of them, and
+            // asking the server twice for one payload would be silly.
+            setEstimates(estimatesFromBoards(boards))
+        }).catch(e => setErr(readErr(e)))
     }, [])
 
     useEffect(() => {
@@ -148,6 +193,29 @@ export function CalendarPage(){
         } finally {
             setBusy(false)
         }
+    }
+
+    /**
+     * Where a click on an entry goes: to the task — without leaving the week.
+     *
+     * The task is hung off the current address as three parameters and
+     * `task-panel-host` opens the panel over the calendar. The first version
+     * navigated to the board instead, which answered the question and took the
+     * week you were reading away in exchange.
+     *
+     * An entry that names no task opens its own dialog. The server refuses to
+     * store one of those, so this should never happen — but a click that
+     * quietly does nothing is the thing this whole change is against.
+     */
+    function onOpenTask(entry){
+        if(!entry || !entry.boardId || !entry.taskId){
+            setDraft(entry)
+            return
+        }
+        navigate({
+            pathname: location.pathname,
+            search: `?${withTaskParams(searchParams, entry).toString()}`
+        })
     }
 
     /** Moving and resizing save straight away, without a dialog. */
@@ -213,14 +281,14 @@ export function CalendarPage(){
             {isLoading && <div className="cal-loading">{t('common.loading')}</div>}
 
             {view === 'month'?(
-                <MonthGrid date={anchor} entries={entries} external={external} workHours={workHours} onCreate={setDraft} onOpen={setDraft} onPickDay={day => {
+                <MonthGrid date={anchor} entries={entries} external={external} workHours={workHours} taskInfo={taskInfo} onCreate={setDraft} onOpen={setDraft} onOpenTask={onOpenTask} onPickDay={day => {
                     setAnchor(startOfDay(day));
                     setView('day')
                 }}/>
             ):(
                 <TimeGrid days={view === 'day'?[startOfDay(anchor)]:weekDays(anchor)} entries={entries}
-                    external={external} workHours={workHours}
-                    onCreate={setDraft} onMove={onMove} onOpen={setDraft}/>
+                    external={external} workHours={workHours} taskInfo={taskInfo}
+                    onCreate={setDraft} onMove={onMove} onOpen={setDraft} onOpenTask={onOpenTask}/>
             )}
 
             {draft && (

@@ -336,6 +336,50 @@ async function syncTaskMembers(trx, boardId, taskId, memberIds){
     await trx('task_member').insert(rows)
 }
 
+/**
+ * One comment, appended, without rewriting the task's whole comment list.
+ *
+ * `syncTaskComments` deletes every row and writes them again; that is right
+ * for a browser holding the full task, and wrong for a caller that only wants
+ * to add a line. Two scripts posting at the same moment through the sync path
+ * would each write their own idea of the list, and one of the two comments
+ * would simply not be there.
+ *
+ * Newest first is `position` ascending, so a new one goes in front of the
+ * lowest. Negative positions are fine — nothing reads the number, only the
+ * order — and the next full task write normalises them back to 0..n.
+ */
+async function addComment(boardId, taskId, comment){
+    return await tx(async trx => {
+        const id = await requireBoardRow(trx, boardId)
+        const task = await trx('task').where({board_id: id, id: sid(taskId)}).first()
+        if(!task) throw httpError(404, 'Task nicht gefunden')
+
+        const lowest = await trx('task_comment')
+            .where({board_id: id, task_id: sid(taskId)})
+            .min({p: 'position'}).first()
+        const position = Number.isFinite(Number(lowest && lowest.p))?Number(lowest.p) - 1:0
+
+        const row = {
+            board_id: id,
+            task_id: sid(taskId),
+            id: newShortId(),
+            position,
+            parent_id: (comment && comment.parentId)?sid(comment.parentId):null,
+            created_at: Number.isFinite(Number(comment && comment.archivedAt))
+                ?Number(comment.archivedAt)
+                :Date.now(),
+            pinned_at: null,
+            by_user_id: (comment && comment.byUserId)?sid(comment.byUserId):null,
+            txt: (comment && comment.txt) || '',
+            style: toJson({}),
+            attachments: toJson([])
+        }
+        await trx('task_comment').insert(row)
+        return {id: row.id, groupId: task.group_id}
+    })
+}
+
 async function syncTaskComments(trx, boardId, taskId, comments){
     await trx('task_comment').where({board_id: boardId, task_id: taskId}).del()
 
@@ -1133,6 +1177,7 @@ async function findBoardsByState(user, state){
 }
 
 module.exports = {
+    addComment, newTaskId: newShortId,
     findById, findForUser, insert, deleteById,
     updateMeta, setColumns, setMembers, setMemberRole, setOwners,
     addGroup, removeGroup, updateGroupMeta, replaceGroup, reorderGroups,

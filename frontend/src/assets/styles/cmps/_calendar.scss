@@ -329,6 +329,150 @@
     align-items: baseline;
 }
 
+/**
+ * The pencil, top right, on hover.
+ *
+ * Invisible until then, NOT `display: none`. That was the first version and it
+ * cannot work: an element that is not displayed cannot take focus, so
+ * `:focus-within` never fires and the button is unreachable by keyboard — the
+ * rule meant to reveal it was the rule preventing it. Transparent instead, so
+ * it is still in the tab order and still there for a screen reader.
+ */
+.cal-event-edit {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    display: grid;
+    opacity: 0;
+    transition: opacity .12s;
+    place-items: center;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, .28);
+    color: variables.$app-bg;
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.cal-event:hover .cal-event-edit,
+.cal-event:focus-within .cal-event-edit {
+    opacity: 1;
+}
+
+.cal-event-edit:hover {
+    background: rgba(0, 0, 0, .45);
+}
+
+.cal-event-edit:focus-visible {
+    outline: 2px solid variables.$app-bg;
+    outline-offset: 1px;
+    opacity: 1;
+}
+
+/* The title has to end before the pencil starts, or it runs underneath it. */
+.cal-event:hover .cal-event-title,
+.cal-event:focus-within .cal-event-title {
+    padding-right: 20px;
+}
+
+/**
+ * The two marks on a block: the timer, and the estimate burned down.
+ *
+ * Bottom right, opposite the pencil in the top right — they are read, it is
+ * pressed, and the two must not fight for the same 18 pixels. They stay
+ * visible on hover, unlike the pencil: a mark you can only see by pointing at
+ * it is a mark you will not find.
+ */
+.cal-event-marks,
+.cal-chip-marks {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cal-event-marks {
+    position: absolute;
+    right: 4px;
+    bottom: 3px;
+}
+
+/* No colour of its own, anywhere below. A solid block is white text on the
+   entry colour; a planned or assumed one is dark text on a pale tint, and a
+   month chip is dark on white. Inheriting is the only thing that is legible
+   on all three — the first version hardcoded white and disappeared on
+   exactly the planned blocks, which are most of them. */
+.cal-event-running {
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    line-height: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .cal-event-running {
+        animation: cal-timer-beat 1.6s ease-in-out infinite;
+    }
+}
+
+@keyframes cal-timer-beat {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .35; }
+}
+
+/**
+ * Recorded time over the estimate, as a filling circle — the same shape the
+ * board's date column uses, so it reads as the same kind of statement.
+ *
+ * `currentColor` throughout: on a block the text is white on the entry colour,
+ * on a month chip it is dark on white, and the ring has to follow whichever it
+ * is sitting on rather than pick a colour of its own.
+ */
+.cal-event-ring {
+    flex: none;
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    background-image: conic-gradient(currentColor var(--fill, 0%), transparent var(--fill, 0%));
+    background-origin: content-box;
+    background-clip: content-box;
+    opacity: .8;
+}
+
+/* Past the estimate. Said in colour, because the circle cannot go past full.
+   Two reds: the pale one reads on a saturated block, the dark one on a pale
+   one, and `color-mix` is not worth a build target for two values. */
+.cal-event-ring.is-over {
+    color: #ffd0d6;
+    border-color: #ffd0d6;
+    opacity: 1;
+}
+
+.cal-event.is-planned .cal-event-ring.is-over,
+.cal-event.is-assumed .cal-event-ring.is-over,
+.cal-chip .cal-event-ring.is-over {
+    color: #d83a52;
+    border-color: #d83a52;
+}
+
+.cal-event-spent {
+    font-size: 10px;
+    line-height: 1;
+    opacity: .75;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The marks come before the pencil in the chip's row and must not be pushed
+   out by a long title. */
+.cal-chip .cal-event-marks {
+    flex: none;
+    margin-left: auto;
+}
+
 .cal-event-handle {
     position: absolute;
     left: 0;
@@ -489,6 +633,46 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Same idea on a month chip, which is one line tall — so the pencil replaces
+   the end of the title rather than sitting on top of it. */
+.cal-chip {
+    position: relative;
+}
+
+.cal-chip-edit {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    display: grid;
+    opacity: 0;
+    transition: opacity .12s;
+    place-items: center;
+    margin-left: auto;
+    padding: 0;
+    border: none;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, .28);
+    color: variables.$app-bg;
+    font-size: 9px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.cal-chip:hover .cal-chip-edit,
+.cal-chip:focus-within .cal-chip-edit {
+    opacity: 1;
+}
+
+.cal-chip-edit:hover {
+    background: rgba(0, 0, 0, .45);
+}
+
+.cal-chip-edit:focus-visible {
+    outline: 2px solid variables.$app-bg;
+    outline-offset: 1px;
+    opacity: 1;
 }
 
 .cal-more {
