@@ -8,6 +8,7 @@ import {PriorityAdmin} from '../cmps/admin/priority-admin'
 import {TeamAdmin} from '../cmps/admin/team-admin'
 import {UserAdmin} from '../cmps/admin/user-admin'
 import {BoardAdmin} from '../cmps/admin/board-admin'
+import {TokenAdmin} from '../cmps/admin/token-admin'
 import {ADMIN_TABS, resolveAdminTab} from '../cmps/admin/admin-tabs'
 import {Icon} from '../cmps/icon'
 import {t} from '../i18n'
@@ -114,6 +115,7 @@ export function AdminPage(){
                 <UserAdmin users={users} onChanged={reload} onError={onError} onFlash={flash}/>}
             {tab === 'boards' &&
                 <BoardAdmin users={users} boards={boards} onChanged={reload} onError={onError} onFlash={flash}/>}
+            {tab === 'tokens' && <TokenAdmin users={users} onError={onError} onFlash={flash}/>}
         </section>
     )
 }

@@ -101,6 +101,77 @@
         margin-bottom: 24px;
     }
 
+    /* Enough room for the label above a select, without the 28px the page
+       puts under every other .admin-sub. */
+    .admin-sub.is-tight {
+        margin-bottom: 12px;
+    }
+
+    .admin-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 420px;
+        margin-bottom: 16px;
+    }
+
+    .admin-field-label {
+        font-size: 13px;
+        color: #676879;
+    }
+
+    .admin-warn {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 12px;
+        margin: 0 0 16px;
+        border-radius: 6px;
+        border-left: 4px solid #fdab3d;
+        background: #fff7ec;
+        font-size: 14px;
+        line-height: 1.45;
+
+        i {
+            margin-top: 3px;
+            color: #d68a00;
+        }
+    }
+
+    /**
+     * The one-time value.
+     *
+     * Framed rather than dropped into the page, because it is the only thing
+     * on this screen that cannot be looked up again — and it has to read as
+     * "act now", not as another row of data.
+     */
+    .admin-card.is-fresh-token {
+        border-color: #00c875;
+        background: #f4fdf8;
+    }
+
+    .token-value {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .token-code {
+        flex: 1;
+        min-width: 260px;
+        padding: 10px 12px;
+        border: 1px solid #d0d4e4;
+        border-radius: 6px;
+        background: #fff;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+        /* It is 68 characters and must be readable and selectable whole, so it
+           wraps rather than scrolling out of sight. */
+        overflow-wrap: anywhere;
+        user-select: all;
+    }
+
     .admin-section-title {
         font-size: 18px;
         margin-bottom: 14px;

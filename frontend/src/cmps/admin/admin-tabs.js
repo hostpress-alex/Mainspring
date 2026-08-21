@@ -13,7 +13,8 @@ export const ADMIN_TABS = [
     {key: 'general', labelKey: 'admin.tabGeneral', icon: 'sliders'},
     {key: 'team', labelKey: 'admin.tabTeam', icon: 'users'},
     {key: 'users', labelKey: 'admin.tabUsers', icon: 'user-gear'},
-    {key: 'boards', labelKey: 'admin.tabBoards', icon: 'chalkboard'}
+    {key: 'boards', labelKey: 'admin.tabBoards', icon: 'chalkboard'},
+    {key: 'tokens', labelKey: 'admin.tabTokens', icon: 'key'}
 ]
 
 export const DEFAULT_ADMIN_TAB = ADMIN_TABS[0].key
