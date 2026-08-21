@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 /**
  * Admin Page.
  *
@@ -18,6 +20,77 @@
     .admin-sub {
         color: #676879;
         margin-bottom: 28px;
+    }
+
+    /**
+     * The section strip.
+     *
+     * Deliberately the same shape as the tabs across a board — an underline on
+     * the open one and nothing else. A second tab style in one application is
+     * two things to keep in step, and the board's version already answers the
+     * question of what a tab looks like here.
+     */
+    .admin-tabs {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+        border-bottom: 1px solid #d0d4e4;
+    }
+
+    .admin-tab {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: 36px;
+        /* Sits ON the strip's own line, so the active underline covers it
+           instead of drawing a second line one pixel below. */
+        margin-bottom: -1px;
+
+        &.is-active {
+            border-bottom: 2px solid variables.$board-btn;
+        }
+
+        &:hover:not(.is-active) {
+            background-color: variables.$workspace-hover;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+    }
+
+    .admin-tab-open {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 100%;
+        padding: 0 14px;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+
+        i {
+            font-size: 12px;
+            color: #676879;
+        }
+    }
+
+    .admin-tab.is-active .admin-tab-open {
+        font-weight: 500;
+    }
+
+    .admin-tab.is-active .admin-tab-open i {
+        color: variables.$board-btn;
+    }
+
+    .admin-tab-open:focus-visible {
+        outline: 2px solid variables.$primary-text-color;
+        outline-offset: -2px;
+        border-radius: 4px;
     }
 
     .admin-card {
