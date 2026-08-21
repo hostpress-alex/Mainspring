@@ -1,36 +1,35 @@
 import {t} from '../i18n'
 
 /**
- * Was von einem Fehler noch inline gezeigt werden muss.
+ * What is left for an inline display to say about an error.
  *
- * Seit Runde 29 meldet `http.service` JEDEN fehlgeschlagenen Request selbst —
- * eine Box unten links, für die ganze Anwendung, an einer Stelle. Die
- * Inline-Meldungen in den Panels stammen aus der Zeit davor, als es diesen
- * Kanal nicht gab. Seither zeigen Kalender, Suche, Profil und ein Dutzend
- * andere denselben Satz zweimal.
+ * Since round 29 `http.service` reports EVERY failed request itself — a box in
+ * the bottom left corner, for the whole application, from one place. The inline
+ * messages in the panels are older than that channel; they exist precisely
+ * because there was nowhere else to say it. Ever since, the calendar, the
+ * search, the profile and a dozen others show the same sentence twice.
  *
- * Die Trennlinie ist nicht „welche Datei", sondern **ob der Fehler überhaupt
- * über das Netz gegangen ist**:
+ * The dividing line is not "which file" but **whether the error went over the
+ * wire at all**:
  *
- *   hat eine `response`  -> der Server hat geantwortet, `http.service` hat es
- *                           schon gesagt. Inline wäre die Dopplung.
- *   hat keine            -> Validierung, ein Rechenfehler, ein `new Error()`
- *                           aus dem Panel selbst. Das hat keinen anderen
- *                           Kanal und MUSS inline stehen.
+ *   has a `response`  -> the server answered, `http.service` has already said
+ *                        so. Inline would be the duplicate.
+ *   has none          -> a validation, an arithmetic error, a `new Error()`
+ *                        from the panel itself. That has no other channel and
+ *                        MUST be shown inline.
  *
- * Deshalb ein Helfer und keine zwölf umgebauten try/catch-Blöcke: die Regel
- * ist eine einzige, sie steht hier, und jede Inline-Anzeige stellt dieselbe
- * Frage.
+ * Hence one helper instead of twelve rebuilt try/catch blocks: the rule is a
+ * single one, it lives here, and every inline display asks the same question.
  *
- * Ausnahme mit Absicht: `pages/login-signup` behält seine eigene Auswertung.
- * `messageFor` schweigt bei `auth/*` — ein falsches Passwort ist eine Antwort
- * und keine Störung — also gibt es dort keine Box, die doppeln könnte, und
- * das Formular ist die einzige Stelle, die es sagen kann.
+ * Deliberate exception: `pages/login-signup` keeps its own evaluation.
+ * `messageFor` is silent for `auth/*` — a wrong password is an answer, not a
+ * malfunction — so there is no box there that could duplicate, and the form is
+ * the only thing that can report it.
  */
 export function localErrorText(err){
     if(!err) return null
-    // Ein Netzfehler ohne Antwort (Server aus, Kabel ab) ist ebenfalls schon
-    // gemeldet — `messageFor` beantwortet ihn mit errors.offline.
+    // A network error without an answer (server down, cable out) has been
+    // reported as well — `messageFor` answers it with errors.offline.
     if(err.response || err.request || err.code === 'ERR_NETWORK') return null
     if(err.code === 'ERR_CANCELED' || err.name === 'CanceledError') return null
     return err.message || String(err) || t('common.unknownError')

@@ -29,13 +29,12 @@ config.isGuestMode = process.env.GUEST_MODE === 'true'
 // anyone can create an account for themselves and see every board.
 config.allowSignup = process.env.ALLOW_SIGNUP !== 'false'
 
-// The key the login cookie is encrypted with. There is deliberately no shared
-// default: the cookie *is* the user record, so whoever knows the key can mint
-// one for any account without touching the database. In production a missing
-// value stops the server (server.js); in development auth.service falls back
-// to a key that is named after what it is.
+// The key the login cookie USED to be encrypted with, back when the cookie
+// *was* the user record and whoever knew the key could mint one for any
+// account without touching the database. Sessions are rows now
+// (services/session.repo.js), the cookie carries an opaque token, and this
+// grants nothing.
 //
-//   openssl rand -hex 32
 // Unused since sessions became rows. Kept for one release so that an
 // environment still setting SECRET1 does not look broken; nothing reads it.
 config.sessionSecret = process.env.SECRET1 || null

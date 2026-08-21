@@ -113,9 +113,6 @@ const port = process.env.PORT || 3030
  * anything. So the start would rather fail loudly.
  */
 async function start(){
-    // The login cookie is the user record, encrypted. Without a real key it
-    // is encrypted with one that is printed in the source, which means anyone
-    // can write themselves an admin cookie. Refuse rather than pretend.
     // The check for SECRET1 was here. It guarded a key that signed the login
     // cookie — and a key that can sign a cookie can sign an admin's. Sessions
     // are rows now (services/session.repo.js); there is no key left to leak,

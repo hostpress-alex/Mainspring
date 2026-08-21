@@ -128,15 +128,15 @@ cd frontend && npm run build
 cd ../backend && npm run server:prod:mac
 ```
 
-The server looks for the build in `backend/public`, which is gitignored. It's
-output, not source. Until recently a react-scripts build from before the Vite
-move was committed there instead: 19.6 MB, 17 of them a sourcemap for code
-that no longer existed, and it was what production actually served.
+The server looks for the build in `frontend/build`, which is where Vite
+writes it — `FRONTEND_BUILD` in `server.js`, used by both the static handler
+and the single-page fallback. It is gitignored: output, not source.
 
-One step is still open. Vite writes to `frontend/build`, so a build doesn't
-land where the server looks for it. Either point `outDir` at
-`../backend/public` in `frontend/vite.config.js`, or copy the folder across by
-hand after building.
+It used to look in `backend/public`, which meant a build never landed where
+the server read from and somebody copied the folder across by hand. Worse, a
+react-scripts build from before the Vite move was committed there — 19.6 MB,
+17 of them a sourcemap for code that no longer existed — and that was what
+production actually served. Build output now stays with whoever builds it.
 
 ## Configuration
 
@@ -150,67 +150,123 @@ as well. It's not in the repo and shouldn't be.
 | `ALLOWED_ORIGINS` | three localhost variants | comma separated. Applies to the API and the socket both. |
 | `ALLOW_SIGNUP` | `true` | set `false` on anything reachable, or strangers will sign themselves up and see every board |
 | `GUEST_MODE` | `false` | turns authentication off entirely. Debugging only. |
-| `SECRET1` | none | encrypts the login cookie. **Required in production**, the server refuses to start without it. `openssl rand -hex 32` |
 | `TRUST_PROXY` | `false` | set `true` behind a reverse proxy, otherwise every request looks like it comes from the proxy and the login limit treats the world as one visitor |
 | `NODE_ENV` | | `production` serves the static build and marks the cookie secure |
+| `UPLOAD_DIR` | `backend/uploads` | where uploaded files land on disk |
+| `UPLOAD_MAX_BYTES` | 10 MB | the ceiling for one upload — `services/file.service.js`, not `config/` |
+| `TIME_MAX_HOURS` | `8` | a forgotten timer is closed AT this cap, marked `auto`, rather than when somebody notices |
+| `AUTOMATION_DELAY_MS` | `1000` | how long a rule waits before it acts, so a burst of edits does not become a burst of rules |
+| `GOOGLE_SA_CLIENT_EMAIL`, `GOOGLE_SA_PRIVATE_KEY`, `GOOGLE_SA_KEY_FILE` | none | the service account for the read-only calendar mirror. Leave unset and the feature is simply off. |
+| `GOOGLE_SYNC_MINUTES` | see `config/` | how often that mirror is refreshed |
+| `SECRET1` | — | **reads nothing any more.** Kept in the table only so that an environment still setting it does not look broken. |
 
-The login cookie isn't a session id you look up in a table. It's the user
-record itself, encrypted with `SECRET1`. Anyone holding that key can write
-themselves an admin cookie without going near the database, which is why there
-is no default value any more and why production won't boot without one. In
-development you get a fallback named `insecure-development-key-do-not-use-in-production`
-and a warning in the log.
+**The login cookie is not a credential you can mint.** It used to be: the
+cookie *was* the user record, encrypted with `SECRET1`, so anyone holding that
+key could write themselves an admin cookie without going near the database.
+Since `000018_sessions` the cookie holds an opaque random token, the `session`
+table stores its SHA-256, and the row is what grants anything. Knowing
+`SECRET1` now grants nothing at all, which is why the server no longer refuses
+to start without it.
 
 ## What it does
 
-Boards with drag and drop for groups and tasks. Columns are per board, and
-each status-style column keeps its own label list, so the priority menu
-doesn't offer you "Done" any more.
+Boards with drag and drop for groups and tasks. Columns are per board and
+come in sixteen kinds — status, dropdown, text, long text, date, deadline,
+person, number, file, checkbox, link, tags, priority, estimate, created, last
+updated. A status or dropdown column keeps its own label list, so the
+priority menu doesn't offer you "Done" any more. Tags work the same way — a
+vocabulary belonging to one board. Priorities went the other way on purpose:
+one global scale, because a priority only means something if everyone agrees
+what it is.
 
-Three views: table, kanban, and a statistics page with charts by label and by
-member. Tasks open into a detail modal with comments (one level of replies),
-file attachments and an activity log, all updating live while someone else
-edits.
+**Views are tabs.** Table, kanban and a statistics page are the three that
+always exist; a filter you have set can be saved as a fourth, a fifth, with a
+name. A tab carries both halves of a way of looking — which rows (the filter
+rules) and which drawing — and is private until somebody deliberately shares
+it with the board.
 
-There's a calendar for scheduling tasks into time slots per person, month and
-week grids. Uploads go to disk under `backend/uploads/` with metadata in the
-database; we keep the original filename around so downloads arrive as
-`offer.pdf` and not `a1b2f9.pdf`.
+Tasks open into a detail modal with updates (one level of replies, emoji
+reactions, and who has seen them), subtasks, file attachments, an activity log
+and recorded time, all updating live while someone else edits.
 
-Login is username and password (bcrypt) or Google. Sessions live in an
-httpOnly cookie. Boards have owners and members, and there's an admin page for
-user management. Failed logins are counted per address and per account, ten
-against one account or thirty across all of them inside fifteen minutes and
-you get a `429` until the window passes. Note that this bites even if you then
-remember the right password, since the limit is checked before the password
-is.
+**Time.** A timer per person, started from a task. One at a time, and starting
+a second one asks what to do with the first rather than deciding for you.
+Entries can be corrected and typed in by hand afterwards — that is what keeps
+the totals believable. An estimate column and the recorded time together give
+each task a "how far through it are we".
+
+**Calendar and planner.** Month and week grids for scheduling tasks into time
+slots per person, plus each person's working hours and, optionally, a
+read-only mirror of their Google calendar so the planner does not schedule
+over a meeting. The planner fills the free time with the tasks that are due,
+marks everything it laid down as its own, and says which blocks are built on
+an assumed duration rather than a real estimate.
+
+**Automations** per board: when this happens, do that. A rule runs as the
+person who wrote it, fires at most once per chain, and everything it did — or
+refused to do — lands in a run log.
+
+Also: a global search that only returns what you are allowed to see, a bin and
+an archive with no cascade, notifications with a mute per task, and an HTTP
+API with revocable tokens for callers that are not a browser (`API.md`).
+
+Uploads go to disk under `backend/uploads/` with metadata in the database; we
+keep the original filename around so downloads arrive as `offer.pdf` and not
+`a1b2f9.pdf`. A download is checked against the board the file belongs to, not
+just against being signed in.
+
+Login is username and password (bcrypt). Google sign-in was removed — it
+fetched `googleapis.com` from a tool that only runs on the VPN and used the
+Google account id as the password. A session is a **row in the database**, and
+the cookie holds nothing but an opaque token, so knowing a secret is no longer
+enough to mint one; signing out somewhere else really ends it. Boards have
+owners, editors and viewers, and there is an admin page for users, teams,
+boards, priorities and API tokens. Failed logins are counted per address and
+per account, ten against one account or thirty across all of them inside
+fifteen minutes and you get a `429` until the window passes. Note that this
+bites even if you then remember the right password, since the limit is checked
+before the password is.
 
 Interface is German by default, English available. Everything user-facing sits
 in `frontend/src/i18n/`. We didn't pull in an i18n library: one JSON file per
-language and a `t()` function covers what fifteen people need.
+language and a `t()` function covers what fifteen people need. The language
+belongs to the account, not to the browser.
 
 ## Code layout
 
 ```
 backend/
   api/<area>/          controller | service | repo
-    board/             boards, groups, tasks, activities
-    user/  auth/       accounts and login
-    schedule/          calendar
+    auth/  user/       accounts and login
+    board/             boards, groups, tasks, activities, saved views
+    automation/        rules per board (+ engine, which is pure)
+    calendar/          the read-only Google mirror
+    schedule/          calendar entries
+    planner/           filling free time with what is due (+ core, triggers)
+    time/              recorded working time
+    workhours/         when each person works
+    priority/          the one global scale
+    notification/  seen/  reaction/    what happened to an update
+    search/            one query, five permission-joined reads
+    token/             API tokens
     upload/            files
   db/migrations/       MariaDB schema, numbered, additive
-  middlewares/         auth, logging, async local storage
-  services/            socket, files, logging, db connection
-  test/                node:test
+  middlewares/         auth, rate limit, async local storage
+  services/            socket, files, sessions, logging, throttling
+  test/                node:test — 28 files
   scripts/             seeding, admin, board ownership
 
 frontend/src/
   cmps/                components by area
   pages/               one per route
-  services/            http calls, helpers
+  services/            http calls, helpers, pure logic
+  customHooks/         the two shared ones
+  constants/           the app name, and nothing else yet
   store/               redux
   i18n/                de.json | en.json | t()
   assets/styles/       sass, one partial per component
+  test/                vitest — 12 files
+  scripts/             check-exports, check-tdz, check-icons
 ```
 
 Every backend area is the same three layers. Controller turns HTTP into a
@@ -221,17 +277,37 @@ made swapping the storage engine out possible in the first place.
 ## Tests
 
 ```bash
-cd backend  && npm test
-cd frontend && npm test
+npm test                 # both halves, each with its own runner
+npm run test:api         # backend only  — node:test, no database, ~2s
+npm run test:web         # frontend only — vitest
+npm run test:log         # everything into test.log, last 30 lines printed
 ```
 
-Coverage is thin, and it's worth saying which parts are covered rather than
-implying the rest is.
+**Do not run `npx vitest` in the root.** The two halves use different runners,
+and vitest's default search picks up the 28 `backend/test/*.test.js` files it
+cannot run — pages of failures that have nothing to do with the code.
 
-`board-access.test.js` covers who can see and administer a board, including
-the old boards that carry a single `ownerId` instead of an `ownerIds` array.
-`socket.service.test.js` covers pulling the login cookie out of a handshake.
-On the frontend there's the statistics module and the user reducer.
+383 backend cases across 28 files: permissions and roles, the automation
+engine, the planner and its triggers, sessions and token lifetimes, the login
+throttle, the rate limit, lifecycle, search, socket rooms, time, work hours,
+priorities, notifications. None of them need a database. On the frontend, 12
+files covering the pure services — statistics, task progress, spans, relative
+time, mentions, error routing, the reducer.
+
+Two static checks beside the tests, both in `frontend/`:
+
+```bash
+npm run check            # both of the below
+npm run check:exports    # an imported name the target module does not export
+npm run check:tdz        # a const read before its own line, inside a function
+```
+
+They exist because both of those failures produce a **white page with nothing
+in the console that names the file**, and the ordinary test suite is happily
+green while the app does not start. The TDZ one is written to descend into a
+nested function only where it is an argument to a call — i.e. where it runs
+immediately, like a `useState(() => …)` initialiser — because that is the case
+that bites and anything wider drowns it in noise.
 
 No end-to-end tests. An older version of this file claimed Playwright
 coverage. There has never been a Playwright config in this repo.
@@ -257,31 +333,53 @@ contents pushed to them, logged in or not. Identity now comes from the login
 cookie and joining a board's room takes the same permission the REST API asks
 for.
 
-New since the original: calendar, admin page, file uploads with metadata,
-threaded comments, translations.
+New since the original, and none of it was in the bootcamp project: roles per
+board, saved views as tabs, board filters, automations, a global search,
+subtasks, a bin and an archive, notifications, rich text with mentions, time
+tracking, working hours, a planner, an external calendar mirror, tags, one
+global priority scale, reactions and seen-marks on updates, an HTTP API with
+revocable tokens, calendar, admin page, file uploads with metadata, threaded
+comments, translations.
+
+Accounts and board memberships are switched off, never deleted. A person who
+leaves keeps their row, so everything they wrote keeps its author instead of
+turning into "Unknown" — which this project learned the hard way and spent two
+migrations repairing.
 
 ## Rough edges
 
 Listed here because they're easier to find in a README than in the code.
 
 The login rate limit lives in memory. A restart clears it and a second process
-would count separately. Fine for us, not fine for anything public.
+would count separately. Fine for us, not fine for anything public — and the
+trade-off is written into `services/login-throttle.service.js` rather than
+left to be discovered.
 
-Uploaded files are only checked for "are you logged in", not for "is this file
-from a board you're on". The ids are 32 hex characters so nobody is guessing
-one, but anyone who learns an id can fetch it.
-
-Reading one board is seven queries on MariaDB, and the board overview loads
+Reading one board is several queries on MariaDB, and the board overview loads
 every task of every board while it's at it. Fine at our size. It's the first
-place to look when the overview gets slow.
-
-`board-send-update` relays a board object that the *browser* assembled. The
-server doesn't inspect it. The fix is to emit from the service layer after
-each write instead of relaying between browsers, which nobody has done yet.
+place to look when the overview gets slow. `col_values` is not indexed either,
+so filtering on a status value across all boards is a full pass.
 
 No version number per task, so two people typing a task title at the same
 moment still clobber each other, just field by field now instead of the whole
 board.
+
+About 55 backend error messages are still hand-written sentences that the
+frontend prints as they are. They are outside `i18n/`, and they are not even
+all in one language — some German, some English. The shape they want is a
+stable code the frontend maps to a key, which is a change on both sides in the
+same breath.
+
+`frontend/src/test/` cannot be run from a Linux shell against this checkout:
+`rolldown` in `node_modules` is the macOS binary. Run the frontend tests on the
+machine that installed them.
+
+**Two things listed here for a long time are done and are kept as a note so
+nobody fixes them twice.** Uploads are checked against the board the file
+belongs to, not just against being signed in (`file.board_id`, written when the
+file is saved, since a random id is not a permission). And `board-send-update`
+is gone: every write in `board.service.js` reads the board back and emits that,
+so the server no longer relays an object the browser assembled.
 
 ## Conventions
 

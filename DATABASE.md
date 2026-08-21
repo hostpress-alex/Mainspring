@@ -133,6 +133,14 @@ automation_run  what a rule did, capped at 200 entries per board
 board_view      a tab on a board: which rows, which drawing, who sees it
 task_time       one worked interval on a task: who, from when to when,
                 and what they wrote about it
+comment_reaction  one person, one emoji, one comment
+comment_seen    one person having had one comment on screen
+priority        the one global priority scale; a task stores the id
+work_hours      one row per person per weekday; a missing row is a free day
+calendar_link   whose Google account a person is
+external_event  the read-only copy of what was found in that account
+api_token       a key for callers that are not a browser; the id is the
+                SHA-256 of the token
 ```
 
 Migrations, in order:
@@ -160,6 +168,17 @@ Migrations, in order:
 | `20260816_000019_board_views.js` | `board_view` — a filter with a name, shared with the board |
 | `20260817_000020_view_tabs.js` | `board_view.display` and `.visibility` — a saved filter becomes a tab |
 | `20260818_000021_task_time.js` | `task_time` — recorded working time, one row per interval |
+| `20260818_000022_comment_reaction.js` | `comment_reaction` — an emoji from one person on one comment |
+| `20260819_000023_priority.js` | `priority` — one global scale; task values become ids |
+| `20260819_000024_priority_repair.js` | clears priority values pointing at a row that is not there |
+| `20260819_000025_work_hours.js` | `work_hours` — when each person works, per weekday |
+| `20260819_000026_external_calendar.js` | `calendar_link` and `external_event` — the read-only Google mirror |
+| `20260819_000027_task_created.js` | `task.created_at` / `.created_by_id`, backfilled from the activity log |
+| `20260819_000028_comment_seen.js` | `comment_seen` — who has had an update on screen |
+| `20260819_000029_schedule_source.js` | `schedule.source` / `.is_assumed` / `.planned_at` — the planner's own marks |
+| `20260819_000030_comment_author_repair.js` | gives updates their author back, where the log still proves it |
+| `20260820_000031_api_tokens.js` | `api_token` — a key that does not time out when idle |
+| `20260821_000032_comment_time.js` | `task_comment.time_id` — the update a timer posted |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -344,6 +363,75 @@ truth, the copy is written at login and whenever the profile is saved.
 is unique; `original_name` holds what it was called when it was uploaded, so a
 download produces `offer.pdf` rather than `a1b2…f9.pdf`.
 
+**Reactions and seen-marks have no foreign key onto `task_comment`, and it is
+the same trap twice.** Writing a task rewrites its comments: `syncTaskComments`
+deletes every row for that task and inserts them again under the same ids. A
+cascade from either table would empty it whenever somebody edited a task —
+days after anybody reacted or read anything, which is the kind of loss nobody
+connects to its cause. So both link by id alone, and the same sync clears the
+rows that no longer point at a comment. `board_id` does carry a cascade: a
+deleted board really is gone, and nothing rewrites boards wholesale.
+
+**A seen-mark is written once and never touched again.** There is no "unseen",
+because the fact cannot be undone, and a second look does not move the time.
+Deliberately no device, no user agent, no address: the useful part is *that*
+somebody read it, and the rest is a record about a colleague that nobody needs
+to keep.
+
+**Priorities are global, tags are per column — on purpose.** A priority is a
+scale everybody has to agree on, so it is one table and a task stores the id;
+renaming "High" is one UPDATE and touches no task. A tag list is a vocabulary
+somebody made up for one board, and a global one grows until nobody reads it,
+so tag definitions ride in `board_column.settings` and never became a table.
+Both store ids rather than words for the same reason: renaming must not
+rewrite every task that used the old text.
+
+**Work hours are minutes since midnight, and a missing row is a free day.**
+Times as strings sort and subtract badly in three languages; one integer
+compares correctly and formats into anything. Weekdays are numbered the way
+JavaScript numbers them (0 = Sunday) because the calendar grids already ask
+`date.getDay()`. There are no validity ranges — "these hours from March, those
+from September" would double every query in the feature and nobody has asked
+what last spring's capacity was. If that day comes it is an added `valid_from`
+and a GROUP BY, not a rewrite.
+
+**The external calendar is a mirror and is never written back.** `calendar_link`
+says whose Google account a person is, `external_event` is the copy of what was
+found there — split so that removing the link does not delete the events and a
+failed sync leaves the last good copy on screen instead of an empty week. The
+scope asked for is `calendar.readonly`, so a bug that tried to write would be
+refused at the far end as well. `external_id` is the key, which is what makes a
+sync safe to run twice.
+
+**The planner marks its own work.** `schedule.source` is `manual` or `auto`,
+and without it the planner cannot clean up after itself: a block it laid
+yesterday and an appointment somebody typed look identical, so it would either
+delete what people wrote or never tidy anything. `is_assumed` is the honest
+half of a deliberate decision — a task with no estimate is still planned, using
+a default, and every block built on a guess says so rather than letting the
+calendar look more certain than it is.
+
+**A token is not a session, which is why it is not in that table.** A session
+is a person at a keyboard and must time out when unused; a token is a script
+that may sit idle for six weeks and must still work on the seventh. One table
+would mean one of those two rules is wrong for half the rows. Both store the
+SHA-256 of the value, so neither table is a set of working keys. `prefix` keeps
+the first few characters in the clear, so a token found in a config file can be
+matched to its row without pasting the secret anywhere.
+
+**An update posted by the timer stores the entry, not the duration.** Storing
+the number would be a copy, and copies have already cost this project two
+migrations. A time entry can be corrected afterwards, and an update saying
+"2 h" beside an entry that now says "1 h 30" is worse than an update saying
+nothing — one of the two gets believed. `ON DELETE SET NULL`, because deleting
+a measurement must not delete the words somebody wrote.
+
+**`task.created_at` is NULL where the past cannot be read.** It was backfilled
+from the `create` entries in the activity log, which is a witness rather than a
+guess — but that log keeps forty entries per board, so most older tasks have
+none. Those keep NULL and the column shows a dash. An invented creation date
+would be indistinguishable from a real one, and therefore believed.
+
 ### A few queries for DBeaver
 
 All tasks of a board with their group and status:
@@ -422,16 +510,28 @@ ORDER BY week DESC, u.fullname;
 
 Access control lives in `api/board/board.service.js`: `hasAccess` (owner,
 member or admin) and `isOwner` (owner or admin), both covered by
-`test/board-access.test.js`. Ownership itself is a row in `board_member` with
-`is_owner = 1` — there is no owner field on the board.
+`test/board-access.test.js`. What a member may do beyond reading comes from
+`api/board/board.roles.js` — `roleOf`, `isEditor`, `canManageGroup`,
+`canWriteComment`.
 
-The real-time layer asks those same two functions. Until recently it asked
-nobody at all: a socket named the room it wanted and got it, so anyone who
-knew or guessed a board id received that board's contents. Joining a board
-room now needs the same access the REST API demands, and a socket's identity
-comes from the `loginToken` cookie instead of from what the client claims
-about itself. The file comment in `services/socket.service.js` has the detail.
+The role is a row in `board_member`, not a field on the board. Since
+`000009_roles` the column that decides is `role` (`owner` / `editor` /
+`viewer`); the older boolean `is_owner` is still written alongside it so that
+anything reading the old column stays correct, and it is on its way out.
+`board.repo.js` treats `role` as the truth and falls back to `is_owner` only
+where a row predates the migration.
 
-One gap is deliberately still open and documented there: `board-send-update`
-relays a board that the *client* composed. Closing it means emitting from the
-service layer after each write instead of relaying between browsers.
+The real-time layer asks those same functions. Until recently it asked nobody
+at all: a socket named the room it wanted and got it, so anyone who knew or
+guessed a board id received that board's contents. Joining a board room now
+needs the same access the REST API demands, and a socket's identity comes from
+the same httpOnly `loginToken` cookie the REST API uses — which since
+`000018_sessions` is an opaque session token, not something a client can mint.
+The file comment in `services/socket.service.js` has the detail.
+
+~~One gap is deliberately still open: `board-send-update` relays a board that
+the *client* composed.~~ **Closed.** Every write in `board.service.js` now ends
+in `_pushed`, which reads the board back and emits that. Two things fell out of
+it that were not the point: the filter is applied by the receiver, so nobody's
+filter briefly becomes everybody's, and a push for a board this browser has
+since left is ignored instead of putting the previous board back on screen.
