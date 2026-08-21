@@ -1,0 +1,149 @@
+@use "../setup/functions";
+@use "../setup/variables";
+
+/**
+ * The tooltips.
+ *
+ * There was no stylesheet for these at all, which is why nobody could find
+ * one: they come from `@mui/material`'s <Tooltip>, Emotion writes their rules
+ * into <head> at runtime, and the box itself is rendered through a portal onto
+ * `document.body`. So it sits outside every component in the tree, and the
+ * selectors here are deliberately global — there is nothing to nest them
+ * under.
+ *
+ * **Every class is written twice on purpose.** Emotion injects at runtime and
+ * the order against this stylesheet is not guaranteed, so `.x.x` doubles the
+ * specificity without reaching for `!important`. It looks odd and it is the
+ * quiet way to win.
+ *
+ * The values below are MUI's own defaults, restated rather than changed:
+ * loading this file must look like loading nothing. They are here so that all
+ * of it is in one place and a change to one property does not leave the box
+ * half MUI's and half ours.
+ *
+ * NOT restated: the placement margins and transform origins. Those are the
+ * popper's geometry, they are correct, and copying geometry is how a tooltip
+ * ends up two pixels off its arrow. Leave them to MUI.
+ *
+ * 26 call sites share this. There is no per-tooltip styling and there should
+ * not be — a tooltip that looks different from the others reads as a different
+ * kind of thing.
+ */
+
+/* ----------------------------------------------------------- the box -- */
+
+.MuiTooltip-tooltip.MuiTooltip-tooltip {
+    background-color: variables.$tooltip-bg;
+    border-radius: 4px;
+    color: variables.$tooltip-text;
+    // 0.6875rem written out, and not a typo for rem(11px). MUI sizes with
+    // pxToRem, which assumes a 16px root: pxToRem(11) = 11/16 = 0.6875rem.
+    // This project sets html { font-size: 13px } ($body-rem), so it lands at
+    // 8.9px, not 11 — every MUI component here is about a fifth smaller than
+    // MUI means it to be. The literal keeps this file a no-op; the line below
+    // gives the 11px that was intended.
+    font-size: 0.6875rem;
+    // font-size: functions.rem(11px);   // = 11px
+    font-weight: 500;
+    max-width: 300px;
+    padding: 4px 8px;
+    // Long words break rather than widening the box past max-width.
+    word-wrap: break-word;
+
+    // MUI sets its own font family (the theme's, i.e. Roboto — which this
+    // project does not load, so it lands on the system fallback). Uncomment to
+    // use the application's font instead. Left off because switching it is a
+    // visible change, and this file starts out as a no-op.
+    // font-family: inherit;
+}
+
+/**
+ * The arrow.
+ *
+ * Coloured through `color`, not `background`: MUI draws the triangle in a
+ * `::before` filled with `currentColor`, so setting a background here paints a
+ * square behind it instead.
+ *
+ * MUI's own default is 0.9 opacity here against 0.92 on the box — two values
+ * for one surface, which shows as a faint seam. One variable for both.
+ */
+.MuiTooltip-arrow.MuiTooltip-arrow {
+    color: variables.$tooltip-bg;
+}
+
+/* ------------------------------------------------------ where it sits -- */
+
+/**
+ * MUI ships `z-index: 1500`, which is above everything in `setup/_layers.scss`
+ * and connected to none of it — the twenty-first unrelated number, in the one
+ * project that wrote a file to abolish those. Above the confirmation dialog
+ * and above the failure message, so a tooltip could cover the question it is
+ * being asked next to.
+ *
+ * $z-tooltip is the named step. It is the top of the scale, which is right:
+ * a tooltip belongs to whatever is under the pointer, and whatever is under
+ * the pointer is by definition the frontmost thing.
+ */
+.MuiTooltip-popper.MuiTooltip-popper {
+    z-index: variables.$z-tooltip;
+}
+
+/* --------------------------------------------------------- what is in it -- */
+
+/**
+ * Content lives here, not with the component that opens the tooltip.
+ *
+ * These two used to sit in `_comment-preview.scss` because that is where their
+ * components are — but the markup is rendered on `document.body`, not inside a
+ * comment, and looking for it under the comment styles is exactly the wrong
+ * place to look.
+ */
+
+/**
+ * Who gave a reaction.
+ *
+ * A face and a name per line, not a comma-separated run: at five or six people
+ * a sentence stops being readable, and the faces are what most people
+ * recognise before they have read anything.
+ */
+.reaction-who {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 0;
+
+    .reaction-who-line {
+        align-items: center;
+        display: flex;
+        font-size: functions.rem(13px);
+        gap: 8px;
+        white-space: nowrap;
+
+        img {
+            border-radius: 50%;
+            height: 22px;
+            object-fit: cover;
+            width: 22px;
+        }
+    }
+}
+
+/** Who has read an update. Same shape, smaller faces. */
+.comment-seen-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.comment-seen-person {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.comment-seen-avatar {
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+}

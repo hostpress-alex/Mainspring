@@ -54,3 +54,18 @@ $z-confirm: 600;
  * would ever see.
  */
 $z-message: 700;
+
+/**
+ * The tooltip, and the top of the scale.
+ *
+ * A ninth layer, added against this file's own advice, because the
+ * alternative is worse: MUI ships `z-index: 1500` on its popper, which is
+ * above every step here and related to none of them — precisely the
+ * twenty-first unconnected number this file exists to abolish. Naming it is
+ * how it comes back under the same roof.
+ *
+ * Top, and that is not laziness: a tooltip belongs to whatever the pointer is
+ * on, and whatever the pointer is on is the frontmost thing there is. It also
+ * covers nothing for longer than the pointer rests.
+ */
+$z-tooltip: 800;

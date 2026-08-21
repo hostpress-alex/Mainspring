@@ -185,14 +185,6 @@ export function CommentPreview({
                         element the visibility is measured on, so it has to be
                         at the bottom of the card rather than at the top: an
                         update is read from the top down. */}
-                    <CommentSeen
-                        boardId={board?._id}
-                        taskId={taskId}
-                        commentId={comment.id}
-                        authorId={comment.byMember && comment.byMember._id}
-                        myId={me && me._id}
-                        members={board?.members || members}
-                        seen={seenByComment[comment.id] || []}/>
                     <CommentReactions
                         reactions={reactions[comment.id] || {}}
                         people={board?.members || members}
@@ -225,6 +217,14 @@ export function CommentPreview({
                             </span>
                         </Tooltip>
                     )}
+                    <CommentSeen
+                        boardId={board?._id}
+                        taskId={taskId}
+                        commentId={comment.id}
+                        authorId={comment.byMember && comment.byMember._id}
+                        myId={me && me._id}
+                        members={board?.members || members}
+                        seen={seenByComment[comment.id] || []}/>
                 </div>
             )}
 

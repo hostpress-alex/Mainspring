@@ -175,6 +175,13 @@ $home-slate:        #424272;
 $home-veil:         #0b0b3181;
 $home-veil-soft:    #4e4d5824;
 
+// --- Tooltip -----------------------------------------------------------
+// MUI's own default: grey[700] at 92 %. Named here so the box and its arrow
+// cannot drift apart — MUI ships 0.92 for one and 0.9 for the other.
+$tooltip-bg:   rgba(97, 97, 97, .92);
+$tooltip-text: #fff;
+
+
 // --- Fileformats -----------------------------------------------------
 $file-word:        #2b579a;
 $file-excel:       #217346;
