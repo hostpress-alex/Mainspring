@@ -1,5 +1,6 @@
 import {t} from '../i18n'
 import {formatClock} from './time.service.js';
+import {msOrNull} from './date.util.js';
 export const utilService = {
     makeId,
     makeLorem,
@@ -93,10 +94,18 @@ function getRandomColor(){
     return `#${randColor.toUpperCase()}`
 }
 
-/** Whole minutes since `time`. Negative when the moment is in the future. */
+/**
+ * Whole minutes since `time`. Negative when the moment is in the future,
+ * `NaN` when there is no moment.
+ *
+ * The null check is `msOrNull`'s and not this function's on purpose: the first
+ * version here did `Number(time)` and trusted `Number.isFinite`, and
+ * `Number(null)` is 0 — so a missing timestamp came out as "vor 2955 Wo."
+ * instead of as an empty string. Third time in this project; see msOrNull.
+ */
 function minutesSince(time){
-    const then = Number(time)
-    if(!Number.isFinite(then)) return NaN
+    const then = msOrNull(time)
+    if(then === null) return NaN
     return Math.floor((Date.now() - then) / 60000)
 }
 

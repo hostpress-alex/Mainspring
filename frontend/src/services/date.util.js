@@ -69,6 +69,25 @@ export const isToday = d => isSameDay(d, new Date())
 export const pad = n => String(n).padStart(2, '0')
 
 /**
+ * A moment in milliseconds, or null when the value is not one.
+ *
+ * The guard that matters is the first line, and it has now been got wrong
+ * three times in this project — in the comment author repair, in the API token
+ * expiry and here: **`Number(null)` is 0, and 0 is finite.** So the obvious
+ * `Number.isFinite(Number(value))` accepts null, undefined and empty string
+ * and calls them "1 January 1970". A missing timestamp then reads as
+ * "vor 2955 Wochen" instead of as nothing at all.
+ *
+ * Every relative-time function in this file and in util.service goes through
+ * here, so there is one place to get it right.
+ */
+export function msOrNull(value){
+    if(value === null || value === undefined || value === '') return null
+    const ms = value instanceof Date?value.getTime():Number(value)
+    return Number.isFinite(ms)?ms:null
+}
+
+/**
  * "2 days ago", in whatever language the interface is in.
  *
  * Intl does the wording, so this needs no list of German month names and no
@@ -76,8 +95,8 @@ export const pad = n => String(n).padStart(2, '0')
  * to make.
  */
 export function fmtRelative(value, now = Date.now()){
-    const then = value instanceof Date?value.getTime():Number(value)
-    if(!Number.isFinite(then)) return ''
+    const then = msOrNull(value)
+    if(then === null) return ''
     const seconds = Math.round((then - now) / 1000)
     const steps = [
         [60, 'second', 1],

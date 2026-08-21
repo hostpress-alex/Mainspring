@@ -14,7 +14,7 @@
         "db:migrate":      "knex migrate:latest",
         "db:rollback":     "knex migrate:rollback",
         "db:status":       "knex migrate:status",
-        "test":            "node --test test/*.test.js"
+        "test":            "NODE_ENV=test node --test test/*.test.js"
     },
     "author":          "Me",
     "license":         "ISC",

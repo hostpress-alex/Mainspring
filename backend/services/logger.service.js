@@ -70,6 +70,20 @@ function isError(e){
     return e && e.stack && e.message
 }
 
+/**
+ * Whether a line also goes to the terminal.
+ *
+ * Under `node --test` it does not. The suite produced about a hundred lines of
+ * WARN and DEBUG — the login throttle alone fires forty deliberate failures,
+ * and the log-roll test writes padding through this very function — so the
+ * result of a test run had to be dug out from between them. A log nobody can
+ * read is the reason somebody deletes lines by hand before sending it on.
+ *
+ * The FILE is still written: the roll test measures exactly that, and it is
+ * the one thing here that has to keep working under test.
+ */
+const isQuiet = () => process.env.NODE_ENV === 'test'
+
 function doLog(level, ...args){
 
     const strs = args.map(arg =>
@@ -81,7 +95,7 @@ function doLog(level, ...args){
     const userId = store?.loggedinUser?._id
     const str = userId?`(userId: ${userId})`:''
     line = `${getTime()} - ${level} - ${line} ${str}\n`
-    console.log(line)
+    if(!isQuiet()) console.log(line)
     rollIfNeeded(line.length)
     fs.appendFile(logFile, line, (err) => {
         if(err) console.log('FATAL: cannot write to log file')
