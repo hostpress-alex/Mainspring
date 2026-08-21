@@ -42,11 +42,11 @@
     // 8.9px, not 11 — every MUI component here is about a fifth smaller than
     // MUI means it to be. The literal keeps this file a no-op; the line below
     // gives the 11px that was intended.
-    font-size: 0.6875rem;
+    font-size: 0.9rem;
     // font-size: functions.rem(11px);   // = 11px
     font-weight: 500;
     max-width: 300px;
-    padding: 4px 8px;
+    padding: .5rem 1rem;
     // Long words break rather than widening the box past max-width.
     word-wrap: break-word;
 
@@ -121,9 +121,9 @@
 
         img {
             border-radius: 50%;
-            height: 22px;
+            height: 2rem;
             object-fit: cover;
-            width: 22px;
+            width: 2rem;
         }
     }
 }
@@ -138,12 +138,12 @@
 .comment-seen-person {
     align-items: center;
     display: flex;
-    gap: 6px;
+    gap: .75rem;
     white-space: nowrap;
 }
 
 .comment-seen-avatar {
     border-radius: 50%;
-    height: 20px;
-    width: 20px;
+    height: 2rem;
+    width: 2rem;
 }

@@ -26,22 +26,25 @@
             gap: variables.$spacing-small;
             width: 100%;
 
+            /* A heading, not a field. The text cursor and the box on hover
+               were the affordances of the click-to-edit it used to be —
+               renaming happens in the board info dialog now, and an outline
+               that appears under the pointer and does nothing when clicked is
+               a promise the page no longer keeps. */
             h1 {
-                border: 1px solid transparent;
                 color: variables.$primary-text-color;
-                cursor: text;
+                cursor: default;
                 letter-spacing: 0.5px;
                 padding: variables.$spacing-xs variables.$spacing-xs variables.$spacing-xs 0;
-
-                &:hover {
-                    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-                }
             }
 
-            & > * {
+            /* The buttons beside it. `:not(:first-child)` skipped the title
+               back when it was the first child AND interactive; the title is
+               neither now, so the buttons say so for themselves. */
+            & > *:not(blockquote) {
                 cursor: pointer;
 
-                &:hover:not(:first-child) {
+                &:hover {
                     background-color: variables.$workspace-hover;
                 }
             }

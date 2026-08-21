@@ -1,13 +1,11 @@
 import {BoardFilter} from '../board/board-filter'
-import {updateBoardMeta, toggleModal, toggleStarred} from '../../store/board.actions'
-import {loadBoards} from '../../store/board.actions'
+import {toggleStarred} from '../../store/board.actions'
 
 import { Icon } from '../icon'
 import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 import {Tooltip} from '@mui/material'
-import {singleLineEditable} from '../../services/editable'
 import {RichTextView} from '../rich-text/rich-text-view'
 import {AutomationPanel} from '../automation/automation-panel'
 import {BinPanel} from '../bin/bin-panel'
@@ -34,18 +32,6 @@ export function BoardHeader({
     const [isAutomationOpen, setIsAutomationOpen] = useState(false)
     const [isBinOpen, setIsBinOpen] = useState(false)
 
-    async function onSave(ev){
-        const value = ev.target.innerText
-        if(!value || value === board.title) return
-        board.title = value
-        try {
-            await updateBoardMeta(board._id, {title: value})
-            loadBoards()
-        } catch(err) {
-            console.log('saving failed')
-        }
-    }
-
     function onToggleStarred(){
         try {
             toggleStarred(board, isStarredOpen)
@@ -65,19 +51,16 @@ export function BoardHeader({
         <header className="board-header">
             <section className="board-title flex align-center space-around">
                 <div className="board-info flex">
-                    {/* Editable only for whoever may actually save it. A
-                        contentEditable that quietly loses the change on blur is
-                        worse than a heading that is plainly not editable. */}
-                    {canManage?(
-                        <Tooltip title={t('board.clickToEdit')} arrow>
-                            <blockquote contentEditable onBlur={onSave} suppressContentEditableWarning={true}
-                                        {...singleLineEditable()}>
-                                <h1>{board.title}</h1>
-                            </blockquote>
-                        </Tooltip>
-                    ):(
-                        <blockquote><h1>{board.title}</h1></blockquote>
-                    )}
+                    {/* Not editable here, deliberately, and it used to be.
+                        A contentEditable heading has no edge and no cursor
+                        change to say where it starts or ends, so a click meant
+                        for the page put the caret in the board's name — and
+                        the save happens on blur, silently, wherever you click
+                        next. Renaming lives in the board info dialog behind
+                        the button to the right, where there is a field, a
+                        description beside it and somewhere to look when it
+                        does not work. */}
+                    <blockquote><h1>{board.title}</h1></blockquote>
                     <Tooltip title={t('board.showDescription')} arrow>
                         <div className="info-btn icon" onClick={() => setIsShowDescription(true)}>
                             <Icon name='circle-exclamation'/>
