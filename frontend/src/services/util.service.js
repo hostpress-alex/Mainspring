@@ -93,8 +93,22 @@ function getRandomColor(){
     return `#${randColor.toUpperCase()}`
 }
 
+/** Whole minutes since `time`. Negative when the moment is in the future. */
+function minutesSince(time){
+    const then = Number(time)
+    if(!Number.isFinite(then)) return NaN
+    return Math.floor((Date.now() - then) / 60000)
+}
+
+/**
+ * "3 Std.", "2 Tg." — the largest unit that fits.
+ *
+ * The ladder returns on the first match, which is what makes it correct. Its
+ * twin below did not, and see there for what that cost.
+ */
 function calculateTime(time){
-    const timeDiff = Math.floor((Date.now() - time) / 60000)
+    const timeDiff = minutesSince(time)
+    if(!Number.isFinite(timeDiff)) return ''
     if(timeDiff >= 60 * 24 * 7) return `${Math.floor(timeDiff / (60 * 24 * 7))} ${t('time.weekShort')}`
     if(timeDiff >= 60 * 24) return `${Math.floor(timeDiff / (60 * 24))} ${t('time.dayShort')}`
     if(timeDiff >= 60) return `${Math.floor(timeDiff / 60)} ${t('time.hourShort')}`
@@ -102,16 +116,27 @@ function calculateTime(time){
     return t('time.justNow')
 }
 
+/**
+ * The same thing, as "vor 2 Tg.".
+ *
+ * This used to carry its own copy of the ladder above, and the copy had two
+ * faults that together produced "vor 42492 Min." for something 41 hours old:
+ *
+ *   - no `else`. Every branch that matched overwrote the one before it, so the
+ *     SMALLEST unit always won. It could never say hours, days or weeks — the
+ *     one job it had.
+ *   - the numbers 1, 2, 3, 4 were glued to the front of each branch's text.
+ *     Somebody used them to see which branch had fired and they shipped. The
+ *     "4" is the whole difference between 42492 and the real 2492.
+ *
+ * So it does not have its own copy any more. One ladder, one place to be wrong.
+ */
 function calculateTimeWithBefore(time){
-    var timeReturn = '';
-    const timeDiff = Math.floor((Date.now() - time) / 60000)
-    if(timeDiff >= 60 * 24 * 7) timeReturn =  `1${Math.floor(timeDiff / (60 * 24 * 7))} ${t('time.weekShort')}`
-    if(timeDiff >= 60 * 24) timeReturn =  `2${Math.floor(timeDiff / (60 * 24))} ${t('time.dayShort')}`
-    if(timeDiff >= 60) timeReturn =  `3${Math.floor(timeDiff / 60)} ${t('time.hourShort')}`
-    if(timeDiff >= 2) timeReturn =  `4` + timeDiff + ` ${t('time.minuteShort')}`
-    else return t('time.justNow')
-
-    return `${t('time.beforeTime', {time: timeReturn})}`;
+    const timeDiff = minutesSince(time)
+    if(!Number.isFinite(timeDiff)) return ''
+    // "vor gerade eben" is not a sentence.
+    if(timeDiff < 2) return t('time.justNow')
+    return t('time.beforeTime', {time: calculateTime(time)})
 }
 
 function getFormattedDate(timestamp){

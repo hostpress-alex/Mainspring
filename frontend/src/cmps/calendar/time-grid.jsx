@@ -12,6 +12,8 @@ const SNAP = 15                 // minute grid for dragging and creating
 const MIN_DRAG_MINUTES = 15     // below this it counts as a click, not as a drag
 const DEFAULT_MINUTES = 60      // duration for a plain click into the grid
 const GUTTER_PX = 58           // width of the hour rail, see calendar.css
+/** A little sky above the first entry, so it does not sit on the top edge. */
+const AIR_ABOVE_PX = 24
 
 /**
  * Day and week view.
@@ -64,6 +66,77 @@ function offHoursOf(workHours, day){
     return bands
 }
 
+/**
+ * Which part of the day is worth looking at.
+ *
+ * The grid is all 24 hours and it has to be — an entry at 04:30 is a real
+ * entry and a calendar that cannot show it is broken. But a day whose content
+ * sits between 09:00 and 18:00 used to open at midnight, so seeing anything
+ * cost eight empty hours of scrolling. The old code scrolled to a fixed
+ * `(7/24) * range * 1.15` — a guess with a fudge factor in it, wrong in both
+ * directions: past an early entry, short of a late one.
+ *
+ * Read from what is actually on screen, in this order:
+ *
+ *   1. the entries in view, the ones from Google included. They take up the
+ *      same room and are just as much a reason to be looking somewhere.
+ *   2. failing that, the working hours of the days shown. An empty Tuesday
+ *      should still open on Tuesday's working day rather than at midnight.
+ *   3. failing that — nothing planned, no hours recorded — a plain office day.
+ *
+ * Minutes since midnight, both ends.
+ */
+const FALLBACK_FROM = 8 * 60
+const FALLBACK_TO = 18 * 60
+
+/** A Date, whatever it arrived as. Null when it is not a moment at all. */
+function toDate(value){
+    if(value === null || value === undefined || value === '') return null
+    const date = (value instanceof Date)?value:new Date(value)
+    return Number.isNaN(date.getTime())?null:date
+}
+
+export function spanOfInterest(items, days, workHours){
+    let from = Infinity
+    let to = -Infinity
+
+    for(const item of items || []){
+        // Three shapes reach this: a schedule entry carries what the server
+        // sent (an ISO string), an entry being previewed carries a Date, and
+        // a Google event carries milliseconds. `minutesOfDay` wants a Date, so
+        // the coercion happens here rather than at three call sites — the
+        // first version skipped it and the whole calendar went down on
+        // "d.getHours is not a function".
+        const start = toDate(item && item.start)
+        const end = toDate(item && item.end)
+        if(!start || !end) continue
+
+        // Clamped into the day. An entry that began the evening before is
+        // drawn from midnight here, and taking its real start would drag the
+        // view to 22:00 on a day where nothing happens before nine.
+        const startMin = Math.max(0, minutesOfDay(start))
+        const endMin = minutesOfDay(end)
+        from = Math.min(from, startMin)
+        // Midnight as an END means the next day, not the same one — and so
+        // does any end that lands before its own start.
+        to = Math.max(to, endMin <= startMin?1440:endMin)
+    }
+
+    if(from === Infinity){
+        for(const day of days || []){
+            const hours = (workHours || []).find(h => h.weekday === day.getDay())
+            if(!hours) continue
+            from = Math.min(from, Number(hours.startMin) || 0)
+            to = Math.max(to, Number(hours.endMin) || 0)
+        }
+    }
+
+    if(from === Infinity) return {fromMin: FALLBACK_FROM, toMin: FALLBACK_TO}
+    // A block of no height would ask to be centred on nothing.
+    if(to <= from) to = Math.min(1440, from + 60)
+    return {fromMin: from, toMin: to}
+}
+
 export function TimeGrid({days, entries, external = [], workHours = [], taskInfo = {}, onCreate, onMove, onOpen, onOpenTask}){
     const elGrid = useRef()
     const elBody = useRef()
@@ -76,12 +149,86 @@ export function TimeGrid({days, entries, external = [], workHours = [], taskInfo
         return () => clearInterval(id)
     }, [])
 
-    // Scroll into the working day on opening instead of starting at midnight
-    useLayoutEffect(() => {
+    /**
+     * Put the day's content on screen, once, without ever fighting the person.
+     *
+     * Two rules, and both of them are the difference between helpful and
+     * infuriating:
+     *
+     *   - once per visible range. The entries arrive after the first paint, so
+     *     this cannot be a mount-only effect — but re-running it on every
+     *     change to `entries` would yank the view back under somebody's hands
+     *     the moment they drag one.
+     *   - the moment the scroll position is moved by hand, this stops for that
+     *     range. Somebody who scrolled to 06:00 to look at something meant it.
+     *
+     * Paging to another week is a new range and starts again, which is the
+     * behaviour you want: a fresh week opens on its own content.
+     */
+    const rangeKey = `${days.length}:${days[0]?+days[0]:0}`
+    const autoScroll = useRef({key: null, mine: -1, byHand: false, done: false})
+
+    useEffect(() => {
         const body = elBody.current
         if(!body) return
-        body.scrollTop = (7 / 24) * (body.scrollHeight - body.clientHeight) * 1.15
-    }, [days.length])
+
+        function onScroll(){
+            const state = autoScroll.current
+            // Our own assignment fires this too. Anything further than a
+            // rounding difference from what we set was a hand.
+            if(Math.abs(body.scrollTop - state.mine) > 2) state.byHand = true
+        }
+
+        body.addEventListener('scroll', onScroll, {passive: true})
+        return () => body.removeEventListener('scroll', onScroll)
+    }, [])
+
+    useLayoutEffect(() => {
+        const body = elBody.current
+        const grid = elGrid.current
+        if(!body || !grid) return
+
+        const state = autoScroll.current
+        if(state.key !== rangeKey){
+            state.key = rangeKey
+            state.byHand = false
+            state.done = false
+        } else if(state.byHand || state.done){
+            return
+        }
+
+        const height = grid.offsetHeight
+        if(!height) return
+
+        // From the props, deliberately, and not from `shown`: that one carries
+        // the drag preview, so depending on it would recompute the scroll
+        // target on every mouse move while somebody is moving an entry.
+        const items = [
+            ...(entries || []),
+            ...(external || []).filter(e => e && !e.isAllDay)
+        ]
+        const {fromMin, toMin} = spanOfInterest(items, days, workHours)
+        const gridTop = grid.offsetTop
+        const perMin = height / 1440
+        // The sticky header and the all-day row sit above the grid inside the
+        // same scroller, so the visible height of the grid is what is left.
+        const view = Math.max(0, body.clientHeight - (gridTop - body.offsetTop))
+        const blockPx = (toMin - fromMin) * perMin
+
+        // Centred only when the whole block fits. Centring a block taller than
+        // the window opens BELOW its first entry, which is the one thing this
+        // was supposed to stop.
+        const target = blockPx < view
+            ?gridTop + fromMin * perMin - (view - blockPx) / 2
+            :gridTop + fromMin * perMin - AIR_ABOVE_PX
+
+        const next = Math.max(0, Math.min(body.scrollHeight - body.clientHeight, Math.round(target)))
+        state.mine = next
+        // Only finished once there was something real to go by, so the first
+        // paint — before the entries arrive — does not lock in the fallback.
+        state.done = items.length > 0
+        body.scrollTop = next
+    }, [rangeKey, entries, external, workHours])
 
     /**
      * Measurements are taken from the grid element. The columns themselves sit
