@@ -9,7 +9,7 @@
     box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
     border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
     border-radius: 8px;
-    z-index: calc(var(--z-popover) + 50);   /* the host for menus opened from anywhere, so above them */
+    z-index: variables.$z-popover + 50;   /* the host for menus opened from anywhere, so above them */
 
     // Whatever is clickable in a popup should look it. Until now the cursor
     // change hung off each popup file separately — and was promptly missing.

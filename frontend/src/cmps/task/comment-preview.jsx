@@ -8,6 +8,7 @@ import {formatRelative, formatExact} from '../../services/date.util'
 import { Avatar } from '../avatar'
 import {AttachmentStrip} from './attachment-strip'
 import {CommentReactions} from './comment-reactions'
+import {formatDuration} from '../../services/time.service'
 import {useTaskReactions} from './use-task-reactions'
 import {RichTextEditor} from '../rich-text/rich-text-editor'
 import {RichTextView} from '../rich-text/rich-text-view'
@@ -202,6 +203,27 @@ export function CommentPreview({
                             <Icon name='reply'/>
                             <span>{t('update.replies')}</span>
                         </button>
+                    )}
+                    {/**
+                     * How long the work took, for an update the timer posted.
+                     *
+                     * Far right, after everything you can DO with the update,
+                     * because it is not an action — it is a fact about where
+                     * the text came from. Only present when there is one, and
+                     * that is the minority of updates: a band that says
+                     * nothing under every other one is noise.
+                     *
+                     * The number comes from the time entry on every read, not
+                     * from a copy on the comment, so correcting the entry
+                     * corrects this. See migration 20260821_000032.
+                     */}
+                    {comment.timeMs > 0 && (
+                        <Tooltip title={t('time.fromTimer')} arrow placement="top">
+                            <span className="comment-time">
+                                <Icon name='stopwatch'/>
+                                <span>{formatDuration(comment.timeMs)}</span>
+                            </span>
+                        </Tooltip>
                     )}
                 </div>
             )}

@@ -97,7 +97,7 @@
                 width: functions.rem(30px);
                 height: functions.rem(30px);
                 background-color: variables.$color-done-green;
-                color: #fff;
+                color: variables.$app-bg;
                 border-radius: 8px;
             }
 
@@ -200,9 +200,9 @@
         left: calc(100% - 14px);
         padding: variables.$spacing-xs;
         border-radius: 20px;
-        border: 1px solid #c3c6d4;
-        background-color: #fff;
-        z-index: var(--z-nav);
+        border: 1px solid variables.$task-box-shadow-color;
+        background-color: variables.$app-bg;
+        z-index: variables.$z-nav;
         cursor: pointer;
         transition: .2s;
 
@@ -250,7 +250,7 @@
     gap: 4px;
     cursor: pointer;
     padding: 7px 8px 5px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
 
     .workspace-section-name {
@@ -268,6 +268,6 @@
 
 .workspace-section-empty {
     padding: 4px 12px 8px;
-    color: #9699a6;
+    color: variables.$field-border;
     font-size: 12px;
 }

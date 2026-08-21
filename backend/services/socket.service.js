@@ -118,17 +118,13 @@ function boardHasTask(board, taskId){
 }
 
 /**
- * Turn the topic a client asked for into the room it is actually allowed to
- * join. Returns null when it may not join anything.
+ * The board room a client may join, or null.
  *
- * A topic is either a board id (board-details.jsx) or a task id
- * (task-modal.jsx). A task modal is only ever opened from inside a board the
- * client already had open, so a task topic is resolved against the board this
- * socket was last authorised for. That keeps the lookup exact — (board_id, id)
- * is the primary key of a task — and avoids scanning for a task id that is
- * only unique within its own board.
+ * `chat-set-topic` carries a board id and nothing else now. It used to carry
+ * either a board id or a task id and this function guessed which by trying the
+ * board lookup first — see taskRoomFor for why that guess had to go.
  */
-async function resolveRoom(socket, topic){
+async function boardRoomFor(socket, topic){
     const id = String(topic || '').trim()
     if(!id) return null
 
@@ -138,18 +134,39 @@ async function resolveRoom(socket, topic){
 
     const user = socket.data.user
     if(!user) return null
-
     const board = await boardIfPermitted(id, user)
-    if(board){
-        socket.data.boardId = id
-        return BOARD_ROOM + id
-    }
+    return board?BOARD_ROOM + id:null
+}
 
-    const openBoardId = socket.data.boardId
-    if(!openBoardId) return null
-    const parent = await boardIfPermitted(openBoardId, user)
-    if(!parent || !boardHasTask(parent, id)) return null
-    return TASK_ROOM + openBoardId + ':' + id
+/**
+ * The task room a client may join, or null.
+ *
+ * The board id is now sent WITH the task id instead of being taken from
+ * whichever board this socket last authorised. That change is not tidiness:
+ *
+ *   - the old version read `socket.data.boardId`, which is only set once a
+ *     board topic has been joined. A task opened from the CALENDAR (see
+ *     task-panel-host) never joins one, so the request was refused and that
+ *     dialog got no live updates at all — no reactions, no read receipts, no
+ *     comments from anybody else. Nothing said so; a socket that has been
+ *     refused looks exactly like one nobody is posting to.
+ *   - and a socket that has two boards in its history would have resolved a
+ *     task against the wrong one.
+ *
+ * The membership check is the same as ever, on the board the client names.
+ */
+async function taskRoomFor(socket, boardId, taskId){
+    const board = String(boardId || '').trim()
+    const task = String(taskId || '').trim()
+    if(!board || !task) return null
+
+    if(config.isGuestMode) return TASK_ROOM + board + ':' + task
+
+    const user = socket.data.user
+    if(!user) return null
+    const parent = await boardIfPermitted(board, user)
+    if(!parent || !boardHasTask(parent, task)) return null
+    return TASK_ROOM + board + ':' + task
 }
 
 /* ---------------------------------------------------------------- set-up -- */
@@ -176,8 +193,11 @@ function setupSocketAPI(http){
             logger.error('cannot identify a socket', err)
             socket.data.user = null
         }
-        socket.data.room = null
-        socket.data.boardId = null
+        // Two slots, not one. They mean different things and end at different
+        // moments: the board room lasts as long as the board is on screen, the
+        // task room as long as a dialog is open on top of it.
+        socket.data.boardRoom = null
+        socket.data.taskRoom = null
         next()
     })
 
@@ -192,10 +212,16 @@ function setupSocketAPI(http){
             logger.info(`Socket disconnected [id: ${socket.id}]`)
         })
 
+        /**
+         * The board on screen.
+         *
+         * Switching boards drops the task room as well: a dialog belonging to
+         * the board you just left is not open any more.
+         */
         socket.on('chat-set-topic', async topic => {
             let room = null
             try {
-                room = await resolveRoom(socket, topic)
+                room = await boardRoomFor(socket, topic)
             } catch(err) {
                 logger.error(`Could not resolve topic ${topic}`, err)
             }
@@ -209,15 +235,47 @@ function setupSocketAPI(http){
                 return
             }
 
-            if(socket.data.room === room) return
-            if(socket.data.room) socket.leave(socket.data.room)
-            socket.join(room)
-            socket.data.room = room
-            logger.info(`Socket [id: ${socket.id}] joined ${room}`)
+            if(joinBoardRoom(socket, room)) logger.info(`Socket [id: ${socket.id}] joined ${room}`)
         })
 
+        /**
+         * A task dialog opened. **The board room is kept.**
+         *
+         * That is the whole point of this round. A socket used to be in one
+         * room, so opening a task left the board's — and every live board
+         * update stopped until the dialog was closed again. Fifteen people saw
+         * a board that had quietly stopped moving, which is indistinguishable
+         * from a board nobody is working on.
+         *
+         * The board id travels with the task id; see taskRoomFor.
+         */
+        socket.on('task-open', async payload => {
+            const {boardId, taskId} = payload || {}
+            let room = null
+            try {
+                room = await taskRoomFor(socket, boardId, taskId)
+            } catch(err) {
+                logger.error(`Could not resolve task ${boardId}/${taskId}`, err)
+            }
+
+            if(!room){
+                logger.warn(`Socket [id: ${socket.id}, user: ${who()}] refused task ${boardId}/${taskId}`)
+                socket.emit('socket-denied', {taskId: String(taskId || '')})
+                return
+            }
+
+            if(joinTaskRoom(socket, room)) logger.info(`Socket [id: ${socket.id}] joined ${room}`)
+        })
+
+        /** The dialog closed. The board room, if there is one, stays. */
+        socket.on('task-close', () => leaveTask(socket))
+
+        /**
+         * A comment. To the task room when a dialog is open, because that is
+         * where a comment is written and read; to the board otherwise.
+         */
         socket.on('chat-send-msg', msg => {
-            const room = socket.data.room
+            const room = targetRoom(socket)
             if(!room) return refuse(socket, 'chat-send-msg')
             socket.broadcast.to(room).emit('chat-add-msg', msg)
         })
@@ -246,12 +304,62 @@ function setupSocketAPI(http){
 
         socket.on('unset-user-socket', () => {
             if(socket.data.user) socket.leave(USER_ROOM + String(socket.data.user._id))
-            if(socket.data.room) socket.leave(socket.data.room)
-            socket.data.room = null
-            socket.data.boardId = null
+            if(socket.data.boardRoom) socket.leave(socket.data.boardRoom)
+            leaveTask(socket)
+            socket.data.boardRoom = null
             socket.data.user = null
         })
     })
+}
+
+/* ------------------------------------------------------- room bookkeeping --
+ *
+ * Which rooms a socket holds, kept out of the event handlers so it can be
+ * tested without a server. The rules are short and the whole round is in the
+ * second one.
+ */
+
+/** Leave the task room, if in one. Idempotent — three callers rely on that. */
+function leaveTask(socket){
+    if(!socket.data.taskRoom) return
+    socket.leave(socket.data.taskRoom)
+    socket.data.taskRoom = null
+}
+
+/**
+ * Move to a board room.
+ *
+ * The task room goes too: a dialog belonging to the board you have just left
+ * is not open any more. Re-joining the room already held does nothing, which
+ * matters because the client re-emits its topic on every reconnect.
+ */
+function joinBoardRoom(socket, room){
+    if(socket.data.boardRoom === room) return false
+    if(socket.data.boardRoom) socket.leave(socket.data.boardRoom)
+    leaveTask(socket)
+    socket.join(room)
+    socket.data.boardRoom = room
+    return true
+}
+
+/**
+ * Add a task room. **The board room is untouched.**
+ *
+ * This one line is the fix. A socket used to hold one room, so this was a
+ * move rather than an addition, and every live board update stopped for as
+ * long as somebody had a task dialog open.
+ */
+function joinTaskRoom(socket, room){
+    if(socket.data.taskRoom === room) return false
+    leaveTask(socket)
+    socket.join(room)
+    socket.data.taskRoom = room
+    return true
+}
+
+/** Where a message from this socket goes: the dialog if one is open. */
+function targetRoom(socket){
+    return socket.data.taskRoom || socket.data.boardRoom || null
 }
 
 function refuse(socket, event){
@@ -298,17 +406,36 @@ function emitToBoard({type, boardId, args = []}){
 }
 
 /**
- * To everyone who has this task open.
+ * To everyone who has this task open — and nobody else.
  *
- * A socket is in exactly one room at a time, and a client with a task dialog
- * open is in that task's room rather than the board's (see resolveRoom). So
- * anything that only matters inside the dialog — a reaction, for instance —
- * has to go here; sending it to the board would reach precisely the people who
- * cannot see it.
+ * For things that only exist inside the dialog. A client with the task open is
+ * in this room whether or not it also has the board open, so this reaches all
+ * of them; it reaches the calendar's task panel too, which has no board room
+ * at all.
  */
 function emitToTask({type, boardId, taskId, args = []}){
     if(!gIo) return
     gIo.to(TASK_ROOM + String(boardId) + ':' + String(taskId)).emit(type, ...args)
+}
+
+/**
+ * To the board AND to the dialog, exactly once each.
+ *
+ * A reaction changes a count in the board row and the contents of the open
+ * dialog, so both audiences want it — and a socket may now be in both rooms.
+ * `to(a).to(b)` is a union, not two sends: socket.io delivers once per socket.
+ *
+ * This replaces the two separate emits that reaction.controller and
+ * seen.controller each had to make, with a comment apiece explaining that a
+ * socket sits in one room and which one was a race. It was a race, it is not
+ * any more, and doing it twice would now deliver twice — to the very clients
+ * that have the dialog open.
+ */
+function emitToBoardAndTask({type, boardId, taskId, args = []}){
+    if(!gIo) return
+    gIo.to(BOARD_ROOM + String(boardId))
+        .to(TASK_ROOM + String(boardId) + ':' + String(taskId))
+        .emit(type, ...args)
 }
 
 /**
@@ -355,6 +482,7 @@ module.exports = {
     emitToUser,
     emitToBoard,
     emitToTask,
+    emitToBoardAndTask,
     emitToAll,
     disconnectUser,
     broadcast,
@@ -362,6 +490,10 @@ module.exports = {
     // Exported so the tests can reach the pure parts without a live server.
     readCookie,
     boardHasTask,
+    leaveTask,
+    joinBoardRoom,
+    joinTaskRoom,
+    targetRoom,
     BOARD_ROOM,
     TASK_ROOM
 }

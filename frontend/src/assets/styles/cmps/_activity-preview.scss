@@ -224,7 +224,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-style: italic;
     }
 }

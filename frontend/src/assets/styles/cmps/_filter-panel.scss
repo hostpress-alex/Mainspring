@@ -43,7 +43,7 @@
     padding: 0 5px;
     border-radius: 9px;
     background: variables.$board-btn;
-    color: #fff;
+    color: variables.$app-bg;
     font-size: 12px;
     text-align: center;
 }
@@ -52,7 +52,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: var(--z-popover);
+    z-index: variables.$z-popover;
     width: min(860px, 96vw);
     margin-top: 6px;
     padding: variables.$spacing-medium;
@@ -90,7 +90,7 @@
         font-size: 14px;
 
         &:disabled {
-            color: #a1a3ad;
+            color: variables.$text-disabled;
             cursor: default;
         }
     }
@@ -115,7 +115,7 @@
         &.is-active {
             background: variables.$board-btn;
             border-color: variables.$board-btn;
-            color: #fff;
+            color: variables.$app-bg;
         }
     }
 }
@@ -148,7 +148,7 @@
     font: inherit;
     font-size: 14px;
 
-    &:disabled { background: #f6f7fb; }
+    &:disabled { background: variables.$sidebar-workspace-bg; }
 }
 
 /* The list of choices for isAnyOf / isNoneOf. Wraps rather than scrolls: a
@@ -182,7 +182,7 @@
 }
 
 .filter-value.is-empty {
-    color: #9699a6;
+    color: variables.$field-border;
     text-align: center;
 }
 
@@ -192,7 +192,7 @@
     color: variables.$workspace-icon-color;
     cursor: pointer;
 
-    &:hover { color: #a3283a; }
+    &:hover { color: variables.$danger-text; }
 }
 
 .filter-actions {
@@ -216,7 +216,7 @@
     &:hover:not(:disabled) { background: variables.$workspace-hover; }
 
     &:disabled {
-        color: #a1a3ad;
+        color: variables.$text-disabled;
         cursor: default;
     }
 }
@@ -224,10 +224,10 @@
 .filter-error {
     margin-bottom: variables.$spacing-small;
     padding: 8px 12px;
-    border: 1px solid #e2445c;
+    border: 1px solid variables.$colors-red-middle;
     border-radius: 6px;
-    background: #fff0f2;
-    color: #a3283a;
+    background: variables.$danger-surface;
+    color: variables.$danger-text;
     font-size: 14px;
 }
 
@@ -243,7 +243,7 @@
 }
 
 .filter-views-label {
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
 }
 
@@ -273,5 +273,5 @@
     color: variables.$workspace-icon-color;
     cursor: pointer;
 
-    &:hover { color: #a3283a; }
+    &:hover { color: variables.$danger-text; }
 }

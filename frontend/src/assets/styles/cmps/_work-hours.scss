@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 /**
  * The weekly hours editor, and the team table it sits inside.
  *
@@ -13,13 +15,13 @@
     }
 
     td {
-        border-bottom: 1px solid #eceef5;
+        border-bottom: 1px solid variables.$surface-muted;
         padding: 6px 4px;
         vertical-align: middle;
     }
 
     tr.is-off td {
-        color: #9699a6;
+        color: variables.$field-border;
     }
 
     .work-hours-day {
@@ -47,7 +49,7 @@
 
     .work-hours-break {
         align-items: center;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         display: flex;
         font-size: 12px;
         gap: 6px;
@@ -59,16 +61,16 @@
     }
 
     .work-hours-dash {
-        color: #676879;
+        color: variables.$workspace-icon-color;
     }
 
     .work-hours-free {
-        color: #9699a6;
+        color: variables.$field-border;
         font-size: 13px;
     }
 
     .work-hours-sum {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: 13px;
         text-align: right;
         white-space: nowrap;
@@ -93,7 +95,7 @@
     }
 
     .work-hours-saved {
-        color: #00854d;
+        color: variables.$success-text-strong;
         font-size: 13px;
     }
 }
@@ -109,7 +111,7 @@
     }
 
     .team-hours-total {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: 12px;
     }
 
@@ -119,7 +121,7 @@
     }
 
     .team-sync {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: 12px;
         white-space: nowrap;
     }
@@ -127,7 +129,7 @@
     /* Not hidden behind a tooltip alone: a calendar that stopped arriving is
        the kind of thing nobody notices until somebody misses a meeting. */
     .team-sync-error {
-        color: #d83a52;
+        color: variables.$danger;
         cursor: help;
     }
 
@@ -137,6 +139,6 @@
     }
 
     .team-editor-row > td {
-        background: #fbfbfd;
+        background: variables.$surface-faint;
     }
 }

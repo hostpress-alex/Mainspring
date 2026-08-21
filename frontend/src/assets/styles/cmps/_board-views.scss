@@ -70,7 +70,7 @@
     padding: 0 4px;
     border-radius: 8px;
     background: variables.$board-btn;
-    color: #fff;
+    color: variables.$app-bg;
     font-size: 11px;
     line-height: 16px;
     text-align: center;
@@ -109,7 +109,7 @@
 
 .view-error {
     padding: 0 variables.$spacing-small;
-    color: #a3283a;
+    color: variables.$danger-text;
     font-size: functions.rem(13px);
 }
 
@@ -117,7 +117,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: var(--z-popover);
+    z-index: variables.$z-popover;
     min-width: 220px;
     margin: 4px 0 0;
     padding: 4px;
@@ -147,12 +147,12 @@
         }
 
         &:disabled {
-            color: #a1a3ad;
+            color: variables.$text-disabled;
             cursor: default;
         }
 
         &.is-danger:hover {
-            color: #a3283a;
+            color: variables.$danger-text;
         }
     }
 }
@@ -162,7 +162,7 @@
     position: absolute;
     top: 100%;
     inset-inline-start: 0;
-    z-index: var(--z-popover);
+    z-index: variables.$z-popover;
     display: flex;
     flex-direction: column;
     gap: variables.$spacing-small;
@@ -219,7 +219,7 @@
             &.is-active {
                 border-color: variables.$board-btn;
                 background: variables.$board-btn;
-                color: #fff;
+                color: variables.$app-bg;
             }
         }
     }
@@ -232,14 +232,14 @@
         cursor: pointer;
 
         &.is-off {
-            color: #9699a6;
+            color: variables.$field-border;
             cursor: default;
         }
     }
 
     .view-form-note {
         margin: 0;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: functions.rem(12px);
     }
 
@@ -248,13 +248,13 @@
         border: 0;
         border-radius: 6px;
         background: variables.$board-btn;
-        color: #fff;
+        color: variables.$app-bg;
         font: inherit;
         font-size: functions.rem(14px);
         cursor: pointer;
 
         &:disabled {
-            background: #c3c6d4;
+            background: variables.$task-box-shadow-color;
             cursor: default;
         }
     }

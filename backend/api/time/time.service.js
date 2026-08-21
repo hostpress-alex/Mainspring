@@ -295,7 +295,12 @@ async function postAsUpdate(user, entry){
             parentId: null,
             txt: entry.note,
             archivedAt: Date.now(),
-            byMember: {_id: sid(user._id), fullname: user.fullname || '', imgUrl: user.imgUrl || ''}
+            byMember: {_id: sid(user._id), fullname: user.fullname || '', imgUrl: user.imgUrl || ''},
+            // Where this text came from. The duration is NOT copied here — it
+            // is read from the entry when the board is read, so correcting the
+            // entry later corrects what this update shows. See the migration
+            // 20260821_000032 for why that matters.
+            timeId: sid(entry.id)
         }
         await boardService.updateTaskFields(entry.boardId, group.id, entry.taskId, {
             comments: [comment, ...(task.comments || [])]

@@ -16,7 +16,7 @@
         height: 100%;
 
         &:hover {
-            border-color: #0073ea;
+            border-color: variables.$board-btn;
         }
 
         .chart-header {
@@ -49,7 +49,7 @@
                 border-radius: 4px;
 
                 &:hover {
-                    background-color: #d0d4e4;
+                    background-color: variables.$layout-border-color;
                 }
             }
         }

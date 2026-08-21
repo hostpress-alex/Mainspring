@@ -12,12 +12,11 @@
     /* Generous on purpose. The groups sit in rows now, so a column that
        scrolls at every screen would hide the second row behind it; this only
        catches a group with a genuinely unreasonable number of cards. */
-    --kanban-column-height: 78vh;
 
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-height: var(--kanban-column-height);
+    max-height: variables.$kanban-column-height;
     border-radius: 8px;
     background-color: variables.$sidebar-workspace-bg;
     overflow: hidden;

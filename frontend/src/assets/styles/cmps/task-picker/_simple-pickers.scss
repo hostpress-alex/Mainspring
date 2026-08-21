@@ -1,3 +1,5 @@
+@use "../../setup/variables";
+
 /**
  * Text, long text, checkbox and link columns.
  * All of this used to sit as inline styles in cmps/task/simple-pickers.jsx.
@@ -33,19 +35,19 @@
     // The editor floats over the row below, hence the shadow and the z-index.
     .longtext-box {
         position: absolute;
-        z-index: var(--z-popover);
+        z-index: variables.$z-popover;
         top: 100%;
         left: 0;
         width: 280px;
-        background: #fff;
-        border: 1px solid #c3c6d4;
+        background: variables.$app-bg;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         padding: 8px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
 
         textarea {
             width: 100%;
-            border: 1px solid #e0e3ee;
+            border: 1px solid variables.$colors-bluish-white;
             border-radius: 4px;
             padding: 6px;
             font: inherit;
@@ -60,12 +62,12 @@
     justify-content: center;
 
     .checkbox-on {
-        color: #00c875;
+        color: variables.$color-done-green;
         font-size: 18px;
     }
 
     .checkbox-off {
-        color: #c3c6d4;
+        color: variables.$task-box-shadow-color;
         font-size: 18px;
     }
 }
@@ -82,7 +84,7 @@
         gap: 5px;
 
         a {
-            color: #0073ea;
+            color: variables.$board-btn;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -90,7 +92,7 @@
         }
 
         .link-icon {
-            color: #0073ea;
+            color: variables.$board-btn;
             flex-shrink: 0;
         }
 

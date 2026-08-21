@@ -198,7 +198,7 @@
     }
 
     .members-imgs {
-        @include mixins.member-img(white, #323338, 1rem, 1rem);
+        @include mixins.member-img(white, variables.$primary-text-color, 1rem, 1rem);
 
         .member-img {
             border: 1px solid variables.$app-bg;

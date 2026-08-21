@@ -81,11 +81,11 @@ module.exports = {
         const fresh = await seenRepo.markSeen({boardId, taskId, commentIds, userId: user._id})
         if(!fresh.length) return {added: 0}
 
-        // Both rooms, for the reason written out in reaction.controller: a
-        // socket sits in one of them and which one is a race.
+        // Both audiences, one delivery — see reaction.controller. A socket may
+        // hold the board room and the task room at once now, so sending twice
+        // would arrive twice.
         const payload = [{boardId, taskId, commentIds: fresh, by: String(user._id)}]
-        sockets().emitToTask({type: SEEN_CHANGED, boardId, taskId, args: payload})
-        sockets().emitToBoard({type: SEEN_CHANGED, boardId, args: payload})
+        sockets().emitToBoardAndTask({type: SEEN_CHANGED, boardId, taskId, args: payload})
 
         return {added: fresh.length}
     }, 'Could not save the receipt')

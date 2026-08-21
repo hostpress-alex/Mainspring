@@ -3,7 +3,7 @@
 .confirm-overlay {
     position: fixed;
     inset: 0;
-    z-index: var(--z-confirm);
+    z-index: variables.$z-confirm;
     background: rgba(41, 47, 76, .45);
     display: flex;
     align-items: center;
@@ -48,46 +48,52 @@
     justify-content: flex-end;
     gap: 8px;
     margin-top: 20px;
-}
 
-.confirm-actions button {
-    height: 34px;
-    padding: 0 16px;
-    border-radius: 4px;
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
+
+    button {
+        height: 34px;
+        padding: 0 16px;
+        border-radius: 4px;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+    }
 }
 
 .confirm-cancel {
-    border: 1px solid #c3c6d4;
+    border: 1px solid variables.$task-box-shadow-color;
     background: variables.$app-bg;
     color: variables.$primary-text-color;
-}
 
-.confirm-cancel:hover {
-    background: variables.$workspace-hover;
+
+    &:hover {
+        background: variables.$workspace-hover;
+    }
 }
 
 .confirm-ok {
     border: none;
     background: variables.$board-btn;
     color: variables.$app-bg;
-}
 
-.confirm-ok:hover {
-    background: variables.$primary-hover-color;
-}
 
-.confirm-ok.is-danger {
-    background: #d83a52;
-}
+    &:hover {
+        background: variables.$primary-hover-color;
+    }
 
-.confirm-ok.is-danger:hover {
-    background: #b92e43;
-}
 
-.confirm-ok:focus-visible {
-    outline: 2px solid variables.$primary-text-color;
-    outline-offset: 2px;
+    &.is-danger {
+        background: variables.$danger;
+    }
+
+
+    &.is-danger:hover {
+        background: variables.$danger-hover;
+    }
+
+
+    &:focus-visible {
+        outline: 2px solid variables.$primary-text-color;
+        outline-offset: 2px;
+    }
 }

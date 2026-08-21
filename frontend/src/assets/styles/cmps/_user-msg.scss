@@ -16,7 +16,7 @@
     position: fixed;
     left: 90px;
     bottom: 24px;
-    z-index: var(--z-message);
+    z-index: variables.$z-message;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -37,20 +37,21 @@
     line-height: 1.45;
     /* The colour is the second signal, never the only one — hence the icon
        and the wording. A red bar alone is unreadable to a part of the team. */
-    border-left: 4px solid #d83a52;
-}
+    border-left: 4px solid variables.$danger;
 
-.user-msg.is-success {
-    border-left-color: #00c875;
+
+    &.is-success {
+        border-left-color: variables.$color-done-green;
+    }
 }
 
 .user-msg-icon {
     margin-top: 2px;
-    color: #d83a52;
+    color: variables.$danger;
 }
 
 .user-msg.is-success .user-msg-icon {
-    color: #00c875;
+    color: variables.$color-done-green;
 }
 
 .user-msg-txt {
@@ -80,16 +81,18 @@
     color: variables.$workspace-icon-color;
     font: inherit;
     cursor: pointer;
-}
 
-.user-msg-close:hover {
-    background: variables.$workspace-hover;
-    color: variables.$primary-text-color;
-}
 
-.user-msg-close:focus-visible {
-    outline: 2px solid variables.$primary-text-color;
-    outline-offset: 1px;
+    &:hover {
+        background: variables.$workspace-hover;
+        color: variables.$primary-text-color;
+    }
+
+
+    &:focus-visible {
+        outline: 2px solid variables.$primary-text-color;
+        outline-offset: 1px;
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {

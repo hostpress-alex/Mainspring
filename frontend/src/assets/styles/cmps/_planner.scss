@@ -12,7 +12,7 @@
  */
 
 .cal-plan-btn {
-    background: #fff;
+    background: variables.$app-bg;
     border: 1px solid variables.$board-btn;
     border-radius: 4px;
     color: variables.$board-btn;
@@ -22,27 +22,28 @@
     padding: 6px 12px;
 
     &:disabled {
-        border-color: #c3c6d4;
-        color: #9699a6;
+        border-color: variables.$task-box-shadow-color;
+        color: variables.$field-border;
         cursor: default;
     }
 }
 
 .cal-event.is-planned {
     /* The colour stays the group's; only the fill goes. */
-    background: color-mix(in srgb, var(--entry-color, #0073ea) 16%, #fff);
-    border: 1px dashed var(--entry-color, #0073ea);
-    color: #323338;
-}
+    background: color-mix(in srgb, var(--entry-color, variables.$board-btn) 16%, variables.$app-bg);
+    border: 1px dashed var(--entry-color, variables.$board-btn);
+    color: variables.$primary-text-color;
 
-.cal-event.is-planned .cal-event-sub {
-    opacity: .75;
+
+    .cal-event-sub {
+        opacity: .75;
+    }
 }
 
 /* An assumed duration gets a corner, not a colour: it is a footnote on the
    block, not a warning about it. */
 .cal-event.is-planned.is-assumed::after {
-    border-color: transparent var(--entry-color, #0073ea) transparent transparent;
+    border-color: transparent var(--entry-color, variables.$board-btn) transparent transparent;
     border-style: solid;
     border-width: 0 10px 10px 0;
     content: '';
@@ -52,22 +53,22 @@
 }
 
 .cal-chip.is-planned {
-    background: #fff;
-    border: 1px dashed var(--entry-color, #0073ea);
-    color: #323338;
+    background: variables.$app-bg;
+    border: 1px dashed var(--entry-color, variables.$board-btn);
+    color: variables.$primary-text-color;
 }
 
 /* ------------------------------------------------------------- report -- */
 
 .plan-report {
-    background: #fff;
-    border: 1px solid var(--cal-border, #e0e3ee);
+    background: variables.$app-bg;
+    border: 1px solid variables.$colors-bluish-white;
     border-radius: 8px;
     margin: 0 0 10px;
     padding: 12px 14px;
 
     h4 {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: 12px;
         font-weight: 600;
         margin: 10px 0 4px;
@@ -103,21 +104,21 @@
 .plan-report-close {
     background: none;
     border: 0;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     cursor: pointer;
     padding: 2px 4px;
 }
 
 .plan-report-line {
     align-items: center;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     display: flex;
     font-size: 13px;
     gap: 6px;
     margin: 6px 0 0;
 
     &.is-assumed {
-        color: #c98a00;
+        color: variables.$warning-text;
     }
 }
 
@@ -126,7 +127,7 @@
 }
 
 .plan-report-why {
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
 /* What was skipped is background information — it is there to be looked up,

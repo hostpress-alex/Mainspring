@@ -15,7 +15,7 @@
         .members-imgs {
             height: 100%;
             width: variables.$cell-width-person;
-            @include mixins.member-img(#323338, white, 1.75rem, 1.75rem);
+            @include mixins.member-img(variables.$primary-text-color, white, 1.75rem, 1.75rem);
             @include mixins.center-flex();
         }
 

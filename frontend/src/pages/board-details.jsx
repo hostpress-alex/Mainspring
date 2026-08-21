@@ -27,7 +27,6 @@ import {Dashboard} from './dashboard'
 export function BoardDetails(){
     const board = useSelector(storeState => storeState.boardModule.filteredBoard)
     const boards = useSelector(storeState => storeState.boardModule.boards)
-    const isBoardModalOpen = useSelector(storeState => storeState.boardModule.isBoardModalOpen)
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [isShowDescription, setIsShowDescription] = useState(false)
@@ -128,11 +127,24 @@ export function BoardDetails(){
         }
     }, [])
 
+    /**
+     * Re-join when the BOARD changes, and only then.
+     *
+     * `isBoardModalOpen` used to be in here, and it was a plaster over
+     * HANDOVER §6: a socket could hold one room, so opening a task dialog left
+     * the board's, and this effect put it back the moment the dialog closed.
+     * Which meant live board updates were dead for exactly as long as somebody
+     * had a task open — and re-joining on every open and close was the only
+     * reason anybody got them back at all.
+     *
+     * The socket holds both rooms now, so the dialog is none of this effect's
+     * business.
+     */
     useEffect(() => {
         socketService.off(SOCKET_EVENT_ADD_UPDATE_BOARD, loadSocketBoard)
         socketService.emit(SOCKET_EMIT_SET_TOPIC, boardId)
         socketService.on(SOCKET_EVENT_ADD_UPDATE_BOARD, loadSocketBoard)
-    }, [boardId, isBoardModalOpen])
+    }, [boardId])
 
     function closeOverlays(){
         setIsInviteModalOpen(false)

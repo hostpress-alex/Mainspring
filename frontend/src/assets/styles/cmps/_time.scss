@@ -4,9 +4,9 @@
 /* Time tracking: the control in the row, the dialog, the history, and the
    indicator in the sidebar. */
 
-$time-accent: #0073ea;
-$time-running: #00c875;
-$time-warn: #e2445c;
+$time-accent: variables.$board-btn;
+$time-running: variables.$color-done-green;
+$time-warn: variables.$colors-red-middle;
 
 /* --- the control, in the task's header -------------------------------- */
 
@@ -29,11 +29,11 @@ $time-warn: #e2445c;
         border: none;
         border-radius: 4px;
         background: transparent;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         cursor: pointer;
         font-size: functions.rem(12px);
 
-        &:hover:not(:disabled) { background: #e6e9ef; color: #323338; }
+        &:hover:not(:disabled) { background: variables.$surface-border; color: variables.$primary-text-color; }
         &:disabled { opacity: .5; cursor: default; }
         &.is-start:hover:not(:disabled) { color: $time-running; }
         &.is-stop:hover:not(:disabled) { color: $time-warn; }
@@ -50,7 +50,7 @@ $time-warn: #e2445c;
     .task-timer-total {
         font-size: functions.rem(12px);
         font-variant-numeric: tabular-nums;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         white-space: nowrap;
         padding-left: 4px;
     }
@@ -95,7 +95,7 @@ $time-warn: #e2445c;
 }
 
 .time-dialog {
-    background: #fff;
+    background: variables.$app-bg;
     border-radius: 8px;
     padding: 20px 22px;
     width: min(420px, calc(100vw - 32px));
@@ -111,11 +111,11 @@ $time-warn: #e2445c;
         align-items: center;
         gap: 6px;
         margin: 0 0 14px;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-variant-numeric: tabular-nums;
 
         .time-dialog-task {
-            color: #323338;
+            color: variables.$primary-text-color;
             font-weight: 600;
         }
     }
@@ -123,14 +123,14 @@ $time-warn: #e2445c;
     .time-dialog-label {
         display: block;
         font-size: functions.rem(13px);
-        color: #676879;
+        color: variables.$workspace-icon-color;
         margin-bottom: 4px;
     }
 
     .time-dialog-note {
         width: 100%;
         padding: 8px 10px;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         font-size: functions.rem(14px);
         font-family: inherit;
@@ -168,17 +168,17 @@ $time-warn: #e2445c;
         }
 
         .time-dialog-cancel {
-            background: #fff;
-            border-color: #c3c6d4;
-            color: #323338;
+            background: variables.$app-bg;
+            border-color: variables.$task-box-shadow-color;
+            color: variables.$primary-text-color;
         }
 
         .time-dialog-ok {
             background: $time-accent;
-            color: #fff;
+            color: variables.$app-bg;
 
             &.is-ghost {
-                background: #fff;
+                background: variables.$app-bg;
                 border-color: $time-accent;
                 color: $time-accent;
             }
@@ -208,21 +208,21 @@ $time-warn: #e2445c;
         margin-right: 6px;
     }
 
-    .time-panel-total-label { color: #676879; }
+    .time-panel-total-label { color: variables.$workspace-icon-color; }
 
     .time-panel-add {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 7px 12px;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
-        background: #fff;
-        color: #323338;
+        background: variables.$app-bg;
+        color: variables.$primary-text-color;
         cursor: pointer;
         font-size: functions.rem(13px);
 
-        &:hover { background: #f5f6f8; }
+        &:hover { background: variables.$row-hover; }
     }
 
     .time-panel-people {
@@ -230,7 +230,7 @@ $time-warn: #e2445c;
         flex-wrap: wrap;
         gap: 14px;
         padding: 10px 0 14px;
-        border-bottom: 1px solid #e6e9ef;
+        border-bottom: 1px solid variables.$surface-border;
 
         li {
             display: flex;
@@ -240,11 +240,11 @@ $time-warn: #e2445c;
         }
 
         .time-panel-avatar { width: 22px; height: 22px; border-radius: 50%; }
-        .time-panel-person-total { color: #676879; font-variant-numeric: tabular-nums; }
+        .time-panel-person-total { color: variables.$workspace-icon-color; font-variant-numeric: tabular-nums; }
     }
 
     .time-panel-empty {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         padding: 12px 0;
     }
 
@@ -259,7 +259,7 @@ $time-warn: #e2445c;
     align-items: flex-start;
     gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px solid #f0f1f4;
+    border-bottom: 1px solid variables.$hairline;
 
     &:hover .time-entry-actions { opacity: 1; }
 
@@ -280,17 +280,17 @@ $time-warn: #e2445c;
         flex-wrap: wrap;
     }
 
-    .time-entry-span { color: #676879; font-size: functions.rem(13px); font-variant-numeric: tabular-nums; }
+    .time-entry-span { color: variables.$workspace-icon-color; font-size: functions.rem(13px); font-variant-numeric: tabular-nums; }
     .time-entry-duration { font-weight: 600; font-variant-numeric: tabular-nums; }
 
     .time-entry-tag {
         font-size: functions.rem(11px);
         padding: 1px 7px;
         border-radius: 10px;
-        background: #e6e9ef;
-        color: #676879;
+        background: variables.$surface-border;
+        color: variables.$workspace-icon-color;
 
-        &.is-warn { background: #ffe6ea; color: #a3283a; }
+        &.is-warn { background: variables.$danger-tint-soft; color: variables.$danger-text; }
     }
 
     .time-entry-note {
@@ -309,12 +309,12 @@ $time-warn: #e2445c;
         button {
             border: none;
             background: transparent;
-            color: #676879;
+            color: variables.$workspace-icon-color;
             cursor: pointer;
             padding: 4px 6px;
             border-radius: 4px;
 
-            &:hover { background: #e6e9ef; color: #323338; }
+            &:hover { background: variables.$surface-border; color: variables.$primary-text-color; }
         }
     }
 }
@@ -322,24 +322,24 @@ $time-warn: #e2445c;
 .time-entry-form {
     width: 100%;
     padding: 12px;
-    border: 1px solid #c3c6d4;
+    border: 1px solid variables.$task-box-shadow-color;
     border-radius: 8px;
-    background: #f9fafc;
+    background: variables.$surface-faint-warm;
 
     .time-entry-form-row {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
 
-        label { display: flex; flex-direction: column; gap: 3px; font-size: functions.rem(12px); color: #676879; }
-        input { padding: 6px 8px; border: 1px solid #c3c6d4; border-radius: 6px; font-size: functions.rem(13px); }
+        label { display: flex; flex-direction: column; gap: 3px; font-size: functions.rem(12px); color: variables.$workspace-icon-color; }
+        input { padding: 6px 8px; border: 1px solid variables.$task-box-shadow-color; border-radius: 6px; font-size: functions.rem(13px); }
     }
 
     .time-entry-form-note {
         width: 100%;
         margin-top: 10px;
         padding: 7px 10px;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         font-size: functions.rem(13px);
     }
@@ -355,7 +355,7 @@ $time-warn: #e2445c;
         &.is-off { opacity: .45; cursor: default; }
     }
 
-    .time-entry-form-error { color: #a3283a; margin: 8px 0 0; font-size: functions.rem(13px); }
+    .time-entry-form-error { color: variables.$danger-text; margin: 8px 0 0; font-size: functions.rem(13px); }
 
     .time-entry-form-actions {
         display: flex;
@@ -366,13 +366,13 @@ $time-warn: #e2445c;
         button {
             padding: 6px 14px;
             border-radius: 6px;
-            border: 1px solid #c3c6d4;
-            background: #fff;
-            color: #323338;
+            border: 1px solid variables.$task-box-shadow-color;
+            background: variables.$app-bg;
+            color: variables.$primary-text-color;
             cursor: pointer;
             font-size: functions.rem(13px);
 
-            &.is-primary { background: $time-accent; border-color: $time-accent; color: #fff; }
+            &.is-primary { background: $time-accent; border-color: $time-accent; color: variables.$app-bg; }
             &:disabled { opacity: .6; cursor: default; }
         }
     }
@@ -420,13 +420,13 @@ $time-warn: #e2445c;
         button {
             border: none;
             background: transparent;
-            color: #c3c6d4;
+            color: variables.$task-box-shadow-color;
             cursor: pointer;
             padding: 2px 4px;
             border-radius: 4px;
             font-size: functions.rem(11px);
 
-            &:hover { color: #fff; background: rgba(255, 255, 255, .12); }
+            &:hover { color: variables.$app-bg; background: rgba(255, 255, 255, .12); }
         }
     }
 }

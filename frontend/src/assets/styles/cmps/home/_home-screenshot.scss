@@ -13,7 +13,7 @@
 
 
         .title {
-            background: linear-gradient(360deg, #adadad 53.95%, #8080e0 121.37%);
+            background: linear-gradient(360deg, variables.$text-faint 53.95%, variables.$home-violet-soft 121.37%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             padding: 18px;

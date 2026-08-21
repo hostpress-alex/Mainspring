@@ -10,7 +10,7 @@
 .search-backdrop {
     position: fixed;
     inset: 0;
-    z-index: var(--z-backdrop);
+    z-index: variables.$z-backdrop;
     background: rgba(0, 0, 0, .4);
 }
 
@@ -19,7 +19,7 @@
     top: 8vh;
     left: 50%;
     transform: translateX(-50%);
-    z-index: var(--z-modal);
+    z-index: variables.$z-modal;
     display: flex;
     flex-direction: column;
     width: min(720px, 92vw);
@@ -78,7 +78,7 @@
 
         &.is-active {
             background: variables.$board-btn;
-            color: #fff;
+            color: variables.$app-bg;
         }
     }
 }
@@ -95,10 +95,10 @@
     margin: 0;
     padding: variables.$spacing-large variables.$spacing-medium;
     text-align: center;
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
-.search-error { color: #a3283a; }
+.search-error { color: variables.$danger-text; }
 
 /**
  * One result.
@@ -126,7 +126,7 @@
     &.is-static { cursor: default; }
 }
 
-.search-row-icon { color: #676879; }
+.search-row-icon { color: variables.$workspace-icon-color; }
 
 .search-row-avatar {
     width: 20px;
@@ -145,7 +145,7 @@
    without its board is not an answer on a board with forty of them. */
 .search-row-where {
     grid-column: 2;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -158,8 +158,8 @@
     align-self: center;
     padding: 2px 8px;
     border-radius: 10px;
-    background: #f1f2f6;
-    color: #676879;
+    background: variables.$surface-soft;
+    color: variables.$workspace-icon-color;
     font-size: 12px;
     white-space: nowrap;
 }

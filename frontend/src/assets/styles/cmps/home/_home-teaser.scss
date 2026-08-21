@@ -46,7 +46,7 @@
         width: 100%;
         opacity: .9;
         border-radius: 10px;
-        filter: drop-shadow(0px 8px 24px #0b0b3181);
+        filter: drop-shadow(0px 8px 24px variables.$home-veil);
     }
 }
 
@@ -56,7 +56,7 @@
     border-radius: 1em;
     display: flex;
     background-color: inherit;
-    color: #c9c5c5;
+    color: variables.$divider-warm;
     justify-content: space-evenly;
     box-shadow: 0px 10px 30px rgba(29, 140, 242, 0.2);
 
@@ -80,7 +80,7 @@
         }
 
         &:hover {
-            background-color: #4e4d5824;
+            background-color: variables.$home-veil-soft;
         }
     }
 

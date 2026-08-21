@@ -12,9 +12,9 @@
  * began. A line and a change of background do that work instead.
  */
 
-$comment-border: #e1e3eb;
-$comment-quiet: #676879;
-$comment-thread-bg: #f5f6f8;
+$comment-border: variables.$hairline-strong;
+$comment-quiet: variables.$workspace-icon-color;
+$comment-thread-bg: variables.$row-hover;
 
 .comments-list {
     display: flex;
@@ -24,7 +24,7 @@ $comment-thread-bg: #f5f6f8;
     > li {
         border: 1px solid $comment-border;
         border-radius: 8px;
-        background: #fff;
+        background: variables.$app-bg;
         padding: 0;
         margin: 0;
         // NOT overflow: hidden. It rounded the reply band's corners neatly and
@@ -34,7 +34,7 @@ $comment-thread-bg: #f5f6f8;
         transition: box-shadow .15s, border-color .15s;
 
         &:hover {
-            border-color: #c3c6d4;
+            border-color: variables.$task-box-shadow-color;
             box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
         }
 
@@ -141,6 +141,40 @@ $comment-thread-bg: #f5f6f8;
     padding: 0 16px 10px 58px;
 }
 
+/**
+ * The duration of an update the timer posted.
+ *
+ * `margin-left: auto` puts it at the right-hand end of the action row and
+ * leaves it there whatever else is in the row — the reactions and the reply
+ * button vary in width per update, and a fixed order would have this drifting
+ * left and right down a list of them.
+ *
+ * Muted, because it is context and not a control: everything else in this row
+ * is something you press.
+ */
+.comment-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding-left: 8px;
+    color: variables.$workspace-icon-color;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    i {
+        font-size: 11px;
+    }
+}
+
+/* On a reply the row is narrower and wrapping is likely, so it goes back to
+   flowing with everything else rather than being pushed to an edge that may
+   be on the next line. */
+.comment-preview.is-reply .comment-time {
+    margin-left: 0;
+}
+
 .comment-reactions {
     display: flex;
     align-items: center;
@@ -160,7 +194,7 @@ $comment-thread-bg: #f5f6f8;
     padding: 2px 9px;
     border: 1px solid $comment-border;
     border-radius: 12px;
-    background: #fff;
+    background: variables.$app-bg;
     cursor: pointer;
     font: inherit;
     font-size: functions.rem(13px);
@@ -168,12 +202,12 @@ $comment-thread-bg: #f5f6f8;
     width: auto;
     color: $comment-quiet;
 
-    &:hover:not(:disabled) { background: #f5f6f8; }
+    &:hover:not(:disabled) { background: variables.$row-hover; }
     &:disabled { cursor: default; }
 
     &.is-mine {
         border-color: variables.$board-btn;
-        background: #eaf2fd;
+        background: variables.$accent-surface-soft;
         color: variables.$board-btn;
         font-weight: 600;
     }
@@ -200,7 +234,7 @@ $comment-thread-bg: #f5f6f8;
     cursor: pointer;
     font-size: functions.rem(14px);
 
-    &:hover { background: #f0f1f4; border-color: $comment-border; }
+    &:hover { background: variables.$hairline; border-color: $comment-border; }
 }
 
 .reaction-picker {
@@ -213,7 +247,7 @@ $comment-thread-bg: #f5f6f8;
     padding: 6px;
     border: 1px solid $comment-border;
     border-radius: 22px;
-    background: #fff;
+    background: variables.$app-bg;
     box-shadow: 0 6px 20px rgba(0, 0, 0, .14);
 
     .reaction-option {
@@ -228,8 +262,8 @@ $comment-thread-bg: #f5f6f8;
         line-height: 1;
         transition: transform .1s, background-color .1s;
 
-        &:hover { background: #f0f1f4; transform: scale(1.15); }
-        &.is-mine { background: #eaf2fd; }
+        &:hover { background: variables.$hairline; transform: scale(1.15); }
+        &.is-mine { background: variables.$accent-surface-soft; }
     }
 }
 
@@ -280,7 +314,7 @@ $comment-thread-bg: #f5f6f8;
 
 .comment-seen-count {
     align-items: center;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     cursor: default;
     display: inline-flex;
     font-size: 12px;

@@ -1,3 +1,5 @@
+@use "../../setup/variables";
+
 @use "../../setup/functions";
 @use "../../setup/mixins";
 
@@ -41,7 +43,7 @@
 
     .file-picker-busy {
         font-size: 11px;
-        color: #676879;
+        color: variables.$workspace-icon-color;
     }
 
     .file-picker-body {
@@ -56,7 +58,7 @@
     .file-picker-link {
         align-items: center;
         background: none;
-        color: #0073ea;
+        color: variables.$board-btn;
         display: flex;
         gap: 4px;
         min-width: 0;
@@ -74,16 +76,16 @@
     // spreadsheet. Everything unknown stays grey and does not shout.
     .file-icon {
         font-size: 1.33rem;
-        color: #676879;
+        color: variables.$workspace-icon-color;
 
-        &.is-pdf        { color: #d32b2b; }
-        &.is-word       { color: #2b579a; }
-        &.is-excel      { color: #217346; }
-        &.is-powerpoint { color: #c43e1c; }
-        &.is-archive    { color: #b28900; }
-        &.is-code       { color: #0073ea; }
-        &.is-audio      { color: #a25ddc; }
-        &.is-video      { color: #7f5347; }
+        &.is-pdf        { color: variables.$danger-strong; }
+        &.is-word       { color: variables.$file-word; }
+        &.is-excel      { color: variables.$file-excel; }
+        &.is-powerpoint { color: variables.$file-powerpoint; }
+        &.is-archive    { color: variables.$warning-strong; }
+        &.is-code       { color: variables.$board-btn; }
+        &.is-audio      { color: variables.$file-media; }
+        &.is-video      { color: variables.$file-archive; }
     }
 
     // The cross only on hover — otherwise every filled cell carries a delete
@@ -91,7 +93,7 @@
     .file-picker-clear {
         background: transparent;
         border: none;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         cursor: pointer;
         font-size: 1.25rem;
         line-height: 1rem;

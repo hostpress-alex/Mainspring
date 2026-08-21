@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 /**
  * Profile Page.
  *
@@ -6,15 +8,15 @@
  */
 .profile-page {
     min-height: 100vh;
-    background: #f6f7fb;
+    background: variables.$sidebar-workspace-bg;
 
     .profile-bar {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 14px 32px;
-        background: #fff;
-        border-bottom: 1px solid #e6e9ef;
+        background: variables.$app-bg;
+        border-bottom: 1px solid variables.$surface-border;
     }
 
     .profile-main {
@@ -29,8 +31,8 @@
     }
 
     .profile-card {
-        background: #fff;
-        border: 1px solid #e0e3ee;
+        background: variables.$app-bg;
+        border: 1px solid variables.$colors-bluish-white;
         border-radius: 10px;
         padding: 22px;
         margin-bottom: 22px;
@@ -42,7 +44,7 @@
     }
 
     .profile-hint {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: 13px;
         margin: 0 0 16px;
     }
@@ -56,12 +58,12 @@
 
     .profile-label {
         font-size: 13px;
-        color: #676879;
+        color: variables.$workspace-icon-color;
     }
 
     .profile-input {
         padding: 9px 12px;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         font-size: 14px;
         max-width: 380px;
@@ -71,27 +73,27 @@
         padding: 9px 18px;
         border: none;
         border-radius: 6px;
-        background: #0073ea;
-        color: #fff;
+        background: variables.$board-btn;
+        color: variables.$app-bg;
         cursor: pointer;
         font-size: 14px;
     }
 
     .profile-btn-ghost {
         padding: 8px 14px;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
-        background: #fff;
-        color: #323338;
+        background: variables.$app-bg;
+        color: variables.$primary-text-color;
         cursor: pointer;
         font-size: 14px;
 
         &:hover:not(:disabled) {
-            background: #f5f6f8;
+            background: variables.$row-hover;
         }
 
         &:disabled {
-            color: #a1a3ad;
+            color: variables.$text-disabled;
             cursor: default;
         }
     }
@@ -108,7 +110,7 @@
         height: 84px;
         border-radius: 50%;
         object-fit: cover;
-        border: 1px solid #e0e3ee;
+        border: 1px solid variables.$colors-bluish-white;
     }
 
     /**
@@ -127,7 +129,7 @@
         align-items: center;
         gap: 12px;
         padding: 8px 0;
-        border-bottom: 1px solid #e6e9ef;
+        border-bottom: 1px solid variables.$surface-border;
         font-size: 14px;
 
         &:last-child {
@@ -136,7 +138,7 @@
     }
 
     .session-icon {
-        color: #676879;
+        color: variables.$workspace-icon-color;
     }
 
     .session-agent {
@@ -149,37 +151,37 @@
         margin-left: 8px;
         padding: 1px 8px;
         border-radius: 10px;
-        background: #eaf3ff;
-        color: #0073ea;
+        background: variables.$colors-bluish-white2;
+        color: variables.$board-btn;
         font-size: 12px;
     }
 
     .session-seen {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: 13px;
         white-space: nowrap;
     }
 
     .profile-error {
-        background: #fff0f2;
-        border: 1px solid #e2445c;
-        color: #a3283a;
+        background: variables.$danger-surface;
+        border: 1px solid variables.$colors-red-middle;
+        color: variables.$danger-text;
         padding: 10px 14px;
         border-radius: 6px;
         margin-bottom: 16px;
     }
 
     .profile-success {
-        background: #eefaf3;
-        border: 1px solid #00c875;
-        color: #00734a;
+        background: variables.$success-surface;
+        border: 1px solid variables.$color-done-green;
+        color: variables.$success-text;
         padding: 10px 14px;
         border-radius: 6px;
         margin-bottom: 16px;
     }
 
     .profile-link {
-        color: #0073ea;
+        color: variables.$board-btn;
         text-decoration: none;
     }
 
@@ -192,7 +194,7 @@
     }
 
     .profile-bar-name {
-        color: #676879;
+        color: variables.$workspace-icon-color;
     }
 
     .profile-avatar-actions {
@@ -214,7 +216,7 @@
     // and height and sits a few pixels off every field above it
     .profile-select {
         appearance: none;
-        background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23676879' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
+        background: variables.$app-bg url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23676879' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
         padding-right: 32px;
         cursor: pointer;
         font-family: inherit;
@@ -222,7 +224,7 @@
 
     // the username cannot be changed and should not look as if it could
     .profile-input.is-locked {
-        background: #f6f7fb;
-        color: #676879;
+        background: variables.$sidebar-workspace-bg;
+        color: variables.$workspace-icon-color;
     }
 }

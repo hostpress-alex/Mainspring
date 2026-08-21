@@ -15,7 +15,7 @@
     }
 
     .due-mark.is-late {
-        color: #d83a52;
+        color: variables.$danger;
     }
 
     .due-dot {
@@ -26,11 +26,11 @@
         background-image: conic-gradient(currentColor var(--fill, 0%), transparent var(--fill, 0%));
         background-origin: content-box;
         background-clip: content-box;
-        color: #9699a6;
+        color: variables.$field-border;
     }
 
-    &.is-soon .due-dot { color: #676879; }
-    &.is-today .due-dot { color: #c98a00; }
+    &.is-soon .due-dot { color: variables.$workspace-icon-color; }
+    &.is-today .due-dot { color: variables.$warning-text; }
 
     /* Wide enough for its date and not a character more — which is the whole
        reason the trigger is a button and not an input. */
@@ -47,7 +47,7 @@
         z-index: 5;
 
         .react-datepicker__header {
-            background-color: #fff;
+            background-color: variables.$app-bg;
         }
     }
 

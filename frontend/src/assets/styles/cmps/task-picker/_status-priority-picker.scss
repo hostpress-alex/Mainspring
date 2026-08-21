@@ -1,3 +1,5 @@
+@use "../../setup/variables";
+
 @use "../../setup/mixins";
 
 .status-priority-picker {
@@ -18,7 +20,7 @@
     .fold {
         position: absolute;
         background: rgba(0, 0, 0, .352);
-        border-color: transparent #fff;
+        border-color: transparent variables.$app-bg;
         border-style: solid;
         border-width: 0;
         display: block;

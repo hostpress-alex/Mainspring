@@ -22,40 +22,41 @@
    rather than as one of your own blocks. The cursor stays an arrow — the one
    honest signal that there is nothing to click here. */
 .cal-event.is-external {
-    background: #eceef5;
-    border-left: 3px solid #9699a6;
-    color: #464a5c;
+    background: variables.$surface-muted;
+    border-left: 3px solid variables.$field-border;
+    color: variables.$text-strong;
     cursor: default;
-}
 
-.cal-event.is-external:hover {
-    filter: none;
-    box-shadow: none;
+
+    &:hover {
+        filter: none;
+        box-shadow: none;
+    }
 }
 
 .cal-chip.is-external {
-    background: #eceef5;
-    border-left: 3px solid #9699a6;
-    color: #464a5c;
+    background: variables.$surface-muted;
+    border-left: 3px solid variables.$field-border;
+    color: variables.$text-strong;
     cursor: default;
 }
 
 .cal-allday {
     display: grid;
     grid-template-columns: 58px repeat(var(--cal-cols), 1fr);
-    border-bottom: 1px solid var(--cal-border);
-    background: #fff;
+    border-bottom: 1px solid variables.$colors-bluish-white;
+    background: variables.$app-bg;
 }
 
 .cal-allday-gutter {
     font-size: 11px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     padding: 4px 6px;
     text-align: right;
 }
 
 .cal-allday-col {
-    border-left: 1px solid var(--cal-border);
+    border-left: 1px solid variables.$colors-bluish-white;
     padding: 3px 4px;
     display: flex;
     flex-direction: column;
@@ -64,10 +65,10 @@
 }
 
 .cal-allday-chip {
-    background: #eceef5;
-    border-left: 3px solid #9699a6;
+    background: variables.$surface-muted;
+    border-left: 3px solid variables.$field-border;
     border-radius: 4px;
-    color: #464a5c;
+    color: variables.$text-strong;
     font-size: 11px;
     overflow: hidden;
     padding: 2px 6px;
@@ -79,8 +80,8 @@
 
 .cal-weekbar {
     align-items: center;
-    background: #fff;
-    border: 1px solid var(--cal-border);
+    background: variables.$app-bg;
+    border: 1px solid variables.$colors-bluish-white;
     border-radius: 8px;
     display: flex;
     flex-wrap: wrap;
@@ -106,16 +107,16 @@
 }
 
 .cal-weekbar-figure.is-strong .cal-weekbar-value {
-    color: #0073ea;
+    color: variables.$board-btn;
 }
 
 .cal-weekbar-label {
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 11px;
 }
 
 .cal-weekbar-track {
-    background: #eceef5;
+    background: variables.$surface-muted;
     border-radius: 4px;
     flex: 1 1 160px;
     height: 8px;
@@ -123,17 +124,17 @@
 }
 
 .cal-weekbar-fill {
-    background: #0073ea;
+    background: variables.$board-btn;
     height: 100%;
 }
 
 /* Over the line, and said in colour rather than in a sentence: the numbers
    next to it already say by how much. */
 .cal-weekbar.is-over .cal-weekbar-fill {
-    background: #e2445c;
+    background: variables.$colors-red-middle;
 }
 
 .cal-weekbar-hint {
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 12px;
 }

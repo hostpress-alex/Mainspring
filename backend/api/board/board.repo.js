@@ -94,6 +94,21 @@ function buildComment(row){
         // board.service.js. A copy stored here went stale the day somebody
         // changed their profile.
         byMember: {_id: row.by_user_id || null},
+        /**
+         * The time entry this update came out of, and the minutes it holds.
+         *
+         * `timeId` is what is stored; `timeMs` is read from the entry every
+         * time the board is read, so correcting an entry corrects every update
+         * that came from it. A duration copied onto the comment would have
+         * been the third stale copy in this schema — see the migration.
+         *
+         * Both null for an ordinary update, which is almost all of them.
+         */
+        timeId: row.time_id || null,
+        timeMs: (row.time_started_at !== null && row.time_started_at !== undefined
+            && row.time_ended_at !== null && row.time_ended_at !== undefined)
+            ?Number(row.time_ended_at) - Number(row.time_started_at)
+            :null,
         attachments: parseJson(row.attachments, []) || [],
         style: parseJson(row.style, {}) || {}
     }
@@ -163,7 +178,14 @@ async function assemble(k, boardRows){
     const tasks = await k('task').whereIn('board_id', ids).where('state', ACTIVE)
         .orderBy('board_id').orderBy('position')
     const taskMembers = await k('task_member').whereIn('board_id', ids).orderBy('position')
-    const comments = await k('task_comment').whereIn('board_id', ids).orderBy('position')
+    // The join is for `timeMs` in buildComment: one left join on task_time's
+    // primary key, so an update posted by the timer can show how long the work
+    // took without the duration being copied onto the comment.
+    const comments = await k('task_comment as c')
+        .leftJoin('task_time as tt', 'tt.id', 'c.time_id')
+        .whereIn('c.board_id', ids)
+        .orderBy('c.position')
+        .select('c.*', 'tt.started_at as time_started_at', 'tt.ended_at as time_ended_at')
     const activities = await k('activity').whereIn('board_id', ids).orderBy('seq', 'desc')
 
     const membersByBoard = bucket(members, r => r.board_id)
@@ -376,6 +398,7 @@ async function addComment(boardId, taskId, comment){
             created_at: msOrNull(comment && comment.archivedAt) ?? Date.now(),
             pinned_at: null,
             by_user_id: (comment && comment.byUserId)?sid(comment.byUserId):null,
+            time_id: (comment && comment.timeId)?sid(comment.timeId):null,
             txt: (comment && comment.txt) || '',
             style: toJson({}),
             attachments: toJson([])
@@ -423,6 +446,10 @@ async function syncTaskComments(trx, boardId, taskId, comments){
             created_at: msOrNull(c && c.archivedAt),
             pinned_at: (msOrNull(c && c.pinnedAt) > 0)?msOrNull(c.pinnedAt):null,
             by_user_id: by._id?sid(by._id):null,
+            // Carried through the delete-and-rewrite, like style and
+            // attachments. A client echoing a comment back must not silently
+            // drop the link to the time entry it came from.
+            time_id: (c && c.timeId)?sid(c.timeId):null,
             txt: (c && c.txt) || '',
             style: toJson((c && c.style) || {}),
             attachments: toJson((c && c.attachments) || [])

@@ -13,10 +13,11 @@
     line-height: 1.4;
     color: variables.$primary-text-color;
     text-align: left;
-}
 
-.label-editor * {
-    box-sizing: border-box;
+
+    * {
+        box-sizing: border-box;
+    }
 }
 
 .label-editor-head {
@@ -91,17 +92,18 @@
     min-width: 0;
     height: 30px;
     padding: 4px 8px;
-    border: 1px solid #c3c6d4;
+    border: 1px solid variables.$task-box-shadow-color;
     border-radius: 4px;
     font: inherit;
     font-size: 14px;
     color: variables.$primary-text-color;
     background: variables.$app-bg;
-}
 
-.label-editor-input:focus {
-    outline: none;
-    border-color: variables.$board-btn;
+
+    &:focus {
+        outline: none;
+        border-color: variables.$board-btn;
+    }
 }
 
 .label-editor-usage {
@@ -109,7 +111,7 @@
     min-width: 20px;
     padding: 1px 6px;
     border-radius: 9px;
-    background: #e6e9ef;
+    background: variables.$surface-border;
     color: variables.$workspace-icon-color;
     font-size: 11px;
     text-align: center;
@@ -128,11 +130,12 @@
     cursor: pointer;
     border-radius: 4px;
     padding: 0;
-}
 
-.label-editor-remove:hover {
-    background: #ffe6e9;
-    color: #a3283a;
+
+    &:hover {
+        background: variables.$danger-tint-softer;
+        color: variables.$danger-text;
+    }
 }
 
 .label-editor-palette {
@@ -142,21 +145,23 @@
     margin: 6px 0 8px 32px;
     padding: 8px;
     background: variables.$sidebar-workspace-bg;
-    border: 1px solid #e6e9ef;
+    border: 1px solid variables.$surface-border;
     border-radius: 6px;
-}
 
-.label-editor-palette button {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 0;
-}
 
-.label-editor-palette button.is-active {
-    border-color: variables.$primary-text-color;
+    button {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 0;
+    }
+
+
+    button.is-active {
+        border-color: variables.$primary-text-color;
+    }
 }
 
 .label-editor-empty {
@@ -178,16 +183,17 @@
     padding: 4px 0;
     font: inherit;
     font-size: 14px;
-}
 
-.label-editor-add:hover {
-    text-decoration: underline;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .label-editor-err {
     margin: 8px 0 0;
     font-size: 13px;
-    color: #a3283a;
+    color: variables.$danger-text;
 }
 
 .label-editor-hint {
@@ -213,37 +219,41 @@
     cursor: pointer;
     font: inherit;
     font-size: 14px;
-}
 
-.label-editor-save:hover {
-    background: variables.$primary-hover-color;
-}
 
-.label-editor-save:disabled {
-    background: #c3c6d4;
-    cursor: default;
+    &:hover {
+        background: variables.$primary-hover-color;
+    }
+
+
+    &:disabled {
+        background: variables.$task-box-shadow-color;
+        cursor: default;
+    }
 }
 
 .label-editor-cancel {
     flex: 0 0 auto;
     height: 34px;
     padding: 0 14px;
-    border: 1px solid #c3c6d4;
+    border: 1px solid variables.$task-box-shadow-color;
     border-radius: 4px;
     background: variables.$app-bg;
     color: variables.$primary-text-color;
     cursor: pointer;
     font: inherit;
     font-size: 14px;
-}
 
-.label-editor-cancel:hover {
-    background: variables.$workspace-hover;
-}
 
-.label-editor-cancel:disabled {
-    color: #a0a3b1;
-    cursor: default;
+    &:hover {
+        background: variables.$workspace-hover;
+    }
+
+
+    &:disabled {
+        color: variables.$text-disabled-cool;
+        cursor: default;
+    }
 }
 
 /* These two used to sit in a `_label-editor.scss` of their own beside the .css
@@ -265,7 +275,7 @@
 .label-editor-done.is-locked,
 .label-editor-remove.is-locked {
     align-items: center;
-    color: #9699a6;
+    color: variables.$field-border;
     cursor: help;
     display: inline-flex;
     justify-content: center;
@@ -273,5 +283,5 @@
 }
 
 .label-editor-done.is-locked {
-    color: #00c875;
+    color: variables.$color-done-green;
 }

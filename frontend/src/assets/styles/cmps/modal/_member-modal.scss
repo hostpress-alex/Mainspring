@@ -129,7 +129,7 @@
        which left reloading the page as the only way out. */
     &.invite {
         @include mixins.center-absolute();
-        z-index: var(--z-modal);
+        z-index: variables.$z-modal;
         background-color: variables.$app-bg;
         border-radius: variables.$spacing-small;
         font-size: functions.rem(14px);
@@ -176,7 +176,7 @@
     align-items: center;
     gap: 8px;
     padding: 5px 0;
-    border-bottom: 1px solid #f1f2f6;
+    border-bottom: 1px solid variables.$surface-soft;
 
     img, .avatar {
         width: 26px;
@@ -227,7 +227,7 @@
     line-height: 1;
     cursor: pointer;
 
-    &:hover { color: #e2445c; }
+    &:hover { color: variables.$colors-red-middle; }
 }
 
 .invite-role {

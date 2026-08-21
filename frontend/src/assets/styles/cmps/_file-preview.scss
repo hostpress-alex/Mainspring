@@ -9,7 +9,7 @@
 .file-preview-overlay {
     position: fixed;
     inset: 0;
-    z-index: var(--z-lightbox);
+    z-index: variables.$z-lightbox;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -34,7 +34,7 @@
     gap: 10px;
     flex: 0 0 auto;
     padding: 10px 12px;
-    border-bottom: 1px solid #e6e9ef;
+    border-bottom: 1px solid variables.$surface-border;
     color: variables.$primary-text-color;
 }
 
@@ -43,11 +43,11 @@
     color: variables.$workspace-icon-color;
 }
 
-.file-preview-icon.is-pdf     { color: #e2445c; }
-.file-preview-icon.is-excel   { color: #00854d; }
-.file-preview-icon.is-word    { color: #1264a3; }
-.file-preview-icon.is-code    { color: #a25ddc; }
-.file-preview-icon.is-image   { color: #0086c0; }
+.file-preview-icon.is-pdf     { color: variables.$colors-red-middle; }
+.file-preview-icon.is-excel   { color: variables.$success-text-strong; }
+.file-preview-icon.is-word    { color: variables.$accent-navy; }
+.file-preview-icon.is-code    { color: variables.$file-media; }
+.file-preview-icon.is-image   { color: variables.$accent-cyan; }
 
 .file-preview-name {
     flex: 1 1 auto;
@@ -77,10 +77,11 @@
     color: variables.$app-bg;
     font-size: 13px;
     text-decoration: none;
-}
 
-.file-preview-download:hover {
-    background: variables.$primary-hover-color;
+
+    &:hover {
+        background: variables.$primary-hover-color;
+    }
 }
 
 .file-preview-close {
@@ -92,11 +93,12 @@
     color: variables.$workspace-icon-color;
     font-size: 16px;
     cursor: pointer;
-}
 
-.file-preview-close:hover {
-    background: #f1f2f6;
-    color: variables.$primary-text-color;
+
+    &:hover {
+        background: variables.$surface-soft;
+        color: variables.$primary-text-color;
+    }
 }
 
 .file-preview-body {
@@ -113,7 +115,7 @@
     align-items: center;
     justify-content: center;
     padding: 16px;
-    background: #1c1f3b;
+    background: variables.$text-midnight;
 }
 
 .file-preview-image {
@@ -159,7 +161,7 @@
 
 .file-preview-table th,
 .file-preview-table td {
-    border: 1px solid #e6e9ef;
+    border: 1px solid variables.$surface-border;
     padding: 5px 9px;
     text-align: left;
     white-space: pre-wrap;
@@ -173,12 +175,12 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    background: #f1f2f6;
+    background: variables.$surface-soft;
     font-weight: 600;
 }
 
 .file-preview-table tbody tr:nth-child(even) td {
-    background: #fbfbfd;
+    background: variables.$surface-faint;
 }
 
 .file-preview-note {
@@ -186,8 +188,9 @@
     padding: 12px 16px;
     color: variables.$workspace-icon-color;
     font-size: 13px;
-}
 
-.file-preview-note.is-error {
-    color: #e2445c;
+
+    &.is-error {
+        color: variables.$colors-red-middle;
+    }
 }

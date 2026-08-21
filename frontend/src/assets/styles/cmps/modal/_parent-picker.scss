@@ -11,7 +11,7 @@
     bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
-    z-index: var(--z-panel);
+    z-index: variables.$z-panel;
     display: flex;
     flex-direction: column;
     width: 320px;
@@ -40,10 +40,11 @@
     padding: 2px 4px;
     color: variables.$workspace-icon-color;
     cursor: pointer;
-}
 
-.parent-picker-close:hover {
-    color: variables.$primary-text-color;
+
+    &:hover {
+        color: variables.$primary-text-color;
+    }
 }
 
 .parent-picker-search {
@@ -55,21 +56,23 @@
     border: 1px solid variables.$layout-border-color;
     border-radius: 6px;
     color: variables.$workspace-icon-color;
-}
 
-.parent-picker-search input {
-    flex: 1 1 auto;
-    min-width: 0;
-    border: 0;
-    background: none;
-    padding: 7px 0;
-    font: inherit;
-    font-size: 13px;
-    color: variables.$primary-text-color;
-}
 
-.parent-picker-search input:focus-visible {
-    outline: 0;
+    input {
+        flex: 1 1 auto;
+        min-width: 0;
+        border: 0;
+        background: none;
+        padding: 7px 0;
+        font: inherit;
+        font-size: 13px;
+        color: variables.$primary-text-color;
+    }
+
+
+    input:focus-visible {
+        outline: 0;
+    }
 }
 
 .parent-picker-scroll {
@@ -109,16 +112,17 @@
     text-align: left;
     color: inherit;
     cursor: pointer;
-}
 
-.parent-picker-item:hover:not(:disabled) {
-    background: #eaf3ff;
+
+    &:hover:not(:disabled) {
+        background: variables.$colors-bluish-white2;
+    }
 }
 
 /* Shown rather than left out: a candidate missing without explanation reads
    as a bug. */
 .parent-picker-item:disabled {
-    color: #9699a6;
+    color: variables.$field-border;
     cursor: not-allowed;
 }
 
@@ -132,7 +136,7 @@
 .parent-picker-note {
     flex: 0 0 auto;
     font-size: 10px;
-    color: #9699a6;
+    color: variables.$field-border;
 }
 
 .parent-picker-empty {

@@ -10,14 +10,14 @@
 .bin-backdrop {
     position: fixed;
     inset: 0;
-    z-index: var(--z-backdrop);
+    z-index: variables.$z-backdrop;
     background: rgba(0, 0, 0, .4);
 }
 
 .bin-overlay {
     position: fixed;
     inset: 12.5%;
-    z-index: var(--z-modal);
+    z-index: variables.$z-modal;
     display: flex;
     flex-direction: column;
     border-radius: 10px;
@@ -41,7 +41,7 @@
 
     .bin-board {
         margin-left: variables.$spacing-small;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-weight: 400;
     }
 
@@ -71,7 +71,7 @@
         &.is-active {
             background: variables.$board-btn;
             border-color: variables.$board-btn;
-            color: #fff;
+            color: variables.$app-bg;
         }
     }
 }
@@ -88,16 +88,16 @@
 .bin-error {
     margin-bottom: variables.$spacing-medium;
     padding: 10px 14px;
-    border: 1px solid #e2445c;
+    border: 1px solid variables.$colors-red-middle;
     border-radius: 6px;
-    background: #fff0f2;
-    color: #a3283a;
+    background: variables.$danger-surface;
+    color: variables.$danger-text;
 }
 
 .bin-empty {
     padding: variables.$spacing-xxl;
     text-align: center;
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
 /**
@@ -113,7 +113,7 @@
     border-bottom: 1px solid variables.$border-color;
 }
 
-.bin-row-icon { color: #676879; }
+.bin-row-icon { color: variables.$workspace-icon-color; }
 
 .bin-row-title {
     overflow: hidden;
@@ -129,7 +129,7 @@
 
 .bin-row-sub,
 .bin-row-at {
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
     white-space: nowrap;
 }
@@ -153,8 +153,8 @@
 .bin-purge {
     border: 0;
     background: none;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     cursor: pointer;
 
-    &:hover { color: #a3283a; }
+    &:hover { color: variables.$danger-text; }
 }

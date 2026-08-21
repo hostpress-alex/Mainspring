@@ -11,7 +11,7 @@
     inset: 86% auto auto 24%;
     right: 106px;
     transition: opacity 150ms, transform 150ms;
-    z-index: var(--z-popover);
+    z-index: variables.$z-popover;
     border-radius: 5px;
     pointer-events: auto;
     background-color: variables.$app-bg;
@@ -166,8 +166,8 @@
         left: 0;
         margin-bottom: 8px;
         z-index: 60;   /* local: .move-to is positioned, so this only orders siblings */
-        background: #fff;
-        color: #323338;
+        background: variables.$app-bg;
+        color: variables.$primary-text-color;
         min-width: 210px;
         border-radius: 8px;
         box-shadow: 0 6px 22px rgba(0, 0, 0, .25);
@@ -181,7 +181,7 @@
     .move-to-head {
         padding: 4px 10px;
         font-size: 12px;
-        color: #676879;
+        color: variables.$workspace-icon-color;
     }
 
     .move-to-item {
@@ -194,7 +194,7 @@
 
         // was two inline handlers writing to element.style
         &:hover {
-            background: #f0f4ff;
+            background: variables.$accent-surface-cool;
         }
 
         .move-to-dot {
@@ -211,7 +211,7 @@
 
         .move-to-count {
             margin-left: auto;
-            color: #676879;
+            color: variables.$workspace-icon-color;
             font-size: 12px;
         }
     }

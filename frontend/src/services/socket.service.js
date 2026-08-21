@@ -10,6 +10,14 @@ export const SOCKET_EVENT_REACTION_CHANGED = 'reaction-changed'
 // board. The server emits the board it has read back instead — see _pushed in
 // backend/api/board/board.service.js. Nothing listens for this any more.
 export const SOCKET_EMIT_SET_TOPIC = 'chat-set-topic'
+// A task dialog opened or closed. Separate from the topic above because the
+// two are not alternatives any anymore: a socket holds the board's room and the
+// task's at the same time, which is what stopped live board updates from
+// dying for as long as a dialog was open. The board id travels with the task
+// id — the server used to take it from whichever board this socket had last
+// joined, and a task opened from the calendar has none.
+export const SOCKET_EMIT_TASK_OPEN = 'task-open'
+export const SOCKET_EMIT_TASK_CLOSE = 'task-close'
 export const SOCKET_EMIT_USER_WATCH = 'user-watch'
 
 const SOCKET_EMIT_LOGIN = 'set-user-socket'
@@ -34,6 +42,7 @@ function createSocketService(){
      * reconnect silently stops all live updates until the next navigation.
      */
     var lastTopic = null
+    var lastTask = null
 
     const socketService = {
         setup(){
@@ -51,7 +60,11 @@ function createSocketService(){
             socket.on('connect', () => {
                 const user = userService.getLoggedinUser()
                 if(user) socket.emit(SOCKET_EMIT_LOGIN, user._id)
+                // Both rooms are restored, and the board first: the server
+                // drops the task room when a board topic arrives, on the
+                // assumption that a new board means the old dialog is gone.
                 if(lastTopic) socket.emit(SOCKET_EMIT_SET_TOPIC, lastTopic)
+                if(lastTask) socket.emit(SOCKET_EMIT_TASK_OPEN, lastTask)
             })
 
             // The server refuses a room instead of going quiet. Worth seeing.
@@ -66,7 +79,15 @@ function createSocketService(){
             else socket.off(eventName, cb)
         },
         emit(eventName, data){
-            if(eventName === SOCKET_EMIT_SET_TOPIC) lastTopic = data
+            // What to say again after a reconnect. Two slots, because the
+            // server holds two rooms; one variable would have restored
+            // whichever happened to be last.
+            if(eventName === SOCKET_EMIT_SET_TOPIC){
+                lastTopic = data
+                lastTask = null
+            }
+            if(eventName === SOCKET_EMIT_TASK_OPEN) lastTask = data
+            if(eventName === SOCKET_EMIT_TASK_CLOSE) lastTask = null
             socket.emit(eventName, data)
         },
         login(userId){
@@ -79,6 +100,7 @@ function createSocketService(){
         logout(){
             socket.emit(SOCKET_EMIT_LOGOUT)
             lastTopic = null
+            lastTask = null
             socket.disconnect().connect()
         },
         terminate(){

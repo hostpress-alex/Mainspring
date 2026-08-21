@@ -3,7 +3,7 @@
 @use "../setup/variables";
 
 .login-page-header {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid variables.$hairline-plain;
     height: 65px;
     background: variables.$login-bg;
 
@@ -24,7 +24,7 @@
         font-size: functions.rem(40px);
         font-weight: 100;
         margin-bottom: variables.$spacing-small;
-        color: #333;
+        color: variables.$text-dark-plain;
     }
 
     // A failed attempt has to be visible. Before this the form simply did
@@ -32,10 +32,10 @@
     .login-error {
         margin: 0 0 12px;
         padding: 8px 12px;
-        border: 1px solid #f0c2c9;
+        border: 1px solid variables.$danger-border;
         border-radius: 4px;
-        background: #fff4f5;
-        color: #a3283a;
+        background: variables.$danger-surface-soft;
+        color: variables.$danger-text;
         font-size: 14px;
         line-height: 1.4;
         text-align: center;
@@ -44,13 +44,13 @@
     .login-explain {
         font-weight: 500;
         margin-bottom: 20px;
-        color: #333
+        color: variables.$text-dark-plain
     }
 
     input {
         width: 328px;
         border-radius: 4px;
-        border: 1px solid #ccc;
+        border: 1px solid variables.$border-color-darker;
         padding: 6px 12px;
         font-size: functions.rem(16px);
         outline: none;
@@ -65,7 +65,7 @@
         border-radius: 4px;
         font-size: functions.rem(18px);
         background-color: variables.$board-btn;
-        color: #fff;
+        color: variables.$app-bg;
     }
 
     .suggest-signup {
@@ -79,7 +79,7 @@
         }
 
         .btn-signup {
-            color: #0fa2e2;
+            color: variables.$accent-sky;
             background-color: variables.$app-bg;
             margin: 0;
             padding: 0;

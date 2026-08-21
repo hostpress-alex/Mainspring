@@ -9,7 +9,7 @@
     left: 0;
     top: 0;
     background-color: white;
-    z-index: var(--z-sticky);
+    z-index: variables.$z-sticky;
 
     .board-title {
         color: variables.$workspace-icon-color;

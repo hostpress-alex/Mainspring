@@ -34,18 +34,18 @@
 
     .estimate-sep,
     .estimate-total {
-        color: #676879;
+        color: variables.$workspace-icon-color;
     }
 
     .estimate-empty {
-        color: #c4c4c4;
+        color: variables.$color-explosive;
     }
 
     &.is-over {
-        background-color: #fff0f2;
+        background-color: variables.$danger-surface;
 
         .estimate-spent {
-            color: #d83a52;
+            color: variables.$danger;
             font-weight: 600;
         }
     }
@@ -59,7 +59,7 @@
  * control and not like a form field.
  */
 .modal-estimate {
-    background: #fff;
+    background: variables.$app-bg;
     border-radius: 6px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, .16);
     padding: 12px;
@@ -72,7 +72,7 @@
     }
 
     .modal-estimate-amount {
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 4px;
         font-size: 14px;
         padding: 6px 8px;
@@ -80,16 +80,16 @@
     }
 
     .modal-estimate-units {
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 4px;
         display: flex;
         overflow: hidden;
     }
 
     .modal-estimate-unit {
-        background: #fff;
+        background: variables.$app-bg;
         border: 0;
-        border-right: 1px solid #c3c6d4;
+        border-right: 1px solid variables.$task-box-shadow-color;
         cursor: pointer;
         font: inherit;
         font-size: 13px;
@@ -101,12 +101,12 @@
 
         &.is-active {
             background: variables.$board-btn;
-            color: #fff;
+            color: variables.$app-bg;
         }
     }
 
     .modal-estimate-err {
-        color: #d83a52;
+        color: variables.$danger;
         font-size: 12px;
         margin: 8px 0 0;
     }
@@ -128,18 +128,18 @@
     }
 
     .modal-estimate-clear {
-        background: #fff;
-        border: 1px solid #c3c6d4;
+        background: variables.$app-bg;
+        border: 1px solid variables.$task-box-shadow-color;
     }
 
     .modal-estimate-save {
         background: variables.$board-btn;
         border: 1px solid variables.$board-btn;
-        color: #fff;
+        color: variables.$app-bg;
     }
 
     .modal-estimate-note {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-size: 12px;
         margin: 10px 0 0;
     }

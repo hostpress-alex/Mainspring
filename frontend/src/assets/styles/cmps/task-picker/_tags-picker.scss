@@ -22,16 +22,16 @@
     }
 
     .tags-empty {
-        color: #c4c4c4;
+        color: variables.$color-explosive;
         margin: 0 auto;
     }
 }
 
 .tag-chip {
     align-items: center;
-    background: color-mix(in srgb, var(--tag-color, #0073ea) 12%, #fff);
+    background: color-mix(in srgb, var(--tag-color, variables.$board-btn) 12%, variables.$app-bg);
     border-radius: 10px;
-    color: var(--tag-color, #0073ea);
+    color: var(--tag-color, variables.$board-btn);
     display: inline-flex;
     font-size: 12px;
     gap: 4px;
@@ -63,7 +63,7 @@
 /* ------------------------------------------------------------- the list -- */
 
 .modal-tags {
-    background: #fff;
+    background: variables.$app-bg;
     border-radius: 8px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, .16);
     display: flex;
@@ -82,7 +82,7 @@
     .modal-tags-back {
         background: none;
         border: 0;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         cursor: pointer;
         padding: 0 4px 0 0;
     }
@@ -90,7 +90,7 @@
     .modal-tags-search,
     .modal-tags-select,
     .modal-tags-rename {
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 4px;
         font: inherit;
         font-size: 13px;
@@ -113,7 +113,7 @@
     .modal-tags-item {
         align-items: center;
         border-radius: 4px;
-        color: var(--tag-color, #0073ea);
+        color: var(--tag-color, variables.$board-btn);
         cursor: pointer;
         display: flex;
         font-size: 13px;
@@ -122,19 +122,19 @@
         padding: 5px 8px;
 
         &:hover {
-            background: #f5f6f8;
+            background: variables.$row-hover;
         }
 
         /* Chosen, and said with the tag's own colour rather than a tick: the
            row is already the colour of the thing it is about. */
         &.is-on {
-            background: var(--tag-color, #0073ea);
-            color: #fff;
+            background: var(--tag-color, variables.$board-btn);
+            color: variables.$app-bg;
         }
     }
 
     .modal-tags-count {
-        background: #fff;
+        background: variables.$app-bg;
         border: 1px solid currentColor;
         border-radius: 10px;
         color: inherit;
@@ -151,23 +151,23 @@
     }
 
     .modal-tags-none {
-        color: #9699a6;
+        color: variables.$field-border;
         font-size: 13px;
         padding: 6px 8px;
     }
 
     .modal-tags-create {
-        background: #f5f6f8;
+        background: variables.$row-hover;
         border: 0;
         border-radius: 4px;
-        color: #323338;
+        color: variables.$primary-text-color;
         cursor: pointer;
         font: inherit;
         font-size: 13px;
         padding: 7px;
 
         &:disabled {
-            color: #9699a6;
+            color: variables.$field-border;
             cursor: default;
         }
     }
@@ -183,7 +183,7 @@
     }
 
     .modal-tags-err {
-        color: #d83a52;
+        color: variables.$danger;
         font-size: 12px;
         margin: 0;
     }
@@ -200,7 +200,7 @@
     .modal-tags-color {
         appearance: none;
         background: none;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 50%;
         cursor: pointer;
         flex: none;
@@ -215,18 +215,18 @@
     .modal-tags-icon {
         background: none;
         border: 0;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         cursor: pointer;
         flex: none;
         padding: 2px 4px;
 
-        &:hover { color: #323338; }
-        &.is-danger:hover { color: #d83a52; }
+        &:hover { color: variables.$primary-text-color; }
+        &.is-danger:hover { color: variables.$danger; }
     }
 
     .modal-tags-confirm {
-        background: #fff8f8;
-        border: 1px solid #e2445c;
+        background: variables.$danger-surface-faint;
+        border: 1px solid variables.$colors-red-middle;
         border-radius: 6px;
         display: flex;
         flex-direction: column;
@@ -242,8 +242,8 @@
         justify-content: flex-end;
 
         button {
-            background: #fff;
-            border: 1px solid #c3c6d4;
+            background: variables.$app-bg;
+            border: 1px solid variables.$task-box-shadow-color;
             border-radius: 4px;
             cursor: pointer;
             font: inherit;
@@ -254,7 +254,7 @@
         .is-primary {
             background: variables.$board-btn;
             border-color: variables.$board-btn;
-            color: #fff;
+            color: variables.$app-bg;
         }
     }
 }

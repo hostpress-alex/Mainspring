@@ -112,13 +112,13 @@
 
     .date-picker.is-overdue .date-trigger,
     .date-picker.is-overdue .date-readonly {
-        color: #d83a52;
+        color: variables.$danger;
         font-weight: 600;
     }
 
     .date-picker.is-today .date-trigger,
     .date-picker.is-today .date-readonly {
-        color: #c98a00;
+        color: variables.$warning-text;
         font-weight: 600;
     }
 

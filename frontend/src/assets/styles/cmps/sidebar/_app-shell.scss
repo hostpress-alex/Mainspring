@@ -43,9 +43,10 @@
 .workspace-sidebar .workspace-section > .board-list-container {
     margin-top: 2px;
     gap: 2px;
-}
 
-.workspace-sidebar .workspace-section > .board-list-container > .board-list {
-    padding-top: 0;
-    padding-bottom: 0;
+
+    > .board-list {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
 }

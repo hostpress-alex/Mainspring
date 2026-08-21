@@ -111,19 +111,16 @@ module.exports = {
          * client-to-client relay this codebase removed from the board once
          * already. One extra request per reaction, for fifteen people.
          *
-         * **Both rooms, and that is not belt-and-braces.** A socket is only
-         * ever in one of them, and which one depends on the order two effects
-         * happened to run in on that client: opening a task from the board
-         * leaves the socket in the task's room, but a reload or a direct link
-         * puts the board back on top of it. So one browser hears task events
-         * and the next one board events, with nothing to tell them apart from
-         * the outside. Sending to both costs one line and stops the feature
-         * from depending on that race. The proper repair — one socket holding
-         * both rooms — is HANDOVER §6 and a job of its own.
+         * **Both audiences, one delivery.** The row on the board shows a count
+         * and the open dialog shows the reaction itself, so both want this. It
+         * used to be two separate emits, with a note here saying a socket sits
+         * in exactly one of the two rooms and which one was a race. That race
+         * is gone (HANDOVER §6 is done), and two emits would now arrive twice
+         * at every client that has the dialog open — so it is one call to the
+         * union of the rooms.
          */
         const payload = [{boardId, taskId, commentId, emoji, by: String(user._id)}]
-        sockets().emitToTask({type: REACTION_CHANGED, boardId, taskId, args: payload})
-        sockets().emitToBoard({type: REACTION_CHANGED, boardId, args: payload})
+        sockets().emitToBoardAndTask({type: REACTION_CHANGED, boardId, taskId, args: payload})
 
         // Only when it goes on. Being told that somebody took a thumb back is
         // a notification nobody wants.

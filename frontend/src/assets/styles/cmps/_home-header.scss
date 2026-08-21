@@ -9,7 +9,7 @@
     height: functions.rem(72px);
     position: sticky;
     top: 0;
-    background: #ffffff;
+    background: variables.$app-bg;
 
     nav {
         height: 100%;
@@ -23,7 +23,7 @@
             background-color: variables.$home-btn-bg;
             // Was living off the global `button { color: whitesmoke }`, which
             // is gone — a dark button says so itself now.
-            color: #fff;
+            color: variables.$app-bg;
             height: 40px;
             width: 130px;
             font-size: functions.rem(13px);
@@ -31,7 +31,7 @@
             border-radius: 40px;
 
             &:hover {
-                background-color: #5151d5;
+                background-color: variables.$home-violet-deep;
 
                 .arrow i {
                     transition: 0.4s;
@@ -54,7 +54,7 @@
 
         .btn-login {
             background-color: variables.$app-bg;
-            color: #535768;
+            color: variables.$text-slate;
             padding: variables.$spacing-small variables.$spacing-medium;
             font-size: functions.rem(14px);
             border-radius: 8px;
@@ -62,8 +62,8 @@
             margin-right: variables.$spacing-medium;
 
             &:hover {
-                color: #5034FF;
-                background-color: #F0F3FF;
+                color: variables.$home-violet;
+                background-color: variables.$accent-surface-cooler;
             }
         }
     }

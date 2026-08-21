@@ -14,7 +14,7 @@
     height: 16px;
     padding: 0 4px;
     border-radius: 8px;
-    background: #e2445c;
+    background: variables.$colors-red-middle;
     color: variables.$app-bg;
     font-size: 10px;
     font-weight: 700;
@@ -36,7 +36,7 @@
     position: fixed;
     top: 12px;
     left: 60px;
-    z-index: var(--z-panel);
+    z-index: variables.$z-panel;
     display: flex;
     flex-direction: column;
     width: min(420px, calc(100vw - 80px));
@@ -50,12 +50,13 @@
 
 .notification-panel-head {
     padding: 14px 16px 10px;
-    border-bottom: 1px solid #e6e9ef;
-}
+    border-bottom: 1px solid variables.$surface-border;
 
-.notification-panel-head h2 {
-    margin: 0 0 8px;
-    font-size: 18px;
+
+    h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+    }
 }
 
 .notification-panel-tools {
@@ -79,11 +80,12 @@
     color: variables.$board-btn;
     cursor: pointer;
     font: inherit;
-}
 
-.notification-mark-all:disabled {
-    color: #9699a6;
-    cursor: default;
+
+    &:disabled {
+        color: variables.$field-border;
+        cursor: default;
+    }
 }
 
 .notification-list {
@@ -110,23 +112,26 @@
     width: 100%;
     padding: 10px 16px;
     border: 0;
-    border-top: 1px solid #f0f1f4;
+    border-top: 1px solid variables.$hairline;
     background: none;
     font: inherit;
     text-align: left;
     cursor: pointer;
-}
 
-.notification-item:hover {
-    background: variables.$board-description-bg;
-}
 
-.notification-item.is-unread {
-    background: #eaf3ff;
-}
+    &:hover {
+        background: variables.$board-description-bg;
+    }
 
-.notification-item.is-unread:hover {
-    background: #dfecff;
+
+    &.is-unread {
+        background: variables.$colors-bluish-white2;
+    }
+
+
+    &.is-unread:hover {
+        background: variables.$accent-tint;
+    }
 }
 
 .notification-avatar {
@@ -166,13 +171,13 @@
 }
 
 .notification-board {
-    color: #9699a6;
+    color: variables.$field-border;
     font-size: 12px;
 }
 
 .notification-when {
     flex: 0 0 auto;
-    color: #9699a6;
+    color: variables.$field-border;
     font-size: 12px;
     white-space: nowrap;
 }

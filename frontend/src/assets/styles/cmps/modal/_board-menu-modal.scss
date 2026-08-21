@@ -1,3 +1,5 @@
+@use "../../setup/variables";
+
 // Assigning a board to a folder. These rules used to sit as inline styles in
 // board-menu-modal.jsx.
 .folder-form {
@@ -7,14 +9,14 @@
     .folder-form-label {
         display: block;
         font-size: 12px;
-        color: #676879;
+        color: variables.$workspace-icon-color;
         margin-bottom: 5px;
     }
 
     .folder-form-input {
         width: 100%;
         padding: 7px 9px;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 5px;
         font: inherit;
     }
@@ -30,16 +32,16 @@
         padding: 6px 10px;
         border: none;
         border-radius: 5px;
-        background: #0073ea;
-        color: #fff;
+        background: variables.$board-btn;
+        color: variables.$app-bg;
         cursor: pointer;
     }
 
     .folder-form-cancel {
         padding: 6px 10px;
-        border: 1px solid #c3c6d4;
+        border: 1px solid variables.$task-box-shadow-color;
         border-radius: 5px;
-        background: #fff;
+        background: variables.$app-bg;
         cursor: pointer;
     }
 }

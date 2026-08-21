@@ -138,15 +138,16 @@
             }
         }
     }
-}
 
-// Calendar and administration: white, dimmed unless it is the current page.
-// Deliberately only .nav-link — the board icon above never had this.
-.main-sidebar .icon-container.nav-link {
-    color: #fff;
-    opacity: .75;
 
-    &.is-active {
-        opacity: 1;
+    // Calendar and administration: white, dimmed unless it is the current page.
+    // Deliberately only .nav-link — the board icon above never had this.
+    .icon-container.nav-link {
+        color: variables.$app-bg;
+        opacity: .75;
+
+        &.is-active {
+            opacity: 1;
+        }
     }
 }

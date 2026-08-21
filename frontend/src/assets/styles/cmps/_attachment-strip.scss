@@ -1,3 +1,5 @@
+@use "../setup/variables";
+
 /**
  * Attachments of an update: thumbnails, file rows, and the lightbox.
  * Was a `const S = {...}` object in cmps/task/attachment-strip.jsx.
@@ -15,8 +17,8 @@
     height: 92px;
     border-radius: 6px;
     overflow: hidden;
-    border: 1px solid #e0e3ee;
-    background: #f6f7fb;
+    border: 1px solid variables.$colors-bluish-white;
+    background: variables.$sidebar-workspace-bg;
 }
 
 .attachment-thumb {
@@ -31,19 +33,19 @@
    markup differs by what the file can do, the look must not. */
 .attachment-file {
     display: flex;
-    border: 1px solid #e0e3ee;
+    border: 1px solid variables.$colors-bluish-white;
     font: inherit;
     text-align: left;
     cursor: pointer;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border: 1px solid #e0e3ee;
+    border: 1px solid variables.$colors-bluish-white;
     border-radius: 6px;
-    background: #f6f7fb;
+    background: variables.$sidebar-workspace-bg;
     font-size: 13px;
     text-decoration: none;
-    color: #0073ea;
+    color: variables.$board-btn;
 }
 
 .attachment-remove {
@@ -55,7 +57,7 @@
     border-radius: 50%;
     border: none;
     background: rgba(0, 0, 0, .6);
-    color: #fff;
+    color: variables.$app-bg;
     cursor: pointer;
     line-height: 20px;
     padding: 0;
@@ -69,7 +71,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-lightbox);
+    z-index: variables.$z-lightbox;
     cursor: zoom-out;
 }
 
@@ -82,11 +84,11 @@
 
 // the size next to a file name
 .attachment-size {
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
 // the same button, but in the row of a non-image file
 .attachment-remove.is-inline {
     position: static;
-    background: #c3c6d4;
+    background: variables.$task-box-shadow-color;
 }

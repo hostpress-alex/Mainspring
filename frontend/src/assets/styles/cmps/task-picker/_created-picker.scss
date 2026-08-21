@@ -1,3 +1,5 @@
+@use "../../setup/variables";
+
 @use "../../setup/mixins";
 
 /**
@@ -23,13 +25,13 @@
     }
 
     .created-date {
-        color: #323338;
+        color: variables.$primary-text-color;
         white-space: nowrap;
     }
 
     /* A task from before this column existed. The dash is the honest answer;
        see the migration for why nothing was made up for these. */
     &.is-empty .created-dash {
-        color: #c4c4c4;
+        color: variables.$color-explosive;
     }
 }

@@ -1,3 +1,5 @@
+@forward "layers";
+
 //home page
 $home-bg: -webkit-linear-gradient(rgb(21 21 59) 0%, rgb(15, 16, 72) 100%);
 $home-secondary-bg: -webkit-linear-gradient(rgb(17 17 66) 6%, rgb(21, 21, 59) 36%, rgb(21, 21, 59) 57%);
@@ -11,24 +13,24 @@ $gray-color: #b7b7b7;
 $app-bg: #ffffff;
 $login-bg: #f7f7f7;
 
+//Colors
+$colors-bluish-white: #e0e3ee;
+$colors-bluish-white2: #eaf3ff;
+$colors-bluish-grey: #c9cee0;
+$colors-red-middle: #e2445c;
+
 //board page
 $border-color: #d0d4e466;
 $border-color-darker: #CCC;
 $sidebar-workspace-bg: #F6F7FB;
 $sidebar-main-bg: #292f4c;
-// The narrow icon rail on the left. Named because more than one thing has to
-// fit inside it without making it wider — see the running timer.
 $sidebar-main-width: 66px;
 $menu-icon-color: #6c6cff;
 $workspace-width: 255px;
 $workspace-icon-color: #676879;
 $workspace-hover: #dcdfec;
 $workspace-board-active: #cce5ff;
-// The row under the pointer. Light enough that a full table of them is not
-// a stripe pattern, dark enough to find on a 27" screen.
 $row-hover: #f5f6f8;
-// The frame around a cell that is being edited. Grey rather than the accent
-// colour: it marks where you are typing, it does not ask for attention.
 $field-border: #9699a6;
 $board-btn: #0073ea;
 $link-color: #1f76c2;
@@ -96,3 +98,96 @@ $body-rem: 13px;
 $mobile-breakpoint: 460px;
 $narrow-breakpoint: 720px;
 $normal-breakpoint: 960px;
+
+// --- Errors and Alerts -------------------------------------------------
+$danger:                #d83a52;
+$danger-hover:          #b92e43;
+$danger-text:           #a3283a;
+$danger-strong:         #d32b2b;
+$danger-surface:        #fff0f2;
+$danger-surface-soft:   #fff4f5;
+$danger-surface-faint:  #fff8f8;
+$danger-border:         #f0c2c9;
+$danger-tint:           #ffd0d6;
+$danger-tint-soft:      #ffe6ea;
+$danger-tint-softer:    #ffe6e9;
+
+// --- Warnung -----------------------------------------------------------
+$warning:              #fdab3d;
+$warning-text:         #c98a00;
+$warning-text-strong:  #d68a00;
+$warning-strong:       #b28900;
+$warning-surface:      #fff7ec;
+
+// --- Success -----------------------------------------------------------
+$success-text:          #00734a;
+$success-text-strong:   #00854d;
+$success-surface:       #eefaf3;
+$success-surface-soft:  #f4fdf8;
+
+// --- Surfaces and Lines ------------------------------------------------
+$surface-faint:       #fbfbfd;
+$surface-faint-cool:  #fafbfd;
+$surface-faint-warm:  #f9fafc;
+$surface-soft:        #f1f2f6;
+$surface-soft-alt:    #f0f1f5;
+$surface-muted:       #eceef5;
+$surface-muted-cool:  #eef0f6;
+$surface-border:      #e6e9ef;
+$hairline:            #f0f1f4;
+$hairline-strong:     #e1e3eb;
+$hairline-plain:      #e0e0e0;
+$divider:             #d9d9d9;
+$divider-strong:      #c4c7d4;
+$divider-warm:        #c9c5c5;
+
+// --- Text --------------------------------------------------------------
+$text-strong:         #464a5c;
+$text-slate:          #535768;
+$text-disabled:       #a1a3ad;
+$text-disabled-cool:  #a0a3b1;
+$text-disabled-warm:  #a9adbf;
+$text-faint:          #adadad;
+$text-faint-warm:     #a6a5a5;
+$text-mid:            #878787;
+$text-mid-plain:      #777;
+$text-dark-plain:     #333;
+$text-black:          #000;
+$text-midnight:       #1c1f3b;
+
+// --- Accent ------------------------------------------------------------
+$accent-deep:            #0060c2;
+$accent-surface:         #e6f2ff;
+$accent-surface-soft:    #eaf2fd;
+$accent-surface-cool:    #f0f4ff;
+$accent-surface-cooler:  #f0f3ff;
+$accent-tint:            #dfecff;
+$accent-tint-strong:     #d6e9ff;
+$accent-sky:             #0fa2e2;
+$accent-cyan:            #0086c0;
+$accent-navy:            #1264a3;
+
+// --- Home --------------------------------------------------------------
+$home-violet:       #5034ff;
+$home-violet-deep:  #5151d5;
+$home-violet-soft:  #8080e0;
+$home-slate:        #424272;
+$home-veil:         #0b0b3181;
+$home-veil-soft:    #4e4d5824;
+
+// --- Fileformats -----------------------------------------------------
+$file-word:        #2b579a;
+$file-excel:       #217346;
+$file-powerpoint:  #c43e1c;
+$file-archive:     #7f5347;
+$file-media:       #a25ddc;
+
+
+// --- Kanban ------------------------------------------------------------
+$kanban-gap:            20px;
+$kanban-per-row:        4;
+$kanban-max-column:     400px;
+$kanban-column-height:  78vh;
+
+// --- Calendar ----------------------------------------------------------
+$cal-hour: 52px;

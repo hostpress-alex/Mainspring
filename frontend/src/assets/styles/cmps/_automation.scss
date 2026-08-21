@@ -16,14 +16,14 @@
 .automation-backdrop {
     position: fixed;
     inset: 0;
-    z-index: var(--z-backdrop);
+    z-index: variables.$z-backdrop;
     background: rgba(0, 0, 0, .4);
 }
 
 .automation-overlay {
     position: fixed;
     inset: 12.5%;
-    z-index: var(--z-modal);
+    z-index: variables.$z-modal;
     display: flex;
     flex-direction: column;
     border-radius: 10px;
@@ -46,7 +46,7 @@
     }
 
     .automation-board {
-        color: #676879;
+        color: variables.$workspace-icon-color;
         font-weight: 400;
     }
 
@@ -77,7 +77,7 @@
         &.is-active {
             background: variables.$board-btn;
             border-color: variables.$board-btn;
-            color: #fff;
+            color: variables.$app-bg;
         }
     }
 }
@@ -94,10 +94,10 @@
 .automation-error {
     margin-bottom: variables.$spacing-medium;
     padding: 10px 14px;
-    border: 1px solid #e2445c;
+    border: 1px solid variables.$colors-red-middle;
     border-radius: 6px;
-    background: #fff0f2;
-    color: #a3283a;
+    background: variables.$danger-surface;
+    color: variables.$danger-text;
 }
 
 /* ------------------------------------------------------------ sentence -- */
@@ -116,7 +116,7 @@
     gap: variables.$spacing-small;
 }
 
-.automation-then-arrow { color: #00c875; }
+.automation-then-arrow { color: variables.$color-done-green; }
 
 /**
  * A word in the sentence that can be clicked.
@@ -135,7 +135,7 @@
     background: none;
     padding: 0 2px;
     font: inherit;
-    color: #9699a6;
+    color: variables.$field-border;
     cursor: pointer;
 
     &.is-set {
@@ -153,7 +153,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: var(--z-popover);
+    z-index: variables.$z-popover;
     min-width: 240px;
     max-height: 280px;
     margin: 4px 0 0;
@@ -186,7 +186,7 @@
 
 .automation-slot-empty {
     padding: 6px 8px;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 14px;
 }
 
@@ -207,7 +207,7 @@
     gap: variables.$spacing-medium;
 }
 
-.automation-arrow { color: #00c875; }
+.automation-arrow { color: variables.$color-done-green; }
 
 .automation-builder-action {
     display: flex;
@@ -241,7 +241,7 @@
 .automation-primary {
     border: 0;
     background: variables.$board-btn;
-    color: #fff;
+    color: variables.$app-bg;
 
     &:disabled {
         background: variables.$layout-border-color;
@@ -275,7 +275,7 @@
     display: flex;
     align-items: center;
     gap: variables.$spacing-small;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
 }
 
@@ -298,7 +298,7 @@
     border: 0;
     background: none;
     cursor: pointer;
-    color: #676879;
+    color: variables.$workspace-icon-color;
     font-size: 15px;
 
     &:hover { color: variables.$primary-text-color; }
@@ -318,7 +318,7 @@
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: #fff;
+        background: variables.$app-bg;
         transition: transform .15s ease;
     }
 
@@ -332,7 +332,7 @@
 .automation-empty {
     padding: variables.$spacing-xl;
     text-align: center;
-    color: #676879;
+    color: variables.$workspace-icon-color;
 }
 
 /* ------------------------------------------------------------ the log -- */
@@ -348,11 +348,11 @@
 }
 
 .automation-run-outcome { font-weight: 600; }
-.automation-run.is-done .automation-run-outcome { color: #00734a; }
-.automation-run.is-failed .automation-run-outcome { color: #a3283a; }
-.automation-run.is-skipped .automation-run-outcome { color: #676879; }
-.automation-run-summary { color: #676879; }
+.automation-run.is-done .automation-run-outcome { color: variables.$success-text; }
+.automation-run.is-failed .automation-run-outcome { color: variables.$danger-text; }
+.automation-run.is-skipped .automation-run-outcome { color: variables.$workspace-icon-color; }
+.automation-run-summary { color: variables.$workspace-icon-color; }
 .automation-run-time {
-    color: #676879;
+    color: variables.$workspace-icon-color;
     white-space: nowrap;
 }

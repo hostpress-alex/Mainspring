@@ -12,7 +12,7 @@
     border-radius: variables.$spacing-small;
     box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
     font-size: functions.rem(14px);
-    z-index: var(--z-modal);
+    z-index: variables.$z-modal;
     border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
     h1 {

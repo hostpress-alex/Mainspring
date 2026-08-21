@@ -17,7 +17,8 @@ import {ErrorBoundary} from '../error-boundary'
 import {
     socketService,
     SOCKET_EMIT_SEND_MSG,
-    SOCKET_EMIT_SET_TOPIC,
+    SOCKET_EMIT_TASK_OPEN,
+    SOCKET_EMIT_TASK_CLOSE,
     SOCKET_EVENT_ADD_MSG
 } from '../../services/socket.service'
 import noUpdate from '../../assets/img/empty-update.png'
@@ -76,13 +77,20 @@ export function TaskModal({task, board, groupId, setModalCurrTask, onClose = nul
         [board.activities, task.id])
 
     useEffect(() => {
-        socketService.emit(SOCKET_EMIT_SET_TOPIC, task.id)
+        // The board id goes with it. The server used to take it from whichever
+        // board this socket had last joined, which meant a task opened from the
+        // calendar — where no board is open — was refused outright and this
+        // dialog got no live updates at all.
+        socketService.emit(SOCKET_EMIT_TASK_OPEN, {boardId: board._id, taskId: task.id})
         socketService.on(SOCKET_EVENT_ADD_MSG, addComment)
 
         return () => {
             socketService.off(SOCKET_EVENT_ADD_MSG, addComment)
+            // Said out loud on the way out. The board room is NOT touched — it
+            // is what carries live board updates while this was open.
+            socketService.emit(SOCKET_EMIT_TASK_CLOSE)
         }
-    }, [task.id])
+    }, [task.id, board._id])
 
     /**
      * A comment from another browser (socket). Deliberately with new objects

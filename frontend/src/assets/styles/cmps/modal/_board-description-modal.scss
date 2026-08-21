@@ -17,7 +17,7 @@
     transition: all 0.4s ease 0s;
     box-shadow: rgb(0 0 0) 1px 0px 20px 0px;
     color: variables.$primary-text-color;
-    z-index: var(--z-modal);
+    z-index: variables.$z-modal;
 
     .close-btn {
         @include mixins.center-flex();
@@ -102,7 +102,7 @@
             }
 
             .board-description-empty {
-                color: #9699a6;
+                color: variables.$field-border;
             }
 
             blockquote {
@@ -153,7 +153,7 @@
             width: 24px;
             height: 24px;
             background-color: variables.$color-done-green;
-            color: #fff;
+            color: variables.$app-bg;
             border-radius: 8px;
         }
 

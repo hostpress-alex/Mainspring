@@ -1,3 +1,5 @@
+@use "sass:math";
+@use "../../setup/variables";
 /* Four groups per row at most, and a group is never wider than 400px.
 
    The width is not set on the column, it falls out of the flex basis: each
@@ -15,22 +17,21 @@
    left-to-right is what says "pipeline", and a second line breaks that. To go
    back, drop `flex-wrap` and put `overflow-x: auto` on the container. */
 .group-list-kanban {
-    --kanban-gap: 20px;
-    --kanban-per-row: 4;
-    --kanban-max-column: 400px;
-
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: var(--kanban-gap);
+    gap: variables.$kanban-gap;
     padding: 12px 38px 24px;
 
     .group-list-ul {
-        // The share of the gaps one column carries: (n - 1) gaps over n columns.
-        --kanban-gap-share: calc(var(--kanban-gap) * (var(--kanban-per-row) - 1) / var(--kanban-per-row));
+        // The share of the gaps one column carries: (n - 1) gaps over n
+        // columns. Sass does this arithmetic at build time; it used to be a
+        // custom property doing it in the browser, for a number that never
+        // changes.
+        $gap-share: math.div(variables.$kanban-gap * (variables.$kanban-per-row - 1), variables.$kanban-per-row);
 
-        flex: 1 1 calc(100% / var(--kanban-per-row) - var(--kanban-gap-share));
-        max-width: var(--kanban-max-column);
+        flex: 1 1 calc(100% / #{variables.$kanban-per-row} - #{$gap-share});
+        max-width: variables.$kanban-max-column;
         min-width: 260px;
         list-style: none;
         margin: 0;

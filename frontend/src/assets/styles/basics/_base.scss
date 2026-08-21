@@ -6,7 +6,7 @@
 * {
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: #878787 #D9D9D9;
+    scrollbar-color: variables.$text-mid variables.$divider;
 
     &::-webkit-scrollbar {
         width: 8px;
@@ -14,19 +14,19 @@
     }
 
     &::-webkit-scrollbar-track {
-        background: #D9D9D9;
+        background: variables.$divider;
     }
 
     &::-webkit-scrollbar-thumb {
         border-radius: 25px;
-        background-color: #A6A5A5;
+        background-color: variables.$text-faint-warm;
         cursor: pointer;
     }
 }
 
 .dark-screen {
     position: fixed;
-    z-index: var(--z-backdrop);
+    z-index: variables.$z-backdrop;
     background-color: variables.$react-modal-background;
     width: 100vw;
     height: 100vh;
