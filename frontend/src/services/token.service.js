@@ -14,6 +14,17 @@ const BASE_URL = 'token/'
  * must never reach localStorage or a URL.
  */
 export const tokenService = {
+    /**
+     * Every token on the system, revoked ones included.
+     *
+     * What the administration shows. Per-account is still available below, but
+     * the overview is the read this page does: the question is which keys
+     * exist, not which keys one account has.
+     */
+    all(){
+        return httpService.get(BASE_URL)
+    },
+
     /** Every token of one account, revoked ones included. */
     forUser(userId){
         return httpService.get(`${BASE_URL}user/${userId}`)

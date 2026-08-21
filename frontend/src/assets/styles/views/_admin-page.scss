@@ -172,6 +172,16 @@
         user-select: all;
     }
 
+    /* A span that has run out reads as background, not as a value. */
+    .admin-td.is-plain-muted {
+        color: #9699a6;
+    }
+
+    /* A revoked token is history, not a row you act on. */
+    .is-muted-row .admin-td {
+        color: #9699a6;
+    }
+
     .admin-section-title {
         font-size: 18px;
         margin-bottom: 14px;

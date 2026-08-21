@@ -107,6 +107,20 @@ async function revoke(id){
         .update({revoked_at: Date.now()})
 }
 
+/**
+ * Every token there is, newest first.
+ *
+ * The administration's job is to show what EXISTS, and the question asked of
+ * this table — which keys are out there, whose are they, is one still in use —
+ * is about all of them at once. Per-account only, which is how this started,
+ * means that question can only be answered by clicking through every account
+ * in turn, and an answer nobody assembles is an answer nobody has.
+ */
+async function findAll(){
+    const rows = await db()('api_token').orderBy('created_at', 'desc')
+    return rows.map(out)
+}
+
 /** Every token of one account, newest first. Revoked ones included — a list
  *  that hides them cannot answer "did we actually take that one away". */
 async function findForUser(userId){
@@ -118,5 +132,5 @@ async function findForUser(userId){
 
 module.exports = {
     PREFIX, VISIBLE, TOUCH_EVERY_MS,
-    newToken, keyOf, create, find, touch, revoke, findForUser
+    newToken, keyOf, create, find, touch, revoke, findForUser, findAll
 }

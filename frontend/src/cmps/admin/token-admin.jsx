@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from 'react'
 import {tokenService, YEAR_MS} from '../../services/token.service'
 import {confirmDialog} from '../confirm-dialog'
 import {utilService} from '../../services/util.service'
+import {fmtSpan} from '../../services/date.util'
 import {Icon} from '../icon'
 import {t} from '../../i18n'
 
@@ -22,18 +23,43 @@ import {t} from '../../i18n'
  * Choosing the account is deliberately an explicit step with nothing
  * preselected. Minting a token on the wrong account is not a mistake you
  * notice: it works, and it works with somebody else's rights.
+ *
+ * **The list below shows every token there is, always.** The first version
+ * only listed the chosen account's, so a reload showed nothing at all until
+ * you picked somebody — and the question this page is opened for is "which
+ * keys exist", not "which keys does this one account have". An answer that has
+ * to be assembled by clicking through eight accounts is an answer nobody has.
+ * The picker now only decides who a NEW token is for.
  */
 
-/** What a token may live for. Not "forever": a key nobody looks at again is
- *  the one still working three jobs after the person who made it left. */
-const LIFETIMES = [
-    {key: '1y', ms: YEAR_MS},
-    {key: '2y', ms: 2 * YEAR_MS}
-]
+/**
+ * What a token may live for. Not "forever": a key nobody looks at again is the
+ * one still working three jobs after the person who made it left.
+ *
+ * Derived from the numbers, not written out per entry. The hand-written
+ * version had `{key: '3y', ms: 2 * YEAR_MS}` and the same for '5y' — a copied
+ * line whose label was changed and whose value was not, so the menu offered
+ * five years and handed out two. A dropdown that lies about what it does is
+ * worse than a dropdown with fewer options, and nothing on screen afterwards
+ * would have contradicted it. Here the label and the value cannot disagree,
+ * because there is only one number.
+ *
+ * The longest one has to stay within what the server allows — see MAX_TTL_MS
+ * in api/token/token.controller. The server no longer clamps silently, so a
+ * mismatch is a 400 rather than a quiet difference.
+ */
+export const LIFETIME_YEARS = [1, 2, 3, 5]
+
+const LIFETIMES = LIFETIME_YEARS.map(years => ({
+    key: `${years}y`,
+    years,
+    ms: years * YEAR_MS
+}))
 
 export function TokenAdmin({users, onError, onFlash}){
     const [userId, setUserId] = useState('')
     const [tokens, setTokens] = useState([])
+    const [isLoaded, setIsLoaded] = useState(false)
     const [form, setForm] = useState({name: '', lifetime: '1y'})
     const [fresh, setFresh] = useState(null)     // the one-time value
     const [copied, setCopied] = useState(false)
@@ -41,16 +67,14 @@ export function TokenAdmin({users, onError, onFlash}){
 
     const owner = users.find(u => String(u._id) === String(userId)) || null
 
-    const reload = useCallback(async id => {
-        if(!id){
-            setTokens([])
-            return
-        }
+    const reload = useCallback(async () => {
         try {
-            const answer = await tokenService.forUser(id)
+            const answer = await tokenService.all()
             setTokens(answer.tokens || [])
         } catch(err) {
             onError(err)
+        } finally {
+            setIsLoaded(true)
         }
         // onError is stable enough here; re-creating this on every render
         // would restart the effect below on every keystroke in the name field.
@@ -58,12 +82,15 @@ export function TokenAdmin({users, onError, onFlash}){
     }, [])
 
     useEffect(() => {
+        reload()
+    }, [reload])
+
+    useEffect(() => {
         // A different account means the previous account's one-time value is
         // not on screen any more either.
         setFresh(null)
         setCopied(false)
-        reload(userId)
-    }, [userId, reload])
+    }, [userId])
 
     async function onCreate(ev){
         ev.preventDefault()
@@ -76,7 +103,7 @@ export function TokenAdmin({users, onError, onFlash}){
             setFresh(answer.token)
             setCopied(false)
             setForm({name: '', lifetime: form.lifetime})
-            await reload(userId)
+            await reload()
         } catch(err) {
             onError(err)
         } finally {
@@ -100,7 +127,7 @@ export function TokenAdmin({users, onError, onFlash}){
             // If the value on screen belongs to the token just revoked, it is
             // no longer worth copying.
             if(fresh && fresh.startsWith(entry.prefix)) setFresh(null)
-            await reload(userId)
+            await reload()
         } catch(err) {
             onError(err)
         }
@@ -121,6 +148,35 @@ export function TokenAdmin({users, onError, onFlash}){
         if(entry.revokedAt) return {key: 'token.stateRevoked', className: 'is-off'}
         if(entry.expiresAt !== null && entry.expiresAt <= Date.now()) return {key: 'token.stateExpired', className: 'is-off'}
         return {key: 'token.stateActive', className: ''}
+    }
+
+    /**
+     * How long it is valid, or how long it was.
+     *
+     * Three answers, because there are three situations and one of them is not
+     * a duration at all:
+     *
+     *   still valid  -> what is LEFT. "expires 20/08/2028" is a fact you have
+     *                   to do arithmetic on; "another 4 years" is the answer.
+     *   revoked      -> from minting to revocation. How long the key was live
+     *                   is the question asked after an incident.
+     *   expired      -> the lifetime it was given, which is what it ran for.
+     *
+     * The exact date stays in the column next to this one, so nothing is lost
+     * by rounding here.
+     */
+    function validityOf(entry){
+        if(entry.revokedAt){
+            return {text: t('token.wasValid', {span: fmtSpan(entry.revokedAt - entry.createdAt)}), past: true}
+        }
+        if(entry.expiresAt === null || entry.expiresAt === undefined){
+            return {text: t('token.unlimited'), past: false}
+        }
+        const left = entry.expiresAt - Date.now()
+        if(left <= 0){
+            return {text: t('token.wasValid', {span: fmtSpan(entry.expiresAt - entry.createdAt)}), past: true}
+        }
+        return {text: t('token.stillValid', {span: fmtSpan(left)}), past: false}
     }
 
     return (
@@ -177,57 +233,70 @@ export function TokenAdmin({users, onError, onFlash}){
                     <p className="admin-sub is-footnote">{t('token.freshHint')}</p>
                 </div>}
 
-            {owner &&
-                <div className="admin-card">
-                    <h2 className="admin-section-title">
-                        {t('token.listHeading', {name: owner.fullname, n: tokens.length})}
-                    </h2>
-                    {tokens.length === 0
-                        ?<p className="admin-muted is-plain">{t('token.none')}</p>
-                        :<table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th className="admin-th">{t('common.name')}</th>
-                                    <th className="admin-th">{t('token.prefix')}</th>
-                                    <th className="admin-th">{t('token.lastUsed')}</th>
-                                    <th className="admin-th">{t('token.expires')}</th>
-                                    <th className="admin-th">{t('common.state')}</th>
-                                    <th className="admin-th"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {tokens.map(entry => {
-                                    const state = stateOf(entry)
-                                    return (
-                                        <tr key={entry.id}>
-                                            <td className="admin-td">{entry.name || '—'}</td>
-                                            <td className="admin-td"><code>{entry.prefix}…</code></td>
-                                            <td className="admin-td">
-                                                {/* "never used" is the answer that says a
-                                                    deployment did not work. */}
-                                                {entry.lastUsedAt
-                                                    ?utilService.calculateTimeWithBefore(entry.lastUsedAt)
-                                                    :<span className="admin-muted is-plain">{t('token.neverUsed')}</span>}
-                                            </td>
-                                            <td className="admin-td">
-                                                {entry.expiresAt?utilService.getFormattedDate(entry.expiresAt):'—'}
-                                            </td>
-                                            <td className="admin-td">
-                                                <span className={`admin-badge ${state.className}`}>{t(state.key)}</span>
-                                            </td>
-                                            <td className="admin-td is-right">
-                                                {!entry.revokedAt &&
-                                                    <button className="admin-btn-danger" onClick={() => onRevoke(entry)}>
-                                                        {t('token.revoke')}
-                                                    </button>}
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>}
-                    <p className="admin-sub is-footnote">{t('token.listFootnote')}</p>
-                </div>}
+            <div className="admin-card">
+                <h2 className="admin-section-title">{t('token.listHeading', {n: tokens.length})}</h2>
+                {tokens.length === 0
+                    ?<p className="admin-muted is-plain">{isLoaded?t('token.none'):t('common.loading')}</p>
+                    :<table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th className="admin-th">{t('common.name')}</th>
+                                <th className="admin-th">{t('token.account')}</th>
+                                <th className="admin-th">{t('token.prefix')}</th>
+                                <th className="admin-th">{t('token.lastUsed')}</th>
+                                <th className="admin-th">{t('token.validity')}</th>
+                                <th className="admin-th">{t('token.expires')}</th>
+                                <th className="admin-th">{t('common.state')}</th>
+                                <th className="admin-th"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {tokens.map(entry => {
+                                const state = stateOf(entry)
+                                const validity = validityOf(entry)
+                                // The owner is looked up in the list the page
+                                // already holds, rather than copied into the
+                                // server's answer where it would go stale the
+                                // day somebody is renamed.
+                                const holder = users.find(u => String(u._id) === String(entry.userId))
+                                return (
+                                    <tr key={entry.id} className={entry.revokedAt?'is-muted-row':''}>
+                                        <td className="admin-td">{entry.name || '—'}</td>
+                                        <td className="admin-td">
+                                            {holder
+                                                ?holder.fullname
+                                                :<span className="admin-muted is-plain">{t('token.accountGone')}</span>}
+                                        </td>
+                                        <td className="admin-td"><code>{entry.prefix}…</code></td>
+                                        <td className="admin-td">
+                                            {/* "never used" is the answer that says a
+                                                deployment did not work. */}
+                                            {entry.lastUsedAt
+                                                ?utilService.calculateTimeWithBefore(entry.lastUsedAt)
+                                                :<span className="admin-muted is-plain">{t('token.neverUsed')}</span>}
+                                        </td>
+                                        <td className={`admin-td${validity.past?' is-plain-muted':''}`}>
+                                            {validity.text}
+                                        </td>
+                                        <td className="admin-td">
+                                            {entry.expiresAt?utilService.getFormattedDate(entry.expiresAt):'—'}
+                                        </td>
+                                        <td className="admin-td">
+                                            <span className={`admin-badge ${state.className}`}>{t(state.key)}</span>
+                                        </td>
+                                        <td className="admin-td is-right">
+                                            {!entry.revokedAt &&
+                                                <button className="admin-btn-danger" onClick={() => onRevoke(entry)}>
+                                                    {t('token.revoke')}
+                                                </button>}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>}
+                <p className="admin-sub is-footnote">{t('token.listFootnote')}</p>
+            </div>
         </>
     )
 }

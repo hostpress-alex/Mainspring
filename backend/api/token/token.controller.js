@@ -21,8 +21,33 @@ function requester(){
  *  left. It can be renewed in one call. */
 const DEFAULT_TTL_MS = 365 * 24 * 60 * 60 * 1000
 
-/** Longer than this and the expiry is a formality. */
-const MAX_TTL_MS = 2 * 365 * 24 * 60 * 60 * 1000
+/**
+ * The longest a token may live.
+ *
+ * Five years is already long enough that the expiry is nearly a formality —
+ * it is a backstop against a key outliving the person who made it, not a
+ * security control. The interface offers 1, 2, 3 and 5; this is the ceiling
+ * that list has to stay under.
+ */
+const MAX_TTL_MS = 5 * 365 * 24 * 60 * 60 * 1000
+
+/**
+ * Every token on the system.
+ *
+ * Admin and session only, like everything else here. It carries `userId` per
+ * row rather than the owner's name: the administration already has the user
+ * list loaded, and a name copied into this answer would go stale the day
+ * somebody is renamed.
+ */
+async function listAllTokens(req, res){
+    try {
+        const list = await apiTokenRepo.findAll()
+        res.send({tokens: list})
+    } catch(err) {
+        logger.error('cannot list api tokens', err)
+        res.status(500).send({err: 'Tokens konnten nicht gelesen werden'})
+    }
+}
 
 async function listTokens(req, res){
     try {
@@ -44,8 +69,17 @@ async function createToken(req, res){
         const owner = await userService.getById(userId)
         if(!owner) return res.status(404).send({err: 'Benutzer nicht gefunden'})
 
+        // Refused, not clamped. A silent `Math.min` is how the interface came
+        // to offer five years while the server handed out two, with nothing
+        // anywhere saying so — the caller asked for something it did not get
+        // and was told it had succeeded.
         const ttl = Number(ttlMs)
-        const life = Number.isFinite(ttl) && ttl > 0?Math.min(ttl, MAX_TTL_MS):DEFAULT_TTL_MS
+        if(Number.isFinite(ttl) && ttl > MAX_TTL_MS){
+            return res.status(400).send({
+                err: `Ein Token darf hoechstens ${Math.round(MAX_TTL_MS / (365 * 24 * 60 * 60 * 1000))} Jahre gelten`
+            })
+        }
+        const life = Number.isFinite(ttl) && ttl > 0?ttl:DEFAULT_TTL_MS
 
         const {token, entry} = await apiTokenRepo.create(userId, {
             name,
@@ -75,4 +109,4 @@ async function revokeToken(req, res){
     }
 }
 
-module.exports = {DEFAULT_TTL_MS, MAX_TTL_MS, listTokens, createToken, revokeToken}
+module.exports = {DEFAULT_TTL_MS, MAX_TTL_MS, listAllTokens, listTokens, createToken, revokeToken}

@@ -153,6 +153,46 @@ export function monthGrid(d){
 
 export const minutesOfDay = d => d.getHours() * 60 + d.getMinutes()
 
+/**
+ * A long span, in one unit: "5 Jahre", "3 Monate", "12 Tage", "4 Std."
+ *
+ * `fmtDuration` below is for a working day — it answers in hours and minutes,
+ * which for the lifetime of an API key reads as "43800 h". This picks the
+ * largest unit that gives a number of at least one and stops there. Nobody
+ * reading "how long is this valid" wants two units, and "1 Jahr 2 Monate
+ * 3 Tage" is a sentence you have to parse rather than see.
+ *
+ * Months are 1/12 of a year and years are 365 days: this measures a duration,
+ * not a distance between two calendar dates, and leap days do not change what
+ * "about five years" means. Where the exact day matters, the expiry DATE is
+ * shown next to it.
+ */
+export function fmtSpan(ms){
+    const total = Math.max(0, Math.round(Number(ms) || 0))
+    const HOUR = 3600000
+    const DAY = 24 * HOUR
+    const YEAR = 365 * DAY
+    const MONTH = YEAR / 12
+
+    const steps = [
+        [YEAR, 'date.spanYear'],
+        [MONTH, 'date.spanMonth'],
+        [DAY, 'date.spanDay'],
+        [HOUR, 'date.spanHour']
+    ]
+    for(const [size, key] of steps){
+        const raw = total / size
+        // The unit is chosen by the WHOLE part and the number is ROUNDED, and
+        // the two have to be different tests. Flooring both put "noch 1 Jahr"
+        // next to "läuft ab 20/08/2028" — 729 days is 1.997 years, floored to
+        // one, and a reader seeing those two side by side concludes that one of
+        // them is broken. Rounding both would call twenty days "1 Monat".
+        if(raw < 1) continue
+        return t(key, {n: Math.max(1, Math.round(raw))})
+    }
+    return t('date.spanShort')
+}
+
 /** Dauer als "1 h 30 min" / "45 min". */
 export function fmtDuration(ms){
     const total = Math.round(ms / MS_MIN)
