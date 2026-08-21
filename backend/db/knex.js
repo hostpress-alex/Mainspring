@@ -60,6 +60,30 @@ function parseJson(value, fallback = null){
     }
 }
 
+/**
+ * A moment in milliseconds, or null when the value is not one.
+ *
+ * The guard that matters is the FIRST line, and this project has now got it
+ * wrong four times: **`Number(null)` is 0, and 0 is finite.** So the obvious
+ * `Number.isFinite(Number(value))?Number(value):null` accepts null, undefined
+ * and the empty string and stores them as 1 January 1970.
+ *
+ * Where that bites is not cosmetic. Every nullable timestamp column in this
+ * schema uses NULL to mean "we do not know", and the epoch to mean "1970" —
+ * two different statements. A comment whose `created_at` is NULL is read back
+ * as `archivedAt: null`, and writing the task again used to turn it into 0.
+ * The repair in round 27 exists precisely because a guessed date cannot be
+ * told from a real one afterwards; this quietly manufactured them.
+ *
+ * Lives next to parseJson and toJson because it is the same kind of thing: a
+ * value on its way into a column, converted in one place instead of thirty.
+ */
+function msOrNull(value){
+    if(value === null || value === undefined || value === '') return null
+    const ms = value instanceof Date?value.getTime():Number(value)
+    return Number.isFinite(ms)?ms:null
+}
+
 /** Counterpart to parseJson: null stays null, everything else gets packed. */
 function toJson(value){
     if(value === undefined || value === null) return null
@@ -84,4 +108,4 @@ async function assertMigrated(){
     throw err
 }
 
-module.exports = {db, destroy, parseJson, toJson, assertMigrated}
+module.exports = {db, destroy, parseJson, toJson, msOrNull, assertMigrated}

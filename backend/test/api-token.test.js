@@ -69,10 +69,22 @@ function table(){
     return q
 }
 
+/**
+ * Only `db` is faked. Everything else comes from the real module.
+ *
+ * The first version listed the exports by hand, and the day `msOrNull` moved
+ * into knex.js this file failed with "msOrNull is not a function" — a stub that
+ * has to be kept in step with the thing it stubs will drift, and it drifts by
+ * breaking tests that have nothing to do with the change. Requiring the real
+ * module costs nothing here: `db()` opens the connection on first CALL, not on
+ * load, and it is never called.
+ */
+const realKnex = require('../db/knex')
+
 require.cache[knexPath] = {
     id: knexPath, filename: knexPath, loaded: true,
-    // `db()` hands back something you call with a table name — db()('session').
-    exports: {db: () => () => table(), parseJson: v => v, toJson: v => v}
+    // `db()` hands back something you call with a table name — db()('api_token').
+    exports: {...realKnex, db: () => () => table()}
 }
 
 const tokenRepo = require('../services/api-token.repo')

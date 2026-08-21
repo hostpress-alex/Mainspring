@@ -9,7 +9,7 @@
  * there is no idle timeout, and revoking keeps the row.
  */
 const crypto = require('crypto')
-const {db} = require('../db/knex')
+const {db, msOrNull} = require('../db/knex')
 
 const sid = v => (v === undefined || v === null)?'':String(v)
 
@@ -29,13 +29,6 @@ const VISIBLE = 8
 const newToken = () => PREFIX + crypto.randomBytes(32).toString('hex')
 
 const keyOf = token => crypto.createHash('sha256').update(String(token)).digest('hex')
-
-/** A moment, or null. Empty is not the epoch. */
-function msOrNull(value){
-    if(value === null || value === undefined || value === '') return null
-    const n = Number(value)
-    return Number.isFinite(n)?n:null
-}
 
 function out(row){
     if(!row) return null

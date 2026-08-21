@@ -14,7 +14,7 @@
  *    between, which is what used to happen.
  */
 const crypto = require('crypto')
-const {db, parseJson, toJson} = require('../../db/knex')
+const {db, parseJson, toJson, msOrNull} = require('../../db/knex')
 
 const MAX_ACTIVITIES = 40
 
@@ -318,7 +318,7 @@ function splitTask(task){
         comments: Array.isArray(task && task.comments)?task.comments:[],
         // Mirror for DBeaver and later analysis. The truth still lives
         // in col_values.updatedBy, so nothing gets lost.
-        updatedAt: Number.isFinite(Number(updatedBy.date))?Number(updatedBy.date):null,
+        updatedAt: msOrNull(updatedBy.date),
         updatedById: updatedBy._id?sid(updatedBy._id):null
     }
 }
@@ -358,7 +358,11 @@ async function addComment(boardId, taskId, comment){
         const lowest = await trx('task_comment')
             .where({board_id: id, task_id: sid(taskId)})
             .min({p: 'position'}).first()
-        const position = Number.isFinite(Number(lowest && lowest.p))?Number(lowest.p) - 1:0
+        // `min()` over no rows answers null, and Number(null) is 0 — so the
+        // first comment on a task used to land at position -1 instead of 0.
+        // Harmless, since only the order is read, but wrong for no reason.
+        const lowestPosition = (lowest && lowest.p !== null && lowest.p !== undefined)?Number(lowest.p):null
+        const position = Number.isFinite(lowestPosition)?lowestPosition - 1:0
 
         const row = {
             board_id: id,
@@ -366,9 +370,10 @@ async function addComment(boardId, taskId, comment){
             id: newShortId(),
             position,
             parent_id: (comment && comment.parentId)?sid(comment.parentId):null,
-            created_at: Number.isFinite(Number(comment && comment.archivedAt))
-                ?Number(comment.archivedAt)
-                :Date.now(),
+            // Absent means "now" here: this path appends a comment somebody
+            // is writing at this moment. That is the opposite of the sync
+            // below, where absent means "we do not know when".
+            created_at: msOrNull(comment && comment.archivedAt) ?? Date.now(),
             pinned_at: null,
             by_user_id: (comment && comment.byUserId)?sid(comment.byUserId):null,
             txt: (comment && comment.txt) || '',
@@ -412,8 +417,11 @@ async function syncTaskComments(trx, boardId, taskId, comments){
         rows.push({
             board_id: boardId, task_id: taskId, id, position: i,
             parent_id: (c && c.parentId)?sid(c.parentId):null,
-            created_at: Number.isFinite(Number(c && c.archivedAt))?Number(c.archivedAt):null,
-            pinned_at: Number.isFinite(Number(c && c.pinnedAt)) && Number(c.pinnedAt) > 0?Number(c.pinnedAt):null,
+            // NULL stays NULL. A comment whose time was never recorded must
+            // not come back out of a rewrite dated 1 January 1970 — see
+            // msOrNull, and round 27 for what a manufactured date costs.
+            created_at: msOrNull(c && c.archivedAt),
+            pinned_at: (msOrNull(c && c.pinnedAt) > 0)?msOrNull(c.pinnedAt):null,
             by_user_id: by._id?sid(by._id):null,
             txt: (c && c.txt) || '',
             style: toJson((c && c.style) || {}),
@@ -503,7 +511,7 @@ async function writeGroup(trx, boardId, group, position){
         color: (group && group.color) || '',
         icon: sanitizeIcon(group && group.icon),
         created_by: (group && group.createdBy)?sid(group.createdBy):null,
-        archived_at: Number.isFinite(Number(group && group.archivedAt))?Number(group.archivedAt):null
+        archived_at: msOrNull(group && group.archivedAt)
     }).onConflict(['board_id', 'id']).merge()
     return id
 }
@@ -575,7 +583,7 @@ function boardMetaRow(board){
         folder: board.folder || '',
         is_starred: !!board.isStarred,
         created_by_id: createdBy._id?sid(createdBy._id):null,
-        archived_at: Number.isFinite(Number(board.archivedAt))?Number(board.archivedAt):null,
+        archived_at: msOrNull(board.archivedAt),
         labels: toJson(board.labels || [])
     }
 }
@@ -619,7 +627,7 @@ async function updateMeta(boardId, patch){
     for(const [key, column] of Object.entries(BOARD_META_FIELDS)){
         if(patch[key] === undefined) continue
         if(key === 'isStarred') update[column] = !!patch[key]
-        else if(key === 'archivedAt') update[column] = Number.isFinite(Number(patch[key]))?Number(patch[key]):null
+        else if(key === 'archivedAt') update[column] = msOrNull(patch[key])
         else update[column] = patch[key] === null?'':String(patch[key])
     }
     if(!Object.keys(update).length) return
@@ -734,7 +742,7 @@ async function updateGroupMeta(boardId, groupId, patch){
     const update = {}
     for(const [key, column] of Object.entries(GROUP_META_FIELDS)){
         if(patch[key] === undefined) continue
-        if(key === 'archivedAt') update[column] = Number.isFinite(Number(patch[key]))?Number(patch[key]):null
+        if(key === 'archivedAt') update[column] = msOrNull(patch[key])
         else if(key === 'icon') update[column] = sanitizeIcon(patch[key])
         else update[column] = patch[key] === null?'':String(patch[key])
     }
@@ -908,7 +916,7 @@ async function updateTaskFields(boardId, groupId, taskId, patch){
             touchesValues = true
             if(key === 'updatedBy'){
                 const by = value || {}
-                update.updated_at = Number.isFinite(Number(by.date))?Number(by.date):null
+                update.updated_at = msOrNull(by.date)
                 update.updated_by_id = by._id?sid(by._id):null
             }
         }
@@ -973,7 +981,9 @@ async function insertActivity(trx, boardId, activity){
     await trx('activity').insert({
         board_id: boardId,
         action: a.action || '',
-        created_at: Number.isFinite(Number(a.createdAt))?Number(a.createdAt):Date.now(),
+        // An activity always happened, so absent means now — never 1970,
+        // which is what `Number(null)` used to make of it.
+        created_at: msOrNull(a.createdAt) ?? Date.now(),
         by_user_id: a.byMember && a.byMember._id?sid(a.byMember._id):null,
         task_id: a.task && a.task.id?sid(a.task.id):null,
         task_title: a.task && a.task.title?String(a.task.title):'',
