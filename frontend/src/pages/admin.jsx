@@ -12,6 +12,7 @@ import {TokenAdmin} from '../cmps/admin/token-admin'
 import {ADMIN_TABS, resolveAdminTab} from '../cmps/admin/admin-tabs'
 import {Icon} from '../cmps/icon'
 import {t} from '../i18n'
+import {localErrorText} from '../services/error-text'
 
 /**
  * The administration, in sections.
@@ -62,7 +63,7 @@ export function AdminPage(){
 
     function readErr(e){
         if(!e) return null
-        return e?.response?.data?.err || e?.message || t('common.unknownError')
+        return localErrorText(e)
     }
 
     /** A panel reports a failure; null clears the line. */

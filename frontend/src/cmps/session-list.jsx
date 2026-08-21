@@ -4,6 +4,7 @@ import {Icon} from './icon'
 import {userService} from '../services/user.service'
 import {utilService} from '../services/util.service'
 import {t} from '../i18n'
+import {localErrorText} from '../services/error-text'
 
 /**
  * Where this account is signed in.
@@ -25,7 +26,7 @@ export function SessionList({userId, onCurrentEnded}){
         try {
             setRows(await userService.getSessions(userId))
         } catch(e) {
-            setErr(e?.response?.data?.err || e?.message || t('common.unknownError'))
+            setErr(localErrorText(e))
         } finally {
             setIsLoading(false)
         }
@@ -42,7 +43,7 @@ export function SessionList({userId, onCurrentEnded}){
             if(row.isCurrent) return onCurrentEnded()
             await load()
         } catch(e) {
-            setErr(e?.response?.data?.err || e?.message || t('common.unknownError'))
+            setErr(localErrorText(e))
         }
     }
 

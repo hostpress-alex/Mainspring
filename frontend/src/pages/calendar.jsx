@@ -22,6 +22,7 @@ import {
     weekDays, fmtDate, fmtMonthYear, fmtWeekdayLong, isoWeek, MS_MIN
 } from '../services/date.util'
 import {t} from '../i18n'
+import {localErrorText} from '../services/error-text'
 
 const VIEWS = [
     {key: 'day', label: 'Tag'},
@@ -29,7 +30,7 @@ const VIEWS = [
     {key: 'month', label: 'Monat'}
 ]
 
-const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
+const readErr = localErrorText
 
 export function CalendarPage(){
     const user = useSelector(storeState => storeState.userModule.user)

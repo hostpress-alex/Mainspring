@@ -10,6 +10,7 @@ import {BinPanel} from '../cmps/bin/bin-panel'
 import {Icon} from '../cmps/icon'
 import { Avatar } from '../cmps/avatar'
 import {t} from '../i18n'
+import {localErrorText} from '../services/error-text'
 
 function initials(name = ''){
     return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
@@ -29,7 +30,7 @@ export function BoardsOverview(){
     const navigate = useNavigate()
 
     useEffect(() => {
-        loadBoards().catch(e => setErr(e?.response?.data?.err || t('board.loadFailed'))).finally(() => setIsLoading(false))
+        loadBoards().catch(e => setErr(localErrorText(e) || t('board.loadFailed'))).finally(() => setIsLoading(false))
     }, [])
 
     async function onCreateBoard(){
@@ -41,7 +42,7 @@ export function BoardsOverview(){
             if(saved && saved._id) navigate(`/board/${saved._id}`)
             else await loadBoards()
         } catch(e) {
-            setErr(e?.response?.data?.err || t('board.createFailed'))
+            setErr(localErrorText(e))
         }
     }
 

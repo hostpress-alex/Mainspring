@@ -9,6 +9,7 @@ import {automationService} from '../../services/automation.service'
 import {emptyRule, isComplete} from '../../services/automation'
 import {utilService} from '../../services/util.service'
 import {t} from '../../i18n'
+import {localErrorText} from '../../services/error-text'
 
 /**
  * The automations of one board.
@@ -260,4 +261,4 @@ function MemberFace({board, userId}){
     )
 }
 
-const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
+const readErr = localErrorText

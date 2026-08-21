@@ -5,6 +5,7 @@ import {
     toClock, fromClock, minutesOfDay, weekMinutes, asHours
 } from '../../services/workhours.service'
 import {getLanguage, t} from '../../i18n'
+import {localErrorText} from '../../services/error-text'
 
 /**
  * One person's week.
@@ -157,5 +158,5 @@ export function WorkHoursEditor({userId, canEdit = true, onSaved}){
 }
 
 function readErr(e){
-    return e?.response?.data?.err || e?.message || t('common.unknownError')
+    return localErrorText(e)
 }

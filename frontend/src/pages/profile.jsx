@@ -11,8 +11,9 @@ import {uploadAvatar, imagesFromClipboard} from '../services/upload.service'
 import {GUEST_IMG} from '../services/avatar'
 import { Avatar } from '../cmps/avatar'
 import {availableLanguages, getLanguage, languageName, setLanguage, t} from '../i18n'
+import {localErrorText} from '../services/error-text'
 
-const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
+const readErr = localErrorText
 
 export function ProfilePage(){
     const user = useSelector(storeState => storeState.userModule.user)

@@ -9,6 +9,7 @@ import {
     timeService, formatDuration, formatClock, spanOf, toInputValue, fromInputValue
 } from '../../services/time.service'
 import {useRunningTimer, useRunningSpan, useTimesChanged, notifyTimesChanged} from './use-running-timer'
+import {localErrorText} from '../../services/error-text'
 
 /**
  * Every interval recorded on one task.
@@ -202,7 +203,7 @@ function TimeEntryForm({entry = null, onCancel, onSave, submitLabel}){
         try {
             await onSave({startedAt, endedAt, note: note.trim(), postUpdate: postUpdate && Boolean(note.trim())})
         } catch(error){
-            setErr(error?.response?.data?.err || t('common.unknownError'))
+            setErr(localErrorText(error))
         } finally {
             setBusy(false)
         }

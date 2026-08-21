@@ -9,6 +9,7 @@ import {fileSize} from '../task/file-type'
 import {utilService} from '../../services/util.service'
 import {withTaskParams} from '../../services/task-link'
 import {t} from '../../i18n'
+import {localErrorText} from '../../services/error-text'
 
 /**
  * Search everything at once.
@@ -213,4 +214,4 @@ export function SearchPanel({onClose}){
     )
 }
 
-const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
+const readErr = localErrorText

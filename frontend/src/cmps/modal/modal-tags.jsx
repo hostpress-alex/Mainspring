@@ -8,6 +8,7 @@ import {
 } from '../../services/tags'
 import {Icon} from '../icon'
 import {t} from '../../i18n'
+import {localErrorText} from '../../services/error-text'
 
 /**
  * Picking tags, and keeping the list in order.
@@ -256,5 +257,5 @@ function ManageTags({board, column, onBack}){
 }
 
 function readErr(e){
-    return e?.response?.data?.err || e?.message || t('common.unknownError')
+    return localErrorText(e)
 }

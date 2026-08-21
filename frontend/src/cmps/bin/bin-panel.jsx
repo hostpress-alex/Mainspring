@@ -8,6 +8,7 @@ import {boardService} from '../../services/board.service'
 import {utilService} from '../../services/util.service'
 import {loadBoard, loadBoards} from '../../store/board.actions'
 import {t} from '../../i18n'
+import {localErrorText} from '../../services/error-text'
 
 /**
  * What left the board, and how to get it back.
@@ -170,4 +171,4 @@ function Row({icon, title, subtitle, at, onRestore, onPurge, onOpen}){
     )
 }
 
-const readErr = e => e?.response?.data?.err || e?.message || t('common.unknownError')
+const readErr = localErrorText
