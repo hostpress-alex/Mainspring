@@ -3,11 +3,11 @@
 @use "../../setup/variables";
 
 .main-sidebar {
-    flex-direction: column;
-    justify-content: space-between;
     background-color: variables.$sidebar-main-bg;
-    min-width: variables.$sidebar-main-width;
+    flex-direction: column;
     height: 100vh;
+    justify-content: space-between;
+    min-width: variables.$sidebar-main-width;
     position: sticky;
     top: 0;
 
@@ -34,9 +34,9 @@
         .open-workspace-btn {
             @include mixins.center-flex();
             color: white;
+            cursor: pointer;
             font-size: functions.rem(24px);
             padding: variables.$spacing-xs;
-            cursor: pointer;
 
             &:hover {
                 @include mixins.hover-sidebar();
@@ -45,12 +45,12 @@
     }
 
     .logged-user-img {
-        height: 37.4px;
-        width: 37.4px;
-        border-radius: 50%;
         border: 1.6px solid white;
+        border-radius: 50%;
         cursor: pointer;
+        height: 37.4px;
         transition: transform .2s;
+        width: 37.4px;
 
         &:hover {
             transform: scale(.9);
@@ -60,21 +60,21 @@
     .tools-container {
         border-bottom: 1px solid variables.$border-color;
         border-top: 1px solid variables.$border-color;
-        height: 100%;
         color: white;
-        gap: variables.$spacing-medium;
         font-size: functions.rem(23px);
+        gap: variables.$spacing-medium;
+        height: 100%;
         padding: variables.$spacing-medium 0;
 
         .icon-container {
-            width: functions.rem(56px);
             height: functions.rem(36px);
+            width: functions.rem(56px);
             @include mixins.center-flex();
             position: relative;
 
             .triangle-icon {
-                position: absolute;
                 color: variables.$sidebar-workspace-bg;
+                position: absolute;
 
                 @include mixins.for-narrow-layout {
                     & {
@@ -100,9 +100,9 @@
     }
 
     .menu-icon {
-        width: functions.rem(42px);
-        height: functions.rem(42px);
         color: variables.$menu-icon-color;
+        height: functions.rem(42px);
+        width: functions.rem(42px);
 
         &:hover {
             @include mixins.hover-sidebar()
@@ -112,13 +112,13 @@
     @include mixins.for-mobile-layout {
         & {
             @include mixins.center-flex();
-            flex-direction: row;
-            position: fixed;
-            width: 100vw;
-            top: initial;
             bottom: 0;
-            height: 8vh;
+            flex-direction: row;
             gap: 30px;
+            height: 8vh;
+            position: fixed;
+            top: initial;
+            width: 100vw;
 
             .tools-container,
             .bottom {

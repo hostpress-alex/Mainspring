@@ -63,12 +63,12 @@
 
     .task-menu {
         @include mixins.center-flex();
+        background-color: white;
+        color: variables.$primary-text-color;
+        height: 40px;
+        left: -47px;
         position: absolute;
         width: 41px;
-        left: -47px;
-        height: 40px;
-        color: variables.$primary-text-color;
-        background-color: white;
 
         @include mixins.for-mobile-layout() {
             & {
@@ -77,10 +77,10 @@
         }
 
         .icon {
-            display: none;
             border-radius: 4px;
-            font-size: functions.rem(20px);
             cursor: pointer;
+            display: none;
+            font-size: functions.rem(20px);
         }
 
         .icon:hover {
@@ -99,10 +99,10 @@
     }
 
     .picker {
-        min-width: variables.$cell-width;
-        height: variables.$cell-height;
         border-bottom: 1px solid variables.$border-color-darker;
         border-right: 1px solid variables.$border-color-darker;
+        height: variables.$cell-height;
+        min-width: variables.$cell-width;
     }
 
     .picker.is-readonly,
@@ -192,8 +192,8 @@
                 color: white;
                 cursor: pointer;
                 font-size: .75rem;
-                line-height: .7rem;
                 height: 13px;
+                line-height: .7rem;
                 margin: 0;
                 position: absolute;
                 right: 15px;

@@ -2,9 +2,9 @@
 @use "../../setup/variables";
 
 .group-list {
+    color: variables.$primary-text-color;
     margin: 0 0 40px 40px;
     position: relative;
-    color: variables.$primary-text-color;
 
     @include mixins.for-mobile-layout() {
         & {

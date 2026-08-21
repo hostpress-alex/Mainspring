@@ -13,15 +13,15 @@
 }
 
 .kanban-card {
+    background-color: variables.$app-bg;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 14%);
+    cursor: grab;
     display: flex;
     flex-direction: column;
+    font-size: functions.rem(13px);
     gap: variables.$spacing-small;
     padding: variables.$spacing-small;
-    border-radius: 6px;
-    background-color: variables.$app-bg;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 14%);
-    font-size: functions.rem(13px);
-    cursor: grab;
 
     &:hover {
         box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
@@ -29,40 +29,40 @@
 
     /* Title row: title, comment bubble, menu. */
     .task-title {
-        display: flex;
         align-items: center;
+        display: flex;
         gap: variables.$spacing-xs;
         min-height: 24px;
 
         blockquote {
             flex: 1 1 auto;
-            min-width: 0;
-            margin: 0;
             font-weight: 500;
             line-height: 1.35;
+            margin: 0;
+            min-width: 0;
 
             &:focus-visible {
+                border-radius: 3px;
                 outline: 2px solid variables.$board-btn;
                 outline-offset: 2px;
-                border-radius: 3px;
             }
         }
 
         .chat-icon {
             @include mixins.center-flex();
-            position: relative;
-            flex: 0 0 auto;
-            font-size: functions.rem(18px);
             color: variables.$chat-icon-color;
             cursor: pointer;
+            flex: 0 0 auto;
+            font-size: functions.rem(18px);
+            position: relative;
 
             &:hover {
                 color: variables.$board-btn;
             }
 
             div {
-                display: flex;
                 align-items: center;
+                display: flex;
             }
 
             .comment-chat {
@@ -71,29 +71,29 @@
 
             .count-comment {
                 @include mixins.center-flex();
-                position: absolute;
-                top: -4px;
-                right: -5px;
-                width: 14px;
-                height: 14px;
-                border-radius: 50%;
                 background-color: variables.$board-btn;
+                border-radius: 50%;
                 color: variables.$app-bg;
                 font-size: functions.rem(9px);
+                height: 14px;
+                position: absolute;
+                right: -5px;
+                top: -4px;
+                width: 14px;
             }
         }
 
         .task-menu {
             @include mixins.center-flex();
-            flex: 0 0 auto;
-            width: 22px;
-            height: 22px;
             border-radius: 4px;
+            flex: 0 0 auto;
+            height: 22px;
+            width: 22px;
 
             .icon {
-                font-size: functions.rem(15px);
                 color: variables.$workspace-icon-color;
                 cursor: pointer;
+                font-size: functions.rem(15px);
             }
 
             &:hover {

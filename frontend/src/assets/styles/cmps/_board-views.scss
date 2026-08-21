@@ -11,17 +11,17 @@
  */
 .board-views {
     align-items: center;
+    flex-wrap: wrap;
     gap: 2px;
     margin-top: variables.$spacing-small;
-    flex-wrap: wrap;
 }
 
 .view-tab {
-    position: relative;
-    display: flex;
     align-items: center;
-    height: 32px;
     color: variables.$primary-text-color;
+    display: flex;
+    height: 32px;
+    position: relative;
 
     &.is-active {
         border-bottom: 2px solid variables.$board-btn;
@@ -36,15 +36,15 @@
 
 .view-open {
     @include mixins.center-flex();
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    font-size: functions.rem(14px);
     gap: variables.$spacing-xs;
     height: 100%;
     padding: 0 variables.$spacing-small;
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    font-size: functions.rem(14px);
-    cursor: pointer;
 
     i {
         font-size: functions.rem(12px);
@@ -66,41 +66,41 @@
 /* How many rules the tab carries. Small, because it is a footnote to the
    name, not a second name. */
 .view-count {
-    min-width: 16px;
-    padding: 0 4px;
-    border-radius: 8px;
     background: variables.$board-btn;
+    border-radius: 8px;
     color: variables.$app-bg;
     font-size: 11px;
     line-height: 16px;
+    min-width: 16px;
+    padding: 0 4px;
     text-align: center;
 }
 
 .view-more {
-    height: 100%;
-    padding: 0 6px 0 0;
-    border: 0;
     background: none;
+    border: 0;
     color: variables.$workspace-icon-color;
     cursor: pointer;
     font-size: 12px;
+    height: 100%;
+    padding: 0 6px 0 0;
 }
 
 .view-new {
-    position: relative;
-    display: flex;
     align-items: center;
+    display: flex;
+    position: relative;
 }
 
 .view-add {
     @include mixins.center-flex();
-    width: 28px;
-    height: 28px;
+    background: none;
     border: 0;
     border-radius: 4px;
-    background: none;
     color: variables.$workspace-icon-color;
     cursor: pointer;
+    height: 28px;
+    width: 28px;
 
     &:hover {
         background-color: variables.$workspace-hover;
@@ -108,39 +108,39 @@
 }
 
 .view-error {
-    padding: 0 variables.$spacing-small;
     color: variables.$danger-text;
     font-size: functions.rem(13px);
+    padding: 0 variables.$spacing-small;
 }
 
 .view-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: variables.$z-popover;
-    min-width: 220px;
-    margin: 4px 0 0;
-    padding: 4px;
-    list-style: none;
+    background: variables.$app-bg;
     border: 1px solid variables.$layout-border-color;
     border-radius: 8px;
-    background: variables.$app-bg;
     box-shadow: 0 8px 26px rgba(0, 0, 0, .16);
+    left: 0;
+    list-style: none;
+    margin: 4px 0 0;
+    min-width: 220px;
+    padding: 4px;
+    position: absolute;
+    top: 100%;
+    z-index: variables.$z-popover;
 
     button {
-        display: flex;
         align-items: center;
-        gap: variables.$spacing-small;
-        width: 100%;
-        padding: 8px 10px;
+        background: none;
         border: 0;
         border-radius: 6px;
-        background: none;
         color: variables.$primary-text-color;
+        cursor: pointer;
+        display: flex;
         font: inherit;
         font-size: functions.rem(14px);
+        gap: variables.$spacing-small;
+        padding: 8px 10px;
         text-align: start;
-        cursor: pointer;
+        width: 100%;
 
         &:hover:not(:disabled) {
             background-color: variables.$workspace-hover;
@@ -159,45 +159,45 @@
 
 /* The form behind the plus. */
 .view-form {
-    position: absolute;
-    top: 100%;
-    inset-inline-start: 0;
-    z-index: variables.$z-popover;
+    background: variables.$app-bg;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, .16);
     display: flex;
     flex-direction: column;
     gap: variables.$spacing-small;
-    width: min(340px, 92vw);
+    inset-inline-start: 0;
     margin-top: 4px;
     padding: variables.$spacing-medium;
-    border: 1px solid variables.$layout-border-color;
-    border-radius: 8px;
-    background: variables.$app-bg;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, .16);
+    position: absolute;
+    top: 100%;
+    width: min(340px, 92vw);
+    z-index: variables.$z-popover;
 
     header {
-        display: flex;
         align-items: center;
+        display: flex;
 
         h4 {
-            margin: 0;
             font-size: functions.rem(15px);
+            margin: 0;
         }
     }
 
     .view-form-close {
-        margin-inline-start: auto;
-        border: 0;
         background: none;
+        border: 0;
         color: variables.$workspace-icon-color;
         cursor: pointer;
+        margin-inline-start: auto;
     }
 
     .view-form-title {
-        padding: 8px 10px;
         border: 1px solid variables.$layout-border-color;
         border-radius: 6px;
         font: inherit;
         font-size: functions.rem(14px);
+        padding: 8px 10px;
     }
 
     .view-form-displays {
@@ -206,30 +206,30 @@
 
         button {
             @include mixins.center-flex();
-            gap: 5px;
-            flex: 1;
-            padding: 7px 6px;
+            background: variables.$app-bg;
             border: 1px solid variables.$layout-border-color;
             border-radius: 6px;
-            background: variables.$app-bg;
+            cursor: pointer;
+            flex: 1;
             font: inherit;
             font-size: functions.rem(13px);
-            cursor: pointer;
+            gap: 5px;
+            padding: 7px 6px;
 
             &.is-active {
-                border-color: variables.$board-btn;
                 background: variables.$board-btn;
+                border-color: variables.$board-btn;
                 color: variables.$app-bg;
             }
         }
     }
 
     .view-form-share {
-        display: flex;
         align-items: center;
-        gap: variables.$spacing-xs;
-        font-size: functions.rem(13px);
         cursor: pointer;
+        display: flex;
+        font-size: functions.rem(13px);
+        gap: variables.$spacing-xs;
 
         &.is-off {
             color: variables.$field-border;
@@ -238,20 +238,20 @@
     }
 
     .view-form-note {
-        margin: 0;
         color: variables.$workspace-icon-color;
         font-size: functions.rem(12px);
+        margin: 0;
     }
 
     .view-form-save {
-        padding: 8px 12px;
+        background: variables.$board-btn;
         border: 0;
         border-radius: 6px;
-        background: variables.$board-btn;
         color: variables.$app-bg;
+        cursor: pointer;
         font: inherit;
         font-size: functions.rem(14px);
-        cursor: pointer;
+        padding: 8px 12px;
 
         &:disabled {
             background: variables.$task-box-shadow-color;

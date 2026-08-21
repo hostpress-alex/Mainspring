@@ -5,15 +5,15 @@
 .dashboard {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     gap: 20px;
+    justify-content: space-between;
     padding: 16px 30px 0 38px;
 
     > * {
-        width: 40%;
-        border-radius: 8px;
         border: 2px solid color.adjust(variables.$border-color, $lightness: -20%);
+        border-radius: 8px;
         height: 100%;
+        width: 40%;
 
         &:hover {
             border-color: variables.$board-btn;
@@ -24,12 +24,12 @@
             color: variables.$primary-text-color;
 
             h2 {
+                font-size: 18px;
+                font-weight: 500;
                 overflow-x: hidden;
                 overflow-y: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-                font-size: 18px;
-                font-weight: 500;
             }
         }
 
@@ -43,10 +43,10 @@
 
             .icon-container {
                 @include mixins.center-flex();
-                width: 20px;
-                height: 20px;
-                cursor: pointer;
                 border-radius: 4px;
+                cursor: pointer;
+                height: 20px;
+                width: 20px;
 
                 &:hover {
                     background-color: variables.$layout-border-color;
@@ -58,8 +58,8 @@
 
     @include mixins.for-mobile-layout() {
         & {
-            padding: 16px 0;
             justify-content: center;
+            padding: 16px 0;
 
             > * {
                 width: 90%;

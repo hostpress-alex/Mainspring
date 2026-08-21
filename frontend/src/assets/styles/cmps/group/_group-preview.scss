@@ -12,11 +12,11 @@
     }
 
     .hidden {
-        position: absolute;
-        left: -46px;
-        width: 40px;
-        height: 40px;
         background-color: white;
+        height: 40px;
+        left: -46px;
+        position: absolute;
+        width: 40px;
 
         @include mixins.for-mobile-layout() {
             & {
@@ -37,20 +37,20 @@
         &:hover {
             .open-modal-icon {
                 @include mixins.center-flex();
+                cursor: pointer;
                 opacity: 1;
                 z-index: 20;
-                cursor: pointer;
             }
         }
     }
 
     .title-container {
+        background-color: variables.$app-bg;
+        left: 40px;
         position: sticky;
         top: 211px;
-        left: 40px;
-        z-index: 2;
-        background-color: variables.$app-bg;
         width: 100%;
+        z-index: 2;
 
         @include mixins.for-narrow-layout() {
             &.not-des {
@@ -87,8 +87,8 @@
                 }
 
                 .close {
-                    transition: transform .2s ease, color .1s ease;
                     transform: rotate(0);
+                    transition: transform .2s ease, color .1s ease;
                 }
 
                 &:hover {
@@ -109,8 +109,8 @@
         border-top: 1px solid variables.$border-color-darker;
         font-size: 1.1rem;
         font-weight: 500;
-        line-height: 1.1rem;
         height: variables.$cell-height;
+        line-height: 1.1rem;
         min-width: variables.$cell-width;
 
         &.task {
@@ -160,12 +160,12 @@
 
             .task-count {
                 color: variables.$workspace-icon-color;
-                white-space: nowrap;
                 font-size: .9rem;
                 line-height: 19px;
                 margin-left: variables.$spacing-small;
-                transition: .2s;
                 opacity: 0;
+                transition: .2s;
+                white-space: nowrap;
             }
 
             &.showBorder {
@@ -174,21 +174,21 @@
             }
 
             .group-title:focus-visible {
-                outline: none;
                 margin-left: variables.$spacing-xs;
+                outline: none;
             }
 
             blockquote {
-                width: auto;
-                min-width: 40px;
                 height: 35px;
+                min-width: 40px;
                 text-overflow: ellipsis;
+                width: auto;
             }
         }
 
         .group-header-title {
-            position: sticky;
             left: 40px;
+            position: sticky;
             z-index: 2;
 
             @include mixins.for-mobile-layout() {
@@ -217,23 +217,23 @@
 
         h4 {
             cursor: text;
-            font-weight: 600;
             font-size: 1.25rem;
+            font-weight: 600;
             padding: variables.$spacing-xs;
         }
 
         .group-menu {
             @include mixins.center-flex();
+            color: variables.$primary-text-color;
+            height: 40px;
+            left: -38px;
             position: absolute;
             width: 40px;
-            left: -38px;
-            height: 40px;
-            color: variables.$primary-text-color;
 
             .icon {
-                display: none;
-                cursor: pointer;
                 border-radius: 4px;
+                cursor: pointer;
+                display: none;
                 font-size: 1.5rem;
             }
 
@@ -274,19 +274,19 @@
         }
 
         .add-task-form {
-            width: 100%;
-            outline: none;
-            height: 36px;
             border-bottom: 1px solid variables.$border-color-darker;
             border-left: 1px solid variables.$border-color-darker;
             border-right: none;
+            height: 36px;
+            outline: none;
+            width: 100%;
         }
 
         input {
-            margin: 6px 10px;
-            height: 24px;
-            border-radius: 8px;
             border: none;
+            border-radius: 8px;
+            height: 24px;
+            margin: 6px 10px;
 
             &:focus-visible {
                 outline: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
@@ -298,9 +298,9 @@
         }
 
         .check-box.add-task {
-            width: 33px;
-            height: 36px;
             border-left: variables.$color-bright-blue-selected;
+            height: 36px;
+            width: 33px;
 
             input {
                 margin: 3px 3px 3px 4px;
@@ -315,17 +315,17 @@
     }
 
     .sticky-div {
-        display: flex;
         background-color: white;
         border-left: 6px solid;
+        display: flex;
+        left: 40px;
         position: sticky;
         z-index: 1;
-        left: 40px;
 
         @include mixins.for-mobile-layout {
             & {
-                min-width: 240px;
                 left: 0;
+                min-width: 240px;
             }
         }
 
@@ -402,24 +402,24 @@
  */
 
 .group-collapsed-bar {
-    position: sticky;
-    left: 40px;
-    display: inline-flex;
     align-items: center;
+    background: variables.$app-bg;
+    border-left: 6px solid var(--group-color);
+    color: variables.$workspace-icon-color;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: .9rem;
+    left: 40px;
     margin: 0 0 8px 40px;
     padding: 4px 12px;
-    border-left: 6px solid var(--group-color);
-    background: variables.$app-bg;
-    color: variables.$workspace-icon-color;
-    font-size: .9rem;
-    cursor: pointer;
+    position: sticky;
 }
 
 .group-preview .title-container .task.title {
-    position: relative;
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: center;
+    position: relative;
 
     .col-label {
         overflow: hidden;

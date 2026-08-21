@@ -2,8 +2,8 @@
 
 .color-palette {
     @include mixins.center-flex();
-    width: 142px;
     flex-wrap: wrap;
+    width: 142px;
 
     > * {
         margin: 5px;

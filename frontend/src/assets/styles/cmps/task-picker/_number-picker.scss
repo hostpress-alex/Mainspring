@@ -8,8 +8,8 @@
     // cell kept getting wider — the value then floated in an empty column.
     width: 100%;
     @include mixins.center-flex();
-    position: relative;
     font-size: functions.rem(14px);
+    position: relative;
 
     &:hover {
         .clear-input,
@@ -19,12 +19,12 @@
     }
 
     input {
-        width: 90%;
-        outline: none;
         border: none;
-        text-align: center;
         height: 80%;
         margin: auto;
+        outline: none;
+        text-align: center;
+        width: 90%;
 
         &:hover {
             border: .2px solid variables.$workspace-hover;
@@ -37,23 +37,23 @@
 
     .clear-input {
         @include mixins.center-flex();
-        opacity: 0;
+        background-color: variables.$workspace-hover;
+        border-radius: 3px;
+        color: variables.$primary-text-color;
+        cursor: pointer;
         margin: 0;
+        opacity: 0;
         padding: 2px;
         position: absolute;
         right: 13px;
-        border-radius: 3px;
-        cursor: pointer;
-        background-color: variables.$workspace-hover;
-        color: variables.$primary-text-color;
     }
 
     .add-number-icons {
         opacity: 0;
         @include mixins.center-flex();
+        cursor: pointer;
         gap: variables.$spacing-xs;
         width: 100%;
-        cursor: pointer;
 
         .plus-icon {
             color: variables.$board-btn;

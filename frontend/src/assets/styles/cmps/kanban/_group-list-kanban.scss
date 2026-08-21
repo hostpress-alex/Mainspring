@@ -17,9 +17,9 @@
    left-to-right is what says "pipeline", and a second line breaks that. To go
    back, drop `flex-wrap` and put `overflow-x: auto` on the container. */
 .group-list-kanban {
+    align-items: flex-start;
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
     gap: variables.$kanban-gap;
     padding: 12px 38px 24px;
 
@@ -31,10 +31,10 @@
         $gap-share: math.div(variables.$kanban-gap * (variables.$kanban-per-row - 1), variables.$kanban-per-row);
 
         flex: 1 1 calc(100% / #{variables.$kanban-per-row} - #{$gap-share});
-        max-width: variables.$kanban-max-column;
-        min-width: 260px;
         list-style: none;
         margin: 0;
+        max-width: variables.$kanban-max-column;
+        min-width: 260px;
         padding: 0;
 
         /* The drag handle @hello-pangea/dnd wraps around the column. It sits

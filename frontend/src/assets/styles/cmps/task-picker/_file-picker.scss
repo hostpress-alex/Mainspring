@@ -27,10 +27,10 @@
     }
 
     .icon {
-        margin: auto;
-        font-size: functions.rem(19px);
-        opacity: 0;
         cursor: pointer;
+        font-size: functions.rem(19px);
+        margin: auto;
+        opacity: 0;
     }
 }
 
@@ -42,15 +42,15 @@
     }
 
     .file-picker-busy {
-        font-size: 11px;
         color: variables.$workspace-icon-color;
+        font-size: 11px;
     }
 
     .file-picker-body {
-        display: flex;
         align-items: center;
-        justify-content: center;
+        display: flex;
         gap: 4px;
+        justify-content: center;
         max-width: 100%;
         width: 100%;
     }
@@ -66,17 +66,17 @@
     }
 
     .file-img {
-        max-width: 1.75rem;
-        max-height: 1.75rem;
         display: block;
+        max-height: 1.75rem;
+        max-width: 1.75rem;
     }
 
     // One icon per file type instead of the name. The colours are the ones
     // everybody already reads without thinking: red PDF, blue Word, green
     // spreadsheet. Everything unknown stays grey and does not shout.
     .file-icon {
-        font-size: 1.33rem;
         color: variables.$workspace-icon-color;
+        font-size: 1.33rem;
 
         &.is-pdf        { color: variables.$danger-strong; }
         &.is-word       { color: variables.$file-word; }

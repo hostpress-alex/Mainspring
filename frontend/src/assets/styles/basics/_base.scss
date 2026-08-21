@@ -5,12 +5,12 @@
 
 * {
     box-sizing: border-box;
-    scrollbar-width: thin;
     scrollbar-color: variables.$text-mid variables.$divider;
+    scrollbar-width: thin;
 
     &::-webkit-scrollbar {
-        width: 8px;
         cursor: pointer;
+        width: 8px;
     }
 
     &::-webkit-scrollbar-track {
@@ -18,18 +18,18 @@
     }
 
     &::-webkit-scrollbar-thumb {
-        border-radius: 25px;
         background-color: variables.$text-faint-warm;
+        border-radius: 25px;
         cursor: pointer;
     }
 }
 
 .dark-screen {
-    position: fixed;
-    z-index: variables.$z-backdrop;
     background-color: variables.$react-modal-background;
-    width: 100vw;
     height: 100vh;
+    position: fixed;
+    width: 100vw;
+    z-index: variables.$z-backdrop;
 }
 
 html {
@@ -42,16 +42,16 @@ main {
 }
 
 h1, h2, h3, h4, h5, h6 {
+    font-family: variables.$title-font-family;
     margin: 0;
     padding: 0;
-    font-family: variables.$title-font-family;
 }
 
 body {
+    font-family: variables.$font-family;
     font-size: variables.$body-rem;
     margin: 0;
     padding: 0;
-    font-family: variables.$font-family;
 }
 
 img {
@@ -59,8 +59,8 @@ img {
 }
 
 ul {
-    padding: 0;
     list-style: none;
+    padding: 0;
 }
 
 li {
@@ -73,8 +73,8 @@ p {
 }
 
 a {
-    text-decoration: none;
     cursor: pointer;
+    text-decoration: none;
 }
 
 input[type=number]::-webkit-inner-spin-button {
@@ -90,13 +90,13 @@ input[type=number]::-webkit-inner-spin-button {
 // enough to be noticed. A button states its own colour, right where its
 // background is decided.
 button {
-    cursor: pointer;
     border: none;
+    cursor: pointer;
 }
 
 .board-main {
-    width: 100%;
     overflow: auto;
+    width: 100%;
 
     @include mixins.for-mobile-layout {
         & {
@@ -106,11 +106,11 @@ button {
 }
 
 blockquote {
-    margin: 0;
-    padding: 0;
-    display: flex;
     align-items: center;
     cursor: text;
+    display: flex;
+    margin: 0;
+    padding: 0;
 
     &:focus-visible {
         outline: 1px solid color.adjust(variables.$border-color, $lightness: -20%);

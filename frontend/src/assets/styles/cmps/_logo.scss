@@ -2,15 +2,15 @@
 @use "../setup/mixins";
 
 .logo {
-    display: flex;
     align-items: center;
     cursor: pointer;
+    display: flex;
     gap: 7px;
 
     &-title {
+        color: black;
         font-size: functions.rem(20px);
         font-weight: 700;
-        color: black;
     }
 
     &-img {

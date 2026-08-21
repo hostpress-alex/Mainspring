@@ -4,23 +4,23 @@
 @use "../../setup/variables";
 
 .board-modal {
-    position: fixed;
-    top: 0;
-    right: 0;
-    flex-direction: column;
-    height: 100vh;
     background-color: variables.$app-bg;
     border-inline-start: 1px solid variables.$border-color-darker;
     // The width comes in as an inline style from BoardModal (remembered per user).
+    box-sizing: border-box;
+    flex-direction: column;
+    height: 100vh;
     // All that is left here is the lower bound, so nothing collapses.
     min-width: 420px;
-    box-sizing: border-box;
     // A scroll area of its own: otherwise the wheel carries through to the board behind.
     overflow-y: auto;
     overscroll-behavior: contain;
+    position: fixed;
+    right: 0;
+    top: 0;
     transform: translateX(100%);
-    z-index: variables.$z-popover;
     transition: transform .6s, box-shadow .6s;
+    z-index: variables.$z-popover;
 
     @include mixins.for-mobile-layout() {
         & {
@@ -32,8 +32,8 @@
     }
 
     &.open {
-        transform: translateX(0);
         box-shadow: -6px 0px 14px rgb(0 0 0 / 20%);
+        transform: translateX(0);
     }
 
     .close-btn {
@@ -43,13 +43,13 @@
 
     // The title sits next to the closing cross, not below it.
     .task-modal-header {
-        justify-content: flex-start;
         align-items: center;
+        font-size: functions.rem(18px);
         gap: variables.$spacing-small;
+        height: auto;
+        justify-content: flex-start;
         margin: 18px 20px 6px 24px;
         min-height: 34px;
-        height: auto;
-        font-size: functions.rem(18px);
 
         .close-btn {
             flex: 0 0 auto;
@@ -57,8 +57,8 @@
         }
 
         .title {
-            min-width: 0;
             flex: 1 1 auto;
+            min-width: 0;
 
             blockquote {
                 margin: 0;
@@ -67,23 +67,23 @@
     }
 
     .task-modal-type {
-        padding: 0 variables.$spacing-large;
         border-bottom: 1px solid variables.$border-color;
+        padding: 0 variables.$spacing-large;
 
         > * {
             @include mixins.center-flex();
-            gap: variables.$spacing-small;
             border-right: 1px solid variables.$border-color;
-            width: fit-content;
-            padding: variables.$spacing-small variables.$spacing-medium;
-            font-weight: 500;
-            font-size: functions.rem(14px);
             cursor: pointer;
+            font-size: functions.rem(14px);
+            font-weight: 500;
+            gap: variables.$spacing-small;
+            padding: variables.$spacing-small variables.$spacing-medium;
+            width: fit-content;
 
             &:hover {
+                background-color: variables.$workspace-hover;
                 border-top-left-radius: variables.$spacing-xs;
                 border-top-right-radius: variables.$spacing-xs;
-                background-color: variables.$workspace-hover;
             }
         }
 
@@ -97,20 +97,20 @@
     }
 
     .update {
-        padding: 20px 20px 6px variables.$spacing-large;
         height: 85vh;
         overflow: auto;
+        padding: 20px 20px 6px variables.$spacing-large;
 
         &::-webkit-scrollbar {
             display: none;
         }
 
         .close-input-container {
-            padding-left: 20px;
-            outline: 1px solid variables.$board-btn;
-            min-height: 40px;
             border-radius: 4px;
             color: variables.$workspace-icon-color;
+            min-height: 40px;
+            outline: 1px solid variables.$board-btn;
+            padding-left: 20px;
 
             &:hover {
                 background-color: variables.$workspace-hover;
@@ -125,10 +125,10 @@
             .save {
                 @include mixins.center-flex();
                 background-color: variables.$board-btn;
-                color: white;
-                margin: 0;
-                height: 32px;
                 border-radius: 4px;
+                color: white;
+                height: 32px;
+                margin: 0;
                 padding: variables.$spacing-xs variables.$spacing-small;
 
                 &:hover {
@@ -146,13 +146,13 @@
             .cancel {
                 @include mixins.center-flex();
                 background-color: transparent;
-                color: variables.$primary-text-color;
                 border: 1px solid variables.$task-box-shadow-color;
-                margin: 0;
-                height: 32px;
                 border-radius: 4px;
-                padding: variables.$spacing-xs variables.$spacing-small;
+                color: variables.$primary-text-color;
                 cursor: pointer;
+                height: 32px;
+                margin: 0;
+                padding: variables.$spacing-xs variables.$spacing-small;
 
                 &:hover {
                     background-color: variables.$workspace-hover;
@@ -172,8 +172,8 @@
 
         .no-updates {
             img {
-                width: 290px;
                 height: auto;
+                width: 290px;
             }
 
             .txt {
@@ -181,8 +181,8 @@
             }
 
             h2 {
-                font-weight: 500;
                 font-size: functions.rem(24px);
+                font-weight: 500;
             }
 
             p {
@@ -205,15 +205,15 @@
  * panel scrolls, and a handle inside it would travel along.
  */
 .board-modal-resizer {
+    background: transparent;
+    bottom: 0;
+    cursor: col-resize;
+    margin-right: -4px;
     position: fixed;
     top: 0;
-    bottom: 0;
-    width: 9px;
-    margin-right: -4px;
-    z-index: variables.$z-popover + 1;
-    cursor: col-resize;
-    background: transparent;
     transition: background-color .15s;
+    width: 9px;
+    z-index: variables.$z-popover + 1;
 
     &:hover,
     &.is-active {
@@ -237,8 +237,8 @@
 }
 
 .update-note {
-    font-size: 13px;
     color: variables.$workspace-icon-color;
+    font-size: 13px;
     margin: 8px 0 0;
 
     &.is-error {

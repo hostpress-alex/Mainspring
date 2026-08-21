@@ -4,25 +4,25 @@
 @use "../../setup/variables";
 
 .login-logout-modal {
-    position: absolute;
     background-color: variables.$app-bg;
-    border-radius: variables.$spacing-small;
-    color: variables.$primary-text-color;
-    box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-    padding: variables.$spacing-small;
-    font-size: functions.rem(14px);
-    z-index: 10;
     border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
-    left: 74%;
+    border-radius: variables.$spacing-small;
     bottom: 70px;
+    box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
+    color: variables.$primary-text-color;
+    font-size: functions.rem(14px);
+    left: 74%;
+    padding: variables.$spacing-small;
+    position: absolute;
+    z-index: 10;
 
     span, a {
         @include mixins.center-flex();
-        cursor: pointer;
-        padding: 0 variables.$spacing-xs;
         border-radius: 4px;
-        gap: variables.$spacing-xs;
         color: variables.$primary-text-color;
+        cursor: pointer;
+        gap: variables.$spacing-xs;
+        padding: 0 variables.$spacing-xs;
 
         &:hover {
             background-color: variables.$workspace-hover;
@@ -31,8 +31,8 @@
 
     @include mixins.for-narrow-layout() {
         & {
-            left: 0;
             bottom: 15px;
+            left: 0;
         }
     }
 }

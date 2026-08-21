@@ -29,9 +29,9 @@
 }
 
 @mixin members() {
+    border-radius: 50%;
     height: 1.75rem;
     width: 1.75rem;
-    border-radius: 50%;
 }
 
 @mixin hover-sidebar() {
@@ -47,86 +47,86 @@
 
     .member-img1 {
         border: 1px solid variables.$app-bg;
-        margin-right: -4px;
-        margin-left: 0;
-        width: $imgSize;
         height: $imgSize;
+        margin-left: 0;
+        margin-right: -4px;
+        width: $imgSize;
     }
 
     .member-img2 {
         border: 1px solid variables.$app-bg;
+        height: $imgSize;
         margin-left: -4px;
         margin-right: -4px;
-        height: $imgSize;
         width: $imgSize;
     }
 
     .show-more-members {
         @include center-flex();
-        font-size: functions.rem(14px);
         background-color: $bgColor;
-        margin-left: -5px;
         border: 1px solid variables.$border-color;
+        color: $txtColor;
+        font-size: functions.rem(14px);
+        height: $countSize;
+        margin-left: -5px;
         padding: functions.em(4px);
         text-align: center;
         width: $countSize;
-        height: $countSize;
-        color: $txtColor;
     }
 }
 
 @mixin task-modal-position() {
-    position: absolute;
-    z-index: 2;
-    top: 21px;
     left: -25px;
+    position: absolute;
+    top: 21px;
+    z-index: 2;
 }
 
 @mixin login-logout-modal-position() {
+    bottom: 15px;
+    left: 0;
     position: sticky;
     z-index: 2;
-    left: 0;
-    bottom: 15px;
 }
 
 @mixin triangle-icon() {
+    bottom: -11px;
     color: white;
     position: relative;
     right: -85px;
-    bottom: -11px;
     z-index: 2;
 }
 
 @mixin center-absolute() {
+    left: 50%;
     position: absolute;
     top: 50%;
-    left: 50%;
     transform: translate(-50%, -50%);
 }
 
 @mixin center-flex() {
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: center;
 }
 
 @mixin menu-modal() {
     background-color: variables.$app-bg;
+    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
     border-radius: variables.$spacing-small;
+    box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
+    color: variables.$primary-text-color;
     display: flex;
     flex-direction: column;
+    font-size: functions.rem(14px);
+    padding: variables.$spacing-small;
     position: absolute;
     top: 40px;
-    color: variables.$primary-text-color;
-    font-size: functions.rem(14px);
     z-index: 10;
-    padding: variables.$spacing-small;
-    box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
     > * {
-        display: flex;
         align-items: center;
+        display: flex;
         gap: 8px;
         padding: variables.$spacing-xs variables.$spacing-small;
 
@@ -138,8 +138,8 @@
 }
 
 @mixin empty-div() {
-    width: 100%;
     border-bottom: 2px solid color.adjust(variables.$border-color, $lightness: -20%);
+    width: 100%;
     &:first-child {
         border-top: 2px solid color.adjust(variables.$border-color, $lightness: -20%);
     }

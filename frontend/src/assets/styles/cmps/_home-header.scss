@@ -4,12 +4,12 @@
 
 .home-header {
     @include mixins.center-flex();
+    background: variables.$app-bg;
+    height: functions.rem(72px);
     justify-content: space-between;
     padding: 0 variables.$spacing-large;
-    height: functions.rem(72px);
     position: sticky;
     top: 0;
-    background: variables.$app-bg;
 
     nav {
         height: 100%;
@@ -22,20 +22,20 @@
             @include mixins.center-flex();
             background-color: variables.$home-btn-bg;
             // Was living off the global `button { color: whitesmoke }`, which
+            border-radius: 40px;
             // is gone — a dark button says so itself now.
             color: variables.$app-bg;
-            height: 40px;
-            width: 130px;
             font-size: functions.rem(13px);
+            height: 40px;
             padding: variables.$spacing-small variables.$spacing-medium;
-            border-radius: 40px;
+            width: 130px;
 
             &:hover {
                 background-color: variables.$home-violet-deep;
 
                 .arrow i {
-                    transition: 0.4s;
                     transform: translateX(4px);
+                    transition: 0.4s;
                 }
             }
 
@@ -54,16 +54,16 @@
 
         .btn-login {
             background-color: variables.$app-bg;
-            color: variables.$text-slate;
-            padding: variables.$spacing-small variables.$spacing-medium;
-            font-size: functions.rem(14px);
             border-radius: 8px;
+            color: variables.$text-slate;
+            font-size: functions.rem(14px);
             font-weight: 300;
             margin-right: variables.$spacing-medium;
+            padding: variables.$spacing-small variables.$spacing-medium;
 
             &:hover {
-                color: variables.$home-violet;
                 background-color: variables.$accent-surface-cooler;
+                color: variables.$home-violet;
             }
         }
     }

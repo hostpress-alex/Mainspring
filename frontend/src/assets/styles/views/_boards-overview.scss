@@ -8,23 +8,23 @@
  * element.style. All of it is here now; the JSX only carries class names.
  */
 .boards-overview {
-    min-height: 100vh;
     background: variables.$sidebar-workspace-bg;
+    min-height: 100vh;
 
     .overview-bar {
-        display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 14px 32px;
         background: variables.$app-bg;
         border-bottom: 1px solid variables.$surface-border;
+        display: flex;
+        justify-content: space-between;
+        padding: 14px 32px;
     }
 
     .overview-bar-user {
-        display: flex;
         align-items: center;
-        gap: 16px;
+        display: flex;
         font-size: 14px;
+        gap: 16px;
     }
 
     .overview-link {
@@ -33,16 +33,16 @@
     }
 
     .overview-user {
-        display: flex;
         align-items: center;
+        display: flex;
         gap: 8px;
     }
 
     .overview-user-img {
-        width: 26px;
-        height: 26px;
         border-radius: 50%;
+        height: 26px;
         object-fit: cover;
+        width: 26px;
     }
 
     .overview-logout {
@@ -50,14 +50,14 @@
     }
 
     .overview-main {
-        max-width: 1180px;
         margin: 0 auto;
+        max-width: 1180px;
         padding: 32px 32px 64px;
     }
 
     .overview-head {
-        display: flex;
         align-items: center;
+        display: flex;
         justify-content: space-between;
         margin-bottom: 6px;
     }
@@ -73,21 +73,21 @@
     }
 
     .overview-search {
-        padding: 9px 12px;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         font-size: 14px;
+        padding: 9px 12px;
         width: 260px;
     }
 
     .overview-btn {
-        padding: 9px 16px;
+        background: variables.$board-btn;
         border: none;
         border-radius: 6px;
-        background: variables.$board-btn;
         color: variables.$app-bg;
         cursor: pointer;
         font-size: 14px;
+        padding: 9px 16px;
         white-space: nowrap;
     }
 
@@ -100,10 +100,10 @@
     .overview-error {
         background: variables.$danger-surface;
         border: 1px solid variables.$colors-red-middle;
-        color: variables.$danger-text;
-        padding: 10px 14px;
         border-radius: 6px;
+        color: variables.$danger-text;
         margin-bottom: 18px;
+        padding: 10px 14px;
     }
 
     .overview-empty {
@@ -130,33 +130,33 @@
 
     .overview-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
         gap: 18px;
+        grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
     }
 
     .overview-card {
-        display: block;
         background: variables.$app-bg;
         border: 1px solid variables.$colors-bluish-white;
         border-radius: 10px;
+        color: inherit;
+        display: block;
         padding: 18px;
         text-decoration: none;
-        color: inherit;
         transition: box-shadow .15s, border-color .15s;
 
         &:hover {
-            box-shadow: 0 3px 12px rgba(0, 0, 0, .09);
             border-color: variables.$board-btn;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, .09);
         }
     }
 
     .overview-card-title {
+        align-items: center;
+        display: flex;
         font-size: 17px;
         font-weight: 600;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
         gap: 7px;
+        margin-bottom: 10px;
     }
 
     .overview-owner-star {
@@ -170,22 +170,22 @@
     }
 
     .overview-avatars {
-        display: flex;
         align-items: center;
+        display: flex;
     }
 
     .overview-avatar {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        background: variables.$task-box-shadow-color;
-        color: variables.$app-bg;
-        font-size: 11px;
-        display: inline-flex;
         align-items: center;
+        background: variables.$task-box-shadow-color;
+        border: 2px solid variables.$app-bg;
+        border-radius: 50%;
+        color: variables.$app-bg;
+        display: inline-flex;
+        font-size: 11px;
+        height: 26px;
         justify-content: center;
         margin-right: -6px;
-        border: 2px solid variables.$app-bg;
+        width: 26px;
 
         // "+3" once there are more members than fit
         &.is-more {
@@ -194,9 +194,9 @@
         }
 
         img {
-            width: 100%;
-            height: 100%;
             border-radius: 50%;
+            height: 100%;
+            width: 100%;
         }
     }
 

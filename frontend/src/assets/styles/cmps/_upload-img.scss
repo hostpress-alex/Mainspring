@@ -9,16 +9,16 @@
     }
 
     label {
-        margin-bottom: variables.$spacing-medium;
         color: variables.$primary-text-color;
+        margin-bottom: variables.$spacing-medium;
         transition: color 200ms ease;
         width: fit-content;
 
         .guest-img {
-            margin-bottom: variables.$spacing-small;
             border-radius: 50%;
-            opacity: 0.3;
             cursor: pointer;
+            margin-bottom: variables.$spacing-small;
+            opacity: 0.3;
 
             &:hover {
                 opacity: 0.5;

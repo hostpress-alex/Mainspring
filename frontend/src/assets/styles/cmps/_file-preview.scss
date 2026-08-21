@@ -7,40 +7,40 @@
    in. See CLAUDE.md, "Layering". */
 
 .file-preview-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: variables.$z-lightbox;
-    display: flex;
     align-items: center;
+    background: rgb(0 0 0 / 62%);
+    display: flex;
+    inset: 0;
     justify-content: center;
     padding: 32px;
-    background: rgb(0 0 0 / 62%);
+    position: fixed;
+    z-index: variables.$z-lightbox;
 }
 
 .file-preview {
+    background: variables.$app-bg;
+    border-radius: 10px;
+    box-shadow: 0 18px 60px rgb(0 0 0 / 45%);
     display: flex;
     flex-direction: column;
-    width: min(1100px, 100%);
     height: min(90vh, 100%);
-    border-radius: 10px;
-    background: variables.$app-bg;
-    box-shadow: 0 18px 60px rgb(0 0 0 / 45%);
     overflow: hidden;
+    width: min(1100px, 100%);
 }
 
 .file-preview-head {
-    display: flex;
     align-items: center;
-    gap: 10px;
-    flex: 0 0 auto;
-    padding: 10px 12px;
     border-bottom: 1px solid variables.$surface-border;
     color: variables.$primary-text-color;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 10px;
+    padding: 10px 12px;
 }
 
 .file-preview-icon {
-    font-size: 18px;
     color: variables.$workspace-icon-color;
+    font-size: 18px;
 }
 
 .file-preview-icon.is-pdf     { color: variables.$colors-red-middle; }
@@ -51,31 +51,31 @@
 
 .file-preview-name {
     flex: 1 1 auto;
+    font-size: 14px;
+    font-weight: 600;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-weight: 600;
-    font-size: 14px;
 }
 
 .file-preview-size {
-    flex: 0 0 auto;
     color: variables.$workspace-icon-color;
+    flex: 0 0 auto;
     font-size: 12px;
     font-variant-numeric: tabular-nums;
 }
 
 .file-preview-download {
-    display: flex;
     align-items: center;
-    gap: 6px;
-    flex: 0 0 auto;
-    padding: 6px 12px;
-    border-radius: 6px;
     background: variables.$board-btn;
+    border-radius: 6px;
     color: variables.$app-bg;
+    display: flex;
+    flex: 0 0 auto;
     font-size: 13px;
+    gap: 6px;
+    padding: 6px 12px;
     text-decoration: none;
 
 
@@ -85,14 +85,14 @@
 }
 
 .file-preview-close {
-    flex: 0 0 auto;
+    background: none;
     border: 0;
     border-radius: 6px;
-    background: none;
-    padding: 6px 9px;
     color: variables.$workspace-icon-color;
-    font-size: 16px;
     cursor: pointer;
+    flex: 0 0 auto;
+    font-size: 16px;
+    padding: 6px 9px;
 
 
     &:hover {
@@ -102,46 +102,46 @@
 }
 
 .file-preview-body {
+    background: variables.$sidebar-workspace-bg;
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
-    background: variables.$sidebar-workspace-bg;
 }
 
 /* An image is centred in whatever room is left and never enlarged past its own
    size — an upscaled screenshot is worse than a small one. */
 .file-preview-body.is-image {
-    display: flex;
     align-items: center;
+    background: variables.$text-midnight;
+    display: flex;
     justify-content: center;
     padding: 16px;
-    background: variables.$text-midnight;
 }
 
 .file-preview-image {
-    max-width: 100%;
     max-height: 100%;
+    max-width: 100%;
     object-fit: contain;
 }
 
 .file-preview-body.is-pdf {
-    padding: 0;
     overflow: hidden;
+    padding: 0;
 }
 
 .file-preview-frame {
-    width: 100%;
-    height: 100%;
     border: 0;
+    height: 100%;
+    width: 100%;
 }
 
 .file-preview-text {
-    margin: 0;
-    padding: 16px;
+    color: variables.$primary-text-color;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 12.5px;
     line-height: 1.55;
-    color: variables.$primary-text-color;
+    margin: 0;
+    padding: 16px;
     /* Wrapped, not scrolled sideways: a log line is read, not compared column
        by column, and a horizontal scrollbar on every line makes it unreadable. */
     white-space: pre-wrap;
@@ -154,29 +154,29 @@
 }
 
 .file-preview-table {
-    border-collapse: collapse;
     background: variables.$app-bg;
+    border-collapse: collapse;
     font-size: 13px;
 }
 
 .file-preview-table th,
 .file-preview-table td {
     border: 1px solid variables.$surface-border;
+    max-width: 340px;
     padding: 5px 9px;
     text-align: left;
-    white-space: pre-wrap;
     vertical-align: top;
-    max-width: 340px;
+    white-space: pre-wrap;
 }
 
 /* The header stays put while a long table scrolls — the whole point of a
    table with named columns. */
 .file-preview-table thead th {
+    background: variables.$surface-soft;
+    font-weight: 600;
     position: sticky;
     top: 0;
     z-index: 1;
-    background: variables.$surface-soft;
-    font-weight: 600;
 }
 
 .file-preview-table tbody tr:nth-child(even) td {
@@ -184,10 +184,10 @@
 }
 
 .file-preview-note {
-    margin: 0;
-    padding: 12px 16px;
     color: variables.$workspace-icon-color;
     font-size: 13px;
+    margin: 0;
+    padding: 12px 16px;
 
 
     &.is-error {

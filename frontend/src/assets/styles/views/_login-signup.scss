@@ -3,41 +3,41 @@
 @use "../setup/variables";
 
 .login-page-header {
+    background: variables.$login-bg;
     border-bottom: 1px solid variables.$hairline-plain;
     height: 65px;
-    background: variables.$login-bg;
 
     .logo {
-        height: 65px;
         cursor: pointer;
+        height: 65px;
     }
 }
 
 .form-container {
     @include mixins.center-flex();
     flex-direction: column;
-    margin-top: 40px;
     margin-bottom: variables.$spacing-medium;
+    margin-top: 40px;
     text-align: center;
 
     h1 {
+        color: variables.$text-dark-plain;
         font-size: functions.rem(40px);
         font-weight: 100;
         margin-bottom: variables.$spacing-small;
-        color: variables.$text-dark-plain;
     }
 
     // A failed attempt has to be visible. Before this the form simply did
     // nothing, which looks the same as a broken button.
     .login-error {
-        margin: 0 0 12px;
-        padding: 8px 12px;
+        background: variables.$danger-surface-soft;
         border: 1px solid variables.$danger-border;
         border-radius: 4px;
-        background: variables.$danger-surface-soft;
         color: variables.$danger-text;
         font-size: 14px;
         line-height: 1.4;
+        margin: 0 0 12px;
+        padding: 8px 12px;
         text-align: center;
     }
 
@@ -48,24 +48,24 @@
     }
 
     input {
-        width: 328px;
-        border-radius: 4px;
         border: 1px solid variables.$border-color-darker;
-        padding: 6px 12px;
+        border-radius: 4px;
         font-size: functions.rem(16px);
-        outline: none;
         margin-bottom: variables.$spacing-medium;
+        outline: none;
+        padding: 6px 12px;
+        width: 328px;
     }
 
     .btn-next {
-        text-align: center;
-        width: 328px;
-        padding: 6px 0;
+        background-color: variables.$board-btn;
         border: none;
         border-radius: 4px;
-        font-size: functions.rem(18px);
-        background-color: variables.$board-btn;
         color: variables.$app-bg;
+        font-size: functions.rem(18px);
+        padding: 6px 0;
+        text-align: center;
+        width: 328px;
     }
 
     .suggest-signup {
@@ -74,16 +74,16 @@
         margin-top: 32px;
 
         .suggest-signup-prefix {
-            padding-right: variables.$spacing-xs;
             font-size: functions.rem(16px);
+            padding-right: variables.$spacing-xs;
         }
 
         .btn-signup {
-            color: variables.$accent-sky;
             background-color: variables.$app-bg;
+            color: variables.$accent-sky;
+            font-size: functions.rem(16px);
             margin: 0;
             padding: 0;
-            font-size: functions.rem(16px);
         }
     }
 }

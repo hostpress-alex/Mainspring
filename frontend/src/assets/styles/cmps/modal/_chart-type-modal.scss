@@ -2,17 +2,17 @@
 @use "../../setup/variables";
 
 .chart-type-modal {
+    color: variables.$primary-text-color;
     display: flex;
     flex-direction: column;
     font-size: functions.rem(16px);
-    color: variables.$primary-text-color;
 
     > * {
-        display: flex;
         align-items: center;
+        cursor: pointer;
+        display: flex;
         gap: variables.$spacing-small;
         padding: variables.$spacing-xs variables.$spacing-small;
-        cursor: pointer;
 
         &:hover {
             background-color: variables.$workspace-hover;

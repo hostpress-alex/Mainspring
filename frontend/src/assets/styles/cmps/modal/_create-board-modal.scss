@@ -5,15 +5,15 @@
 
 .create-board-modal {
     @include mixins.center-absolute();
-    padding: variables.$spacing-medium variables.$spacing-xl variables.$spacing-xl variables.$spacing-xl;
-    width: 500px;
-    color: variables.$primary-text-color;
     background-color: variables.$app-bg;
+    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
     border-radius: variables.$spacing-small;
     box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
+    color: variables.$primary-text-color;
     font-size: functions.rem(14px);
+    padding: variables.$spacing-medium variables.$spacing-xl variables.$spacing-xl variables.$spacing-xl;
+    width: 500px;
     z-index: variables.$z-modal;
-    border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
 
     h1 {
         font-size: functions.rem(32px);
@@ -28,18 +28,18 @@
     }
 
     form {
-        width: 100%;
         padding: unset;
+        width: 100%;
 
         input {
-            width: 100%;
-            border-radius: 4px;
             border: 1px solid variables.$border-color;
+            border-radius: 4px;
+            font-family: inherit;
             font-size: functions.rem(16px);
-            padding: variables.$spacing-small variables.$spacing-medium;
             height: 40px;
             margin: 0;
-            font-family: inherit;
+            padding: variables.$spacing-small variables.$spacing-medium;
+            width: 100%;
 
             &:focus-visible {
                 outline: 1px solid variables.$border-color;
@@ -53,15 +53,15 @@
     }
 
     .close {
+        align-items: center;
         display: flex;
         flex-direction: row-reverse;
-        align-items: center;
 
         .icon {
+            cursor: pointer;
+            height: 28px;
             padding: variables.$spacing-xs variables.$spacing-small;
             width: 32px;
-            height: 28px;
-            cursor: pointer;
 
             &:hover {
                 background-color: variables.$workspace-hover;

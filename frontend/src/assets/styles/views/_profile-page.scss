@@ -7,21 +7,21 @@
  * the JSX only carries class names now.
  */
 .profile-page {
-    min-height: 100vh;
     background: variables.$sidebar-workspace-bg;
+    min-height: 100vh;
 
     .profile-bar {
-        display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 14px 32px;
         background: variables.$app-bg;
         border-bottom: 1px solid variables.$surface-border;
+        display: flex;
+        justify-content: space-between;
+        padding: 14px 32px;
     }
 
     .profile-main {
-        max-width: 720px;
         margin: 0 auto;
+        max-width: 720px;
         padding: 32px 32px 64px;
     }
 
@@ -34,8 +34,8 @@
         background: variables.$app-bg;
         border: 1px solid variables.$colors-bluish-white;
         border-radius: 10px;
-        padding: 22px;
         margin-bottom: 22px;
+        padding: 22px;
     }
 
     .profile-section-title {
@@ -57,36 +57,36 @@
     }
 
     .profile-label {
-        font-size: 13px;
         color: variables.$workspace-icon-color;
+        font-size: 13px;
     }
 
     .profile-input {
-        padding: 9px 12px;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         font-size: 14px;
         max-width: 380px;
+        padding: 9px 12px;
     }
 
     .profile-btn {
-        padding: 9px 18px;
+        background: variables.$board-btn;
         border: none;
         border-radius: 6px;
-        background: variables.$board-btn;
         color: variables.$app-bg;
         cursor: pointer;
         font-size: 14px;
+        padding: 9px 18px;
     }
 
     .profile-btn-ghost {
-        padding: 8px 14px;
+        background: variables.$app-bg;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
-        background: variables.$app-bg;
         color: variables.$primary-text-color;
         cursor: pointer;
         font-size: 14px;
+        padding: 8px 14px;
 
         &:hover:not(:disabled) {
             background: variables.$row-hover;
@@ -99,18 +99,18 @@
     }
 
     .profile-avatar-row {
-        display: flex;
         align-items: center;
+        display: flex;
         gap: 18px;
         margin-bottom: 14px;
     }
 
     .profile-avatar {
-        width: 84px;
-        height: 84px;
-        border-radius: 50%;
-        object-fit: cover;
         border: 1px solid variables.$colors-bluish-white;
+        border-radius: 50%;
+        height: 84px;
+        object-fit: cover;
+        width: 84px;
     }
 
     /**
@@ -124,13 +124,13 @@
     }
 
     .session-row {
-        display: grid;
-        grid-template-columns: 18px minmax(0, 1fr) auto auto;
         align-items: center;
-        gap: 12px;
-        padding: 8px 0;
         border-bottom: 1px solid variables.$surface-border;
+        display: grid;
         font-size: 14px;
+        gap: 12px;
+        grid-template-columns: 18px minmax(0, 1fr) auto auto;
+        padding: 8px 0;
 
         &:last-child {
             border-bottom: 0;
@@ -148,12 +148,12 @@
     }
 
     .session-badge {
-        margin-left: 8px;
-        padding: 1px 8px;
-        border-radius: 10px;
         background: variables.$colors-bluish-white2;
+        border-radius: 10px;
         color: variables.$board-btn;
         font-size: 12px;
+        margin-left: 8px;
+        padding: 1px 8px;
     }
 
     .session-seen {
@@ -165,19 +165,19 @@
     .profile-error {
         background: variables.$danger-surface;
         border: 1px solid variables.$colors-red-middle;
-        color: variables.$danger-text;
-        padding: 10px 14px;
         border-radius: 6px;
+        color: variables.$danger-text;
         margin-bottom: 16px;
+        padding: 10px 14px;
     }
 
     .profile-success {
         background: variables.$success-surface;
         border: 1px solid variables.$color-done-green;
-        color: variables.$success-text;
-        padding: 10px 14px;
         border-radius: 6px;
+        color: variables.$success-text;
         margin-bottom: 16px;
+        padding: 10px 14px;
     }
 
     .profile-link {
@@ -187,10 +187,10 @@
 
 
     .profile-bar-user {
-        display: flex;
-        gap: 16px;
-        font-size: 14px;
         align-items: center;
+        display: flex;
+        font-size: 14px;
+        gap: 16px;
     }
 
     .profile-bar-name {
@@ -199,8 +199,8 @@
 
     .profile-avatar-actions {
         display: flex;
-        gap: 10px;
         flex-wrap: wrap;
+        gap: 10px;
     }
 
     .profile-file-input {
@@ -217,9 +217,9 @@
     .profile-select {
         appearance: none;
         background: variables.$app-bg url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23676879' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center;
-        padding-right: 32px;
         cursor: pointer;
         font-family: inherit;
+        padding-right: 32px;
     }
 
     // the username cannot be changed and should not look as if it could

@@ -1,68 +1,68 @@
 @use "../setup/variables";
 
 .confirm-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: variables.$z-confirm;
+    align-items: center;
     background: rgba(41, 47, 76, .45);
     display: flex;
-    align-items: center;
+    inset: 0;
     justify-content: center;
     padding: 20px;
+    position: fixed;
+    z-index: variables.$z-confirm;
 }
 
 .confirm-box {
-    width: 100%;
-    max-width: 380px;
-    box-sizing: border-box;
     background: variables.$app-bg;
     border-radius: 10px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, .28);
-    padding: 22px 22px 18px;
-    font-family: inherit;
+    box-sizing: border-box;
     color: variables.$primary-text-color;
+    font-family: inherit;
+    max-width: 380px;
+    padding: 22px 22px 18px;
+    width: 100%;
 }
 
 .confirm-title {
-    margin: 0 0 8px;
     font-size: 18px;
     font-weight: 600;
+    margin: 0 0 8px;
 }
 
 .confirm-text {
-    margin: 0;
+    color: variables.$primary-text-color;
     font-size: 14px;
     line-height: 1.5;
-    color: variables.$primary-text-color;
+    margin: 0;
 }
 
 .confirm-hint {
-    margin: 8px 0 0;
+    color: variables.$workspace-icon-color;
     font-size: 13px;
     line-height: 1.5;
-    color: variables.$workspace-icon-color;
+    margin: 8px 0 0;
 }
 
 .confirm-actions {
     display: flex;
-    justify-content: flex-end;
     gap: 8px;
+    justify-content: flex-end;
     margin-top: 20px;
 
 
     button {
-        height: 34px;
-        padding: 0 16px;
         border-radius: 4px;
+        cursor: pointer;
         font: inherit;
         font-size: 14px;
-        cursor: pointer;
+        height: 34px;
+        padding: 0 16px;
     }
 }
 
 .confirm-cancel {
-    border: 1px solid variables.$task-box-shadow-color;
     background: variables.$app-bg;
+    border: 1px solid variables.$task-box-shadow-color;
     color: variables.$primary-text-color;
 
 
@@ -72,8 +72,8 @@
 }
 
 .confirm-ok {
-    border: none;
     background: variables.$board-btn;
+    border: none;
     color: variables.$app-bg;
 
 

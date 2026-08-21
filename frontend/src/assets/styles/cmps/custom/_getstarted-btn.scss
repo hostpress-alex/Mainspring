@@ -3,18 +3,18 @@
 @use "../../setup/variables";
 
 .get-started-btn {
-    display: flex;
+    align-items: center;
     background-image: variables.$home-btn-bg-gradient;
     border-radius: 2em;
     color: variables.$app-bg;
-    letter-spacing: 1px;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    padding: variables.$spacing-medium 0;
-    line-height: 18px;
+    display: flex;
     font-size: functions.rem(16px);
+    justify-content: center;
+    letter-spacing: 1px;
+    line-height: 18px;
+    padding: variables.$spacing-medium 0;
     transition: opacity .3s ease-in-out, box-shadow .2s ease-in-out;
+    width: 100%;
 
     &:hover {
         box-shadow: 0px 0px 16px 6px variables.$home-slate;
@@ -26,15 +26,15 @@
     }
 
     .arrow {
+        font-size: functions.rem(20px);
         margin-left: variables.$spacing-small;
         transition: transform .3s ease-in-out;
-        font-size: functions.rem(20px);
     }
 
     @include mixins.for-normal-layout() {
         & {
-            width: max-content;
             padding: variables.$spacing-medium variables.$spacing-xl;
+            width: max-content;
         }
     }
 }

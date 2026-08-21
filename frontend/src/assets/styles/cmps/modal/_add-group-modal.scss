@@ -4,22 +4,22 @@
 .add-group-modal {
     display: flex;
     flex-direction: column;
-    width: 220px;
     font-size: functions.rem(14px);
     gap: 5px;
+    width: 220px;
 
     > * {
-        display: flex;
         align-items: center;
-        padding: variables.$spacing-xs variables.$spacing-small;
         color: variables.$primary-text-color;
-        gap: 12px;
         cursor: pointer;
+        display: flex;
+        gap: 12px;
+        padding: variables.$spacing-xs variables.$spacing-small;
         transition: .2s;
 
         &:hover {
-            border-radius: 4px;
             background-color: variables.$workspace-hover;
+            border-radius: 4px;
         }
     }
 

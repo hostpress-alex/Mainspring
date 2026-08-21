@@ -1,27 +1,27 @@
 @use "../../setup/variables";
 
 .acd-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(32, 34, 44, .45);
-    z-index: variables.$z-modal;
-    display: flex;
     align-items: center;
+    background: rgba(32, 34, 44, .45);
+    display: flex;
+    inset: 0;
     justify-content: center;
     padding: 24px;
+    position: fixed;
+    z-index: variables.$z-modal;
 }
 
 .acd {
     background: variables.$app-bg;
-    color: variables.$primary-text-color;
     border-radius: 12px;
-    width: 100%;
-    max-width: 620px;
-    max-height: 84vh;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+    color: variables.$primary-text-color;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
     font-size: 14px;
+    max-height: 84vh;
+    max-width: 620px;
+    width: 100%;
 }
 
 .acd *, .acd *::before, .acd *::after {
@@ -29,30 +29,30 @@
 }
 
 .acd-head {
-    padding: 18px 22px 0;
-    display: flex;
     align-items: center;
+    display: flex;
     gap: 12px;
+    padding: 18px 22px 0;
 
 
     h2 {
-        margin: 0;
+        flex: 1;
         font-size: 18px;
         font-weight: 600;
-        flex: 1;
+        margin: 0;
     }
 }
 
 .acd-close {
-    border: none;
     background: transparent;
-    font-size: 22px;
-    line-height: 1;
-    cursor: pointer;
-    color: variables.$workspace-icon-color;
-    width: 32px;
-    height: 32px;
+    border: none;
     border-radius: 50%;
+    color: variables.$workspace-icon-color;
+    cursor: pointer;
+    font-size: 22px;
+    height: 32px;
+    line-height: 1;
+    width: 32px;
 
 
     &:hover {
@@ -65,45 +65,45 @@
 
 
     input {
-        width: 100%;
-        padding: 11px 14px;
         border: 2px solid variables.$board-btn;
         border-radius: 8px;
-        font-size: 15px;
         font-family: inherit;
+        font-size: 15px;
         outline: none;
+        padding: 11px 14px;
+        width: 100%;
     }
 }
 
 .acd-body {
-    padding: 10px 22px 20px;
     overflow: auto;
+    padding: 10px 22px 20px;
 }
 
 .acd-cat {
-    margin-top: 14px;
     color: variables.$workspace-icon-color;
     font-size: 13px;
+    margin-top: 14px;
 }
 
 .acd-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 6px 20px;
+    grid-template-columns: 1fr 1fr;
     margin-top: 8px;
 }
 
 .acd-item {
-    display: flex;
     align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    font: inherit;
     gap: 12px;
     padding: 9px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    font: inherit;
-    color: inherit;
     text-align: left;
     width: 100%;
 
@@ -114,15 +114,15 @@
 }
 
 .acd-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 7px;
-    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    border-radius: 7px;
     color: variables.$app-bg;
-    font-size: 16px;
+    display: inline-flex;
     flex-shrink: 0;
+    font-size: 16px;
+    height: 30px;
+    justify-content: center;
+    width: 30px;
 }
 
 .acd-empty {
@@ -132,12 +132,12 @@
 }
 
 .acd-foot {
-    border-top: 1px solid variables.$colors-bluish-white;
-    padding: 12px 22px;
-    display: flex;
     align-items: center;
-    justify-content: space-between;
+    border-top: 1px solid variables.$colors-bluish-white;
+    display: flex;
     gap: 12px;
+    justify-content: space-between;
+    padding: 12px 22px;
 }
 
 .acd-hint {
@@ -146,16 +146,16 @@
 }
 
 .acd-name {
-    display: flex;
     align-items: center;
+    display: flex;
     gap: 8px;
 
 
     input {
-        padding: 8px 11px;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         font: inherit;
+        padding: 8px 11px;
         width: 210px;
     }
 }

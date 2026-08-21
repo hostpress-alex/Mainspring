@@ -1,42 +1,42 @@
 @use "../setup/variables";
 
 .mention-field {
-    position: relative;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 /* The list hangs below the field. It is a popover anchored to an element, so
    it takes that step — see setup/_layers.scss. */
 .mention-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: variables.$z-popover;
-    width: min(280px, 100%);
-    max-height: 240px;
-    margin: 4px 0 0;
-    padding: 4px;
+    background: variables.$app-bg;
     border: 1px solid variables.$layout-border-color;
     border-radius: 8px;
-    background: variables.$app-bg;
     box-shadow: 0 6px 18px rgba(0, 0, 0, .16);
+    left: 0;
     list-style: none;
+    margin: 4px 0 0;
+    max-height: 240px;
     overflow-y: auto;
+    padding: 4px;
+    position: absolute;
+    top: 100%;
+    width: min(280px, 100%);
+    z-index: variables.$z-popover;
 }
 
 .mention-option {
-    display: flex;
     align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 6px 8px;
+    background: none;
     border: 0;
     border-radius: 6px;
-    background: none;
-    font: inherit;
-    text-align: left;
     cursor: pointer;
+    display: flex;
+    font: inherit;
+    gap: 8px;
+    padding: 6px 8px;
+    text-align: left;
+    width: 100%;
 }
 
 /* One highlight for both hover and keyboard, so the list never shows two
@@ -46,16 +46,16 @@
 }
 
 .mention-avatar {
-    width: 24px;
     height: 24px;
+    width: 24px;
 }
 
 /* The mention inside a posted comment. Not a link: it points at a person, and
    there is no page for a person to go to. */
 .mention {
-    padding: 0 2px;
-    border-radius: 3px;
     background: variables.$colors-bluish-white2;
+    border-radius: 3px;
     color: variables.$board-btn;
     font-weight: 600;
+    padding: 0 2px;
 }

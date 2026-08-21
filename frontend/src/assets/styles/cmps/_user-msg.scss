@@ -13,31 +13,31 @@
  * nobody notices.
  */
 .user-msg-stack {
-    position: fixed;
-    left: 90px;
     bottom: 24px;
-    z-index: variables.$z-message;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    left: 90px;
     max-width: min(420px, calc(100vw - 110px));
+    position: fixed;
+    z-index: variables.$z-message;
 }
 
 .user-msg {
-    display: flex;
     align-items: flex-start;
-    gap: 10px;
-    box-sizing: border-box;
-    padding: 12px 12px 12px 14px;
-    border-radius: 8px;
-    box-shadow: 0 8px 28px rgba(0, 0, 0, .22);
     background: variables.$app-bg;
-    color: variables.$primary-text-color;
-    font-size: 14px;
-    line-height: 1.45;
     /* The colour is the second signal, never the only one — hence the icon
        and the wording. A red bar alone is unreadable to a part of the team. */
     border-left: 4px solid variables.$danger;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .22);
+    box-sizing: border-box;
+    color: variables.$primary-text-color;
+    display: flex;
+    font-size: 14px;
+    gap: 10px;
+    line-height: 1.45;
+    padding: 12px 12px 12px 14px;
 
 
     &.is-success {
@@ -46,8 +46,8 @@
 }
 
 .user-msg-icon {
-    margin-top: 2px;
     color: variables.$danger;
+    margin-top: 2px;
 }
 
 .user-msg.is-success .user-msg-icon {
@@ -63,24 +63,24 @@
 
 .user-msg-count {
     align-self: center;
-    padding: 1px 6px;
-    border-radius: 10px;
     background: variables.$workspace-hover;
+    border-radius: 10px;
     font-size: 12px;
     font-variant-numeric: tabular-nums;
+    padding: 1px 6px;
 }
 
 .user-msg-close {
-    flex: none;
-    width: 24px;
-    height: 24px;
-    padding: 0;
+    background: none;
     border: none;
     border-radius: 4px;
-    background: none;
     color: variables.$workspace-icon-color;
-    font: inherit;
     cursor: pointer;
+    flex: none;
+    font: inherit;
+    height: 24px;
+    padding: 0;
+    width: 24px;
 
 
     &:hover {

@@ -3,44 +3,44 @@
 @use "../../setup/variables";
 
 .board-filter {
-    padding: variables.$spacing-medium 0;
     gap: 5px;
+    padding: variables.$spacing-medium 0;
 
     > * {
         @include mixins.center-flex();
         font-size: functions.rem(14px);
-        height: 32px;
         gap: 5px;
+        height: 32px;
     }
 
     .board-tools {
         > * {
             @include mixins.center-flex();
-            gap: variables.$spacing-xs;
-            padding: 0 8px;
             color: variables.$workspace-icon-color;
-            height: 100%;
             cursor: pointer;
+            gap: variables.$spacing-xs;
+            height: 100%;
+            padding: 0 8px;
 
             &:hover {
-                border-radius: 4px;
                 background-color: variables.$workspace-hover;
+                border-radius: 4px;
             }
 
             .icon {
-                font-size: 18px;
                 color: variables.$workspace-icon-color;
+                font-size: 18px;
 
             }
         }
     }
 
     .add-btn {
-        position: relative;
         background-color: variables.$board-btn;
-        color: white;
         border-radius: 5px;
+        color: white;
         height: 32px;
+        position: relative;
 
         .new-task-btn {
             cursor: pointer;
@@ -50,23 +50,23 @@
 
             &:hover {
                 background-color: variables.$primary-hover-color;
-                border-top-left-radius: 5px;
                 border-bottom-left-radius: 5px;
+                border-top-left-radius: 5px;
             }
         }
 
         .drop-down-btn {
             @include mixins.center-flex();
-            height: 100%;
-            padding: 0 variables.$spacing-small;
             border-left: 1px solid variables.$primary-hover-color;
             cursor: pointer;
+            height: 100%;
+            padding: 0 variables.$spacing-small;
             transition: .4s;
 
             &:hover {
                 background-color: variables.$primary-hover-color;
-                border-top-right-radius: 5px;
                 border-bottom-right-radius: 5px;
+                border-top-right-radius: 5px;
             }
 
             .icon {
@@ -76,20 +76,20 @@
     }
 
     .search-task {
+        background-color: variables.$app-bg;
         border-radius: 4px;
         color: variables.$primary-text-color;
-        background-color: variables.$app-bg;
-        white-space: nowrap;
-        padding: unset;
         margin-left: 3px;
+        padding: unset;
+        white-space: nowrap;
 
         &:hover {
             background-color: variables.$workspace-hover;
         }
 
         &:has(:focus-visible) {
-            border: .5px solid variables.$board-btn;
             background-color: white;
+            border: .5px solid variables.$board-btn;
             outline: none;
         }
 
@@ -97,8 +97,8 @@
             cursor: pointer;
             transition: width .3s;
 
-            border: none;
             background-color: inherit;
+            border: none;
             width: 58px;
 
             &:focus-visible {
@@ -120,8 +120,8 @@
     }
 
     .person-filter {
-        position: relative;
         border-radius: 4px;
+        position: relative;
 
         &.active {
             background-color: variables.$primary-selected-color;
@@ -161,9 +161,9 @@
     }
 
     .members-last-seen {
-        width: max-content;
         gap: variables.$spacing-medium;
         height: functions.rem(32px);
+        width: max-content;
 
         &:hover {
             background-color: variables.$workspace-hover;

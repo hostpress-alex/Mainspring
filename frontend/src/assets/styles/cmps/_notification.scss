@@ -7,20 +7,20 @@
 /* The count sits on the bell rather than beside it, so the sidebar keeps its
    width whether there is something to report or not. */
 .notification-badge {
-    position: absolute;
-    top: -2px;
-    right: -4px;
-    min-width: 16px;
-    height: 16px;
-    padding: 0 4px;
-    border-radius: 8px;
     background: variables.$colors-red-middle;
+    border-radius: 8px;
     color: variables.$app-bg;
     font-size: 10px;
     font-weight: 700;
+    height: 16px;
     line-height: 16px;
-    text-align: center;
+    min-width: 16px;
+    padding: 0 4px;
     pointer-events: none;
+    position: absolute;
+    right: -4px;
+    text-align: center;
+    top: -2px;
 }
 
 /*
@@ -33,50 +33,50 @@
  * overrides them, so the panel follows if the bar ever changes width.
  */
 .notification-panel {
-    position: fixed;
-    top: 12px;
-    left: 60px;
-    z-index: variables.$z-panel;
-    display: flex;
-    flex-direction: column;
-    width: min(420px, calc(100vw - 80px));
-    max-height: calc(100vh - 24px);
+    background: variables.$app-bg;
     border: 1px solid variables.$layout-border-color;
     border-radius: 8px;
-    background: variables.$app-bg;
     box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+    display: flex;
+    flex-direction: column;
+    left: 60px;
+    max-height: calc(100vh - 24px);
     overflow: hidden;
+    position: fixed;
+    top: 12px;
+    width: min(420px, calc(100vw - 80px));
+    z-index: variables.$z-panel;
 }
 
 .notification-panel-head {
-    padding: 14px 16px 10px;
     border-bottom: 1px solid variables.$surface-border;
+    padding: 14px 16px 10px;
 
 
     h2 {
-        margin: 0 0 8px;
         font-size: 18px;
+        margin: 0 0 8px;
     }
 }
 
 .notification-panel-tools {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    display: flex;
     font-size: 13px;
+    gap: 12px;
+    justify-content: space-between;
 }
 
 .notification-filter {
-    display: flex;
     align-items: center;
-    gap: 6px;
     cursor: pointer;
+    display: flex;
+    gap: 6px;
 }
 
 .notification-mark-all {
-    border: 0;
     background: none;
+    border: 0;
     color: variables.$board-btn;
     cursor: pointer;
     font: inherit;
@@ -93,30 +93,30 @@
 }
 
 .notification-section h3 {
-    position: sticky;
-    top: 0;
-    margin: 0;
-    padding: 8px 16px 4px;
     background: variables.$app-bg;
     color: variables.$workspace-icon-color;
     font-size: 12px;
     font-weight: 600;
+    margin: 0;
+    padding: 8px 16px 4px;
+    position: sticky;
     text-transform: uppercase;
+    top: 0;
 }
 
 /* A button rather than a div: the whole row is clickable, and this is the one
    element that gets keyboard focus and Enter for free. */
 .notification-item {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    padding: 10px 16px;
+    background: none;
     border: 0;
     border-top: 1px solid variables.$hairline;
-    background: none;
-    font: inherit;
-    text-align: left;
     cursor: pointer;
+    display: flex;
+    font: inherit;
+    gap: 10px;
+    padding: 10px 16px;
+    text-align: left;
+    width: 100%;
 
 
     &:hover {
@@ -136,8 +136,8 @@
 
 .notification-avatar {
     flex: 0 0 auto;
-    width: 32px;
     height: 32px;
+    width: 32px;
 }
 
 .notification-body {
@@ -176,23 +176,23 @@
 }
 
 .notification-when {
-    flex: 0 0 auto;
     color: variables.$field-border;
+    flex: 0 0 auto;
     font-size: 12px;
     white-space: nowrap;
 }
 
 .notification-dot {
-    flex: 0 0 auto;
     align-self: center;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
     background: variables.$board-btn;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    height: 8px;
+    width: 8px;
 }
 
 .notification-empty {
-    padding: 24px 16px;
     color: variables.$workspace-icon-color;
+    padding: 24px 16px;
     text-align: center;
 }

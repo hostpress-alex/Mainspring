@@ -4,18 +4,18 @@
 @use "../../setup/variables";
 
 .workspace-sidebar {
-    position: relative;
     background-color: variables.$sidebar-workspace-bg;
     border-right: 1px solid color.adjust(variables.$border-color, $lightness: -30%);
     color: variables.$workspace-icon-color;
+    position: relative;
     transition: .4s;
 
     &.open {
         width: 230px;
 
         .workspace-sidebar-header {
-            transition-delay: .25s;
             opacity: 1;
+            transition-delay: .25s;
         }
     }
 
@@ -33,17 +33,17 @@
 
 
     .workspace-sidebar-items {
-        margin: variables.$spacing-medium variables.$spacing-medium 18px variables.$spacing-medium;
         border-bottom: 1px solid color.adjust(variables.$border-color, $lightness: -30%);
         gap: 10px;
+        margin: variables.$spacing-medium variables.$spacing-medium 18px variables.$spacing-medium;
     }
 
     .workspace-title-container {
         color: variables.$primary-text-color;
 
         .workspace-title {
-            font-weight: 400;
             font-size: functions.rem(14px);
+            font-weight: 400;
             padding: 0 0 variables.$spacing-xs 0;
         }
 
@@ -52,13 +52,13 @@
         }
 
         .favorites-title {
+            color: variables.$primary-text-color;
             font-size: functions.rem(16px);
             font-weight: 600;
-            color: variables.$primary-text-color;
 
             .star-icon {
-                margin-right: variables.$spacing-small;
                 color: variables.$color-egg_yolk;
+                margin-right: variables.$spacing-small;
             }
         }
     }
@@ -73,10 +73,10 @@
         .favorites-empty-text {
             flex-direction: column;
             @include mixins.center-flex();
-            text-align: center;
-            padding: 0 12px;
-            font-size: functions.rem(15px);
             color: variables.$primary-text-color;
+            font-size: functions.rem(15px);
+            padding: 0 12px;
+            text-align: center;
 
             b {
                 font-weight: bold;
@@ -85,36 +85,36 @@
     }
 
     .workspace-select {
-        padding: variables.$spacing-small;
         border: 1px solid variables.$workspace-icon-color;
         border-radius: 4px;
+        padding: variables.$spacing-small;
 
         .workspace-logo {
             position: relative;
 
             .lightning-container {
                 @include mixins.center-flex();
-                width: functions.rem(30px);
-                height: functions.rem(30px);
                 background-color: variables.$color-done-green;
-                color: variables.$app-bg;
                 border-radius: 8px;
+                color: variables.$app-bg;
+                height: functions.rem(30px);
+                width: functions.rem(30px);
             }
 
             .home {
-                position: absolute;
-                font-size: functions.rem(18px);
-                z-index: 2;
-                color: black;
                 bottom: -1px;
+                color: black;
+                font-size: functions.rem(18px);
+                position: absolute;
                 right: 64px;
+                z-index: 2;
             }
 
             .workspace-title {
-                font-size: functions.rem(16px);
                 color: variables.$primary-text-color;
-                margin-left: 12px;
+                font-size: functions.rem(16px);
                 font-weight: bold;
+                margin-left: 12px;
             }
         }
     }
@@ -125,10 +125,10 @@
         width: 100%;
 
         .icon {
-            width: 18px;
-            height: 19px;
             color: variables.$primary-text-color;
             font-weight: 400;
+            height: 19px;
+            width: 18px;
         }
 
         span {
@@ -137,13 +137,13 @@
         }
 
         > * {
-            transition: .2s;
-            display: flex;
             align-items: center;
+            cursor: pointer;
+            display: flex;
+            font-size: functions.rem(14px);
             gap: 6px;
             padding: variables.$spacing-xs;
-            cursor: pointer;
-            font-size: functions.rem(14px);
+            transition: .2s;
         }
 
         > *:hover {
@@ -157,14 +157,14 @@
             height: 31px;
 
             &:has(:focus-visible) {
-                border: .5px solid variables.$board-btn;
                 background-color: white;
+                border: .5px solid variables.$board-btn;
                 outline: none;
             }
 
             .search-input {
-                border: none;
                 background-color: inherit;
+                border: none;
                 margin-left: 2px;
 
                 &::-webkit-input-placeholder {
@@ -180,35 +180,35 @@
     }
 
     .board-list-container {
-        margin-top: variables.$spacing-large;
         gap: 5px;
+        margin-top: variables.$spacing-large;
 
         .board-list {
             padding: 0 variables.$spacing-medium;
 
             & .active {
-                border-radius: 4px;
                 background-color: variables.$workspace-board-active;
+                border-radius: 4px;
             }
         }
     }
 
     .toggle-workspace {
         @include mixins.center-flex();
-        position: absolute;
-        top: 13px;
+        background-color: variables.$app-bg;
+        border: 1px solid variables.$task-box-shadow-color;
+        border-radius: 20px;
+        cursor: pointer;
         left: calc(100% - 14px);
         padding: variables.$spacing-xs;
-        border-radius: 20px;
-        border: 1px solid variables.$task-box-shadow-color;
-        background-color: variables.$app-bg;
-        z-index: variables.$z-nav;
-        cursor: pointer;
+        position: absolute;
+        top: 13px;
         transition: .2s;
+        z-index: variables.$z-nav;
 
         &:hover {
-            color: white;
             background-color: variables.$board-btn;
+            color: white;
             padding-left: variables.$spacing-medium;
             padding-right: variables.$spacing-xs;
         }
@@ -233,9 +233,9 @@
     &.open {
         .toggle-workspace {
             &:hover {
+                left: auto;
                 padding: variables.$spacing-xs;
                 padding-right: variables.$spacing-medium;
-                left: auto;
                 right: -12px;
             }
         }
@@ -245,13 +245,13 @@
 // Sections of the board column (favourites, folders). Was inline in
 // workspace-board.jsx.
 .workspace-section-head {
-    display: flex;
     align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    padding: 7px 8px 5px;
     color: variables.$workspace-icon-color;
+    cursor: pointer;
+    display: flex;
     font-size: 13px;
+    gap: 4px;
+    padding: 7px 8px 5px;
 
     .workspace-section-name {
         flex: 1;
@@ -267,7 +267,7 @@
 }
 
 .workspace-section-empty {
-    padding: 4px 12px 8px;
     color: variables.$field-border;
     font-size: 12px;
+    padding: 4px 12px 8px;
 }

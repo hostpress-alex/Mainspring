@@ -18,17 +18,17 @@
     }
 
     .fold {
-        position: absolute;
         background: rgba(0, 0, 0, .352);
         border-color: transparent variables.$app-bg;
         border-style: solid;
         border-width: 0;
         display: block;
         height: 0;
+        position: absolute;
         right: 0;
         top: 0;
-        width: 0;
         transition: border-width .2s ease-out;
+        width: 0;
     }
 }
 

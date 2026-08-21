@@ -3,11 +3,11 @@
 @use "../../setup/variables";
 
 .teaser {
-    padding-top: 10vh;
-    padding-right: 20px;
-    padding-left: 20px;
     background: variables.$home-secondary-bg;
     color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10vh;
 
     &-header {
         padding: 4rem 0;
@@ -19,19 +19,19 @@
         }
 
         &-paragraph {
+            color: lightgrey;
             font-size: functions.rem(16px);
             margin-top: variables.$spacing-small;
-            color: lightgrey;
         }
     }
 
     .teaser-content {
-        display: flex;
         align-items: center;
-        margin-bottom: variables.$spacing-medium;
-        gap: variables.$spacing-small;
         color: variables.$home-active-color;
+        display: flex;
         font-family: variables.$title-font-family;
+        gap: variables.$spacing-small;
+        margin-bottom: variables.$spacing-medium;
         -webkit-transition: opacity 50ms ease, transform 50ms ease;
         transition: opacity 50ms ease, transform 50ms ease;
 
@@ -42,38 +42,38 @@
     }
 
     .home-gif {
-        margin: 10vh 0;
-        width: 100%;
-        opacity: .9;
         border-radius: 10px;
         filter: drop-shadow(0px 8px 24px variables.$home-veil);
+        margin: 10vh 0;
+        opacity: .9;
+        width: 100%;
     }
 }
 
 .views-container {
-    margin-bottom: 5rem;
-    height: 83px;
-    border-radius: 1em;
-    display: flex;
     background-color: inherit;
-    color: variables.$divider-warm;
-    justify-content: space-evenly;
+    border-radius: 1em;
     box-shadow: 0px 10px 30px rgba(29, 140, 242, 0.2);
+    color: variables.$divider-warm;
+    display: flex;
+    height: 83px;
+    justify-content: space-evenly;
+    margin-bottom: 5rem;
 
 
     .view {
-        position: relative;
+        align-items: center;
+        cursor: pointer;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
         font-size: 14px;
-        min-width: 75px;
-        width: 100%;
         height: 100%;
+        justify-content: center;
+        min-width: 75px;
         padding: 0 20px;
+        position: relative;
         transition: background-color .2s ease-in-out;
-        cursor: pointer;
+        width: 100%;
 
         &.active {
             color: variables.$home-active-color;
@@ -85,15 +85,15 @@
     }
 
     .active-indicator {
-        width: 100%;
-        bottom: 0;
-        position: absolute;
-        height: 4px;
         background-color: variables.$home-active-color;
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
+        bottom: 0;
+        height: 4px;
+        position: absolute;
         -webkit-transition: background-color 0.3s ease-in-out;
         transition: background-color 0.1s ease-in-out;
+        width: 100%;
     }
 
     .teaser-container {

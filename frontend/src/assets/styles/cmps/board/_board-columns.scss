@@ -24,26 +24,26 @@
 }
 
 .col-resizer {
-    position: absolute;
-    top: 0;
-    right: -3px;
-    width: 7px;
-    height: 100%;
     cursor: col-resize;
-    z-index: 3;
+    height: 100%;
+    position: absolute;
+    right: -3px;
+    top: 0;
     user-select: none;
+    width: 7px;
+    z-index: 3;
 }
 
 .col-resizer::after {
-    content: '';
-    position: absolute;
-    left: 3px;
-    top: 15%;
-    width: 2px;
-    height: 70%;
-    border-radius: 2px;
     background: transparent;
+    border-radius: 2px;
+    content: '';
+    height: 70%;
+    left: 3px;
+    position: absolute;
+    top: 15%;
     transition: background .12s;
+    width: 2px;
 }
 
 .col-resizer:hover::after,
@@ -59,12 +59,12 @@ body.is-col-resizing {
 
 /* Title area of a column: only this part is the handle for reordering. */
 .cmp-order-title .col-drag {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 4px;
+    display: flex;
     flex: 1 1 auto;
-    min-width: 0;
+    gap: 4px;
     height: 100%;
+    justify-content: center;
+    min-width: 0;
     padding: 0 6px;
 }

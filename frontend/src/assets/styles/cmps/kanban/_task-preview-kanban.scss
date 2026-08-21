@@ -11,33 +11,33 @@
    `max-content` on the first track makes the label column as wide as the
    longest label on that card and no wider. */
 .kanban-fields {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
     align-items: center;
     column-gap: variables.$spacing-small;
-    row-gap: variables.$spacing-xs;
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
     margin: 0;
+    row-gap: variables.$spacing-xs;
 }
 
 .kanban-field-label {
+    color: variables.$workspace-icon-color;
+    font-size: functions.rem(11px);
+    letter-spacing: .02em;
     max-width: 96px;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    color: variables.$workspace-icon-color;
-    font-size: functions.rem(11px);
     text-transform: uppercase;
-    letter-spacing: .02em;
+    white-space: nowrap;
 }
 
 .kanban-field-value {
-    min-width: 0;
     margin: 0;
+    min-width: 0;
 
     .col-cell {
         display: flex;
-        width: 100%;
         overflow: hidden;
+        width: 100%;
     }
 
     /* The cells bring a min-width of their own from the table styles. Undone
@@ -53,13 +53,13 @@
        (`.task-preview-kanban .picker { background-color: ... }`) beat that on
        specificity and painted every chip the same pale grey. */
     .picker {
-        min-height: 28px;
         border-radius: 4px;
+        min-height: 28px;
     }
 
     .status-priority-picker {
+        font-size: functions.rem(12px);
         justify-content: center;
         padding: 0 variables.$spacing-xs;
-        font-size: functions.rem(12px);
     }
 }

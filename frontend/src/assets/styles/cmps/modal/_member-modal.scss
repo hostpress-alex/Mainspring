@@ -7,15 +7,15 @@
     @include mixins.center-flex();
 
     .close-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
         cursor: pointer;
+        position: absolute;
+        right: 10px;
+        top: 10px;
     }
 
     .modal-member-content {
-        width: 360px;
         font-size: functions.rem(14px);
+        width: 360px;
 
         @include mixins.for-mobile-layout() {
             & {
@@ -34,22 +34,22 @@
             margin-top: 0;
 
             li {
-                padding: variables.$spacing-xs variables.$spacing-small;
-                display: flex;
                 align-items: center;
-                gap: variables.$spacing-small;
                 background-color: variables.$member-modal-item-bg;
-                margin: variables.$spacing-xs;
                 border-radius: 8px;
+                display: flex;
+                gap: variables.$spacing-small;
+                margin: variables.$spacing-xs;
+                padding: variables.$spacing-xs variables.$spacing-small;
 
                 img {
-                    width: 22px;
                     height: 22px;
+                    width: 22px;
                 }
 
                 .remove {
-                    margin-right: variables.$spacing-xs;
                     cursor: pointer;
+                    margin-right: variables.$spacing-xs;
                 }
             }
 
@@ -57,11 +57,11 @@
 
         .outTaskMembers {
             .search-div {
+                border: 2px solid color.adjust(variables.$border-color, $lightness: -20%);
+                border-radius: 8px;
                 margin: variables.$spacing-medium 0;
                 padding: variables.$spacing-xs variables.$spacing-xs;
                 width: 320px;
-                border-radius: 8px;
-                border: 2px solid color.adjust(variables.$border-color, $lightness: -20%);
 
                 @include mixins.for-mobile-layout() {
                     & {
@@ -80,13 +80,13 @@
 
                 .icon-container {
                     @include mixins.center-flex();
-                    margin: 0;
                     background-color: white;
                     border-radius: 8px;
-                    width: 24px;
-                    height: 24px;
-                    padding: variables.$spacing-xs variables.$spacing-xs;
                     cursor: pointer;
+                    height: 24px;
+                    margin: 0;
+                    padding: variables.$spacing-xs variables.$spacing-xs;
+                    width: 24px;
 
                     &:hover {
                         background-color: variables.$layout-border-color;
@@ -103,15 +103,15 @@
                 overflow-y: auto;
 
                 li {
-                    padding: variables.$spacing-small;
-                    display: flex;
-                    gap: variables.$spacing-small;
                     border-radius: 8px;
                     cursor: pointer;
+                    display: flex;
+                    gap: variables.$spacing-small;
+                    padding: variables.$spacing-small;
 
                     img {
-                        width: 26px;
                         height: 26px;
+                        width: 26px;
                     }
 
                     &:hover {
@@ -129,13 +129,13 @@
        which left reloading the page as the only way out. */
     &.invite {
         @include mixins.center-absolute();
-        z-index: variables.$z-modal;
         background-color: variables.$app-bg;
+        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
         border-radius: variables.$spacing-small;
+        box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
         font-size: functions.rem(14px);
         padding: variables.$spacing-medium;
-        box-shadow: -3px 4px 14px rgb(0 0 0 / 20%);
-        border: 1px solid color.adjust(variables.$border-color, $lightness: -20%);
+        z-index: variables.$z-modal;
 
 
         .modal-member-content {
@@ -153,9 +153,9 @@
     }
 
     .triangle-icon {
+        color: white;
         position: absolute;
         top: -12px;
-        color: white;
         @include mixins.for-mobile-layout() {
             & {
                 right: 75px
@@ -172,16 +172,16 @@
 }
 
 .member-role-row {
-    display: flex;
     align-items: center;
+    border-bottom: 1px solid variables.$surface-soft;
+    display: flex;
     gap: 8px;
     padding: 5px 0;
-    border-bottom: 1px solid variables.$surface-soft;
 
     img, .avatar {
-        width: 26px;
-        height: 26px;
         border-radius: 50%;
+        height: 26px;
+        width: 26px;
     }
 }
 
@@ -195,13 +195,13 @@
 
 .member-role-select,
 .invite-role select {
-    flex: 0 0 auto;
+    background: variables.$app-bg;
     border: 1px solid variables.$layout-border-color;
     border-radius: 5px;
-    padding: 3px 6px;
+    flex: 0 0 auto;
     font: inherit;
     font-size: 12px;
-    background: variables.$app-bg;
+    padding: 3px 6px;
 }
 
 /* Disabled means the last owner. It stays readable rather than fading out —
@@ -212,30 +212,30 @@
 }
 
 .member-role-static {
-    flex: 0 0 auto;
     color: variables.$workspace-icon-color;
+    flex: 0 0 auto;
     font-size: 12px;
 }
 
 .member-role-remove {
-    flex: 0 0 auto;
-    border: 0;
     background: none;
-    padding: 0 4px;
+    border: 0;
     color: variables.$workspace-icon-color;
+    cursor: pointer;
+    flex: 0 0 auto;
     font-size: 16px;
     line-height: 1;
-    cursor: pointer;
+    padding: 0 4px;
 
     &:hover { color: variables.$colors-red-middle; }
 }
 
 .invite-role {
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-size: 12px;
     color: variables.$workspace-icon-color;
+    display: flex;
+    font-size: 12px;
+    gap: 8px;
+    justify-content: space-between;
+    margin-bottom: 8px;
 }

@@ -7,10 +7,10 @@
  * the JSX only carries class names now.
  */
 .admin-page {
-    padding: 32px 40px;
-    max-width: 1100px;
-    margin: 0 auto;
     font-family: inherit;
+    margin: 0 auto;
+    max-width: 1100px;
+    padding: 32px 40px;
 
     .admin-title {
         font-size: 28px;
@@ -31,22 +31,22 @@
      * question of what a tab looks like here.
      */
     .admin-tabs {
-        display: flex;
         align-items: center;
-        gap: 2px;
-        flex-wrap: wrap;
-        margin-bottom: 24px;
         border-bottom: 1px solid variables.$layout-border-color;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        margin-bottom: 24px;
     }
 
     .admin-tab {
-        position: relative;
-        display: flex;
         align-items: center;
+        display: flex;
         height: 36px;
         /* Sits ON the strip's own line, so the active underline covers it
            instead of drawing a second line one pixel below. */
         margin-bottom: -1px;
+        position: relative;
 
         &.is-active {
             border-bottom: 2px solid variables.$board-btn;
@@ -60,22 +60,22 @@
     }
 
     .admin-tab-open {
-        display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 100%;
-        padding: 0 14px;
-        border: 0;
         background: none;
+        border: 0;
         color: inherit;
+        cursor: pointer;
+        display: flex;
         font: inherit;
         font-size: 14px;
-        cursor: pointer;
+        gap: 8px;
+        height: 100%;
+        justify-content: center;
+        padding: 0 14px;
 
         i {
-            font-size: 12px;
             color: variables.$workspace-icon-color;
+            font-size: 12px;
         }
     }
 
@@ -88,17 +88,17 @@
     }
 
     .admin-tab-open:focus-visible {
+        border-radius: 4px;
         outline: 2px solid variables.$primary-text-color;
         outline-offset: -2px;
-        border-radius: 4px;
     }
 
     .admin-card {
         background: variables.$app-bg;
         border: 1px solid variables.$layout-border-color;
         border-radius: 8px;
-        padding: 20px;
         margin-bottom: 24px;
+        padding: 20px;
     }
 
     /* Enough room for the label above a select, without the 28px the page
@@ -111,30 +111,30 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
-        max-width: 420px;
         margin-bottom: 16px;
+        max-width: 420px;
     }
 
     .admin-field-label {
-        font-size: 13px;
         color: variables.$workspace-icon-color;
+        font-size: 13px;
     }
 
     .admin-warn {
-        display: flex;
         align-items: flex-start;
-        gap: 8px;
-        padding: 10px 12px;
-        margin: 0 0 16px;
-        border-radius: 6px;
-        border-left: 4px solid variables.$warning;
         background: variables.$warning-surface;
+        border-left: 4px solid variables.$warning;
+        border-radius: 6px;
+        display: flex;
         font-size: 14px;
+        gap: 8px;
         line-height: 1.45;
+        margin: 0 0 16px;
+        padding: 10px 12px;
 
         i {
-            margin-top: 3px;
             color: variables.$warning-text-strong;
+            margin-top: 3px;
         }
     }
 
@@ -146,29 +146,29 @@
      * "act now", not as another row of data.
      */
     .admin-card.is-fresh-token {
-        border-color: variables.$color-done-green;
         background: variables.$success-surface-soft;
+        border-color: variables.$color-done-green;
     }
 
     .token-value {
-        display: flex;
         align-items: center;
-        gap: 10px;
+        display: flex;
         flex-wrap: wrap;
+        gap: 10px;
     }
 
     .token-code {
-        flex: 1;
-        min-width: 260px;
-        padding: 10px 12px;
+        background: variables.$app-bg;
         border: 1px solid variables.$layout-border-color;
         border-radius: 6px;
-        background: variables.$app-bg;
+        flex: 1;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 13px;
+        min-width: 260px;
         /* It is 68 characters and must be readable and selectable whole, so it
            wraps rather than scrolling out of sight. */
         overflow-wrap: anywhere;
+        padding: 10px 12px;
         user-select: all;
     }
 
@@ -188,94 +188,94 @@
     }
 
     .admin-table {
-        width: 100%;
         border-collapse: collapse;
         font-size: 14px;
+        width: 100%;
     }
 
     .admin-th {
-        text-align: left;
-        padding: 8px 10px;
         border-bottom: 2px solid variables.$surface-border;
         color: variables.$workspace-icon-color;
         font-weight: 500;
+        padding: 8px 10px;
+        text-align: left;
     }
 
     .admin-td {
-        padding: 8px 10px;
         border-bottom: 1px solid variables.$surface-soft-alt;
+        padding: 8px 10px;
         vertical-align: middle;
     }
 
     .admin-input {
-        padding: 7px 10px;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 4px;
-        margin-right: 8px;
         font-size: 14px;
+        margin-right: 8px;
+        padding: 7px 10px;
     }
 
     .admin-btn {
-        padding: 7px 14px;
+        background: variables.$board-btn;
         border: none;
         border-radius: 4px;
-        background: variables.$board-btn;
         color: variables.$app-bg;
         cursor: pointer;
         font-size: 14px;
+        padding: 7px 14px;
     }
 
     .admin-btn-ghost {
-        padding: 4px 10px;
+        background: variables.$app-bg;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 4px;
-        background: variables.$app-bg;
         cursor: pointer;
         font-size: 13px;
         margin-right: 6px;
+        padding: 4px 10px;
     }
 
     .admin-btn-danger {
-        padding: 4px 10px;
+        background: variables.$app-bg;
         border: 1px solid variables.$colors-red-middle;
         border-radius: 4px;
-        background: variables.$app-bg;
         color: variables.$colors-red-middle;
         cursor: pointer;
         font-size: 13px;
+        padding: 4px 10px;
     }
 
     .admin-badge {
         background: variables.$color-done-green;
-        color: variables.$app-bg;
         border-radius: 10px;
-        padding: 2px 9px;
+        color: variables.$app-bg;
         font-size: 12px;
+        padding: 2px 9px;
 
         // A closed account: grey, and never in the same colour as a role.
         // The two say different things and sit next to each other.
         &.is-off {
-            margin-left: 6px;
             background: variables.$divider-strong;
             color: variables.$primary-text-color;
+            margin-left: 6px;
         }
     }
 
     .admin-chip {
-        display: inline-flex;
         align-items: center;
-        gap: 6px;
         background: variables.$surface-soft-alt;
         border-radius: 14px;
-        padding: 3px 6px 3px 10px;
-        margin-right: 6px;
-        margin-bottom: 4px;
+        display: inline-flex;
         font-size: 13px;
+        gap: 6px;
+        margin-bottom: 4px;
+        margin-right: 6px;
+        padding: 3px 6px 3px 10px;
     }
 
     .admin-remove {
-        cursor: pointer;
         color: variables.$workspace-icon-color;
+        cursor: pointer;
         font-weight: 700;
         padding: 0 4px;
     }
@@ -283,25 +283,25 @@
     .admin-error {
         background: variables.$danger-surface;
         border: 1px solid variables.$colors-red-middle;
-        color: variables.$danger-text;
-        padding: 10px 14px;
         border-radius: 4px;
+        color: variables.$danger-text;
         margin-bottom: 16px;
+        padding: 10px 14px;
     }
 
     .admin-success {
         background: variables.$success-surface;
         border: 1px solid variables.$color-done-green;
-        color: variables.$success-text;
-        padding: 10px 14px;
         border-radius: 4px;
+        color: variables.$success-text;
         margin-bottom: 16px;
+        padding: 10px 14px;
     }
 
 
     .admin-checkbox {
-        margin-right: 12px;
         font-size: 14px;
+        margin-right: 12px;
     }
 
     .admin-td.is-right {
@@ -327,9 +327,9 @@
     }
 
     .admin-sub.is-footnote {
-        margin-top: 14px;
-        margin-bottom: 0;
         font-size: 13px;
+        margin-bottom: 0;
+        margin-top: 14px;
     }
 
     /* ------------------------------------------------- priorities ------ */
@@ -384,8 +384,8 @@
     .priority-move {
         align-items: center;
         display: flex;
-        gap: 8px;
         font-size: 13px;
+        gap: 8px;
         margin-bottom: 12px;
     }
 

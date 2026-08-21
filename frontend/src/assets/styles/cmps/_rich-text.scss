@@ -16,9 +16,9 @@
     p { margin: 0 0 .5em; }
 
     h1, h2, h3 {
-        margin: .8em 0 .4em;
-        line-height: 1.25;
         font-weight: 600;
+        line-height: 1.25;
+        margin: .8em 0 .4em;
     }
 
     h1 { font-size: 1.35em; }
@@ -30,34 +30,34 @@
     li > p { margin: 0; }
 
     blockquote {
-        margin: .5em 0;
-        padding: .1em 0 .1em .8em;
         border-left: 3px solid variables.$layout-border-color;
         color: variables.$workspace-icon-color;
+        margin: .5em 0;
+        padding: .1em 0 .1em .8em;
     }
 
     code {
-        padding: .1em .3em;
-        border-radius: 3px;
         background: variables.$surface-soft;
+        border-radius: 3px;
         font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         font-size: .92em;
+        padding: .1em .3em;
     }
 
     pre {
-        margin: .5em 0;
-        padding: .6em .8em;
-        border-radius: 6px;
         background: variables.$surface-soft;
+        border-radius: 6px;
+        margin: .5em 0;
         overflow-x: auto;
+        padding: .6em .8em;
 
         code { padding: 0; background: none; }
     }
 
     hr {
-        margin: .9em 0;
         border: 0;
         border-top: 1px solid variables.$layout-border-color;
+        margin: .9em 0;
     }
 
     a {
@@ -68,12 +68,12 @@
     /* The checklist, in tiptap's markup. The list marker has to go or every
        item shows a bullet AND a box. */
     ul[data-type="taskList"] {
-        padding-left: 0;
         list-style: none;
+        padding-left: 0;
 
         li {
-            display: flex;
             align-items: flex-start;
+            display: flex;
             gap: .5em;
         }
 
@@ -140,21 +140,21 @@
        never stretched past its own size — an upscaled screenshot is worse
        than a small one. */
     img {
+        border-radius: 6px;
         display: block;
-        max-width: 100%;
         height: auto;
         margin: .6em 0;
-        border-radius: 6px;
+        max-width: 100%;
     }
 
     /* A mention keeps the look it had in the plain textarea. Not a link: it
        points at a person, and there is no page for a person. */
     span[data-type="mention"] {
-        padding: 0 2px;
-        border-radius: 3px;
         background: variables.$colors-bluish-white2;
+        border-radius: 3px;
         color: variables.$board-btn;
         font-weight: 600;
+        padding: 0 2px;
     }
 }
 
@@ -174,15 +174,15 @@
  * the sticky toolbar below takes over.
  */
 .rich-text-editor {
-    position: relative;
+    background: variables.$app-bg;
+    border: 1px solid variables.$layout-border-color;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     max-height: 100%;
     min-height: 0;
-    border: 1px solid variables.$layout-border-color;
-    border-radius: 8px;
-    background: variables.$app-bg;
     overflow: hidden;
+    position: relative;
 }
 
 /**
@@ -195,33 +195,33 @@
  * has the text sliding visibly underneath it.
  */
 .rich-text-toolbar {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    flex: none;
-    display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1px;
-    padding: 4px 6px;
     background: variables.$app-bg;
     border-bottom: 1px solid variables.$layout-border-color;
     border-radius: 8px 8px 0 0;
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    gap: 1px;
+    padding: 4px 6px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .rich-text-tool {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    min-width: 26px;
-    height: 26px;
-    padding: 0 5px;
+    background: none;
     border: 0;
     border-radius: 4px;
-    background: none;
     color: variables.$workspace-icon-color;
-    font-size: 13px;
     cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    height: 26px;
+    justify-content: center;
+    min-width: 26px;
+    padding: 0 5px;
 
     &:hover { background: variables.$surface-soft; color: variables.$primary-text-color; }
     &.is-on { background: variables.$colors-bluish-white2; color: variables.$board-btn; }
@@ -233,27 +233,27 @@
 }
 
 .rich-text-sep {
-    width: 1px;
+    background: variables.$layout-border-color;
     height: 16px;
     margin: 0 4px;
-    background: variables.$layout-border-color;
+    width: 1px;
 }
 
 /* The wrapper EditorContent draws around the editable element. See the note
    at the call site: without it the column stops here. */
 .rich-text-content {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
-    flex: 1 1 auto;
 }
 
 .rich-text-input {
     // min-height for the empty state, min-height: 0 so the flex item may
     // actually shrink — without the second one a flex child refuses to go
+    flex: 1 1 auto;
     // below its content and nothing ever scrolls.
     min-height: 84px;
-    flex: 1 1 auto;
     overflow-y: auto;
     padding: 10px 12px;
 
@@ -263,10 +263,10 @@
        contenteditable has none. Only on the first paragraph, and only while
        the document is empty. */
     p.is-editor-empty:first-child::before {
+        color: variables.$workspace-icon-color;
         content: attr(data-placeholder);
         float: left;
         height: 0;
-        color: variables.$workspace-icon-color;
         pointer-events: none;
     }
 }
@@ -280,61 +280,61 @@
     // through it: a wrapper with a default `min-height: auto` would hold the
     // whole text open and hand the scrolling back to the outer box.
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
-    flex: 1 1 auto;
 
 
     &.is-over::after {
-        content: '';
-        position: absolute;
-        inset: 4px;
+        background: rgb(0 115 234 / 6%);
         border: 2px dashed variables.$board-btn;
         border-radius: 6px;
-        background: rgb(0 115 234 / 6%);
+        content: '';
+        inset: 4px;
         pointer-events: none;
+        position: absolute;
     }
 }
 
 .rich-text-drop-hint {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    padding: 4px 10px;
-    border-radius: 6px;
     background: variables.$board-btn;
+    border-radius: 6px;
     color: variables.$app-bg;
     font-size: 12px;
+    left: 50%;
+    padding: 4px 10px;
     pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .rich-text-link {
+    border-bottom: 1px solid variables.$layout-border-color;
     display: flex;
     gap: 6px;
     padding: 6px 8px;
-    border-bottom: 1px solid variables.$layout-border-color;
 
     input {
-        flex: 1 1 auto;
-        min-width: 0;
         border: 1px solid variables.$layout-border-color;
         border-radius: 5px;
-        padding: 4px 7px;
+        flex: 1 1 auto;
         font: inherit;
         font-size: 13px;
+        min-width: 0;
+        padding: 4px 7px;
     }
 
     input:focus-visible { outline: 0; border-color: variables.$board-btn; }
 
     button {
+        background: variables.$surface-soft;
         border: 0;
         border-radius: 5px;
-        padding: 4px 9px;
-        background: variables.$surface-soft;
+        cursor: pointer;
         font: inherit;
         font-size: 12px;
-        cursor: pointer;
+        padding: 4px 9px;
     }
 
     /* By class, not by type: every button in here is type="button" because
@@ -345,37 +345,37 @@
 /* The @-list. In a portal, so it takes the popover step of the scale and is
    positioned in page coordinates. */
 .rich-text-mentions {
-    position: fixed;
-    z-index: variables.$z-popover;
-    width: min(280px, 90vw);
-    max-height: 240px;
-    margin: 0;
-    padding: 4px;
+    background: variables.$app-bg;
     border: 1px solid variables.$layout-border-color;
     border-radius: 8px;
-    background: variables.$app-bg;
     box-shadow: 0 6px 18px rgb(0 0 0 / 16%);
     list-style: none;
+    margin: 0;
+    max-height: 240px;
     overflow-y: auto;
+    padding: 4px;
+    position: fixed;
+    width: min(280px, 90vw);
+    z-index: variables.$z-popover;
 }
 
 .rich-text-mention-option {
-    display: flex;
     align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 6px 8px;
+    background: none;
     border: 0;
     border-radius: 6px;
-    background: none;
-    font: inherit;
-    text-align: left;
     cursor: pointer;
+    display: flex;
+    font: inherit;
+    gap: 8px;
+    padding: 6px 8px;
+    text-align: left;
+    width: 100%;
 
     &.is-active { background: variables.$colors-bluish-white2; }
 }
 
 .rich-text-mention-avatar {
-    width: 24px;
     height: 24px;
+    width: 24px;
 }

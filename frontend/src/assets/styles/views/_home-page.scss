@@ -4,10 +4,10 @@
 
 .home-page {
     background-image: variables.$home-bg;
-    margin: 0;
-    padding-top: functions.rem(72px);
     color: variables.$app-bg;
     font-family: variables.$title-font-family;
+    margin: 0;
+    padding-top: functions.rem(72px);
 
     .home-content {
         padding-top: variables.$spacing-xxl;
@@ -16,40 +16,38 @@
         margin-bottom: variables.$spacing-medium;
 
         .home-paragraph {
-            color: variables.$app-bg;
-            text-align: center;
-            font-size: functions.rem(14px);
             color: variables.$workspace-icon-color;
+            font-size: functions.rem(14px);
+            text-align: center;
         }
 
         .headers-container {
             text-align: center;
 
             .main-title {
-                display: flex;
-                flex-direction: column;
-                font-weight: 600;
                 background: linear-gradient(360deg, variables.$text-faint 53.95%, variables.$home-violet-soft 121.37%);
                 -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                margin-bottom: variables.$spacing-large;
+                display: flex;
+                flex-direction: column;
                 font-size: functions.rem(30px);
-                margin-bottom: variables.$spacing-medium;
-                line-height: 40px;
+                font-weight: 600;
                 letter-spacing: 2px;
+                line-height: 40px;
+                margin-bottom: variables.$spacing-medium;
+                -webkit-text-fill-color: transparent;
 
                 @include mixins.for-normal-layout() {
                     & {
                         font-size: functions.rem(46px);
-                        margin-bottom: variables.$spacing-medium;
                         line-height: 65px;
+                        margin-bottom: variables.$spacing-medium;
                     }
                 }
             }
 
             .secondary-title {
-                font-weight: 300;
                 font-size: functions.rem(16px);
+                font-weight: 300;
                 letter-spacing: 1px;
                 padding: 0 variables.$spacing-large;
 
@@ -63,19 +61,19 @@
         }
 
         .get-started {
+            align-items: center;
             display: flex;
             flex-direction: column;
-            align-items: center;
             gap: 10px;
-            padding: 32px 0;
             max-width: 90%;
+            padding: 32px 0;
         }
     }
 
     .hero {
-        width: 100%;
         height: auto;
         margin: 0;
         padding: 0;
+        width: 100%;
     }
 }

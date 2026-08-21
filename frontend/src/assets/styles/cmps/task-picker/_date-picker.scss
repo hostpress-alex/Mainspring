@@ -19,14 +19,14 @@
     }
 
     .due-dot {
-        width: 13px;
-        height: 13px;
-        border: 1.5px solid currentColor;
-        border-radius: 50%;
+        background-clip: content-box;
         background-image: conic-gradient(currentColor var(--fill, 0%), transparent var(--fill, 0%));
         background-origin: content-box;
-        background-clip: content-box;
+        border: 1.5px solid currentColor;
+        border-radius: 50%;
         color: variables.$field-border;
+        height: 13px;
+        width: 13px;
     }
 
     &.is-soon .due-dot { color: variables.$workspace-icon-color; }

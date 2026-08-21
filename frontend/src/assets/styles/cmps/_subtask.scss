@@ -35,14 +35,14 @@
 
 /* The run of children of one task reads as one block. */
 .task-preview.is-subtask .sticky-div::after {
-    content: '';
-    position: absolute;
-    left: 44px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
     background: var(--group-color, variables.$layout-border-color);
+    bottom: 0;
+    content: '';
+    left: 44px;
     opacity: .45;
+    position: absolute;
+    top: 0;
+    width: 2px;
 }
 
 .task-preview.is-subtask .task-title blockquote {
@@ -52,48 +52,48 @@
 /* The row that creates one. Built from the same pieces as a task row so the
    input ends where the first column begins. */
 .subtask-add {
-    background: variables.$surface-faint;
     align-items: stretch;
+    background: variables.$surface-faint;
 
 
     .subtask-add-title {
-        display: flex;
         align-items: center;
+        display: flex;
         padding-left: 26px;
     }
 
 
     input[type="text"] {
-        width: 100%;
-        border: 0;
         background: none;
-        padding: 6px 0;
+        border: 0;
+        color: variables.$workspace-icon-color;
         font: inherit;
         font-size: 13px;
-        color: variables.$workspace-icon-color;
+        padding: 6px 0;
+        width: 100%;
     }
 
 
     input[type="text"]:focus-visible {
-        outline: 0;
         color: variables.$primary-text-color;
+        outline: 0;
     }
 }
 
 /* The toggle and the counter on the parent row. */
 .subtask-toggle {
-    display: flex;
     align-items: center;
-    gap: 4px;
-    flex: 0 0 auto;
+    background: none;
     border: 0;
     border-radius: 4px;
-    background: none;
-    padding: 2px 5px;
     color: variables.$workspace-icon-color;
+    cursor: pointer;
+    display: flex;
+    flex: 0 0 auto;
     font: inherit;
     font-size: 11px;
-    cursor: pointer;
+    gap: 4px;
+    padding: 2px 5px;
 
 
     &:hover {

@@ -11,27 +11,27 @@ $time-warn: variables.$colors-red-middle;
 /* --- the control, in the task's header -------------------------------- */
 
 .task-timer {
-    display: inline-flex;
     align-items: center;
-    gap: 2px;
+    display: inline-flex;
     flex: 0 0 auto;
+    gap: 2px;
     // Pushed to the right-hand end of the header, opposite the title.
     margin-left: auto;
     padding-left: 12px;
 
     .task-timer-btn {
-        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        width: 22px;
-        height: 22px;
-        padding: 0;
+        background: transparent;
         border: none;
         border-radius: 4px;
-        background: transparent;
         color: variables.$workspace-icon-color;
         cursor: pointer;
+        display: inline-flex;
         font-size: functions.rem(12px);
+        height: 22px;
+        justify-content: center;
+        padding: 0;
+        width: 22px;
 
         &:hover:not(:disabled) { background: variables.$surface-border; color: variables.$primary-text-color; }
         &:disabled { opacity: .5; cursor: default; }
@@ -40,19 +40,19 @@ $time-warn: variables.$colors-red-middle;
     }
 
     .task-timer-clock {
+        color: $time-running;
         font-size: functions.rem(12px);
         font-variant-numeric: tabular-nums;
-        color: $time-running;
         font-weight: 600;
         padding-right: 2px;
     }
 
     .task-timer-total {
+        color: variables.$workspace-icon-color;
         font-size: functions.rem(12px);
         font-variant-numeric: tabular-nums;
-        color: variables.$workspace-icon-color;
-        white-space: nowrap;
         padding-left: 4px;
+        white-space: nowrap;
     }
 }
 
@@ -67,13 +67,13 @@ $time-warn: variables.$colors-red-middle;
 }
 
 .task-running-dot {
-    display: inline-flex;
     align-items: center;
-    flex: 0 0 auto;
-    padding: 0 4px;
-    color: $time-running;
-    font-size: functions.rem(13px);
     animation: time-running-pulse 1.4s ease-in-out infinite;
+    color: $time-running;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: functions.rem(13px);
+    padding: 0 4px;
 
     // A blinking element is a genuine problem for some people. The sign stays,
     // the blinking goes.
@@ -85,34 +85,34 @@ $time-warn: variables.$colors-red-middle;
 /* --- the dialog ------------------------------------------------------- */
 
 .time-dialog-overlay {
-    position: fixed;
-    inset: 0;
+    align-items: center;
     background: rgba(0, 0, 0, .35);
     display: flex;
-    align-items: center;
+    inset: 0;
     justify-content: center;
+    position: fixed;
     z-index: 1000;
 }
 
 .time-dialog {
     background: variables.$app-bg;
     border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .2);
     padding: 20px 22px;
     width: min(420px, calc(100vw - 32px));
-    box-shadow: 0 12px 32px rgba(0, 0, 0, .2);
 
     .time-dialog-title {
-        margin: 0 0 10px;
         font-size: functions.rem(17px);
+        margin: 0 0 10px;
     }
 
     .time-dialog-elapsed {
-        display: flex;
         align-items: center;
+        color: variables.$workspace-icon-color;
+        display: flex;
+        font-variant-numeric: tabular-nums;
         gap: 6px;
         margin: 0 0 14px;
-        color: variables.$workspace-icon-color;
-        font-variant-numeric: tabular-nums;
 
         .time-dialog-task {
             color: variables.$primary-text-color;
@@ -121,29 +121,29 @@ $time-warn: variables.$colors-red-middle;
     }
 
     .time-dialog-label {
+        color: variables.$workspace-icon-color;
         display: block;
         font-size: functions.rem(13px);
-        color: variables.$workspace-icon-color;
         margin-bottom: 4px;
     }
 
     .time-dialog-note {
-        width: 100%;
-        padding: 8px 10px;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
-        font-size: functions.rem(14px);
         font-family: inherit;
+        font-size: functions.rem(14px);
+        padding: 8px 10px;
         resize: vertical;
+        width: 100%;
     }
 
     .time-dialog-check {
-        display: flex;
         align-items: center;
+        cursor: pointer;
+        display: flex;
+        font-size: functions.rem(13px);
         gap: 8px;
         margin-top: 10px;
-        font-size: functions.rem(13px);
-        cursor: pointer;
 
         // Nothing to post yet: shown, so the option is discoverable, but
         // plainly not available.
@@ -152,19 +152,19 @@ $time-warn: variables.$colors-red-middle;
 
     .time-dialog-actions {
         display: flex;
-        justify-content: flex-end;
         gap: 8px;
+        justify-content: flex-end;
         margin-top: 18px;
 
         button {
-            display: inline-flex;
             align-items: center;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            font-size: functions.rem(14px);
             gap: 6px;
             padding: 8px 14px;
-            border-radius: 6px;
-            font-size: functions.rem(14px);
-            cursor: pointer;
-            border: 1px solid transparent;
         }
 
         .time-dialog-cancel {
@@ -194,49 +194,49 @@ $time-warn: variables.$colors-red-middle;
     padding: 16px 20px 24px;
 
     .time-panel-head {
-        display: flex;
         align-items: baseline;
-        justify-content: space-between;
+        display: flex;
         gap: 12px;
+        justify-content: space-between;
         margin-bottom: 14px;
     }
 
     .time-panel-total-value {
         font-size: functions.rem(22px);
-        font-weight: 700;
         font-variant-numeric: tabular-nums;
+        font-weight: 700;
         margin-right: 6px;
     }
 
     .time-panel-total-label { color: variables.$workspace-icon-color; }
 
     .time-panel-add {
-        display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 7px 12px;
+        background: variables.$app-bg;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
-        background: variables.$app-bg;
         color: variables.$primary-text-color;
         cursor: pointer;
+        display: inline-flex;
         font-size: functions.rem(13px);
+        gap: 6px;
+        padding: 7px 12px;
 
         &:hover { background: variables.$row-hover; }
     }
 
     .time-panel-people {
+        border-bottom: 1px solid variables.$surface-border;
         display: flex;
         flex-wrap: wrap;
         gap: 14px;
         padding: 10px 0 14px;
-        border-bottom: 1px solid variables.$surface-border;
 
         li {
-            display: flex;
             align-items: center;
-            gap: 6px;
+            display: flex;
             font-size: functions.rem(13px);
+            gap: 6px;
         }
 
         .time-panel-avatar { width: 22px; height: 22px; border-radius: 50%; }
@@ -255,11 +255,11 @@ $time-warn: variables.$colors-red-middle;
 }
 
 .time-entry {
-    display: flex;
     align-items: flex-start;
+    border-bottom: 1px solid variables.$hairline;
+    display: flex;
     gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px solid variables.$hairline;
 
     &:hover .time-entry-actions { opacity: 1; }
 
@@ -274,30 +274,30 @@ $time-warn: variables.$colors-red-middle;
     .time-entry-body { flex: 1 1 auto; min-width: 0; }
 
     .time-entry-line {
-        display: flex;
         align-items: center;
-        gap: 10px;
+        display: flex;
         flex-wrap: wrap;
+        gap: 10px;
     }
 
     .time-entry-span { color: variables.$workspace-icon-color; font-size: functions.rem(13px); font-variant-numeric: tabular-nums; }
     .time-entry-duration { font-weight: 600; font-variant-numeric: tabular-nums; }
 
     .time-entry-tag {
+        background: variables.$surface-border;
+        border-radius: 10px;
+        color: variables.$workspace-icon-color;
         font-size: functions.rem(11px);
         padding: 1px 7px;
-        border-radius: 10px;
-        background: variables.$surface-border;
-        color: variables.$workspace-icon-color;
 
         &.is-warn { background: variables.$danger-tint-soft; color: variables.$danger-text; }
     }
 
     .time-entry-note {
-        margin: 4px 0 0;
         font-size: functions.rem(13px);
-        white-space: pre-wrap;
+        margin: 4px 0 0;
         overflow-wrap: anywhere;
+        white-space: pre-wrap;
     }
 
     .time-entry-actions {
@@ -307,12 +307,12 @@ $time-warn: variables.$colors-red-middle;
         transition: opacity .12s;
 
         button {
-            border: none;
             background: transparent;
+            border: none;
+            border-radius: 4px;
             color: variables.$workspace-icon-color;
             cursor: pointer;
             padding: 4px 6px;
-            border-radius: 4px;
 
             &:hover { background: variables.$surface-border; color: variables.$primary-text-color; }
         }
@@ -320,37 +320,37 @@ $time-warn: variables.$colors-red-middle;
 }
 
 .time-entry-form {
-    width: 100%;
-    padding: 12px;
+    background: variables.$surface-faint-warm;
     border: 1px solid variables.$task-box-shadow-color;
     border-radius: 8px;
-    background: variables.$surface-faint-warm;
+    padding: 12px;
+    width: 100%;
 
     .time-entry-form-row {
         display: flex;
-        gap: 12px;
         flex-wrap: wrap;
+        gap: 12px;
 
         label { display: flex; flex-direction: column; gap: 3px; font-size: functions.rem(12px); color: variables.$workspace-icon-color; }
         input { padding: 6px 8px; border: 1px solid variables.$task-box-shadow-color; border-radius: 6px; font-size: functions.rem(13px); }
     }
 
     .time-entry-form-note {
-        width: 100%;
-        margin-top: 10px;
-        padding: 7px 10px;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
         font-size: functions.rem(13px);
+        margin-top: 10px;
+        padding: 7px 10px;
+        width: 100%;
     }
 
     .time-entry-form-check {
-        display: flex;
         align-items: center;
+        cursor: pointer;
+        display: flex;
+        font-size: functions.rem(13px);
         gap: 8px;
         margin-top: 10px;
-        font-size: functions.rem(13px);
-        cursor: pointer;
 
         &.is-off { opacity: .45; cursor: default; }
     }
@@ -359,18 +359,18 @@ $time-warn: variables.$colors-red-middle;
 
     .time-entry-form-actions {
         display: flex;
-        justify-content: flex-end;
         gap: 8px;
+        justify-content: flex-end;
         margin-top: 12px;
 
         button {
-            padding: 6px 14px;
-            border-radius: 6px;
-            border: 1px solid variables.$task-box-shadow-color;
             background: variables.$app-bg;
+            border: 1px solid variables.$task-box-shadow-color;
+            border-radius: 6px;
             color: variables.$primary-text-color;
             cursor: pointer;
             font-size: functions.rem(13px);
+            padding: 6px 14px;
 
             &.is-primary { background: $time-accent; border-color: $time-accent; color: variables.$app-bg; }
             &:disabled { opacity: .6; cursor: default; }
@@ -381,28 +381,28 @@ $time-warn: variables.$colors-red-middle;
 /* --- the indicator in the sidebar -------------------------------------- */
 
 .running-timer {
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 2px;
     margin-bottom: 12px;
 
     // The rail is sized by its widest child, so anything in here that is wider
     // than the icons makes the whole sidebar jump — every time a timer starts
-    // and again when it stops. It gets the rail's width and nothing more.
-    width: variables.$sidebar-main-width;
     box-sizing: border-box;
     overflow: hidden;
+    // and again when it stops. It gets the rail's width and nothing more.
+    width: variables.$sidebar-main-width;
 
     .running-timer-open {
-        display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 2px;
-        border: none;
         background: transparent;
+        border: none;
         color: $time-running;
         cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
         padding: 2px;
     }
 
@@ -418,13 +418,13 @@ $time-warn: variables.$colors-red-middle;
         gap: 2px;
 
         button {
-            border: none;
             background: transparent;
+            border: none;
+            border-radius: 4px;
             color: variables.$task-box-shadow-color;
             cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 4px;
             font-size: functions.rem(11px);
+            padding: 2px 4px;
 
             &:hover { color: variables.$app-bg; background: rgba(255, 255, 255, .12); }
         }

@@ -16,11 +16,11 @@
 
     .menu-icon-container {
         @include mixins.center-flex();
+        border-radius: 4px;
+        height: 24px;
+        opacity: 0;
         position: relative;
         width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        opacity: 0;
 
         .icon {
             font-size: 1.1rem;
@@ -39,11 +39,11 @@
     font-size: functions.rem(14px);
 
     > * {
-        display: flex;
         align-items: center;
+        cursor: pointer;
+        display: flex;
         gap: 8px;
         padding: variables.$spacing-xs variables.$spacing-small;
-        cursor: pointer;
 
         &:hover {
             background-color: variables.$workspace-hover;

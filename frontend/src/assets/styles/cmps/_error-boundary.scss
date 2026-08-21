@@ -5,29 +5,29 @@
  * Was inline in error-boundary.jsx.
  */
 .error-boundary {
-    padding: 12px 14px;
-    margin: 8px 0;
-    border-radius: 6px;
     background: variables.$danger-surface-soft;
     border: 1px solid variables.$danger-border;
+    border-radius: 6px;
     color: variables.$danger-text;
     font-size: 13px;
     line-height: 1.5;
+    margin: 8px 0;
+    padding: 12px 14px;
 
     .error-boundary-hint {
-        margin-top: 4px;
         color: variables.$workspace-icon-color;
+        margin-top: 4px;
     }
 
     .error-boundary-retry {
-        margin-top: 8px;
-        padding: 4px 10px;
+        background: variables.$app-bg;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 4px;
-        background: variables.$app-bg;
         cursor: pointer;
         font: inherit;
         font-size: 13px;
+        margin-top: 8px;
+        padding: 4px 10px;
     }
 }
 
@@ -36,8 +36,8 @@
  * than in a file of their own because each of them is one rule.
  */
 .img-uploader-preview {
-    max-width: 100px;
     float: right;
+    max-width: 100px;
 
     &.is-large {
         max-width: 200px;
@@ -45,11 +45,11 @@
 }
 
 .cal-avatar {
-    width: 30px;
-    height: 30px;
     border-radius: 50%;
-    object-fit: cover;
     display: block;
+    height: 30px;
+    object-fit: cover;
+    width: 30px;
 }
 
 .cal-error {
@@ -68,25 +68,25 @@
 }
 
 .app-shell-corner {
-    position: fixed;
-    left: 70px;
     bottom: 16px;
+    left: 70px;
+    position: fixed;
     z-index: variables.$z-popover + 20;   /* over the anchored menus, under the dynamic host */
 }
 
 .invite-hint {
-    padding: 8px 4px;
     color: variables.$workspace-icon-color;
     font-size: 13px;
+    padding: 8px 4px;
 }
 
 .column-title-input {
-    width: 90%;
     border: 1px solid variables.$board-btn;
     border-radius: 4px;
-    padding: 2px 6px;
     font: inherit;
+    padding: 2px 6px;
     text-align: center;
+    width: 90%;
 }
 
 .group-color-dot {
@@ -113,12 +113,12 @@
 }
 
 .cal-hint-dot {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    border-radius: 2px;
-    margin-right: 6px;
     background: var(--entry-color);
+    border-radius: 2px;
+    display: inline-block;
+    height: 9px;
+    margin-right: 6px;
+    width: 9px;
 }
 
 .group-list-inner {
@@ -128,11 +128,11 @@
 /* The "this label means done" switch in the label editor. Off it is a quiet
    outline, on it is the same green the finished states use. */
 .label-editor-done {
-    border: 0;
     background: none;
-    padding: 2px 4px;
+    border: 0;
     color: variables.$color-explosive;
     cursor: pointer;
+    padding: 2px 4px;
 
 
     &:hover {
@@ -148,23 +148,23 @@
 /* The message itself. Monospaced and scrollable, because a stack trace that
    wraps is a stack trace nobody reads. */
 .error-boundary-detail {
-    margin-top: 10px;
     font-size: 13px;
+    margin-top: 10px;
 
     summary {
-        cursor: pointer;
         color: variables.$danger-text;
+        cursor: pointer;
         word-break: break-word;
     }
 
     pre {
-        max-height: 240px;
-        margin: 8px 0 0;
-        padding: 8px;
-        overflow: auto;
-        border-radius: 6px;
         background: rgba(0, 0, 0, .05);
+        border-radius: 6px;
         font-size: 12px;
+        margin: 8px 0 0;
+        max-height: 240px;
+        overflow: auto;
+        padding: 8px;
         white-space: pre-wrap;
         word-break: break-word;
     }

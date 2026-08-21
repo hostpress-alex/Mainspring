@@ -6,13 +6,13 @@
    visible through it, otherwise the grid loses its ruler exactly where
    somebody is trying to see whether a meeting fits. */
 .cal-offhours {
-    position: absolute;
+    background: rgba(103, 104, 121, .07);
+    height: var(--height);
     left: 0;
+    pointer-events: none;
+    position: absolute;
     right: 0;
     top: var(--top);
-    height: var(--height);
-    background: rgba(103, 104, 121, .07);
-    pointer-events: none;
     z-index: 0;
 }
 
@@ -29,8 +29,8 @@
 
 
     &:hover {
-        filter: none;
         box-shadow: none;
+        filter: none;
     }
 }
 
@@ -42,26 +42,26 @@
 }
 
 .cal-allday {
+    background: variables.$app-bg;
+    border-bottom: 1px solid variables.$colors-bluish-white;
     display: grid;
     grid-template-columns: 58px repeat(var(--cal-cols), 1fr);
-    border-bottom: 1px solid variables.$colors-bluish-white;
-    background: variables.$app-bg;
 }
 
 .cal-allday-gutter {
-    font-size: 11px;
     color: variables.$workspace-icon-color;
+    font-size: 11px;
     padding: 4px 6px;
     text-align: right;
 }
 
 .cal-allday-col {
     border-left: 1px solid variables.$colors-bluish-white;
-    padding: 3px 4px;
     display: flex;
     flex-direction: column;
     gap: 3px;
     min-height: 24px;
+    padding: 3px 4px;
 }
 
 .cal-allday-chip {

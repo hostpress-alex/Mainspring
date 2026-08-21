@@ -3,15 +3,15 @@
 @use "../setup/variables";
 
 .activity-preview {
-    display: flex;
-    padding: variables.$spacing-small 0 variables.$spacing-small 0;
     border-bottom: 1px solid variables.$task-box-shadow-color;
-    margin: 0 25px 0 25px;
-    gap: .75rem;
-    font-size: 1rem;
-    line-height: 1.3rem;
-    height: 5rem;
     color: variables.$primary-text-color;
+    display: flex;
+    font-size: 1rem;
+    gap: .75rem;
+    height: 5rem;
+    line-height: 1.3rem;
+    margin: 0 25px 0 25px;
+    padding: variables.$spacing-small 0 variables.$spacing-small 0;
 
     @include mixins.for-mobile-layout() {
         & {
@@ -30,16 +30,16 @@
 
         @include mixins.for-mobile-layout() {
             & {
-                width: 100px;
                 gap: unset;
+                width: 100px;
             }
         }
 
         .time {
             flex-grow: 1;
             font-size: 1rem;
-            line-height: 1.3rem;
             gap: 6px;
+            line-height: 1.3rem;
 
             i {
                 font-size: 1rem;
@@ -54,14 +54,14 @@
         }
 
         .title {
-            height: 100%;
             gap: variables.$spacing-xs;
+            height: 100%;
 
             @include mixins.for-mobile-layout() {
                 & {
-                    width: 50px;
                     gap: unset;
                     overflow: hidden;
+                    width: 50px;
                 }
             }
 
@@ -94,9 +94,9 @@
         }
 
         img {
+            height: 13px;
             margin-left: auto;
             width: 13px;
-            height: 13px;
 
         }
 
@@ -139,24 +139,24 @@
         }
 
         .icon {
-            font-size: 1.25rem;
             color: variables.$color-explosive;
+            font-size: 1.25rem;
             margin: 0 variables.$spacing-xs;
         }
 
         &.label-container {
             span {
                 &.label {
-                    width: 100%;
-                    padding: 0 variables.$spacing-small;
-                    color: white;
                     border-radius: 4px;
+                    color: white;
+                    padding: 0 variables.$spacing-small;
+                    width: 100%;
 
                     @include mixins.for-mobile-layout() {
                         &.label {
-                            width: 40px;
-                            height: 30px;
                             font-size: functions.rem(10px);
+                            height: 30px;
+                            width: 40px;
                         }
                     }
                 }
@@ -199,11 +199,11 @@
     }
 
     .activity-task {
-        margin-top: 1px;
+        color: variables.$primary-text-color;
         font-size: functions.rem(13px);
         font-weight: 500;
         line-height: 1.2;
-        color: variables.$primary-text-color;
+        margin-top: 1px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -220,11 +220,11 @@
     min-width: 0;
 
     .excerpt {
+        color: variables.$workspace-icon-color;
         display: block;
+        font-style: italic;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: variables.$workspace-icon-color;
-        font-style: italic;
     }
 }

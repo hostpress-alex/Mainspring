@@ -22,11 +22,11 @@ $comment-thread-bg: variables.$row-hover;
     gap: 14px;
 
     > li {
+        background: variables.$app-bg;
         border: 1px solid $comment-border;
         border-radius: 8px;
-        background: variables.$app-bg;
-        padding: 0;
         margin: 0;
+        padding: 0;
         // NOT overflow: hidden. It rounded the reply band's corners neatly and
         // cut the "…" menu off at the card edge — a dropdown has to be allowed
         // to leave the box it belongs to. The band rounds its own corners
@@ -47,57 +47,57 @@ $comment-thread-bg: variables.$row-hover;
 }
 
 .comment-head {
-    display: flex;
     align-items: center;
+    display: flex;
     gap: 10px;
     padding: 14px 16px 0;
 
     .comment-avatar {
-        width: 32px;
+        border-radius: 50%;
         height: 32px;
         min-width: 32px;
-        border-radius: 50%;
         object-fit: cover;
+        width: 32px;
     }
 
     .comment-author {
-        font-weight: 600;
-        font-size: functions.rem(15px);
         color: variables.$primary-text-color;
-        white-space: nowrap;
+        font-size: functions.rem(15px);
+        font-weight: 600;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     // Written out — "vor 3 Tagen", not "3d". Quiet, because it is the second
     // question, never the first.
     .comment-when {
-        font-size: functions.rem(13px);
         color: $comment-quiet;
+        font-size: functions.rem(13px);
         white-space: nowrap;
     }
 
     .pinned-badge {
-        display: inline-flex;
         align-items: center;
+        background-color: variables.$workspace-board-active;
+        border-radius: 10px;
+        color: variables.$workspace-icon-color;
+        display: inline-flex;
+        font-size: functions.rem(12px);
         gap: 4px;
         padding: 2px 8px;
-        border-radius: 10px;
-        background-color: variables.$workspace-board-active;
-        color: variables.$workspace-icon-color;
-        font-size: functions.rem(12px);
         white-space: nowrap;
     }
 
     .comment-tools {
         @include mixins.center-flex();
-        position: relative;
-        margin-left: auto;
-        width: 26px;
-        height: 26px;
         border-radius: 4px;
         color: $comment-quiet;
         flex: 0 0 auto;
+        height: 26px;
+        margin-left: auto;
+        position: relative;
+        width: 26px;
 
         &:hover { background-color: variables.$workspace-hover; }
         &.active { background-color: variables.$workspace-board-active; }
@@ -116,10 +116,10 @@ $comment-thread-bg: variables.$row-hover;
     overflow-wrap: anywhere;
 
     p {
-        margin: 0 0 8px;
-        padding: 0;
-        max-width: none;
         line-height: 1.55;
+        margin: 0 0 8px;
+        max-width: none;
+        padding: 0;
 
         &:last-child { margin-bottom: 0; }
     }
@@ -134,10 +134,10 @@ $comment-thread-bg: variables.$row-hover;
 /* --- what you can do with a comment ----------------------------------- */
 
 .comment-actions {
-    display: flex;
     align-items: center;
-    gap: 8px;
+    display: flex;
     flex-wrap: wrap;
+    gap: 8px;
     padding: 0 16px 10px 58px;
 }
 
@@ -153,14 +153,14 @@ $comment-thread-bg: variables.$row-hover;
  * is something you press.
  */
 .comment-time {
-    display: inline-flex;
     align-items: center;
+    color: variables.$workspace-icon-color;
+    display: inline-flex;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
     gap: 5px;
     margin-left: auto;
     padding-left: 8px;
-    color: variables.$workspace-icon-color;
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
     white-space: nowrap;
 
     i {
@@ -176,10 +176,10 @@ $comment-thread-bg: variables.$row-hover;
 }
 
 .comment-reactions {
-    display: flex;
     align-items: center;
-    gap: 6px;
+    display: flex;
     flex-wrap: wrap;
+    gap: 6px;
 }
 
 /*
@@ -188,26 +188,26 @@ $comment-thread-bg: variables.$row-hover;
  * Yours is outlined, so "have I already?" is answered without counting.
  */
 .reaction-chip {
-    display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 2px 9px;
+    background: variables.$app-bg;
     border: 1px solid $comment-border;
     border-radius: 12px;
-    background: variables.$app-bg;
+    color: $comment-quiet;
     cursor: pointer;
+    display: inline-flex;
     font: inherit;
     font-size: functions.rem(13px);
+    gap: 5px;
     line-height: 1.6;
+    padding: 2px 9px;
     width: auto;
-    color: $comment-quiet;
 
     &:hover:not(:disabled) { background: variables.$row-hover; }
     &:disabled { cursor: default; }
 
     &.is-mine {
-        border-color: variables.$board-btn;
         background: variables.$accent-surface-soft;
+        border-color: variables.$board-btn;
         color: variables.$board-btn;
         font-weight: 600;
     }
@@ -216,51 +216,51 @@ $comment-thread-bg: variables.$row-hover;
 }
 
 .reaction-picker-anchor {
-    position: relative;
     display: inline-flex;
+    position: relative;
 }
 
 .reaction-add {
-    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 24px;
-    padding: 0;
+    background: transparent;
     border: 1px solid transparent;
     border-radius: 12px;
-    background: transparent;
     color: $comment-quiet;
     cursor: pointer;
+    display: inline-flex;
     font-size: functions.rem(14px);
+    height: 24px;
+    justify-content: center;
+    padding: 0;
+    width: 26px;
 
     &:hover { background: variables.$hairline; border-color: $comment-border; }
 }
 
 .reaction-picker {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 0;
-    z-index: 20;
-    display: flex;
-    gap: 2px;
-    padding: 6px;
+    background: variables.$app-bg;
     border: 1px solid $comment-border;
     border-radius: 22px;
-    background: variables.$app-bg;
+    bottom: calc(100% + 6px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, .14);
+    display: flex;
+    gap: 2px;
+    left: 0;
+    padding: 6px;
+    position: absolute;
+    z-index: 20;
 
     .reaction-option {
-        width: 32px;
-        height: 32px;
-        padding: 0;
+        background: transparent;
         border: none;
         border-radius: 50%;
-        background: transparent;
         cursor: pointer;
         font-size: functions.rem(18px);
+        height: 32px;
         line-height: 1;
+        padding: 0;
         transition: transform .1s, background-color .1s;
+        width: 32px;
 
         &:hover { background: variables.$hairline; transform: scale(1.15); }
         &.is-mine { background: variables.$accent-surface-soft; }
@@ -286,17 +286,17 @@ $comment-thread-bg: variables.$row-hover;
     padding: 2px 0;
 
     .reaction-who-line {
-        display: flex;
         align-items: center;
-        gap: 8px;
+        display: flex;
         font-size: functions.rem(13px);
+        gap: 8px;
         white-space: nowrap;
 
         img {
-            width: 22px;
-            height: 22px;
             border-radius: 50%;
+            height: 22px;
             object-fit: cover;
+            width: 22px;
         }
     }
 }

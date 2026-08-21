@@ -7,13 +7,13 @@
 .text-picker input,
 .link-picker input,
 .dropdown-picker input {
-    width: 100%;
-    border: none;
     background: transparent;
-    text-align: center;
-    font: inherit;
+    border: none;
     color: inherit;
+    font: inherit;
     outline: none;
+    text-align: center;
+    width: 100%;
 }
 
 .longtext-picker {
@@ -21,11 +21,11 @@
 
     .longtext-value {
         display: block;
+        opacity: 1;
         overflow: hidden;
+        padding: 0 8px;
         text-overflow: ellipsis;
         white-space: nowrap;
-        padding: 0 8px;
-        opacity: 1;
 
         &.is-empty {
             opacity: .45;
@@ -34,31 +34,31 @@
 
     // The editor floats over the row below, hence the shadow and the z-index.
     .longtext-box {
-        position: absolute;
-        z-index: variables.$z-popover;
-        top: 100%;
-        left: 0;
-        width: 280px;
         background: variables.$app-bg;
         border: 1px solid variables.$task-box-shadow-color;
         border-radius: 6px;
-        padding: 8px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+        left: 0;
+        padding: 8px;
+        position: absolute;
+        top: 100%;
+        width: 280px;
+        z-index: variables.$z-popover;
 
         textarea {
-            width: 100%;
             border: 1px solid variables.$colors-bluish-white;
             border-radius: 4px;
-            padding: 6px;
             font: inherit;
+            padding: 6px;
             resize: vertical;
+            width: 100%;
         }
     }
 }
 
 .checkbox-picker {
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: center;
 
     .checkbox-on {
@@ -78,17 +78,17 @@
     flex-direction: row;
 
     &.is-view {
-        display: flex;
         align-items: center;
-        justify-content: center;
+        display: flex;
         gap: 5px;
+        justify-content: center;
 
         a {
             color: variables.$board-btn;
+            max-width: 80%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 80%;
         }
 
         .link-icon {

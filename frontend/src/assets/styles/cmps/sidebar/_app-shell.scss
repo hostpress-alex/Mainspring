@@ -1,8 +1,8 @@
 /* Shared shell: main bar + board column on the left, content on the right.
    That way the navigation stays put on every page. */
 .app-shell {
-    display: flex;
     align-items: stretch;
+    display: flex;
     min-height: 100vh;
 }
 
@@ -12,8 +12,8 @@
 
 .app-shell-content {
     flex: 1 1 auto;
-    min-width: 0;
     height: 100vh;
+    min-width: 0;
     overflow: auto;
 }
 
@@ -41,12 +41,12 @@
    Inside a section that gap is too big — undone here with the same
    specificity and a later position. */
 .workspace-sidebar .workspace-section > .board-list-container {
-    margin-top: 2px;
     gap: 2px;
+    margin-top: 2px;
 
 
     > .board-list {
-        padding-top: 0;
         padding-bottom: 0;
+        padding-top: 0;
     }
 }
