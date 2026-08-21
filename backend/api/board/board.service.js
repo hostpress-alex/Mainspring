@@ -18,6 +18,8 @@ const priorities = () => require('../priority/priority.service')
 const planning = () => require('../planner/planner.triggers')
 const automationEngine = require('../automation/automation.engine')
 const viewRepo = require('./board-view.repo')
+const taskFileRefs = require('./task-files')
+const fileService = require('../../services/file.service')
 const sockets = () => require('../../services/socket.service')
 
 /**
@@ -46,7 +48,7 @@ async function _pushed(boardId){
 }
 const userRepo = require('../user/user.repo')
 
-/** Wirft einen Fehler, den der Controller auf einen HTTP-Status abbilden kann. */
+/** Raises an error the controller can map onto an HTTP status. */
 function httpError(status, msg){
     const err = new Error(msg)
     err.status = status
@@ -153,16 +155,16 @@ const enrichMembers = enrichPeople
 const COL_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789'
 
 /* ----------------------------------------------------------------------
- * Label-Listen pro Spalte
+ * Label lists per column
  *
- * Frueher teilten sich Status und Prioritaet EINE Liste am Board. Im
- * Prioritaets-Menue stand deshalb auch "Done". Jetzt haengt die Auswahl an
- * der Spalte: column.labels.
+ * Status and priority used to share ONE list on the board, which is why the
+ * priority menu offered "Done" as well. The choice now hangs off the
+ * column: column.labels.
  *
- * Fuer Boards von frueher wird die Liste einmal hergeleitet — aus den
- * Werten, die in dieser Spalte tatsaechlich vorkommen. Sobald eine Spalte
- * ihre eigene Liste hat, wird hier nichts mehr angefasst; ab dann bestimmt
- * der Benutzer, was drinsteht (auch das Loeschen eines Labels).
+ * For older boards the list is derived once — from the values that
+ * actually occur in that column. As soon as a column has a list of its own
+ * nothing here touches it again; from then on the user decides what is in
+ * it, including deleting a label.
  * -------------------------------------------------------------------- */
 
 const EMPTY_LABEL_COLOR = '#c4c4c4'
@@ -180,7 +182,7 @@ const DEFAULT_LABELS = {
     ]
 }
 
-/** Reservefarben fuer Werte, zu denen es kein Label mehr gibt. */
+/** Fallback colours for values that no longer have a label. */
 const SPARE_COLORS = ['#0086c0', '#579bfc', '#a25ddc', '#00c875', '#fdab3d', '#e2445c', '#ff642e']
 
 function makeLabelId(){
@@ -311,7 +313,7 @@ function ensureColumnLabels(board){
 
         let source
         if(used.length){
-            // Was wirklich benutzt wird, gewinnt — mit der bisherigen Farbe.
+            // What is actually in use wins — keeping the colour it had.
             source = used.map((title, i) => byTitle.get(title)
                 || {title, color: SPARE_COLORS[i % SPARE_COLORS.length]})
         } else {
@@ -326,7 +328,7 @@ function ensureColumnLabels(board){
             title: l.title,
             color: l.color || SPARE_COLORS[0]
         }))
-        // Ohne leeres Label liesse sich ein gesetzter Wert nie zuruecknehmen.
+        // Without an empty label a value once set could never be taken back.
         const empty = boardLabels.find(l => l && !l.title)
         column.labels.push({
             id: (empty && empty.id) || makeLabelId(),
@@ -350,7 +352,7 @@ async function query(filterBy = {}){
     }
 }
 
-/** Rohzugriff ohne Rechtepruefung — nur intern verwenden. */
+/** Raw access without a permission check — internal use only. */
 async function _getByIdRaw(boardId){
     return await boardRepo.findById(boardId)
 }
@@ -395,8 +397,8 @@ async function add(board){
         const uid = sid(user._id)
         board.ownerIds = [uid]
 
-        // Der Ersteller muss auch Mitglied sein, sonst taucht er nicht in der
-        // Mitgliederliste des Boards auf.
+        // The creator has to be a member as well, otherwise they do not show
+        // up in the board's member list.
         if(!Array.isArray(board.members)) board.members = []
         if(!memberIdsOf(board).includes(uid)){
             board.members.push({_id: uid, fullname: user.fullname, imgUrl: user.imgUrl || ''})
@@ -422,7 +424,6 @@ async function add(board){
  * bottom of board.routes.js for the HTTP routes that went with them.
  * ==================================================================== */
 
-/** Board laden und Rechte pruefen. `owner: true` verlangt Owner oder Admin. */
 /**
  * Load a board and check what this person may do with it.
  *
@@ -573,14 +574,13 @@ async function updateMeta(boardId, patch){
 }
 
 /**
- * Spaltenliste des Boards.
+ * The board's column list.
  *
  * Owner only. This used to be open to every member with a note saying a 403
  * here would break it for most people — which was true while every board had
  * exactly one member who was also its owner. A column is part of the frame:
  * removing one takes its values out of every task on the board, for everybody.
- * Das Sortieren der
- * Spalten ist in der Oberflaeche weiterhin auf Owner beschraenkt.
+ * Sorting the columns stays restricted to owners in the interface as well.
  */
 async function setColumns(boardId, columns){
     await _requireBoard(boardId, {owner: true})
@@ -1056,6 +1056,66 @@ async function boardsInState(state){
     return await boardRepo.findBoardsByState(getLoggedinUser(), state)
 }
 
+/* --------------------------------------------------- Dateien am Task -- */
+
+/**
+ * Every upload recorded against a task, and where each one is still used.
+ *
+ * The sources are worked out HERE and handed over ready, rather than left to
+ * the browser. Two reasons, and only the second one is about tidiness:
+ *
+ *   - the same answer decides whether a delete is allowed, and that decision
+ *     may not depend on a client agreeing with the server;
+ *   - a second implementation in the frontend would be a copy that drifts,
+ *     and this project has paid for copies more than once.
+ *
+ * A file with an empty `sources` is one nothing points at any more — dropped
+ * from a draft before it was posted, or left behind when an update was
+ * deleted. Nothing has ever removed those rows: `fileService.remove` had no
+ * caller at all until this route.
+ *
+ * Any member may look. Reading an attachment is reading.
+ */
+async function taskFiles(boardId, taskId){
+    await _requireBoard(boardId)
+    const refs = await boardRepo.findTaskFileRefs(boardId, taskId)
+    if(!refs) throw httpError(404, 'Task nicht gefunden')
+
+    const sources = taskFileRefs.sourcesOf(refs)
+    const files = await boardRepo.findFilesByTask(boardId, taskId)
+    return files.map(file => ({...file, sources: sources.get(file.id) || []}))
+}
+
+/**
+ * Remove an upload that nothing points at any more.
+ *
+ * Deliberately only those. A file still shown under an update — or worse,
+ * sitting inside its text as an image — would leave a broken picture in a
+ * message somebody wrote, and the damage stays invisible until that update is
+ * opened again. So the reference check is the gate, and it is checked against
+ * the database at this moment rather than against what the client believed
+ * when it drew the button.
+ *
+ * The file has to belong to this task. Without that check the route is a way
+ * to delete any file in the installation by naming a task you may write to.
+ */
+async function removeTaskFile(boardId, taskId, fileId){
+    await _requireBoard(boardId, {editor: true})
+
+    const files = await boardRepo.findFilesByTask(boardId, taskId)
+    const file = files.find(f => f.id === String(fileId))
+    if(!file) throw httpError(404, 'Datei nicht gefunden')
+
+    const refs = await boardRepo.findTaskFileRefs(boardId, taskId)
+    if(refs && taskFileRefs.isReferenced(refs, file.id)){
+        throw httpError(409, 'Diese Datei wird im Task noch verwendet')
+    }
+
+    await fileService.remove(file.id)
+    logger.info(`file ${file.id} removed from task ${taskId}`)
+    return {ok: true, id: file.id}
+}
+
 /* ------------------------------------------------------- for good now -- */
 
 async function purgeBoard(boardId){
@@ -1206,6 +1266,7 @@ module.exports = {
     addActivity,
 
     views, addView, updateView, removeView,
+    taskFiles, removeTaskFile,
     setBoardState, setGroupState, setTaskState,
     bin, boardsInState,
     purgeBoard, purgeGroup, purgeTask,

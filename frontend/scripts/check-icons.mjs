@@ -103,3 +103,21 @@ export function reportIcons (label) {
         console.log(`        fa-${key.replace('/', ' fa-')}  (${why})  ${files[0]}${files.length > 1 ? ` +${files.length - 1}` : ''}`)
     }
 }
+
+/**
+ * Run directly (`npm run check:icons`), not only at dev-server start.
+ *
+ * Without this the file exports two functions and does nothing when it is
+ * executed, so `node scripts/check-icons.mjs` printed nothing and exited 0 —
+ * which reads as "all clear" and is the one answer a check must never give by
+ * accident. It cost exactly that: a Pro-only icon went in while the check sat
+ * there looking green.
+ *
+ * Exits 1 when something needs Pro, so it can stand next to check:exports and
+ * check:tdz in one command.
+ */
+if(process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop())){
+    reportIcons('check')
+    const {proOnly = []} = checkIcons()
+    if(proOnly.length) process.exit(1)
+}

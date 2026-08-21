@@ -1,6 +1,6 @@
 /**
- * Nur fuer das Kommandozeilenwerkzeug von Knex (Migrationen).
- * Die Anwendung selbst verbindet ueber db/knex.js.
+ * Only for Knex's command line tool (migrations).
+ * The application itself connects through db/knex.js.
  *
  *   npx knex migrate:latest
  *   npx knex migrate:rollback

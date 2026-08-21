@@ -1,0 +1,158 @@
+@use "../setup/functions";
+@use "../setup/mixins";
+@use "../setup/variables";
+
+/**
+ * The files of a task.
+ *
+ * A row per file rather than a grid of thumbnails: what is being asked here is
+ * "what is attached and where does it come from", and a name plus its origin
+ * answers that. A thumbnail answers "which picture", which the update itself
+ * already shows.
+ */
+.task-files {
+    /* The same inset as .time-panel, so the two tabs do not shift the page
+       sideways when you switch between them. */
+    padding: 16px 20px 24px;
+    max-height: 85vh;
+    overflow: auto;
+}
+
+.task-files.is-loading,
+.task-files-empty {
+    padding: variables.$spacing-medium;
+    color: #676879;
+    font-size: functions.rem(14px);
+}
+
+.task-files-error {
+    margin-bottom: variables.$spacing-small;
+    padding: 8px 12px;
+    border: 1px solid #e2445c;
+    border-radius: 6px;
+    background: #fff0f2;
+    color: #a3283a;
+    font-size: functions.rem(14px);
+}
+
+/* The heading over the leftovers. It carries its own explanation: a list of
+   files nobody can find in the task looks like a fault otherwise. */
+.task-files-head {
+    margin-top: variables.$spacing-large;
+    padding-top: variables.$spacing-medium;
+    border-top: 1px solid variables.$border-color;
+
+    h4 {
+        margin: 0;
+        font-size: functions.rem(14px);
+    }
+
+    p {
+        margin: 2px 0 0;
+        color: #676879;
+        font-size: functions.rem(13px);
+    }
+}
+
+.task-files-list {
+    margin: variables.$spacing-small 0 0;
+    padding: 0;
+    list-style: none;
+
+    &.is-unused .task-file {
+        color: #676879;
+    }
+}
+
+.task-file {
+    display: flex;
+    align-items: center;
+    gap: variables.$spacing-small;
+    padding: 8px variables.$spacing-small;
+    border-radius: 6px;
+
+    &:hover {
+        background-color: variables.$workspace-hover;
+    }
+
+    .task-file-icon {
+        font-size: functions.rem(20px);
+        color: variables.$workspace-icon-color;
+    }
+
+    /* The same colours the file column uses — red PDF, blue Word, green
+       spreadsheet. Kept in step with cmps/task-picker/_file-picker.scss on
+       purpose: one file must not be two colours in two places. */
+    &.is-pdf .task-file-icon        { color: variables.$danger-strong; }
+    &.is-word .task-file-icon       { color: variables.$file-word; }
+    &.is-excel .task-file-icon      { color: variables.$file-excel; }
+    &.is-powerpoint .task-file-icon { color: variables.$file-powerpoint; }
+    &.is-archive .task-file-icon    { color: variables.$warning-strong; }
+    &.is-code .task-file-icon       { color: variables.$board-btn; }
+    &.is-audio .task-file-icon      { color: variables.$file-media; }
+    &.is-video .task-file-icon      { color: variables.$file-archive; }
+    &.is-image .task-file-icon      { color: variables.$file-media; }
+}
+
+.task-file-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.task-file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: functions.rem(14px);
+}
+
+.task-file-meta,
+.task-file-where {
+    color: #676879;
+    font-size: functions.rem(12px);
+}
+
+.task-file-where {
+    color: variables.$board-btn;
+}
+
+.task-file-who {
+    @include mixins.members();
+    flex: none;
+}
+
+.task-file-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: none;
+
+    button,
+    a {
+        @include mixins.center-flex();
+        width: 28px;
+        height: 28px;
+        border: 0;
+        border-radius: 4px;
+        background: none;
+        color: variables.$workspace-icon-color;
+        cursor: pointer;
+        text-decoration: none;
+
+        &:hover:not(:disabled) {
+            background-color: variables.$app-bg;
+            color: variables.$primary-text-color;
+        }
+
+        &:disabled {
+            cursor: default;
+            opacity: .5;
+        }
+
+        &.is-danger:hover:not(:disabled) {
+            color: variables.$danger-strong;
+        }
+    }
+}

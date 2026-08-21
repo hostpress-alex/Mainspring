@@ -124,7 +124,29 @@ export function sanitize(html){
 /* --------------------------------------------------------- old content -- */
 
 const MENTION_TOKEN = /@\[([^\]\n]+)\]\(([^)\s]+)\)/g
-const HTML_LIKE = /<(p|div|ul|ol|li|h[1-3]|blockquote|pre|strong|em|s|u|b|i|a|br|hr|span|code)\b/i
+
+/**
+ * Does a stored value already look like HTML?
+ *
+ * Built from ALLOWED_TAGS rather than typed out a second time. It used to be
+ * its own hand-written list, and it had drifted: `img`, `label`, `input` and
+ * `del` were in the allowlist and missing here. The consequence was not a
+ * missing tag but a visible one — an update whose content began with an
+ * `<img>` (a pasted screenshot, which is the ONLY thing in it) failed this
+ * test, was taken for old plain text, and got escaped. The reader then saw
+ * `<img src="/api/upload/…">` printed as words, in the editor and on the
+ * screen, and typing one character afterwards saved it that way.
+ *
+ * Longest first, so `blockquote` is not matched as `b` followed by a word
+ * boundary that is not there.
+ *
+ * The heuristic keeps its known failure: a plain-text comment that literally
+ * contains "<p>" is treated as HTML and cleaned, so the reader sees the tag
+ * gone rather than printed. That is the trade for needing no migration of
+ * every row that is fine.
+ */
+const HTML_LIKE = new RegExp(
+    `<(?:${[...ALLOWED_TAGS].sort((a, b) => b.length - a.length).join('|')})\\b`, 'i')
 
 function escapeHtml(text){
     return String(text)

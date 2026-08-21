@@ -26,6 +26,12 @@ router.delete('/:boardId/purge', g.purgeBoard)
 router.delete('/:boardId/group/:groupId/purge', g.purgeGroup)
 router.delete('/:boardId/task/:taskId/purge', g.purgeTask)
 
+// The uploads recorded against one task. Reading is open to any member;
+// removing needs write rights AND a file nothing points at any more — see
+// board.service.removeTaskFile.
+router.get('/:boardId/task/:taskId/file', g.getTaskFiles)
+router.delete('/:boardId/task/:taskId/file/:fileId', g.deleteTaskFile)
+
 // --- Targeted writes ------------------------------------------------------
 // Mind the order: the specific paths have to come BEFORE the general ones,
 // otherwise /:boardId swallows everything.

@@ -138,12 +138,22 @@ export function RichTextEditor({
         }
     }, [])
 
-    // Only when the host really means a different document — see above.
+    /**
+     * Only when the host really means a different document — see above.
+     *
+     * Both sides go through trimTrailingEmpty, because that is what onUpdate
+     * hands out. ProseMirror keeps an empty paragraph after an atom block so
+     * there is somewhere to put the cursor, so pasting an image left the
+     * editor holding `<img><p></p>` while the host held `<img>` — different
+     * strings, same document. The effect then re-seeded the editor on every
+     * pasted image and threw the cursor back to the start.
+     */
     useEffect(() => {
         if(!editor) return
         const incoming = fromLegacy(value)
-        if(incoming === editor.getHTML()) return
-        if(isEmpty(incoming) && isEmpty(editor.getHTML())) return
+        const current = trimTrailingEmpty(editor.getHTML())
+        if(incoming === current) return
+        if(isEmpty(incoming) && isEmpty(current)) return
         editor.commands.setContent(incoming, {emitUpdate: false})
     }, [value, editor])
 

@@ -15,6 +15,8 @@ export const boardService = {
     canManageMembers,
     canManageBoard,
     getViews,
+    getTaskFiles,
+    removeTaskFile,
     addView,
     updateView,
     removeView,
@@ -181,6 +183,26 @@ function remove(boardId){
 /* ------------------------------------------ Gespeicherte Filter -- */
 
 /** The saved filters of a board. Everybody on it sees all of them. */
+/* ------------------------------------------ Dateien am Task -- */
+
+/**
+ * Every upload recorded against a task, each with the places it is still used.
+ *
+ * The `sources` come from the server rather than being worked out here. The
+ * same answer decides whether a delete is allowed, and a second implementation
+ * in the browser would be a copy that drifts — a delete button that does
+ * nothing reads as the application being broken, not as the button being
+ * wrong.
+ */
+function getTaskFiles(boardId, taskId){
+    return httpService.get(`${BASE_URL}${boardId}/task/${taskId}/file`)
+}
+
+/** Only files nothing points at any more; the server refuses the rest. */
+function removeTaskFile(boardId, taskId, fileId){
+    return httpService.delete(`${BASE_URL}${boardId}/task/${taskId}/file/${fileId}`)
+}
+
 function getViews(boardId){
     return httpService.get(`${BASE_URL}${boardId}/view`)
 }

@@ -1,9 +1,9 @@
 /**
- * Controller fuer die gezielten Schreibvorgaenge.
+ * Controller for the targeted writes.
  *
- * Alle geben das frische Board zurueck: der Schreibvorgang ist granular (nur
- * das geaenderte Feld wandert in die Datenbank), das Lesen danach ist billig
- * und haelt das Frontend einfach.
+ * All of them return the fresh board: the write is granular (only the changed
+ * field goes to the database), and the read afterwards is cheap and keeps the
+ * frontend simple.
  */
 const boardService = require('./board.service')
 const logger = require('../../services/logger.service')
@@ -37,6 +37,16 @@ module.exports = {
     deleteView: handler(req =>
         boardService.removeView(req.params.boardId, req.params.viewId),
         'Ansicht konnte nicht geloescht werden'),
+
+    /* ---------------------------------------------- Dateien am Task -- */
+
+    getTaskFiles: handler(req =>
+        boardService.taskFiles(req.params.boardId, req.params.taskId),
+        'Dateien konnten nicht geladen werden'),
+
+    deleteTaskFile: handler(req =>
+        boardService.removeTaskFile(req.params.boardId, req.params.taskId, req.params.fileId),
+        'Datei konnte nicht geloescht werden'),
 
     /* ---------------------------------------- Papierkorb und Archiv -- */
 

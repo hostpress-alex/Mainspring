@@ -7,15 +7,15 @@ const router = express.Router()
 
 router.use(requireAuth)
 
-// Rohe Bytes statt multipart: kein zusaetzliches Paket noetig, und der Browser
-// kann ein File- oder Blob-Objekt (auch aus der Zwischenablage) direkt senden.
+// Raw bytes instead of multipart: no extra package needed, and the browser can
+// send a File or Blob object (including one from the clipboard) directly.
 //
-// type: '*/*' ist Absicht. Frueher stand hier die Liste der erlaubten MIME-Typen
-// — dann liess Express den Rumpf bei allem anderen einfach weg, und der Server
-// meldete "Leere Datei" statt "Dateityp nicht erlaubt". Schlimmer: Browser
-// schicken fuer Office-Dateien haeufig application/octet-stream, die kamen so
-// nie an. Welche Typen wirklich erlaubt sind, entscheidet der file.service —
-// das Groessenlimit greift hier davor.
+// type: '*/*' is deliberate. This used to hold the list of allowed MIME types
+// — and then Express simply dropped the body for everything else, so the
+// server reported "empty file" instead of "file type not allowed". Worse:
+// browsers often send application/octet-stream for Office files, which never
+// arrived at all. Which types are really allowed is file.service's decision
+// — the size limit applies here, before it.
 router.post('/', express.raw({
     type: '*/*',
     limit: fileService.MAX_BYTES

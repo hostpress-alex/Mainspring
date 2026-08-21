@@ -1,18 +1,18 @@
 /**
- * Weist herrenlose Boards einem Benutzer zu und sorgt dafuer, dass jeder
- * Owner auch Mitglied ist.
+ * Assigns ownerless boards to a user and makes sure every owner is a member
+ * as well.
  *
  *   OWNER=alex npm run claim:boards
- *     - Boards ohne Owner  -> Owner wird <OWNER>
- *     - Owner werden immer auch als Mitglied eingetragen
+ *     - boards without an owner  -> <OWNER> becomes the owner
+ *     - owners are always recorded as members too
  *
  *   OWNER=alex ALL=true npm run claim:boards
- *     - schreibt zusaetzlich JEDES Board auf <OWNER> um
+ *     - additionally rewrites EVERY board onto <OWNER>
  *
  *
- * Die Umstellung vom alten Einzelfeld ownerId auf ownerIds passiert inzwischen
- * schon beim Lesen bzw. bei der Migration nach MariaDB; hier geht es nur noch
- * um Boards, die niemandem gehoeren.
+ * The move from the old single ownerId field to ownerIds happens on read and in
+ * the migration to MariaDB by now; what is left for this script are the boards
+ * that belong to nobody.
  */
 const boardRepo = require('../api/board/board.repo')
 const userRepo = require('../api/user/user.repo')
@@ -34,7 +34,7 @@ async function main(){
     }
     const uid = sid(user._id)
 
-    // Als Admin lesen, sonst sieht man nur die eigenen Boards.
+    // Read as an admin, otherwise only one's own boards are visible.
     const boards = await boardRepo.findForUser({_id: uid, isAdmin: true}, {})
     if(!boards.length){
         console.log('Keine Boards gefunden.')
@@ -71,7 +71,7 @@ async function main(){
             && currentOwners.every((v, i) => v === ownerIds[i])
         if(ownersUnchanged && !added.length) continue
 
-        // Erst Mitglieder, dann Owner: ein Owner muss Mitglied sein.
+        // Members first, owners second: an owner has to be a member.
         if(added.length) await boardRepo.setMembers(boardId, members)
         if(!ownersUnchanged) await boardRepo.setOwners(boardId, ownerIds)
 

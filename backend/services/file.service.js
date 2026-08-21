@@ -118,17 +118,17 @@ function isInline(mime){
     return INLINE_MIMES.has(mime)
 }
 
-/** Erlaubt nur harmlose Pfadsegmente — keine Slashes, keine Punkte. */
+/** Allows harmless path segments only — no slashes, no dots. */
 function safeSegment(value){
     const clean = String(value || '').replace(/[^A-Za-z0-9_-]/g, '')
     return clean.slice(0, 64)
 }
 
 /**
- * Zielordner nach Verwendungszweck:
+ * Target folder by purpose:
  *   profile              -> uploads/profile/
  *   task + taskId        -> uploads/task/<taskId>/
- *   alles andere         -> uploads/misc/<jahr>/<monat>/
+ *   everything else      -> uploads/misc/<year>/<month>/
  */
 function targetDir(scope, taskId, now){
     if(scope === 'profile') return 'profile'
@@ -142,6 +142,19 @@ function targetDir(scope, taskId, now){
 
 async function save(buffer, mime, user, opts = {}){
     if(!buffer || !buffer.length) throw httpError(400, 'Leere Datei')
+
+    /**
+     * A file on a task must name its board.
+     *
+     * Without it `board_id` stays NULL, and NULL means "belongs to no board",
+     * which means readable by anybody signed in. That is right for a profile
+     * picture and wrong for an attachment, and the difference is one optional
+     * parameter that a caller can forget — `FilePicker` even defaults its
+     * `board` prop to null. So it is refused here rather than left to every
+     * call site to get right: a loud failure beats a file that is quietly
+     * public.
+     */
+    if(opts.scope === 'task' && !opts.boardId) throw httpError(400, 'boardId fehlt fuer scope=task')
     const type = resolveType(mime, opts.name)
     if(buffer.length > MAX_BYTES){
         throw httpError(413, `Datei ist groesser als ${Math.round(MAX_BYTES / 1024 / 1024)} MB`)
@@ -153,8 +166,8 @@ async function save(buffer, mime, user, opts = {}){
     const dir = path.join(UPLOAD_ROOT, rel)
     await fs.mkdir(dir, {recursive: true})
 
-    // Auf der Platte heisst die Datei nach ihrer Id — der urspruengliche Name
-    // kommt nur in die Datenbank und wird beim Herunterladen wieder gesetzt.
+    // On disk the file is named after its id — the original name only
+    // goes into the database and is put back on download.
     const filename = `${id}.${type.ext}`
     await fs.writeFile(path.join(dir, filename), buffer)
 
@@ -187,7 +200,7 @@ async function getMeta(id){
     return doc
 }
 
-/** Absoluter Pfad, gegen Ausbrechen aus dem Upload-Verzeichnis abgesichert. */
+/** Absolute path, guarded against escaping the upload directory. */
 function absPathOf(doc){
     const abs = path.resolve(UPLOAD_ROOT, doc.relPath)
     if(!abs.startsWith(path.resolve(UPLOAD_ROOT) + path.sep)){

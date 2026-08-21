@@ -59,8 +59,8 @@ function toRow(entry){
 
 async function findForUser(userId, {from, to} = {}){
     let q = db()('schedule').where({user_id: sid(userId)})
-    // Ueberlappung statt Enthaltensein: ein Eintrag, der in die Woche
-    // hineinragt, muss mitkommen.
+    // Overlap rather than containment: an entry that reaches into the week
+    // has to come along.
     if(to) q = q.where('start_at', '<', new Date(to))
     if(from) q = q.where('end_at', '>', new Date(from))
     return (await q.orderBy('start_at')).map(out)
@@ -71,8 +71,8 @@ async function findById(id){
 }
 
 async function insert(entry){
-    // Bei der Migration kommt die alte Id mit, damit nichts umgeschluesselt
-    // werden muss. Im Normalbetrieb vergibt der Server eine neue.
+    // The migration brings the old id along so that nothing has to be
+    // re-keyed. In normal operation the server hands out a new one.
     const given = sid(entry._id)
     const id = /^[a-f0-9]{24}$/i.test(given)?given.toLowerCase():newId()
     await db()('schedule').insert({id, ...toRow(entry)})

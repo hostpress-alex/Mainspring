@@ -16,11 +16,11 @@ import {t} from '../../i18n'
  * status changes to Done, move the task to Done". A form with three dropdowns
  * holds the same data and nobody can tell at a glance what it will do.
  *
- * The sentences live in the text catalogue with named holes — "Wenn {column}
- * auf {value} wechselt" — and `Sentence` puts the pickers into the holes.
- * That matters for more than tidiness: German and English do not put the parts
- * in the same order, and a sentence glued together from fixed fragments in the
- * JSX can only ever have one order.
+ * The sentences live in the text catalogue with named holes, e.g. the en key
+ * "when {column} changes to {value}", and `Sentence` puts the pickers into the
+ * holes. That matters for more than tidiness: the de catalogue orders the same
+ * sentence differently, and a sentence glued together from fixed fragments in
+ * the JSX can only ever have one order.
  */
 export function Sentence({template, slots}){
     return String(template).split(/(\{\w+\})/).map((part, i) => {

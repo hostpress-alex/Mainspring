@@ -14,6 +14,7 @@ import {TimePanel} from '../time/time-panel'
 import {TaskTimerControls} from '../time/task-timer'
 import {useBoardTotals} from '../time/use-board-totals'
 import {ErrorBoundary} from '../error-boundary'
+import {TaskFiles} from '../task/task-files'
 import {
     socketService,
     SOCKET_EMIT_SEND_MSG,
@@ -271,9 +272,6 @@ export function TaskModal({task, board, groupId, setModalCurrTask, onClose = nul
         setComment(prev => ({...prev, attachments: [...(prev.attachments || []), saved]}))
     }
 
-    /** Ctrl+V in the update area: attach images from the clipboard. */
-
-
     function onRemoveAttachment(id){
         setComment(prev => ({...prev, attachments: (prev.attachments || []).filter(a => a._id !== id)}))
     }
@@ -358,9 +356,19 @@ export function TaskModal({task, board, groupId, setModalCurrTask, onClose = nul
                 <Icon name='stopwatch'/>
                 <span>{t('time.times')}</span>
             </div>
+            {/* Files are uploaded into an update or into a file column, never
+                here — this tab only says what ended up on the task, and where
+                each one is still used. */}
+            <div onClick={() => setTab('files')} className={`files-btn ${tab === 'files'?'active':''}`}>
+                <Icon name='paperclip'/>
+                <span>{t('file.files')}</span>
+            </div>
         </div>
         {tab === 'time' && <ErrorBoundary label={t('time.times')}>
             <TimePanel board={board} task={currTask}/>
+        </ErrorBoundary>}
+        {tab === 'files' && <ErrorBoundary label={t('file.files')}>
+            <TaskFiles board={board} task={currTask} user={user}/>
         </ErrorBoundary>}
         {isShowActivity && <ErrorBoundary label={t('activity.area')}>
             <ul className="activities">

@@ -5,8 +5,8 @@ const crypto = require('crypto')
 const {db} = require('../../db/knex')
 
 const sid = v => (v === undefined || v === null)?'':String(v)
-// Gleiche Form wie die alte ObjectId, damit bestehende Links und die
-// Verweise in board_member unveraendert weiterfunktionieren.
+// Same shape as the old ObjectId, so that existing links and the references
+// in board_member keep working unchanged.
 const newUserId = () => crypto.randomBytes(12).toString('hex')
 
 function out(row){

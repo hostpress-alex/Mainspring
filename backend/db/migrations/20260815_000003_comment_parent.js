@@ -1,13 +1,12 @@
 /**
- * Antworten auf Updates.
+ * Replies to updates.
  *
- * Ein Kommentar mit parent_id ist eine Antwort auf den Kommentar mit dieser
- * Id. Bewusst nur eine Ebene tief — Antworten auf Antworten liest hinterher
- * niemand mehr.
+ * A comment with a parent_id is a reply to the comment with that id. One level
+ * deep on purpose — nobody reads replies to replies afterwards.
  *
- * Kein Fremdschluessel auf sich selbst: die Kommentare eines Tasks werden in
- * einem Rutsch geschrieben (erst geloescht, dann neu eingefuegt), und dabei
- * darf die Reihenfolge innerhalb der Transaktion keine Rolle spielen.
+ * No foreign key onto itself: a task's comments are written in one go (deleted
+ * first, then inserted again), and the order inside that transaction must not
+ * matter.
  */
 exports.up = async function up(knex){
     await knex.schema.alterTable('task_comment', t => {

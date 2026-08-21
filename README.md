@@ -213,7 +213,10 @@ API with revocable tokens for callers that are not a browser (`API.md`).
 Uploads go to disk under `backend/uploads/` with metadata in the database; we
 keep the original filename around so downloads arrive as `offer.pdf` and not
 `a1b2f9.pdf`. A download is checked against the board the file belongs to, not
-just against being signed in.
+just against being signed in. A task has a **files tab** listing everything
+ever uploaded to it, with where each one is still used — under an update,
+inside the text of one, or as a file column — and, separately, the ones
+nothing points at any more, which can be deleted there.
 
 Login is username and password (bcrypt). Google sign-in was removed — it
 fetched `googleapis.com` from a tool that only runs on the VPN and used the
@@ -297,14 +300,17 @@ time, mentions, error routing, the reducer.
 Two static checks beside the tests, both in `frontend/`:
 
 ```bash
-npm run check            # both of the below
+npm run check            # all three of the below
 npm run check:exports    # an imported name the target module does not export
 npm run check:tdz        # a const read before its own line, inside a function
+npm run check:icons      # an icon that only exists in Font Awesome Pro
 ```
 
-They exist because both of those failures produce a **white page with nothing
+The first two exist because those failures produce a **white page with nothing
 in the console that names the file**, and the ordinary test suite is happily
-green while the app does not start. The TDZ one is written to descend into a
+green while the app does not start. The third catches an icon that renders as
+an empty box for anyone without a Pro licence — development happens with Pro
+installed, so nobody here would ever see it. The TDZ one is written to descend into a
 nested function only where it is an argument to a call — i.e. where it runs
 immediately, like a `useState(() => …)` initialiser — because that is the case
 that bites and anything wider drowns it in noise.

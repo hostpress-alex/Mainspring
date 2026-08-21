@@ -3,29 +3,29 @@ import {localErrorText} from '../services/error-text'
 import {messageFor} from '../services/http.service'
 
 /**
- * Die Regel, die die doppelten Fehlermeldungen abgeschafft hat.
+ * The rule that got rid of the duplicated error messages.
  *
- * `http.service` meldet jeden fehlgeschlagenen Request global; die Panels
- * melden zusaetzlich inline. Ergebnis war derselbe Satz zweimal. Die Trennung
- * laeuft darueber, ob der Fehler ueberhaupt ueber das Netz gegangen ist.
+ * `http.service` reports every failed request globally; the panels reported
+ * inline on top of that. The result was the same sentence twice. The split runs
+ * along whether the error went over the wire at all.
  */
-describe('localErrorText — was inline noch gesagt werden muss', () => {
-    it('schweigt, wenn der Server geantwortet hat', () => {
+describe('localErrorText — what is left to say inline', () => {
+    it('stays silent when the server answered', () => {
         const err = new Error('Request failed with status code 500')
         err.response = {status: 500, data: {err: 'Board nicht gefunden'}}
         expect(localErrorText(err)).toBe(null)
     })
 
-    it('schweigt auch ohne Antwort, wenn ein Request rausging', () => {
-        // Server aus, Kabel ab: axios setzt `request`, aber keine `response`.
-        // messageFor beantwortet das mit errors.offline — also schon gesagt.
+    it('stays silent without an answer as long as a request went out', () => {
+        // Server down, cable out: axios sets `request` but no `response`.
+        // messageFor answers that with errors.offline — so it is already said.
         const err = new Error('Network Error')
         err.request = {}
         err.code = 'ERR_NETWORK'
         expect(localErrorText(err)).toBe(null)
     })
 
-    it('schweigt bei abgebrochenen Requests', () => {
+    it('stays silent for cancelled requests', () => {
         const canceled = new Error('canceled')
         canceled.code = 'ERR_CANCELED'
         expect(localErrorText(canceled)).toBe(null)
@@ -35,28 +35,28 @@ describe('localErrorText — was inline noch gesagt werden muss', () => {
         expect(localErrorText(byName)).toBe(null)
     })
 
-    it('zeigt eine Validierung aus dem Panel selbst', () => {
+    it('shows a validation raised by the panel itself', () => {
         // board-admin: onError(new Error(t('admin.ownerRequired')))
-        expect(localErrorText(new Error('Ein Board braucht einen Besitzer')))
-            .toBe('Ein Board braucht einen Besitzer')
+        expect(localErrorText(new Error('A board needs an owner')))
+            .toBe('A board needs an owner')
     })
 
-    it('nimmt auch einen nackten String', () => {
-        expect(localErrorText('so nicht')).toBe('so nicht')
+    it('takes a bare string as well', () => {
+        expect(localErrorText('no good')).toBe('no good')
     })
 
-    it('macht aus nichts nichts', () => {
+    it('makes nothing out of nothing', () => {
         expect(localErrorText(null)).toBe(null)
         expect(localErrorText(undefined)).toBe(null)
     })
 })
 
 /**
- * Der eigentliche Punkt: nie beide. Das ist die Eigenschaft, die kaputt war,
- * und die einzige, die dauerhaft geprueft werden muss — wer von beiden redet,
- * ist eine Optik-Entscheidung, dass nur einer redet, ist die Anforderung.
+ * The actual point: never both. That is the property that was broken, and the
+ * only one that has to stay checked — WHICH of the two speaks is a matter of
+ * looks, that only one speaks is the requirement.
  */
-describe('global oder inline, aber nie beides', () => {
+describe('global or inline, but never both', () => {
     function withResponse(status, serverErr){
         const err = new Error(`Request failed with status code ${status}`)
         err.request = {}
@@ -65,39 +65,39 @@ describe('global oder inline, aber nie beides', () => {
     }
 
     const cases = [
-        ['500 mit Serversatz', 'board/1', 'GET', withResponse(500, 'Board nicht gefunden')],
-        ['500 ohne Serversatz', 'board/1', 'PUT', withResponse(500)],
+        ['500 with a server sentence', 'board/1', 'GET', withResponse(500, 'Board nicht gefunden')],
+        ['500 without one', 'board/1', 'PUT', withResponse(500)],
         ['403', 'user/1', 'PUT', withResponse(403)],
-        ['404 beim Lesen', 'board/nope', 'GET', withResponse(404, 'Nicht gefunden')]
+        ['404 while reading', 'board/nope', 'GET', withResponse(404, 'Nicht gefunden')]
     ]
 
     for(const [name, endpoint, method, err] of cases){
-        it(`${name}: nur die Box`, () => {
+        it(`${name}: the box only`, () => {
             expect(messageFor(endpoint, method, err)).toBeTruthy()
             expect(localErrorText(err)).toBe(null)
         })
     }
 
-    it('Validierung: nur inline', () => {
-        // Ein selbst geworfener Fehler erreicht `ajax` nie, also gibt es dazu
-        // auch keine Box — er hat genau einen Kanal, und der ist inline.
-        const err = new Error('Ende liegt vor dem Anfang')
+    it('validation: inline only', () => {
+        // An error thrown here never reaches `ajax`, so there is no box for it
+        // either — it has exactly one channel, and that channel is inline.
+        const err = new Error('The end is before the start')
         expect(err.response).toBe(undefined)
         expect(err.request).toBe(undefined)
-        expect(localErrorText(err)).toBe('Ende liegt vor dem Anfang')
+        expect(localErrorText(err)).toBe('The end is before the start')
     })
 
-    it('401: beide schweigen, die Seite wird ersetzt', () => {
+    it('401: both stay silent, the page is being replaced', () => {
         const err = withResponse(401)
         expect(messageFor('board/1', 'GET', err)).toBe(null)
         expect(localErrorText(err)).toBe(null)
     })
 
-    it('auth/* schweigt global — deshalb wertet login-signup selbst aus', () => {
+    it('auth/* is silent globally — which is why login-signup evaluates itself', () => {
         const err = withResponse(401, 'Falsches Passwort')
         expect(messageFor('auth/login', 'POST', err)).toBe(null)
-        // Und weil localErrorText hier auch schweigen wuerde, ist
-        // pages/login-signup absichtlich NICHT umgestellt.
+        // And because localErrorText would be silent here too,
+        // pages/login-signup is deliberately NOT converted.
         expect(localErrorText(err)).toBe(null)
     })
 })

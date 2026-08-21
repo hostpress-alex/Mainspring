@@ -179,6 +179,8 @@ Migrations, in order:
 | `20260819_000030_comment_author_repair.js` | gives updates their author back, where the log still proves it |
 | `20260820_000031_api_tokens.js` | `api_token` — a key that does not time out when idle |
 | `20260821_000032_comment_time.js` | `task_comment.time_id` — the update a timer posted |
+| `20260821_000033_unescape_images.js` | puts back images that were stored as their own source text |
+| `20260821_000034_file_board_repair.js` | fills in `file.board_id` on the uploads that never got one |
 
 **Why `col_values` is JSON.** A board's columns are freely configurable —
 status, priority, date, custom text and number columns. Adding a table column
@@ -358,6 +360,20 @@ holds a copy, because the interface has to choose a language before React
 renders and before any request has come back — without the copy every page
 would appear in the wrong language first and correct itself. The column is the
 truth, the copy is written at login and whenever the profile is saved.
+
+**A file's board is its permission, and it was not being written.** `000017`
+added `file.board_id` and said the board would be written when the file is
+saved. It was not: the upload controller read `scope`, `taskId` and `name` out
+of the query string and dropped `boardId`, so every upload after that day
+carried NULL — while the column, the frontend, this file and `README.md` all
+described the check as done. NULL means "belongs to no board", which means
+readable by anybody signed in; that is right for the profile pictures in this
+same table and wrong for four days of attachments. `000034` fills the column
+in from the task, `upload.controller.js` now writes it and checks it on the way
+out, and `file.service.save` refuses a `scope=task` upload that does not name a
+board — a caller can forget an optional parameter, and the failure has to be
+loud rather than a quietly public file. `test/file-permission.test.js` holds
+the decision, which nothing tested before.
 
 **Uploaded files keep two names.** On disk a file is named after its id, which
 is unique; `original_name` holds what it was called when it was uploaded, so a

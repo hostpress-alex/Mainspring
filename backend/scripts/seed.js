@@ -1,10 +1,10 @@
 /**
- * Legt Demo-Boards an, damit die App aus einer leeren Datenbank heraus benutzbar ist.
- *   node scripts/seed.js          -> nur wenn die board-Collection leer ist
- *   node scripts/seed.js --force  -> loescht bestehende Boards und legt neu an
+ * Creates demo boards so the app is usable out of an empty database.
+ *   node scripts/seed.js          -> only if the board collection is empty
+ *   node scripts/seed.js --force  -> drops the existing boards and starts over
  *
- * Die Struktur folgt getEmptyBoard()/getEmptyGroup()/getEmptyTask()
- * aus frontend/src/services/board.service.js.
+ * The shape follows getEmptyBoard()/getEmptyGroup()/getEmptyTask() from
+ * frontend/src/services/board.service.js.
  */
 const boardRepo = require('../api/board/board.repo')
 
@@ -93,7 +93,7 @@ const BOARDS = [
 async function main(){
     const force = process.argv.includes('--force')
 
-    // Als Admin lesen, damit wirklich alle Boards gezaehlt werden.
+    // Read as an admin so that all boards really are counted.
     const existing = await boardRepo.findForUser({_id: 'seed', isAdmin: true}, {})
 
     if(existing.length > 0 && !force){

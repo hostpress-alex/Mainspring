@@ -195,7 +195,7 @@ async function update(user, requester){
         const isAdmin = requester && requester.isAdmin === true
         if(!isSelf && !isAdmin) throw httpError(403, 'Kein Zugriff auf diesen Benutzer')
 
-        // Whitelist. Alles andere aus dem Request-Body wird ignoriert.
+        // Allow-list. Everything else in the request body is ignored.
         const userToSave = {}
         let changesPassword = false
         if(typeof user.fullname === 'string') userToSave.fullname = user.fullname
@@ -204,9 +204,9 @@ async function update(user, requester){
             if(taken) throw httpError(409, 'Benutzername bereits vergeben')
             userToSave.username = user.username
         }
-        // Profilbild: nur ein Pfad auf die eigene Upload-Schicht. Externe URLs
-        // werden abgewiesen, damit keine Bilder von fremden Servern eingebunden
-        // werden. Altbestand als Data-URL bleibt lesbar, wird aber nicht neu gesetzt.
+        // Profile picture: only a path into our own upload layer. External URLs
+        // are refused so that no images get pulled in from foreign servers. Older
+        // data URLs stay readable but are never written again.
         if(typeof user.imgUrl === 'string'){
             if(user.imgUrl && !/^\/api\/upload\/[a-f0-9]{32}$/.test(user.imgUrl)){
                 throw httpError(400, 'Profilbild muss ueber den Upload dieser Anwendung kommen')
@@ -225,11 +225,11 @@ async function update(user, requester){
             userToSave.language = code
         }
 
-        // Passwoerter werden IMMER gehasht. Vorher landete der Klartext in der DB.
+        // Passwords are ALWAYS hashed. The plain text used to land in the DB.
         if(user.password){
             if(String(user.password).length < 8) throw httpError(400, 'Passwort muss mindestens 8 Zeichen haben')
-            // Wer sein eigenes Passwort aendert, muss das alte kennen. Admins duerfen
-            // fremde Passwoerter ohne das alte zuruecksetzen.
+            // Changing one's own password requires knowing the old one. Admins
+            // may reset somebody else's password without it.
             if(isSelf){
                 if(!user.currentPassword) throw httpError(400, 'Bitte aktuelles Passwort angeben')
                 const ok = await bcrypt.compare(String(user.currentPassword), existing.password || '')
@@ -243,7 +243,7 @@ async function update(user, requester){
             // out straight afterwards.
             changesPassword = true
         }
-        // Nur Admins duerfen das Admin-Flag setzen, und niemand sich selbst degradieren.
+        // Only admins may set the admin flag, and nobody may demote themselves.
         if(typeof user.isAdmin === 'boolean' && isAdmin){
             if(isSelf && user.isAdmin === false) throw httpError(400, 'Du kannst dir selbst nicht die Admin-Rechte entziehen')
             userToSave.isAdmin = user.isAdmin
@@ -258,7 +258,7 @@ async function update(user, requester){
     }
 }
 
-/** Vom Admin angelegter Benutzer. Passwort wird hier gehasht. */
+/** A user created by an admin. The password is hashed here. */
 async function create({username, password, fullname, imgUrl, isAdmin}){
     try {
         if(!username || !password || !fullname) throw httpError(400, 'username, password und fullname sind Pflicht')
@@ -279,7 +279,7 @@ async function create({username, password, fullname, imgUrl, isAdmin}){
     }
 }
 
-/** Registrierung. Das Passwort ist hier bereits gehasht (auth.service). */
+/** Sign-up. The password arrives already hashed (auth.service). */
 async function add(user){
     try {
         const saved = await userRepo.insert({

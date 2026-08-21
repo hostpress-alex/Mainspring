@@ -378,9 +378,12 @@
   },
   "file": {
     "attach": "Datei anhängen",
+    "download": "Herunterladen",
     "file": "Datei",
+    "files": "Dateien",
     "imageFailed": "Bild konnte nicht verarbeitet werden",
     "imageReadFailed": "Bild konnte nicht gelesen werden",
+    "noneInTask": "An diesem Task hängen noch keine Dateien.",
     "noneSelected": "Keine Datei ausgewählt",
     "notAllowed": "Zugriff auf die Datei nicht erlaubt.",
     "notAnImage": "Das ist kein Bild",
@@ -390,7 +393,21 @@
     "readFailed": "Datei konnte nicht gelesen werden",
     "readFailedWhy": "Datei konnte nicht gelesen werden ({reason})",
     "remove": "Datei entfernen",
-    "uploadFailed": "Upload fehlgeschlagen"
+    "unusedHint": "Hochgeladen, aber im Task nirgends mehr eingebunden — etwa aus einem Entwurf entfernt oder mit einem gelöschten Update verschwunden.",
+    "unusedTitle": "Nicht mehr verwendet",
+    "uploadFailed": "Upload fehlgeschlagen",
+    "usedInColumn": {
+      "one": "in einer Spalte",
+      "other": "in {n} Spalten"
+    },
+    "usedInText": {
+      "one": "im Text eines Updates",
+      "other": "im Text von {n} Updates"
+    },
+    "usedInUpdate": {
+      "one": "in einem Update",
+      "other": "in {n} Updates"
+    }
   },
   "filter": {
     "addRule": "Filter hinzufügen",

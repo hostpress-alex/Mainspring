@@ -11,7 +11,8 @@
     "test": "vitest",
     "check:tdz": "node scripts/check-tdz.cjs",
     "check:exports": "node scripts/check-exports.cjs",
-    "check": "npm run check:exports && npm run check:tdz"
+    "check": "npm run check:exports && npm run check:tdz && npm run check:icons",
+    "check:icons": "node scripts/check-icons.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

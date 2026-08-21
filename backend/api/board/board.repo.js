@@ -1185,6 +1185,59 @@ async function findTaskRow(boardId, taskId){
     }
 }
 
+/**
+ * Everything needed to work out which files a task still points at.
+ *
+ * Three narrow reads rather than `findById(boardId)`. Assembling a whole board
+ * to answer one question about one task is the same mistake the file-board
+ * migration warns about for the permission check: it costs seven queries and
+ * every task of the board to look at a list of at most a dozen rows.
+ *
+ * Shaped for `task-files.js`, which is pure and knows nothing about rows.
+ */
+async function findTaskFileRefs(boardId, taskId){
+    const id = checkBoardId(boardId)
+    const task = await db()('task').where({board_id: id, id: sid(taskId)}).first('col_values')
+    if(!task) return null
+
+    const comments = await db()('task_comment')
+        .where({board_id: id, task_id: sid(taskId)})
+        .select('id', 'txt', 'attachments')
+
+    // Only the file columns. A text column whose value happens to look like an
+    // upload URL is not a file hanging off this task.
+    const columns = await db()('board_column')
+        .where({board_id: id, type: 'file'})
+        .select('id', 'field')
+
+    return {
+        colValues: parseJson(task.col_values, {}) || {},
+        comments: comments.map(row => ({
+            id: row.id,
+            txt: row.txt || '',
+            attachments: parseJson(row.attachments, []) || []
+        })),
+        fileFields: columns.map(row => row.field || row.id)
+    }
+}
+
+/** The uploads recorded against one task, newest last. */
+async function findFilesByTask(boardId, taskId){
+    const rows = await db()('file')
+        .where({board_id: checkBoardId(boardId), task_id: sid(taskId)})
+        .orderBy('created_at')
+        .select('id', 'mime', 'size', 'original_name', 'uploaded_by_id', 'created_at')
+    return rows.map(row => ({
+        id: row.id,
+        url: `/api/upload/${row.id}`,
+        mime: row.mime || '',
+        size: Number(row.size) || 0,
+        name: row.original_name || '',
+        uploadedBy: row.uploaded_by_id || null,
+        createdAt: row.created_at?new Date(row.created_at).getTime():null
+    }))
+}
+
 /** Hard delete, for emptying a bin. The only place a row really goes away. */
 async function purgeGroup(boardId, groupId){
     const id = checkBoardId(boardId)
@@ -1221,7 +1274,7 @@ module.exports = {
     addTask, addSubtask, setSubtasks, setTaskParent, removeTask, updateTaskFields, replaceTask, setGroupTasks, moveTask,
     addActivity,
     setBoardState, setGroupState, setTaskState, findBin, findBoardsByState,
-    findGroupRow, findTaskRow, purgeGroup, purgeTask, isMember, roleOnBoard,
+    findGroupRow, findTaskRow, findTaskFileRefs, findFilesByTask, purgeGroup, purgeTask, isMember, roleOnBoard,
     ACTIVE, ARCHIVED, TRASHED, STATES,
     MAX_ACTIVITIES
 }

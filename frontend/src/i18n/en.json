@@ -378,9 +378,12 @@
   },
   "file": {
     "attach": "Attach file",
+    "download": "Download",
     "file": "File",
+    "files": "Files",
     "imageFailed": "Image could not be processed",
     "imageReadFailed": "Image could not be read",
+    "noneInTask": "No files on this task yet.",
     "noneSelected": "No file selected",
     "notAllowed": "Not allowed to open that file.",
     "notAnImage": "That is not an image",
@@ -390,7 +393,21 @@
     "readFailed": "File could not be read",
     "readFailedWhy": "Could not read the file ({reason})",
     "remove": "Remove file",
-    "uploadFailed": "Upload failed"
+    "unusedHint": "Uploaded, but no longer referenced anywhere in the task — removed from a draft, or left behind when an update was deleted.",
+    "unusedTitle": "No longer used",
+    "uploadFailed": "Upload failed",
+    "usedInColumn": {
+      "one": "in a column",
+      "other": "in {n} columns"
+    },
+    "usedInText": {
+      "one": "in the text of an update",
+      "other": "in the text of {n} updates"
+    },
+    "usedInUpdate": {
+      "one": "in one update",
+      "other": "in {n} updates"
+    }
   },
   "filter": {
     "addRule": "Add filter",
