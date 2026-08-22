@@ -7,6 +7,9 @@ import {setDynamicModalObj, updateTaskAction} from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
 import {singleLineEditable} from '../../services/editable'
 import * as boardRoles from '../../services/board-roles'
+import {ChecklistMark} from '../task/checklist-mark'
+import {TimeMark} from '../task/time-mark'
+import {CardMembers} from './card-members'
 
 export function TaskTitleKanban({task, group, board}){
     const dynamicModalObj = useSelector(storeState => storeState.boardModule.dynamicModalObj)
@@ -46,6 +49,16 @@ export function TaskTitleKanban({task, group, board}){
                         {...singleLineEditable()}>
                 <span>{task.title}</span>
             </blockquote>
+            {/* Who has it, as a face rather than as a label/value line in the
+                card body. On a Kanban "who is doing this" is the first
+                question, and a row saying "Person: Alex" costs a line of card
+                height to answer it worse. */}
+            <CardMembers task={task} board={board}/>
+            {/* Filled circle = time, stroked ring with a tick = checklist.
+                Two shapes on purpose: they would otherwise be read as the
+                same measurement. */}
+            <TimeMark board={board} task={task}/>
+            <ChecklistMark task={task} onOpen={() => onOpenModal(task)}/>
             <div onClick={() => onOpenModal(task)} className="chat-icon">
                 {task.comments.length > 0 && <div>
                     <Icon name='comment' variant='fa-regular' className="comment-chat"/>

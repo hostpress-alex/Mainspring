@@ -60,7 +60,7 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
                 <Tooltip title={t('nav.workspaces')} arrow placement="right">
                     <div className="icon-container" onClick={() => onChooseIcon('board')}>
                         <WorkspaceIcon/>
-                        {active('board') && <Icon name='caret-left' className="triangle-icon"/>}
+                        {active('board') && <div className="triangle-icon"/>}
                     </div>
                 </Tooltip>
 
@@ -78,18 +78,9 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
                 <Tooltip title={t('nav.calendar')} arrow placement="right">
                     <Link to="/calendar" className={`icon-container nav-link${location.pathname === '/calendar'?' is-active':''}`}>
                         <Icon name='calendar-days'/>
-                        {location.pathname === '/calendar' && <Icon name='caret-left' className="triangle-icon"/>}
+                        {location.pathname === '/calendar' && <div className="triangle-icon"/>}
                     </Link>
                 </Tooltip>
-
-                {user?.isAdmin && (
-                    <Tooltip title={t('nav.administration')} arrow placement="right">
-                        <Link to="/admin" className={`icon-container nav-link${location.pathname === '/admin'?' is-active':''}`}>
-                            <Icon name='user-shield'/>
-                            {location.pathname === '/admin' && <Icon name='caret-left' className="triangle-icon"/>}
-                        </Link>
-                    </Tooltip>
-                )}
             </div>
 
             {isSearchOpen && <SearchPanel onClose={() => setIsSearchOpen(false)}/>}
@@ -99,6 +90,16 @@ export function MainSidebar({setIsLoginModalOpen, setWorkspaceDisplay, setIsWork
                     Above the avatar, because it is the one thing here that is
                     costing time while it is being ignored. */}
                 <RunningTimer/>
+
+                {user?.isAdmin && (
+                    <Tooltip title={t('nav.administration')} arrow placement="right">
+                        <Link to="/admin" className={`icon-container nav-link${location.pathname === '/admin'?' is-active':''}`}>
+                            <Icon name='user-shield'/>
+                            {location.pathname === '/admin' && <div className="triangle-icon"/>}
+                        </Link>
+                    </Tooltip>
+                )}
+
                 <Tooltip title={user?t('nav.profileTooltip', {name: user.fullname}):t('nav.login')} arrow placement="right">
                     <Avatar className="logged-user-img" src={user?.imgUrl} onClick={() => setIsLoginModalOpen && setIsLoginModalOpen(prev => !prev)}/>
                 </Tooltip>

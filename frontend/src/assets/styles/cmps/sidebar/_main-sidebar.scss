@@ -48,9 +48,9 @@
         border: 1.6px solid white;
         border-radius: 50%;
         cursor: pointer;
-        height: 37.4px;
+        height: 3rem;
         transition: transform .2s;
-        width: 37.4px;
+        width: 3rem;
 
         &:hover {
             transform: scale(.9);
@@ -60,32 +60,23 @@
     .tools-container {
         border-bottom: 1px solid variables.$border-color;
         border-top: 1px solid variables.$border-color;
-        color: white;
-        font-size: functions.rem(23px);
-        gap: variables.$spacing-medium;
+        color: variables.$app-bg;
+        font-size: 1.75rem;
+        gap: variables.$spacing-small;
         height: 100%;
+        line-height: 1.5rem;
         padding: variables.$spacing-medium 0;
-
-        .icon-container {
-            height: functions.rem(36px);
-            width: functions.rem(56px);
-            @include mixins.center-flex();
-            position: relative;
-
-            .triangle-icon {
-                color: variables.$sidebar-workspace-bg;
-                position: absolute;
-
-                @include mixins.for-narrow-layout {
-                    & {
-                        left: 46px;
-                    }
-                }
-            }
-        }
 
         > *:hover {
             @include mixins.hover-sidebar()
+        }
+
+        > div {
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            padding: .75rem 0;
+            width: 100%;
         }
     }
 
@@ -96,7 +87,34 @@
         // account rather than as a state.
         flex-direction: column;
         gap: variables.$spacing-medium;
-        padding: variables.$spacing-medium 0;
+        padding: variables.$spacing-small 0 variables.$spacing-medium 0;
+    }
+
+    a.icon-container {
+        align-items: center;
+        display: flex;
+        height: 2.75rem;
+        justify-content: center;
+        position: relative;
+        text-align: center;
+        width: 100%;
+
+        i {
+            font-size: 1.75rem;
+            line-height: 1.25rem;
+        }
+
+        div.triangle-icon {
+            border-bottom: 1rem solid transparent;
+            border-radius: 9px;
+            border-right: 1rem solid variables.$app-bg;
+            border-top: 1rem solid transparent;
+            height: 0;
+            position: absolute;
+            right: -3px;
+            text-align: right;
+            width: 0;
+        }
     }
 
     .menu-icon {

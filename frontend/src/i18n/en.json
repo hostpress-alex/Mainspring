@@ -251,8 +251,10 @@
     "deleteName": "The column “{title}”",
     "deleteNote": "The values of this column are lost in every task of this board.",
     "dragWidth": "Drag to resize",
+    "hideOnCard": "Remove from the Kanban card",
     "renameHint": "Double-click to rename",
     "search": "Search column…",
+    "showOnCard": "Show on the Kanban card",
     "thisColumn": "This column",
     "titleHint": "You can rename it later by double-clicking the column header",
     "type": {
@@ -721,6 +723,7 @@
   "task": {
     "add": "+ Add task",
     "addSubtask": "+ Add a subtask",
+    "checklistDone": "{done} of {total} done",
     "convert": "Convert",
     "convertPick": "Pick the new parent task",
     "convertSearch": "Search tasks",

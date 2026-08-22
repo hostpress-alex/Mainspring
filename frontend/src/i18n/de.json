@@ -251,8 +251,10 @@
     "deleteName": "Die Spalte „{title}“",
     "deleteNote": "Die Werte dieser Spalte gehen bei allen Tasks des Boards verloren.",
     "dragWidth": "Breite ziehen",
+    "hideOnCard": "Von der Kanban-Karte nehmen",
     "renameHint": "Doppelklick zum Umbenennen",
     "search": "Spalte suchen…",
+    "showOnCard": "Auf Kanban-Karte zeigen",
     "thisColumn": "Diese Spalte",
     "titleHint": "Titel später per Doppelklick auf den Spaltenkopf änderbar",
     "type": {
@@ -721,6 +723,7 @@
   "task": {
     "add": "+ Task hinzufügen",
     "addSubtask": "+ Subtask hinzufügen",
+    "checklistDone": "{done} von {total} erledigt",
     "convert": "Konvertieren",
     "convertPick": "Neuen übergeordneten Task wählen",
     "convertSearch": "Task suchen",

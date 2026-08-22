@@ -9,6 +9,7 @@ import {StatusPicker} from './status-picker'
 import {setDynamicModalObj, toggleModal, updateTaskAction} from '../../store/board.actions'
 import {boardService} from '../../services/board.service'
 import {singleLineEditable, isOnText} from '../../services/editable'
+import {ChecklistMark} from './checklist-mark'
 import {UpdatedPicker} from './updated-picker'
 import {CreatedPicker} from './created-picker'
 import {TagsPicker} from './tags-picker'
@@ -193,6 +194,10 @@ export function TaskPreview({
                     <div className="open-task-details " onClick={onOpenModal}>
                         <Icon name='up-right-and-down-left-from-center'/>
                     </div>
+                    {/* Before the bubble, not after: both say what is inside
+                        the task, and this is the one that says how far it has
+                        got. */}
+                    <ChecklistMark task={task} onOpen={onOpenModal}/>
                     <div onClick={onOpenModal} className="chat-icon">
                         {updateCount > 0 && <div>
                             <Icon name='comment' variant='fa-regular' className="comment-chat"/>

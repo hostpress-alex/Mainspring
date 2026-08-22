@@ -1,0 +1,134 @@
+@use "../setup/mixins";
+@use "../setup/variables";
+
+/**
+ * How much of a task's checklists is ticked, in the row.
+ *
+ * A ring that fills around its edge, with a tick in the middle — and
+ * deliberately NOT the filled circle from `cal-event-ring` and `due-dot`.
+ * That shape is spoken for twice and both times it means time: how much of an
+ * estimate has been worked, and how much of the run-up to a deadline is gone.
+ * A third one in the same row would be read as one of those before anybody
+ * thought about it.
+ *
+ * The tick is what makes the difference readable at fourteen pixels: it says
+ * which kind of progress this is before the ring says how much.
+ */
+.checklist-mark {
+    @include mixins.center-flex();
+    cursor: pointer;
+    flex: none;
+
+    svg {
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+
+    circle {
+        fill: none;
+        stroke-width: 1;
+    }
+
+    /* The unfilled part of the ring. Present at 0 % as well, so the mark has
+       the same outline whatever the count — a ring that appears out of nothing
+       at the first tick reads as an element being added, not as progress. */
+    .checklist-track {
+        stroke: variables.$field-border;
+    }
+
+    .checklist-fill {
+        stroke: variables.$color-done-green-hover;
+        // Round, so one item out of forty is a dot rather than a hairline.
+        stroke-linecap: round;
+        stroke-width: 2;
+    }
+
+    .checklist-tick {
+        fill: none;
+        stroke: variables.$workspace-icon-color;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.8;
+    }
+}
+
+/* Spacing belongs to the row, not to the mark: the Kanban title row is a flex
+   with a gap and needs nothing, the table row has no gap and the mark would
+   otherwise sit flush against the border of the comment compartment. */
+.task-preview .task-title .checklist-mark {
+    margin-inline-end: variables.$spacing-xs;
+}
+
+/* Finished is the one state worth its own colour. Everything before it is the
+   same grey at a different angle — a scale that changes hue while it fills
+   reads as several states rather than one. */
+.checklist-mark.is-complete {
+    .checklist-fill,
+    .checklist-tick {
+        stroke: variables.$color-done-green;
+    }
+}
+
+/* ------------------------------------------------------------- time -- */
+
+/**
+ * How much of the estimate has been worked.
+ *
+ * The FILLED circle, and here that is right: the board says "time" with this
+ * shape twice already — `cal-event-ring` for exactly this measurement and
+ * `due-dot` for the run-up to a deadline. The checklist ring above is stroked
+ * with a tick precisely so the two cannot be confused.
+ */
+.time-mark {
+    background-clip: content-box;
+    background-image: conic-gradient(currentColor var(--fill, 0%), transparent var(--fill, 0%));
+    background-origin: content-box;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    color: variables.$workspace-icon-color;
+    flex: none;
+    height: 12px;
+    width: 12px;
+
+    /* Over the estimate is the one thing worth a colour: it is the only state
+       the circle cannot show by how full it is, because it is already full. */
+    &.is-over {
+        color: variables.$danger-tint;
+    }
+}
+
+/* ---------------------------------------------------------- the faces -- */
+
+.card-members {
+    align-items: center;
+    display: inline-flex;
+    flex: none;
+    /* Overlapping, the way the board header stacks them: two faces side by
+       side take the width of a column the card does not have. */
+    margin-inline-start: variables.$spacing-xs;
+
+    .card-member {
+        border: 1.5px solid white;
+        border-radius: 50%;
+        height: 20px;
+        object-fit: cover;
+        width: 20px;
+
+        & + .card-member {
+            margin-inline-start: -6px;
+        }
+    }
+
+    .card-member-more {
+        align-items: center;
+        background-color: variables.$workspace-hover;
+        border-radius: 50%;
+        color: variables.$workspace-icon-color;
+        display: inline-flex;
+        font-size: 10px;
+        height: 20px;
+        justify-content: center;
+        margin-inline-start: -6px;
+        width: 20px;
+    }
+}

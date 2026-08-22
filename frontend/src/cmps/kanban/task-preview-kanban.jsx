@@ -5,6 +5,7 @@ import {updateTaskAction} from '../../store/board.actions'
 import {touchedBy} from '../../services/updated-by'
 import {DynamicCmp} from '../task/task-preview'
 import {filledColumns} from '../board/column-value'
+import {cardColumns} from '../../services/kanban-card'
 import * as boardRoles from '../../services/board-roles'
 
 /**
@@ -28,7 +29,13 @@ import * as boardRoles from '../../services/board-roles'
  */
 export function TaskPreviewKanban({task, group, board}){
     const user = useSelector(storeState => storeState.userModule.user)
-    const columns = filledColumns(board, task)
+    // Which columns the card shows is a choice per column now — see
+    // services/kanban-card.js. Still only the ones that hold something: a card
+    // is read at a glance in a stack of thirty, and an empty row answers
+    // nothing while costing the same height as a full one.
+    const chosen = cardColumns(board)
+    const columns = filledColumns(board, task).filter(column =>
+        chosen.some(other => other.id === column.id))
     // The same rule as in the table: a viewer reads the card and changes
     // nothing on it.
     const canWork = boardRoles.canEdit(board, user)
